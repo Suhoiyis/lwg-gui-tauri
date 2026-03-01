@@ -5,6 +5,13 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "opener:default"
+    "shell:allow-open",
+    "shell:default",
+    "opener:default",
+
+    {
+      "identifier": "fs:scope",
+      "allow": ["$HOME/**"]
+    }
   ]
 }
