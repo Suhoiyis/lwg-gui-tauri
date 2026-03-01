@@ -11,7 +11,7 @@ import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 
 // 2. Shadcn UI 组件
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -140,15 +140,23 @@ export function App() {
 
       <Separator orientation="vertical" className="h-6 mx-2" />
       
-      <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input 
+      <InputGroup className="relative flex-1 max-w-md">
+        <InputGroupAddon align="inline-start">
+          <Search className="w-4 h-4" />
+        </InputGroupAddon>
+        <InputGroupInput 
           placeholder="Search..." 
-          className="pl-10 bg-muted/20 border-none h-9"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-      </div>
+        {searchQuery && (
+          <InputGroupAddon align="inline-end">
+            <span className="text-xs">{filteredWallpapers.length} Results</span>
+          </InputGroupAddon>
+        )}
+
+
+      </InputGroup>
 
       <div className="flex-1" />
       
