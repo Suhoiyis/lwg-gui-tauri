@@ -24,8 +24,10 @@ import { Layout } from "./components/Layout";
 import { Settings } from "./pages/Settings";
 import { Performance } from "./pages/Performance";
 import { WallpaperContextMenu } from "./components/WallpaperContextMenu";
-import { MOCK_WALLPAPERS } from "./mock/wallpapers";
+
 import { Wallpaper } from "./types";
+
+import { scanWallpapers } from "./api/wallpaper";
 
 // 页面切换动画配置
 const pageVariants = {
@@ -47,9 +49,30 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    setWallpapers(MOCK_WALLPAPERS);
-    if (MOCK_WALLPAPERS.length > 0) setSelectedId(MOCK_WALLPAPERS[0].id);
+useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      
+      // 1. 调用我们在第一步里写的 API
+      const realData = await scanWallpapers();
+      
+      // 2. 打印到控制台，方便你调试
+      console.log("📱 前端收到的最终数据:", realData);
+
+      // 3. 设置数据
+      setWallpapers(realData);
+      
+      // 4. 如果有数据，默认选中第一个
+      if (realData.length > 0) {
+        setSelectedId(realData[0].id);
+      } else {
+        // 如果没数据，清空选中状态
+        setSelectedId(null); 
+      }
+      
+      setIsLoading(false);
+    };
+    loadData();
   }, []);
 
   const selectedWallpaper = useMemo(() => 
