@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Wallpaper } from '../mock/wallpapers';
+import { Wallpaper } from '../types';
 import { scanWallpapers } from '../api/wallpaper';
 
 interface AppState {
@@ -17,6 +17,7 @@ interface AppState {
   
   // 计算属性 (Getter)
   getFilteredWallpapers: () => Wallpaper[];
+  getSelectedWallpaper: () => Wallpaper | null;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -44,5 +45,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     return wallpapers.filter(w => 
       w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
     );
+  },
+
+  getSelectedWallpaper: () => {
+    const { wallpapers, selectedId } = get();
+    return wallpapers.find(w => w.id === selectedId) || null;
   }
 }));

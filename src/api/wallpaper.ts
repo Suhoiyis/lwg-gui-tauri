@@ -30,3 +30,14 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
     return [];
   }
 }
+
+export async function applyWallpaper(id: string): Promise<void> {
+  try {
+    console.log(`🚀 [API] 请求应用壁纸: ${id}`);
+    await invoke("apply_wallpaper", { id });
+    console.log("✅ [API] 应用成功");
+  } catch (error) {
+    console.error("❌ [API] 应用失败:", error);
+    throw error; // 抛出错误让 UI 知道
+  }
+}

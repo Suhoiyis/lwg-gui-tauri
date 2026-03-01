@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { 
-  Monitor, Search, Play, Image as ImageIcon, Video, Globe, 
-  Settings as SettingsIcon, Activity, RefreshCw, Square, 
-  Shuffle, Camera, ExternalLink, Pencil, ListFilter
+  Monitor, Search, Play, Image as ImageIcon, Video, 
+  Settings as SettingsIcon, Activity, Square, 
+  Shuffle, Camera
 } from "lucide-react";
 
 // 1. 动画与特效库
@@ -15,19 +15,16 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
-} from "@/components/ui/select";
 
-// 3. 项目自定义组件与 API
+// 3. 项目自定义组件
 import { Layout } from "./components/Layout";
 import { Settings } from "./pages/Settings";
 import { Performance } from "./pages/Performance";
-import { WallpaperContextMenu } from "./components/WallpaperContextMenu";
 
 import { Wallpaper } from "./types";
-
-import { scanWallpapers } from "./api/wallpaper";
+import { useAppStore } from "./store/appStore";
+import { applyWallpaper } from "./api/wallpaper";
+import { toast } from "sonner";
 
 // 页面切换动画配置
 const pageVariants = {
@@ -43,48 +40,42 @@ const pageTransition = {
 } as const;
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<string>("wallpapers"); // 控制页面切换
-  const [wallpapers, setWallpapers] = useState<Wallpaper[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  // Local UI state (not in store)
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Zustand store state and actions
+  const selectedId = useAppStore((state) => state.selectedId);
+  const searchQuery = useAppStore((state) => state.searchQuery);
+  const activeTab = useAppStore((state) => state.activeTab);
+  
+  const loadWallpapers = useAppStore((state) => state.loadWallpapers);
+  const setSelectedId = useAppStore((state) => state.setSelectedId);
+  const setSearchQuery = useAppStore((state) => state.setSearchQuery);
+  const setActiveTab = useAppStore((state) => state.setActiveTab);
+  const getFilteredWallpapers = useAppStore((state) => state.getFilteredWallpapers);
+  const getSelectedWallpaper = useAppStore((state) => state.getSelectedWallpaper);
 
-useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      
-      // 1. 调用我们在第一步里写的 API
-      const realData = await scanWallpapers();
-      
-      // 2. 打印到控制台，方便你调试
-      console.log("📱 前端收到的最终数据:", realData);
-
-      // 3. 设置数据
-      setWallpapers(realData);
-      
-      // 4. 如果有数据，默认选中第一个
-      if (realData.length > 0) {
-        setSelectedId(realData[0].id);
-      } else {
-        // 如果没数据，清空选中状态
-        setSelectedId(null); 
-      }
-      
-      setIsLoading(false);
-    };
-    loadData();
+  useEffect(() => {
+    setIsLoading(true);
+    loadWallpapers().finally(() => setIsLoading(false));
   }, []);
 
-  const selectedWallpaper = useMemo(() => 
-    wallpapers.find(w => w.id === selectedId), 
-    [wallpapers, selectedId]
-  );
+  const selectedWallpaper = getSelectedWallpaper();
+  const filteredWallpapers = getFilteredWallpapers();
 
-  const filteredWallpapers = useMemo(() => {
-    return wallpapers.filter(w => 
-      w.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [wallpapers, searchQuery]);
+  // --- Apply Wallpaper Handler ---
+  const handleApply = async () => {
+    if (!selectedWallpaper) return;
+    
+    try {
+      console.log("Applying:", selectedWallpaper.title);
+      await applyWallpaper(selectedWallpaper.id);
+      toast.success(`已应用: ${selectedWallpaper.title}`);
+    } catch (error) {
+      console.error(error);
+      toast.error("应用失败，请检查后台日志");
+    }
+  };
 
   // --- Navbar (包含切换按钮) ---
   const Navbar = (
@@ -155,8 +146,8 @@ useEffect(() => {
           <div className="space-y-3">
             <h1 className="text-xl font-bold leading-tight">{selectedWallpaper?.title}</h1>
             <div className="flex flex-wrap gap-2">
-              <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20">3314492008</Badge>
-              <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/20">321.6 MB</Badge>
+              <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20">{selectedWallpaper?.id || "ID"}</Badge>
+              <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/20">{selectedWallpaper?.size || "0 MB"}</Badge>
             </div>
           </div>
           <div className="space-y-2 border-t pt-4">
@@ -168,7 +159,10 @@ useEffect(() => {
         </div>
       </ScrollArea>
       <div className="p-6 border-t bg-background/50">
-        <Button className="w-full h-12 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg shadow-pink-500/20 gap-2">
+        <Button 
+          onClick={handleApply}
+          className="w-full h-12 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg shadow-pink-500/20 gap-2"
+        >
           <Play className="w-5 h-5 fill-current" /> Apply Wallpaper
         </Button>
       </div>
@@ -191,7 +185,7 @@ useEffect(() => {
                 <span className="text-pink-500 uppercase">Currently Using</span>
                 <span className="text-foreground truncate max-w-[300px]">{selectedWallpaper?.title}</span>
               </div>
-              <span className="text-xs font-mono text-muted-foreground/50">21 / 39</span>
+              <span className="text-xs font-mono text-muted-foreground/50">{filteredWallpapers.length} wallpapers</span>
             </div>
 
             <ScrollArea className="flex-1">
@@ -237,21 +231,23 @@ useEffect(() => {
 
 function WallpaperCard({ wp, isSelected, onSelect }: { wp: Wallpaper; isSelected: boolean; onSelect: () => void }) {
   return (
-    <CardContainer className="inter-var w-full">
-      <CardBody className={`
-        relative group/card bg-card border-border/50 w-full rounded-2xl p-2 border transition-all cursor-pointer
-        ${isSelected ? 'ring-2 ring-pink-500 ring-offset-4 ring-offset-background bg-muted/50' : 'hover:border-pink-500/50'}
-      `} onClick={onSelect}>
-        <CardItem translateZ="50" className="w-full aspect-square rounded-xl overflow-hidden relative">
-          <img src={wp.preview} className="h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-110" />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-3 pt-8">
-            <p className="text-[11px] font-bold text-white truncate">{wp.title}</p>
-          </div>
-          <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md p-1.5 rounded-lg border border-white/10">
-            {wp.type === 'Video' ? <Video className="w-3 h-3 text-pink-400" /> : <ImageIcon className="w-3 h-3 text-emerald-400" />}
-          </div>
-        </CardItem>
-      </CardBody>
-    </CardContainer>
+    <div onClick={onSelect} className="cursor-pointer">
+      <CardContainer className="inter-var w-full">
+        <CardBody className={`
+          relative group/card bg-card border-border/50 w-full rounded-2xl p-2 border transition-all
+          ${isSelected ? 'ring-2 ring-pink-500 ring-offset-4 ring-offset-background bg-muted/50' : 'hover:border-pink-500/50'}
+        `}>
+          <CardItem translateZ="50" className="w-full aspect-square rounded-xl overflow-hidden relative">
+            <img src={wp.preview} className="h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-110" />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-3 pt-8">
+              <p className="text-[11px] font-bold text-white truncate">{wp.title}</p>
+            </div>
+            <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md p-1.5 rounded-lg border border-white/10">
+              {wp.type === 'Video' ? <Video className="w-3 h-3 text-pink-400" /> : <ImageIcon className="w-3 h-3 text-emerald-400" />}
+            </div>
+          </CardItem>
+        </CardBody>
+      </CardContainer>
+    </div>
   );
 }
