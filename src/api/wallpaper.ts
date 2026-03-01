@@ -41,3 +41,14 @@ export async function applyWallpaper(id: string): Promise<void> {
     throw error; // 抛出错误让 UI 知道
   }
 }
+
+export async function stopWallpaper(): Promise<void> {
+  try {
+    console.log("🚀 [API] 请求停止壁纸...");
+    await invoke("stop_wallpaper");
+    console.log("✅ [API] 壁纸已停止");
+  } catch (error) {
+    console.error("❌ [API] 停止失败:", error);
+    throw error;
+  }
+}

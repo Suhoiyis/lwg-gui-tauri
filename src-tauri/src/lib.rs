@@ -124,10 +124,26 @@ async fn apply_wallpaper(
         println!("✅ [Rust] 壁纸应用成功！");
         Ok(())
     }
+}
+
+// 🔥 新增：停止壁纸命令
+#[tauri::command]
+async fn stop_wallpaper(state: State<'_, AppState>) -> Result<(), String> {
+    
+    #[cfg(target_os = "linux")]
+    {
+        println!("⏹️ [Rust] 正在停止壁纸...");
+        
+        let mut controller = state.controller.lock().await;
+        controller.stop().await;
+        
+        println!("✅ [Rust] 壁纸已停止！");
+        Ok(())
+    }
 
     #[cfg(not(target_os = "linux"))]
     {
-        println!("🪟 Windows 模拟应用: {}", id);
+        println!("🪟 Windows 模拟停止");
         Ok(())
     }
 }
@@ -169,7 +185,8 @@ pub fn run() {
         // --- 3. 注册命令 ---
         .invoke_handler(tauri::generate_handler![
             get_wallpapers, 
-            apply_wallpaper // 👈 别忘了注册这个新命令
+            apply_wallpaper,
+            stop_wallpaper
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
