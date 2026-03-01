@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+import { App } from "./App";
 import "./index.css";
 // 1. 引入 Provider
 import { ThemeProvider } from "./components/theme-provider";
