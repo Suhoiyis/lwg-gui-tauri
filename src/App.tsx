@@ -16,6 +16,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 // 3. 项目自定义组件
 import { Layout } from "./components/Layout";
 import { Settings } from "./pages/Settings";
@@ -111,32 +113,17 @@ export function App() {
   // --- Navbar (包含切换按钮) ---
   const Navbar = (
     <div className="flex w-full items-center gap-4 py-2">
-      <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border">
-        <Button
-          variant={activeTab === "wallpapers" ? "secondary" : "ghost"} 
-          size="sm" 
-          onClick={() => setActiveTab("wallpapers")}
-          className="gap-2 h-8"
-        >
+      <TabsList className="bg-muted/40 border border-border h-auto p-1">
+        <TabsTrigger value="wallpapers" className="gap-2 h-8 data-[state=active]:bg-secondary">
           <ImageIcon className="w-4 h-4" /> Library
-        </Button>
-        <Button 
-          variant={activeTab === "settings" ? "secondary" : "ghost"} 
-          size="sm" 
-          onClick={() => setActiveTab("settings")}
-          className="gap-2 h-8"
-        >
+        </TabsTrigger>
+        <TabsTrigger value="settings" className="gap-2 h-8 data-[state=active]:bg-secondary">
           <SettingsIcon className="w-4 h-4" /> Settings
-        </Button>
-        <Button 
-          variant={activeTab === "performance" ? "secondary" : "ghost"} 
-          size="sm" 
-          onClick={() => setActiveTab("performance")}
-          className="gap-2 h-8"
-        >
+        </TabsTrigger>
+        <TabsTrigger value="performance" className="gap-2 h-8 data-[state=active]:bg-secondary">
           <Activity className="w-4 h-4" /> Monitor
-        </Button>
-      </div>
+        </TabsTrigger>
+      </TabsList>
 
       <Separator orientation="vertical" className="h-6 mx-2" />
       
@@ -154,8 +141,6 @@ export function App() {
             <span className="text-xs">{filteredWallpapers.length} Results</span>
           </InputGroupAddon>
         )}
-
-
       </InputGroup>
 
       <div className="flex-1" />
@@ -221,62 +206,64 @@ export function App() {
   );
 
   return (
-    <Layout navbar={Navbar} sidebar={activeTab === "wallpapers" ? WallpaperSidebar : null}>
-      <AnimatePresence mode="wait"> {/* 关键：处理切换动画 */}
-        {activeTab === "wallpapers" && (
-          <motion.div 
-            key="wallpapers" 
-            initial="initial" animate="in" exit="out" 
-            variants={pageVariants} transition={pageTransition} 
-            className="h-full flex flex-col p-6 space-y-6"
-          >
-            {/* 状态工具栏 */}
-            <div className="flex items-center justify-between bg-muted/20 px-4 py-2 rounded-xl border border-border/50">
-              <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest">
-                <span className="text-pink-500 uppercase">Currently Using</span>
-                <span className="text-foreground truncate max-w-[300px]">{selectedWallpaper?.title}</span>
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Layout navbar={Navbar} sidebar={activeTab === "wallpapers" ? WallpaperSidebar : null}>
+        <AnimatePresence mode="wait"> {/* 关键：处理切换动画 */}
+          {activeTab === "wallpapers" && (
+            <motion.div 
+              key="wallpapers" 
+              initial="initial" animate="in" exit="out" 
+              variants={pageVariants} transition={pageTransition} 
+              className="h-full flex flex-col p-6 space-y-6"
+            >
+              {/* 状态工具栏 */}
+              <div className="flex items-center justify-between bg-muted/20 px-4 py-2 rounded-xl border border-border/50">
+                <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest">
+                  <span className="text-pink-500 uppercase">Currently Using</span>
+                  <span className="text-foreground truncate max-w-[300px]">{selectedWallpaper?.title}</span>
+                </div>
+                <span className="text-xs font-mono text-muted-foreground/50">{filteredWallpapers.length} wallpapers</span>
               </div>
-              <span className="text-xs font-mono text-muted-foreground/50">{filteredWallpapers.length} wallpapers</span>
-            </div>
 
-            <ScrollArea className="flex-1">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 pb-10">
-                {filteredWallpapers.map((wp) => (
-                   <WallpaperCard 
-                     key={wp.id} 
-                     wp={wp} 
-                     isSelected={selectedId === wp.id} 
-                     onSelect={() => setSelectedId(wp.id)} 
-                   />
-                ))}
-              </div>
-            </ScrollArea>
-          </motion.div>
-        )}
+              <ScrollArea className="flex-1">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 pb-10">
+                  {filteredWallpapers.map((wp) => (
+                     <WallpaperCard 
+                       key={wp.id} 
+                       wp={wp} 
+                       isSelected={selectedId === wp.id} 
+                       onSelect={() => setSelectedId(wp.id)} 
+                     />
+                  ))}
+                </div>
+              </ScrollArea>
+            </motion.div>
+          )}
 
-        {activeTab === "settings" && (
-          <motion.div 
-            key="settings" 
-            initial="initial" animate="in" exit="out" 
-            variants={pageVariants} transition={pageTransition} 
-            className="h-full"
-          >
-            <Settings />
-          </motion.div>
-        )}
+          {activeTab === "settings" && (
+            <motion.div 
+              key="settings" 
+              initial="initial" animate="in" exit="out" 
+              variants={pageVariants} transition={pageTransition} 
+              className="h-full"
+            >
+              <Settings />
+            </motion.div>
+          )}
 
-        {activeTab === "performance" && (
-          <motion.div 
-            key="performance" 
-            initial="initial" animate="in" exit="out" 
-            variants={pageVariants} transition={pageTransition} 
-            className="h-full"
-          >
-            <Performance />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Layout>
+          {activeTab === "performance" && (
+            <motion.div 
+              key="performance" 
+              initial="initial" animate="in" exit="out" 
+              variants={pageVariants} transition={pageTransition} 
+              className="h-full"
+            >
+              <Performance />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Layout>
+    </Tabs>
   );
 }
 
