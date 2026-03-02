@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { 
-  PlayCircle, Monitor, Settings2, FileText, 
-  Volume2, MousePointer2, Clock, Zap, 
+import {
+  PlayCircle, Monitor, Settings2, FileText,
+  Volume2, MousePointer2, Clock, Zap,
   FolderOpen, Shield, Power, Moon, Sun,
-  RotateCw, Copy, Trash2, Download, RefreshCw, 
-  Speaker, Activity, AlertCircle, Link, 
+  RotateCw, Copy, Trash2, Download, RefreshCw,
+  Speaker, Activity, AlertCircle, Link,
   Camera, EyeOff, FileImage, CheckCircle2,
-  Check, Filter,  XCircle
+  Check, Filter,  XCircle, Save, Square
 } from "lucide-react";
 
 import { LogEntry } from "@/types";
@@ -20,13 +20,18 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/components/theme-provider";
-import { 
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+
+
+import { toast } from "sonner";
+import { stopWallpaper } from "@/api/wallpaper";
 
 // 定义 4 大黄金分组
 type SettingsTab = "playback" | "display" | "system" | "logs";
@@ -34,45 +39,83 @@ type SettingsTab = "playback" | "display" | "system" | "logs";
 export function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("playback");
 
+  // --- 全局操作处理 (占位逻辑) ---
+  const handleSave = () => {
+    // 未来这里会调用 Store 的 saveSettings
+    toast.success("Settings saved successfully");
+  };
+
+  const handleReload = () => {
+    // 未来这里调用 restart_wallpapers
+    toast.info("Reloading wallpapers...");
+  };
+
+  const handleStop = async () => {
+    try {
+      await stopWallpaper();
+      toast.success("Wallpaper stopped");
+    } catch (e) {
+      toast.error("Failed to stop wallpaper");
+    }
+  };
+
   return (
     <div className="flex h-full w-full bg-background text-foreground rounded-xl overflow-hidden border">
-      
+
       {/* 1. 左侧导航栏 - 黄金分组 */}
       <aside className="w-64 border-r bg-muted/30 flex flex-col">
+        {/* 标题 */}
         <div className="p-6">
           <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <Settings2 className="w-6 h-6" /> Settings
           </h2>
         </div>
-        <div className="px-3 space-y-1">
-          <NavButton 
-            active={activeTab === "playback"} 
+
+        {/* 导航按钮 (添加 flex-1 让它占据剩余空间，把底部按钮顶下去) */}
+        <div className="px-3 space-y-1 flex-1">
+          <NavButton
+            active={activeTab === "playback"}
             onClick={() => setActiveTab("playback")}
             icon={<PlayCircle className="w-4 h-4" />}
             label="Playback & Perf"
             desc="FPS, Cycling, Interaction"
           />
-          <NavButton 
-            active={activeTab === "display"} 
+          <NavButton
+            active={activeTab === "display"}
             onClick={() => setActiveTab("display")}
             icon={<Monitor className="w-4 h-4" />}
             label="Audio & Display"
             desc="Monitor, Theme, Volume"
           />
-          <NavButton 
-            active={activeTab === "system"} 
+          <NavButton
+            active={activeTab === "system"}
             onClick={() => setActiveTab("system")}
             icon={<Zap className="w-4 h-4" />}
             label="System & Tools"
             desc="Paths, Root, Autostart"
           />
-          <NavButton 
-            active={activeTab === "logs"} 
+          <NavButton
+            active={activeTab === "logs"}
             onClick={() => setActiveTab("logs")}
             icon={<FileText className="w-4 h-4" />}
             label="Log Monitor"
             desc="Debug & Filters"
           />
+        </div>
+
+        {/* 👇 新增：底部全局操作栏 (Global Actions) */}
+        <div className="p-4 border-t bg-background/50 space-y-3 backdrop-blur-sm">
+          <Button className="w-full gap-2 font-bold shadow-lg shadow-primary/20" onClick={handleSave}>
+            <Save className="w-4 h-4" /> Save Changes
+          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleReload}>
+              <RotateCw className="w-3 h-3" /> Reload
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2 text-red-500 hover:text-red-600 hover:bg-red-500/10" onClick={handleStop}>
+              <Square className="w-3 h-3 fill-current" /> Stop
+            </Button>
+          </div>
         </div>
       </aside>
 
@@ -99,11 +142,11 @@ function PlaybackSettings() {
 
   return (
     <div className="space-y-6">
-      <Header 
-        title="Playback & Performance" 
-        desc="Fine-tune rendering quality, automation, and system integration." 
+      <Header
+        title="Playback & Performance"
+        desc="Fine-tune rendering quality, automation, and system integration."
       />
-      
+
       {/* 1. 渲染与质量 (Rendering Quality) */}
       <Card>
         <CardHeader>
