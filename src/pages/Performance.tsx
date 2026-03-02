@@ -1,5 +1,5 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Cpu, HardDrive, Activity, Smartphone } from "lucide-react";
+import { Cpu, MemoryStick, Activity, Smartphone } from "lucide-react";
 
 // Mock Data generation
 const generateData = () => Array.from({ length: 30 }, (_, i) => ({
@@ -19,7 +19,7 @@ export function Performance() {
         {/* 1. 顶部数据卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard title="Total CPU" value="12.5%" sub="4 Cores Active" icon={<Cpu className="text-primary" />} />
-          <StatCard title="Memory Usage" value="807.1 MB" sub="of 32 GB" icon={<HardDrive className="text-blue-400" />} />
+          <StatCard title="Memory Usage" value="807.1 MB" sub="of 32 GB" icon={<MemoryStick className="text-blue-400" />} />
           <StatCard title="Active Threads" value="31" sub="Across 3 processes" icon={<Activity className="text-green-400" />} />
         </div>
 
