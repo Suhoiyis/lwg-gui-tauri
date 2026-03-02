@@ -5,7 +5,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAppStore } from "@/store/appStore";
 import { applyWallpaper } from "@/api/wallpaper";
 import { toast } from "sonner";
+import { convertFileSrc } from "@tauri-apps/api/core";
 
+/**
+ * 将本地文件路径转换为浏览器可加载的 URL
+ */
+function getPreviewUrl(preview: string): string {
+  if (preview.startsWith('http://') || preview.startsWith('https://')) {
+    return preview;
+  }
+  return convertFileSrc(preview);
+}
 export function WallpaperSidebar() {
   const selectedWallpaper = useAppStore((state) => state.getSelectedWallpaper());
 
@@ -30,7 +40,15 @@ export function WallpaperSidebar() {
         {selectedWallpaper ? (
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
             <div className="aspect-[4/5] rounded-2xl overflow-hidden border border-border shadow-2xl">
-              <img src={selectedWallpaper.preview} className="w-full h-full object-cover" alt={selectedWallpaper.title} />
+              <img 
+                src={getPreviewUrl(selectedWallpaper.preview)} 
+                className="w-full h-full object-cover" 
+                alt={selectedWallpaper.title}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
+                }}
+              />
             </div>
             <div className="space-y-3">
               <h1 className="text-xl font-bold leading-tight">{selectedWallpaper.title}</h1>
