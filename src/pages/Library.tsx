@@ -1,15 +1,30 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty";
-import { WallpaperCard } from "@/components/WallpaperCard"; // 修正引用路径
+import { WallpaperCard } from "@/components/WallpaperCard";
 import { useAppStore } from "@/store/appStore";
+import { useMemo, useCallback } from "react";
 
 export function Library() {
-  const getFilteredWallpapers = useAppStore((state) => state.getFilteredWallpapers);
-  const filteredWallpapers = getFilteredWallpapers();
-  
+  const wallpapers = useAppStore((state) => state.wallpapers);
+  const searchQuery = useAppStore((state) => state.searchQuery);
   const selectedId = useAppStore((state) => state.selectedId);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
-  const selectedWallpaper = useAppStore((state) => state.getSelectedWallpaper());
+  
+  const filteredWallpapers = useMemo(() => {
+    if (!searchQuery) return wallpapers;
+    const lowerQ = searchQuery.toLowerCase();
+    return wallpapers.filter(w => 
+      w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
+    );
+  }, [wallpapers, searchQuery]);
+  
+  const selectedWallpaper = useMemo(() => {
+    return wallpapers.find(w => w.id === selectedId) || null;
+  }, [wallpapers, selectedId]);
+  
+  const handleSelect = useCallback((id: string) => {
+    setSelectedId(id);
+  }, [setSelectedId]);
 
   return (
     <div className="h-full flex flex-col p-6 space-y-6">
@@ -32,13 +47,13 @@ export function Library() {
             <EmptyState />
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 pb-10">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
             {filteredWallpapers.map((wp) => (
               <WallpaperCard 
                 key={wp.id} 
                 wp={wp} 
                 isSelected={selectedId === wp.id} 
-                onSelect={() => setSelectedId(wp.id)} 
+                onSelect={() => handleSelect(wp.id)} 
               />
             ))}
           </div>

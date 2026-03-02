@@ -39,10 +39,11 @@ export function WallpaperSidebar() {
       <ScrollArea className="flex-1 p-6">
         {selectedWallpaper ? (
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-            <div className="aspect-[4/5] rounded-2xl overflow-hidden border border-border shadow-2xl">
+            {/* 图片容器 - 正方形，短边裁剪 */}
+            <div className="aspect-square relative overflow-hidden border border-border shadow-2xl rounded-2xl bg-muted">
               <img 
                 src={getPreviewUrl(selectedWallpaper.preview)} 
-                className="w-full h-full object-cover" 
+                className="absolute inset-0 w-full h-full object-cover" 
                 alt={selectedWallpaper.title}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
