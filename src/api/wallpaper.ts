@@ -34,6 +34,11 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
     console.log("🚀 [Prod] 请求真实壁纸数据...");
     const data = await invoke<any[]>("get_wallpapers");
     
+    // 调试：打印第一个壁纸的 preview 路径
+    if (data.length > 0) {
+      console.log("📷 [Debug] 第一张壁纸 preview 路径:", data[0].preview);
+    }
+    
     return data.map((item) => ({
       id: item.id,
       title: item.title,
