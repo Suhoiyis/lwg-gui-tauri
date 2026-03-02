@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/sonner"; // 确保 Toast 正常工作
 
 // 项目自定义组件
 import { Layout } from "./components/Layout";
-import { AppNavbar } from "./components/Appnavbar";
+import { AppNavbar } from "./components/AppnavBar";
 import { WallpaperSidebar } from "./components/WallpaperSidebar";
 
 // 页面组件
