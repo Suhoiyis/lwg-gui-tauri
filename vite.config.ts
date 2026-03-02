@@ -22,7 +22,7 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
-    host: host || false,
+    host: true,
     hmr: host
       ? {
           protocol: "ws",
@@ -33,6 +33,7 @@ export default defineConfig(async () => ({
     watch: {
       // 3. tell Vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
+      usePolling: true,
     },
   },
 }));
