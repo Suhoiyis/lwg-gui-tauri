@@ -1,31 +1,46 @@
 import { create } from 'zustand';
-import { Wallpaper } from '../types';
+import { invoke } from '@tauri-apps/api/tauri';
+import { Wallpaper, AppConfig } from '../types';
 import { scanWallpapers } from '../api/wallpaper';
 
 interface AppState {
-  // 数据
+  // Wallpaper data
   wallpapers: Wallpaper[];
   selectedId: string | null;
   searchQuery: string;
   activeTab: "wallpapers" | "settings" | "performance";
   
-  // 动作
+  // Settings data
+  settings: AppConfig | null;
+  settingsLoading: boolean;
+  
+  // Wallpaper actions
   loadWallpapers: () => Promise<void>;
   setSelectedId: (id: string | null) => void;
   setSearchQuery: (query: string) => void;
-  setActiveTab: (tab: any) => void;
+  setActiveTab: (tab: "wallpapers" | "settings" | "performance") => void;
   
-  // 计算属性 (Getter)
+  // Settings actions
+  fetchSettings: () => Promise<void>;
+  updateSetting: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => void;
+  saveSettings: () => Promise<void>;
+  restartWallpapers: () => Promise<void>;
+  
+  // Computed properties (Getter)
   getFilteredWallpapers: () => Wallpaper[];
   getSelectedWallpaper: () => Wallpaper | null;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
+  // Initial state
   wallpapers: [],
   selectedId: null,
   searchQuery: "",
   activeTab: "wallpapers",
+  settings: null,
+  settingsLoading: false,
 
+  // Wallpaper actions
   loadWallpapers: async () => {
     const data = await scanWallpapers();
     set({ wallpapers: data });
@@ -37,6 +52,48 @@ export const useAppStore = create<AppState>((set, get) => ({
   setSelectedId: (id) => set({ selectedId: id }),
   setSearchQuery: (q) => set({ searchQuery: q }),
   setActiveTab: (tab) => set({ activeTab: tab }),
+
+  // Settings actions
+  fetchSettings: async () => {
+    set({ settingsLoading: true });
+    try {
+      const settings = await invoke<AppConfig>('get_settings');
+      set({ settings, settingsLoading: false });
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+      set({ settingsLoading: false });
+      throw error;
+    }
+  },
+
+  updateSetting: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
+    const currentSettings = get().settings;
+    if (currentSettings) {
+      set({ settings: { ...currentSettings, [key]: value } });
+    }
+  },
+
+  saveSettings: async () => {
+    const settings = get().settings;
+    if (!settings) {
+      throw new Error('No settings to save');
+    }
+    try {
+      await invoke('save_settings', { config: settings });
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      throw error;
+    }
+  },
+
+  restartWallpapers: async () => {
+    try {
+      await invoke('restart_wallpapers');
+    } catch (error) {
+      console.error('Failed to restart wallpapers:', error);
+      throw error;
+    }
+  },
 
   getFilteredWallpapers: () => {
     const { wallpapers, searchQuery } = get();
