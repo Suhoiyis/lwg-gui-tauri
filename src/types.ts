@@ -12,8 +12,9 @@ export interface Wallpaper {
 export interface AppConfig {
   // --- 1. Playback & Performance ---
   fps: number;
-  scaling: "default" | "stretch" | "fit" | "fill";
-  clamping: "clamp" | "border" | "repeat";
+  scaling: string;
+  clamping: string;
+
   
   noFullscreenPause: boolean;
   disableMouse: boolean;
@@ -27,14 +28,14 @@ export interface AppConfig {
   noAudioProcessing: boolean;
   
   // --- 3. Monitor & Display ---
-  lastScreen?: string;
+  lastScreen?: string | null;
   lastWallpaper?: string;
   activeMonitors: Record<string, string>;
   
   // --- 4. Automation (Cycling) ---
   cycleEnabled: boolean;
   cycleInterval: number;
-  cycleOrder: "random" | "title" | "size" | "size_desc" | "type" | "id";
+  cycleOrder: string;
 
   // --- 5. Wayland Tweaks ---
   waylandOnlyActive: boolean;
