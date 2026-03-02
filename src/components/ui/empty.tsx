@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority"
+import { Ghost } from "lucide-react";
 
 import { cn } from "@/lib/utils"
 
@@ -101,4 +102,20 @@ export {
   EmptyDescription,
   EmptyContent,
   EmptyMedia,
+}
+
+export function EmptyState() {
+  return (
+    <Empty>
+      <EmptyMedia>
+        <Ghost className="size-12 text-muted-foreground/50" />
+      </EmptyMedia>
+      <EmptyHeader>
+        <EmptyTitle>No Wallpapers Found</EmptyTitle>
+        <EmptyDescription>
+          Try a correct library path or add some new wallpapers.
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  )
 }

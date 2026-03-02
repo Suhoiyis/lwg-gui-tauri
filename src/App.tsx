@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EmptyState } from "@/components/ui/empty";
 
 // 3. 项目自定义组件
 import { Layout } from "./components/Layout";
@@ -226,16 +227,25 @@ export function App() {
               </div>
 
               <ScrollArea className="flex-1">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 pb-10">
-                  {filteredWallpapers.map((wp) => (
-                     <WallpaperCard 
-                       key={wp.id} 
-                       wp={wp} 
-                       isSelected={selectedId === wp.id} 
-                       onSelect={() => setSelectedId(wp.id)} 
-                     />
-                  ))}
-                </div>
+                {/* 👇👇👇 核心修改开始 👇👇👇 */}
+                {filteredWallpapers.length === 0 ? (
+                  // 情况 A: 没壁纸，显示空状态
+                  <div className="flex h-full min-h-[50vh] items-center justify-center">
+                    <EmptyState />
+                  </div>
+                ) : (
+                  // 情况 B: 有壁纸，显示网格
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 pb-10">
+                    {filteredWallpapers.map((wp) => (
+                       <WallpaperCard 
+                         key={wp.id} 
+                         wp={wp} 
+                         isSelected={selectedId === wp.id} 
+                         onSelect={() => setSelectedId(wp.id)} 
+                       />
+                    ))}
+                  </div>
+                )}
               </ScrollArea>
             </motion.div>
           )}
