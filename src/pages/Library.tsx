@@ -103,8 +103,11 @@ export function Library() {
                 <ContextMenu key={wp.id}>
                   {/* 触发区域：原来的卡片 */}
                   <ContextMenuTrigger asChild>
-                    {/* 加个 div 包装，防止样式冲突，确保右键区域覆盖整个卡片 */}
-                    <div className="w-full h-full relative cursor-context-menu">
+                    {/* ✨ onDoubleClick ， select-none */}
+                    <div
+                      className="w-full h-full relative cursor-context-menu select-none"
+                      onDoubleClick={() => handleApply(wp.id, wp.title)}
+                    >
                       <WallpaperCard
                         wp={wp}
                         isSelected={selectedId === wp.id}
