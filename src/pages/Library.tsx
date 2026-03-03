@@ -63,7 +63,7 @@ export function Library() {
       </div>
 
       {/* 1. 侧边栏：只在 md 尺寸以上显示 */}
-      <aside className="w-64 border-r bg-muted/30 h-full hidden md:block flex-shrink-0">
+      <aside className="w-64 border-l bg-muted/30 h-full hidden md:block flex-shrink-0">
         <WallpaperSidebar />
       </aside>
 
