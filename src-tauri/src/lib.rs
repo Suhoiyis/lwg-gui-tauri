@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
-use tauri::State;
+use tauri::{Emitter, State};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::sync::Mutex;
 
 
@@ -12,7 +13,21 @@ use lwg_core::{
     controller::WallpaperController, 
     config::AppConfig as LwgAppConfig,
     wallpaper::WallpaperManager,
+    PerformanceMonitor,
+    ScreenshotRecord,
 };
+
+// Non-Linux: provide local ScreenshotRecord definition
+#[cfg(not(target_os = "linux"))]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScreenshotRecord {
+    pub timestamp: u64,
+    pub wp_id: String,
+    pub output_path: String,
+    pub duration: f32,
+    pub max_cpu: f32,
+    pub max_mem: f32,
+}
 
 // ================= 数据结构 =================
 
@@ -176,6 +191,11 @@ struct AppState {
     
     #[cfg(target_os = "linux")]
     config_manager: Mutex<LwgConfigManager>,
+    
+    #[cfg(target_os = "linux")]
+    performance_monitor: Arc<std::sync::Mutex<PerformanceMonitor>>,
+    
+    monitor_running: Arc<AtomicBool>,
     
     #[cfg(not(target_os = "linux"))]
     _dummy: bool,
@@ -519,6 +539,95 @@ async fn get_autostart_status() -> Result<bool, String> {
     }
 }
 
+// ================= Performance Monitoring Commands =================
+
+#[tauri::command]
+async fn start_performance_monitor(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
+    // Check if already running
+    if state.monitor_running.load(Ordering::SeqCst) {
+        return Ok(());
+    }
+    
+    state.monitor_running.store(true, Ordering::SeqCst);
+    let running = state.monitor_running.clone();
+    
+    #[cfg(target_os = "linux")]
+    let monitor = state.performance_monitor.clone();
+    
+    // Spawn background thread for periodic stats emission
+    std::thread::spawn(move || {
+        while running.load(Ordering::SeqCst) {
+            #[cfg(target_os = "linux")]
+            {
+                if let Ok(monitor) = monitor.lock() {
+                    let stats = monitor.get_stats();
+                    let _ = app.emit("performance-update", &stats);
+                }
+            }
+            
+            #[cfg(not(target_os = "linux"))]
+            {
+                // Emit empty stats on non-Linux platforms
+                let _ = app.emit("performance-update", serde_json::json!({
+                    "total_cpu": 0.0,
+                    "total_memory_mb": 0.0,
+                    "total_threads": 0,
+                    "processes": {},
+                    "timestamp": 0
+                }));
+            }
+            
+            std::thread::sleep(std::time::Duration::from_secs(1));
+        }
+    });
+    
+    println!("✅ [Rust] Performance monitor started");
+    Ok(())
+}
+
+#[tauri::command]
+async fn stop_performance_monitor(
+    state: State<'_, AppState>,
+) -> Result<(), String> {
+    state.monitor_running.store(false, Ordering::SeqCst);
+    println!("✅ [Rust] Performance monitor stopped");
+    Ok(())
+}
+
+#[tauri::command]
+async fn get_screenshot_history(
+    _state: State<'_, AppState>,
+) -> Result<Vec<ScreenshotRecord>, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let monitor = _state.performance_monitor.lock()
+            .map_err(|e| format!("Lock error: {}", e))?;
+        Ok(monitor.get_screenshot_history())
+    }
+    
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(Vec::new())
+    }
+}
+
+#[tauri::command]
+async fn clear_screenshot_history(
+    _state: State<'_, AppState>,
+) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut monitor = _state.performance_monitor.lock()
+            .map_err(|e| format!("Lock error: {}", e))?;
+        monitor.clear_screenshot_history();
+    }
+    
+    Ok(())
+}
+
 // ================= 主入口 =================
 
 pub fn run() {
@@ -528,17 +637,24 @@ pub fn run() {
         println!("🐧 [Linux] 初始化应用状态...");
         let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
-        let controller = WallpaperController::new(shared_config);
+        let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
+        let mut controller = WallpaperController::new(shared_config);
+        controller.set_performance_monitor(performance_monitor.clone());
         AppState { 
             controller: Mutex::new(controller),
             config_manager: Mutex::new(config_manager),
+            performance_monitor,
+            monitor_running: Arc::new(AtomicBool::new(false)),
         }
     };
 
     #[cfg(not(target_os = "linux"))]
     let app_state = {
         println!("🪟 [Windows Mock] 初始化 Mock 应用状态...");
-        AppState { _dummy: true }
+        AppState {
+            _dummy: true,
+            monitor_running: Arc::new(AtomicBool::new(false)),
+        }
     };
 
     tauri::Builder::default()
@@ -553,7 +669,12 @@ pub fn run() {
             restart_wallpapers,
             // System integration commands
             set_autostart,
-            get_autostart_status
+            get_autostart_status,
+            // Performance monitoring commands
+            start_performance_monitor,
+            stop_performance_monitor,
+            get_screenshot_history,
+            clear_screenshot_history
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
