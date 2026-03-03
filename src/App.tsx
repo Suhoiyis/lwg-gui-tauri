@@ -3,12 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // Shadcn UI 组件
 import { Tabs } from "@/components/ui/tabs";
-import { Toaster } from "@/components/ui/sonner"; // 确保 Toast 正常工作
+import { Toaster } from "@/components/ui/sonner";
 
 // 项目自定义组件
 import { Layout } from "./components/Layout";
 import { AppNavbar } from "./components/AppnavBar";
-import { WallpaperSidebar } from "./components/WallpaperSidebar";
 
 // 页面组件
 import { Library } from "./pages/Library";
@@ -17,7 +16,6 @@ import { Performance } from "./pages/Performance";
 
 import { useAppStore } from "./store/appStore";
 
-// 页面切换动画配置
 const pageVariants = {
   initial: { opacity: 0, y: 10, scale: 0.99 },
   in: { opacity: 1, y: 0, scale: 1 },
@@ -31,10 +29,8 @@ const pageTransition = {
 } as const;
 
 export function App() {
-  // Local UI state
   const [isLoading, setIsLoading] = useState(false);
   
-  // Zustand store state and actions
   const activeTab = useAppStore((state) => state.activeTab);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
@@ -49,8 +45,7 @@ export function App() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <Layout 
           navbar={<AppNavbar />} 
-          // 只有在 Library (wallpapers) 标签页时才显示侧边栏
-          sidebar={activeTab === "wallpapers" ? <WallpaperSidebar /> : null}
+          sidebar={null}
         >
           <AnimatePresence mode="wait">
             {activeTab === "wallpapers" && (
@@ -88,7 +83,6 @@ export function App() {
           </AnimatePresence>
         </Layout>
       </Tabs>
-      {/* 确保 Sonner Toaster 位于最顶层，否则 Settings 页面的 toast 无法显示 */}
       <Toaster />
     </>
   );
