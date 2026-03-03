@@ -68,8 +68,27 @@ export function AppNavbar() {
 
   return (
     <div className="flex w-full items-center gap-4 py-2 px-4 drag-region select-none">
-      {/* 1. Left: Tabs */}
-      <div className="no-drag">
+      {/* 1. Left: Compact Toggle & Tabs */}
+      <div className="no-drag flex items-center gap-2">
+        {/* ✨ Compact Mode */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-primary hover:bg-primary/10"
+                onClick={() => toggleCompactMode(true)}
+              >
+                <Minimize2 className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Compact Mode</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
         <TabsList className="bg-muted/40 border border-border h-auto p-1">
           <TabsTrigger
             value="wallpapers"
@@ -137,7 +156,7 @@ export function AppNavbar() {
             </TooltipContent>
           </Tooltip>
 
-          {/* SHUFFLE Button (已恢复) */}
+          {/* SHUFFLE Button */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -154,7 +173,7 @@ export function AppNavbar() {
             </TooltipContent>
           </Tooltip>
 
-          {/* SCREENSHOT Button (已恢复) */}
+          {/* SCREENSHOT Button */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -166,24 +185,8 @@ export function AppNavbar() {
             </TooltipContent>
           </Tooltip>
 
+          {/* Separator (Compact Mode 移走后保留分隔符) */}
           <Separator orientation="vertical" className="h-4 mx-1" />
-
-          {/* Compact Mode */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-primary hover:bg-primary/10"
-                onClick={() => toggleCompactMode(true)}
-              >
-                <Minimize2 className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Compact Mode</p>
-            </TooltipContent>
-          </Tooltip>
 
           {/* Hamburger Menu */}
           <AppMenu />
