@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ArrowLeft,
   Maximize2,
@@ -24,41 +24,71 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import { useAppStore } from "@/store/appStore";
 import { WallpaperCard } from "@/components/library/WallpaperCard";
 export function CompactMode() {
   const { wallpapers, selectedId, setSelectedId, toggleCompactMode } =
     useAppStore();
 
-  const [jumpIndex, setJumpIndex] = useState("");
   const [isCopied, setIsCopied] = useState(false);
+  const [api, setApi] = useState<CarouselApi>();
 
-  // 获取当前选中的壁纸对象
+  // 1. 获取当前壁纸数据
   const currentWallpaper = useMemo(
     () => wallpapers.find((w) => w.id === selectedId) || wallpapers[0],
     [wallpapers, selectedId],
   );
 
-  // 获取当前壁纸的索引
   const currentIndex = useMemo(
     () => wallpapers.findIndex((w) => w.id === selectedId) + 1,
     [wallpapers, selectedId],
   );
 
-  // 上一张/下一张逻辑
+  // --- 核心修复：双向同步逻辑 ---
+  useEffect(() => {
+    if (!api) return;
+
+    // A. 监听 Carousel 滚动结束事件 (select)
+    const onSelect = () => {
+      const snapIndex = api.selectedScrollSnap();
+      const targetWp = wallpapers[snapIndex];
+
+      if (targetWp && targetWp.id !== selectedId) {
+        setSelectedId(targetWp.id);
+      }
+    };
+
+    api.on("select", onSelect);
+
+    // B. 当外部 selectedId 变化时，同步 Carousel
+    const index = wallpapers.findIndex((w) => w.id === selectedId);
+    if (index !== -1 && api.selectedScrollSnap() !== index) {
+      setTimeout(() => api.scrollTo(index), 20);
+    }
+
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api, selectedId, wallpapers, setSelectedId]);
+
+  // 2. 导航逻辑
   const handleNavigate = (direction: -1 | 1) => {
     const currentIdx = wallpapers.findIndex((w) => w.id === selectedId);
     if (currentIdx === -1) return;
-
     let newIdx = currentIdx + direction;
-    // 循环播放
     if (newIdx < 0) newIdx = wallpapers.length - 1;
     if (newIdx >= wallpapers.length) newIdx = 0;
-
     setSelectedId(wallpapers[newIdx].id);
   };
 
-  // 随机壁纸
   const handleLucky = () => {
     const randomIdx = Math.floor(Math.random() * wallpapers.length);
     setSelectedId(wallpapers[randomIdx].id);
@@ -66,20 +96,18 @@ export function CompactMode() {
 
   return (
     <div className="flex flex-col h-full bg-background text-foreground select-none">
-      {/* 1. 顶部导航栏 (Navbar) */}
+      {/* Navbar */}
       <div className="flex items-center justify-between p-2 border-b bg-muted/20 drag-region">
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 no-drag"
           onClick={() => toggleCompactMode(false)}
         >
           <Maximize2 className="h-4 w-4" />
         </Button>
-
-        {/* 屏幕选择器 (简化版) */}
         <Select defaultValue="all">
-          <SelectTrigger className="h-7 w-[110px] text-xs">
+          <SelectTrigger className="h-7 w-[110px] text-xs border-none bg-transparent shadow-none focus:ring-0 no-drag">
             <SelectValue placeholder="Screen" />
           </SelectTrigger>
           <SelectContent>
@@ -87,35 +115,31 @@ export function CompactMode() {
             <SelectItem value="1">Display 1</SelectItem>
           </SelectContent>
         </Select>
-
         <div className="no-drag">
           <AppMenu />
         </div>
       </div>
 
-      {/* 2. 主内容滚动区 */}
+      {/* Main Content */}
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4 flex flex-col items-center">
-          {/* 预览图区域 */}
+          {/* Preview Image */}
           <div className="w-[200px] h-[200px] bg-muted rounded-lg shadow-sm border overflow-hidden relative group">
             {currentWallpaper?.preview ? (
               <img
                 src={convertFileSrc(currentWallpaper.preview)}
-                alt="Preview"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                 No Preview
               </div>
             )}
-
-            {/* 悬浮控制层 */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <Button
                 size="icon"
                 variant="secondary"
-                className="rounded-full h-10 w-10"
+                className="rounded-full shadow-lg"
                 onClick={handleLucky}
               >
                 <Shuffle className="h-4 w-4" />
@@ -123,13 +147,11 @@ export function CompactMode() {
             </div>
           </div>
 
-          {/* 标题与信息 */}
+          {/* Title & Info */}
           <div className="w-full text-center space-y-1">
             <h3 className="font-bold text-lg leading-tight line-clamp-2 px-4">
-              {currentWallpaper?.title || "Select Wallpaper"}
+              {currentWallpaper?.title}
             </h3>
-
-            {/* ID Copy Chip */}
             <div
               className="inline-flex items-center gap-1 text-[10px] bg-muted px-2 py-0.5 rounded-full text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors"
               onClick={() => {
@@ -138,7 +160,7 @@ export function CompactMode() {
                 setTimeout(() => setIsCopied(false), 1500);
               }}
             >
-              <span>{currentWallpaper?.id || "---"}</span>
+              <span>{currentWallpaper?.id}</span>
               {isCopied ? (
                 <Check className="h-3 w-3 text-green-500" />
               ) : (
@@ -147,7 +169,7 @@ export function CompactMode() {
             </div>
           </div>
 
-          {/* 跳转控制 */}
+          {/* Controls */}
           <div className="flex items-center gap-2 w-full px-4 justify-center">
             <Button
               variant="outline"
@@ -157,11 +179,9 @@ export function CompactMode() {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-
-            <div className="flex items-center gap-1 bg-muted rounded-md px-2 h-8">
+            <div className="flex items-center gap-1 bg-muted rounded-md px-2 h-8 font-mono">
               <Input
                 className="h-6 w-10 p-0 text-center border-none bg-transparent focus-visible:ring-0 text-xs"
-                placeholder="#"
                 value={currentIndex || "-"}
                 readOnly
               />
@@ -169,7 +189,6 @@ export function CompactMode() {
                 / {wallpapers.length}
               </span>
             </div>
-
             <Button
               variant="outline"
               size="icon"
@@ -180,89 +199,75 @@ export function CompactMode() {
             </Button>
           </div>
 
-          {/* 操作大按钮 */}
           <Button
             className="w-full font-bold shadow-lg shadow-primary/20"
             size="lg"
           >
             Apply Wallpaper
           </Button>
-
           <Separator />
 
-          {/* Tags */}
           <div className="w-full space-y-2">
             <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Tags
             </div>
             <div className="flex flex-wrap gap-1.5">
-              <Badge
-                variant="secondary"
-                className="text-[10px] px-1.5 h-5 font-normal"
-              >
-                Anime
-              </Badge>
-              <Badge
-                variant="secondary"
-                className="text-[10px] px-1.5 h-5 font-normal"
-              >
-                Cyberpunk
-              </Badge>
-              <Badge
-                variant="secondary"
-                className="text-[10px] px-1.5 h-5 font-normal"
-              >
-                4K
-              </Badge>
+              {currentWallpaper?.tags?.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="text-[10px] px-1.5 h-5 font-normal"
+                >
+                  {tag}
+                </Badge>
+              ))}
             </div>
           </div>
 
-          {/* Type Info */}
           <div className="w-full flex justify-between text-xs px-1">
             <span className="text-muted-foreground">Type</span>
-            <span className="font-mono">Video (mp4)</span>
+            <span className="font-mono">{currentWallpaper?.type}</span>
           </div>
         </div>
       </ScrollArea>
 
-      {/* 3. 底部缩略图导航 (Thumb Grid) */}
-      <div className="p-2 border-t bg-muted/10">
-        <div className="flex justify-center gap-2">
-          {/* 显示当前壁纸及其前后的缩略图 (这里简单模拟5个) */}
-          {[-2, -1, 0, 1, 2].map((offset) => {
-            const idx =
-              (currentIndex - 1 + offset + wallpapers.length) %
-              wallpapers.length;
-            const wp = wallpapers[idx];
-            const isActive = offset === 0;
+      {/* 3. Bottom Carousel (Fixed) */}
+      <div className="p-2 border-t bg-muted/10 relative">
+        <Carousel
+          setApi={setApi}
+          opts={{ align: "center", loop: true }}
+          className="w-full max-w-full"
+        >
+          <CarouselContent className="-ml-1">
+            {/* ✨ 修复点 1：这里增加了 index 参数 */}
+            {wallpapers.map((wp, index) => (
+              <CarouselItem key={wp.id} className="pl-1 basis-1/5 select-none">
+                <div
+                  className={`aspect-square rounded-md overflow-hidden cursor-pointer transition-all border-2 ${selectedId === wp.id ? "border-primary shadow-md scale-95" : "border-transparent opacity-60 hover:opacity-100"}`}
+                  // ✨ 修复点 2：把点击事件加回来了
+                  // 点击时命令 Carousel 滚到这一张，随后会自动触发 onSelect 更新壁纸
+                  onClick={() => api?.scrollTo(index)}
+                >
+                  {wp.preview ? (
+                    <img
+                      src={convertFileSrc(wp.preview)}
+                      className="w-full h-full object-cover"
+                      draggable={false}
+                    />
+                  ) : (
+                    <div className="bg-muted w-full h-full" />
+                  )}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
 
-            if (!wp) return null; // 防止数据未加载
-
-            return (
-              <div
-                key={offset}
-                onClick={() => setSelectedId(wp.id)}
-                className={`
-                     w-10 h-10 rounded-md overflow-hidden cursor-pointer transition-all border-2
-                     ${isActive ? "border-primary scale-110 shadow-md" : "border-transparent opacity-60 hover:opacity-100"}
-                   `}
-              >
-                {wp.preview ? (
-                  <img
-                    src={convertFileSrc(wp.preview)}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted" />
-                )}
-              </div>
-            );
-          })}
-        </div>
+          <CarouselPrevious className="left-1 h-6 w-6 opacity-70 hover:opacity-100" />
+          <CarouselNext className="right-1 h-6 w-6 opacity-70 hover:opacity-100" />
+        </Carousel>
       </div>
     </div>
   );
 }
 
-// 辅助函数：处理文件路径（Mock一下，防止报错）
 const convertFileSrc = (path: string) => path;
