@@ -29,6 +29,9 @@ interface AppState {
   // Computed properties (Getter)
   getFilteredWallpapers: () => Wallpaper[];
   getSelectedWallpaper: () => Wallpaper | null;
+
+  isCompactMode: boolean;
+  toggleCompactMode: (enabled: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -99,7 +102,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { wallpapers, searchQuery } = get();
     if (!searchQuery) return wallpapers;
     const lowerQ = searchQuery.toLowerCase();
-    return wallpapers.filter(w => 
+    return wallpapers.filter(w =>
       w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
     );
   },
@@ -107,5 +110,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   getSelectedWallpaper: () => {
     const { wallpapers, selectedId } = get();
     return wallpapers.find(w => w.id === selectedId) || null;
-  }
+  },
+
+  isCompactMode: false,
+  toggleCompactMode: (enabled) => set({ isCompactMode: enabled }),
 }));
