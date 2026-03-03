@@ -25,34 +25,33 @@ import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/store/appStore";
 import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
 import { toast } from "sonner";
+import { AppMenu } from "@/components/AppMenu";
 
 export function AppNavbar() {
   const searchQuery = useAppStore((state) => state.searchQuery);
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
-  const toggleCompactMode = useAppStore((state) => state.toggleCompactMode); // ✨ 新增
+  const toggleCompactMode = useAppStore((state) => state.toggleCompactMode);
 
   const getFilteredWallpapers = useAppStore(
     (state) => state.getFilteredWallpapers,
   );
   const setSelectedId = useAppStore((state) => state.setSelectedId);
-
   const filteredWallpapers = getFilteredWallpapers();
 
-  // --- Stop Wallpaper Handler ---
+  // --- Actions ---
   const handleStop = async () => {
     try {
       await stopWallpaper();
-      toast.success("壁纸已停止");
+      toast.success("Wallpaper stopped");
     } catch (error) {
       console.error(error);
-      toast.error("停止失败");
+      toast.error("Failed to stop");
     }
   };
 
-  // --- Shuffle Wallpaper Handler ---
   const handleShuffle = async () => {
     if (filteredWallpapers.length === 0) {
-      toast.error("没有可用的壁纸");
+      toast.error("No wallpapers available");
       return;
     }
     const randomIndex = Math.floor(Math.random() * filteredWallpapers.length);
@@ -60,16 +59,16 @@ export function AppNavbar() {
     try {
       await applyWallpaper(randomWallpaper.id);
       setSelectedId(randomWallpaper.id);
-      toast.success(`随机应用: ${randomWallpaper.title}`);
+      toast.success(`Applied: ${randomWallpaper.title}`);
     } catch (error) {
       console.error(error);
-      toast.error("随机应用失败");
+      toast.error("Failed to apply");
     }
   };
 
   return (
-    <div className="flex w-full items-center gap-4 py-2 px-4 drag-region">
-      {/* 1. 左侧：导航标签页 */}
+    <div className="flex w-full items-center gap-4 py-2 px-4 drag-region select-none">
+      {/* 1. Left: Tabs */}
       <div className="no-drag">
         <TabsList className="bg-muted/40 border border-border h-auto p-1">
           <TabsTrigger
@@ -95,7 +94,7 @@ export function AppNavbar() {
 
       <Separator orientation="vertical" className="h-6 mx-2" />
 
-      {/* 2. 中间：搜索框 */}
+      {/* 2. Middle: Search */}
       <div className="no-drag flex-1 max-w-md">
         <InputGroup className="relative w-full">
           <InputGroupAddon align="inline-start">
@@ -118,9 +117,10 @@ export function AppNavbar() {
 
       <div className="flex-1" />
 
-      {/* 3. 右侧：快速操作区 */}
+      {/* 3. Right: Quick Actions */}
       <TooltipProvider>
         <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border no-drag">
+          {/* STOP Button */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -137,6 +137,7 @@ export function AppNavbar() {
             </TooltipContent>
           </Tooltip>
 
+          {/* SHUFFLE Button (已恢复) */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -153,6 +154,7 @@ export function AppNavbar() {
             </TooltipContent>
           </Tooltip>
 
+          {/* SCREENSHOT Button (已恢复) */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -166,7 +168,7 @@ export function AppNavbar() {
 
           <Separator orientation="vertical" className="h-4 mx-1" />
 
-          {/* Compact Mode 切换按钮 */}
+          {/* Compact Mode */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -182,6 +184,9 @@ export function AppNavbar() {
               <p>Compact Mode</p>
             </TooltipContent>
           </Tooltip>
+
+          {/* Hamburger Menu */}
+          <AppMenu />
         </div>
       </TooltipProvider>
     </div>

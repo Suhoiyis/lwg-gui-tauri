@@ -11,6 +11,7 @@ import {
   Check,
   Monitor,
 } from "lucide-react";
+import { AppMenu } from "@/components/AppMenu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -87,9 +88,9 @@ export function CompactMode() {
           </SelectContent>
         </Select>
 
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <RotateCw className="h-4 w-4" />
-        </Button>
+        <div className="no-drag">
+          <AppMenu />
+        </div>
       </div>
 
       {/* 2. 主内容滚动区 */}
@@ -242,7 +243,7 @@ export function CompactMode() {
                 key={offset}
                 onClick={() => setSelectedId(wp.id)}
                 className={`
-                     w-10 h-10 rounded-md overflow-hidden cursor-pointer transition-all border-2 
+                     w-10 h-10 rounded-md overflow-hidden cursor-pointer transition-all border-2
                      ${isActive ? "border-primary scale-110 shadow-md" : "border-transparent opacity-60 hover:opacity-100"}
                    `}
               >
