@@ -6,6 +6,7 @@ import {
   RotateCcw,
   LogOut,
   History,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,9 +29,16 @@ export function AppMenu() {
     toast.info("Refreshing library...");
   };
 
-  const handleHistory = () => toast.info("History Panel (Coming soon)"); // ✨ 新增
+  const handleHistory = () => toast.info("History Panel (Coming soon)");
   const handleGetStarted = () =>
     toast.info("Show Welcome Screen (Coming soon)");
+
+  const handleCheckUpdate = () => {
+    toast.info("Checking for updates...", {
+      description: "You are on the latest version (v0.1.0)",
+    });
+  };
+
   const handleAbout = () =>
     toast.info("LWG GUI v0.1.0\nCreated with Tauri & React");
   const handleRestart = () => toast.warning("Restarting app... (Mock)");
@@ -64,6 +72,10 @@ export function AppMenu() {
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
+
+        <DropdownMenuItem onClick={handleCheckUpdate}>
+          <Download className="mr-2 h-4 w-4" /> Check for Update
+        </DropdownMenuItem>
 
         <DropdownMenuItem onClick={handleAbout}>
           <Info className="mr-2 h-4 w-4" /> About
