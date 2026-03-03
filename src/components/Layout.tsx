@@ -18,7 +18,6 @@ export function Layout({ navbar, sidebar, children }: LayoutProps) {
 
       {/* 下方主体区域 */}
       <div className="flex flex-1 overflow-hidden min-w-0">
-        
         {/* 左侧主内容：修复核心 - 移除了 flex flex-col 和 h-full */}
         <main className="flex-1 overflow-y-auto p-4 min-w-0 scrollbar-thin relative">
           {children}

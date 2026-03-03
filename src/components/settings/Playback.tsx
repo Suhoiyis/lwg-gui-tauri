@@ -1,6 +1,12 @@
 import { Zap, MousePointer2, Clock } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 // 引入公共组件
@@ -32,7 +38,9 @@ export function PlaybackSettings() {
           <CardTitle className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-orange-500" /> Rendering Quality
           </CardTitle>
-          <CardDescription>Optimize for battery life or visual fidelity.</CardDescription>
+          <CardDescription>
+            Optimize for battery life or visual fidelity.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <SliderRow
@@ -63,7 +71,9 @@ export function PlaybackSettings() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Display Behavior</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Display Behavior</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SelectField
@@ -114,7 +124,9 @@ export function PlaybackSettings() {
               <InputField
                 label="Cycle Interval (minutes)"
                 value={settings.cycleInterval}
-                onChange={(v) => updateSetting("cycleInterval", parseInt(v) || 15)}
+                onChange={(v) =>
+                  updateSetting("cycleInterval", parseInt(v) || 15)
+                }
                 type="number"
                 min={1}
               />
@@ -133,7 +145,10 @@ export function PlaybackSettings() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Wayland Tweaks</span>
-            <Badge variant="outline" className="text-xs font-normal border-blue-500/30 text-blue-500">
+            <Badge
+              variant="outline"
+              className="text-xs font-normal border-blue-500/30 text-blue-500"
+            >
               Wayland
             </Badge>
           </CardTitle>

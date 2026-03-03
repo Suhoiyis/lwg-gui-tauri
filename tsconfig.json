@@ -20,8 +20,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": ".",                // 👈 添加这行
-    "paths": {                     // 👈 添加这块
+    "baseUrl": ".", // 👈 添加这行
+    "paths": {
+      // 👈 添加这块
       "@/*": ["./src/*"]
     }
   },

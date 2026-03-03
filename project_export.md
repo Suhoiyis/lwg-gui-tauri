@@ -2,6 +2,7 @@
 
 **生成时间**: 2026-03-03 12:31:22
 **根目录**: `C:\Users\i26248\Documents\lwg-gui-tauri`
+
 ---
 
 ## 📂 项目结构图
@@ -171,7 +172,6 @@ This template should help get you started developing with Tauri, React and Types
 ## Recommended IDE Setup
 
 - [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
-
 ```
 
 ---
@@ -204,14 +204,13 @@ This template should help get you started developing with Tauri, React and Types
     "@aceternity": "https://ui.aceternity.com/registry/{name}.json"
   }
 }
-
 ```
 
 ---
 
 ### 📄 文件: `folder.py`
 
-```python
+````python
 import os
 from pathlib import Path
 from datetime import datetime
@@ -221,17 +220,17 @@ from datetime import datetime
 # 1. 忽略的文件夹名称 (目录)
 # 注意：docs 已被移除，现在会被正常抓取
 IGNORE_DIRS = {
-    '.git', 
-    '.github', 
-    '.sisyphus', 
+    '.git',
+    '.github',
+    '.sisyphus',
     'target',        # Rust 构建目录
-    '__pycache__', 
-    'node_modules', 
-    'venv', 
+    '__pycache__',
+    'node_modules',
+    'venv',
     'env',
-    '.vscode',       
-    '.idea',         
-    'dist',          
+    '.vscode',
+    '.idea',
+    'dist',
     'build'
 }
 
@@ -241,7 +240,7 @@ IGNORE_FILES_ALWAYS = {
     '.gitignore',
     'LICENSE',
     'PKGBUILD',
-    'Makefile'      
+    'Makefile'
 }
 
 # 3. Markdown 文件白名单 (只有这些 .md 文件会被保留)
@@ -272,40 +271,40 @@ def generate_ascii_tree(start_path, prefix=""):
         # 排除输出文件和脚本本身
         if e in [OUTPUT_FILENAME, SCRIPT_FILENAME]:
             continue
-        
+
         full_path = os.path.join(start_path, e)
         is_dir = os.path.isdir(full_path)
         is_file = os.path.isfile(full_path)
-        
+
         # 1. 排除 IGNORE_DIRS 中的文件夹
         if is_dir and e in IGNORE_DIRS:
             continue
-            
+
         # 2. 排除 ALWAYS_IGNORE 中的特定文件
         if is_file and e in IGNORE_FILES_ALWAYS:
             continue
-            
+
         # 3. 特殊逻辑：如果是 .md 文件，检查是否在白名单中
         if is_file and e.lower().endswith('.md'):
             if e not in MD_WHITELIST:
                 continue # 不在白名单的 .md 文件直接跳过（不显示在树中）
-            
+
         filtered_entries.append(e)
 
     for i, entry in enumerate(filtered_entries):
         full_path = os.path.join(start_path, entry)
         is_last = (i == len(filtered_entries) - 1)
-        
+
         connector = "└── " if is_last else "├── "
         tree_str += f"{prefix}{connector}{entry}"
-        
+
         if os.path.isdir(full_path):
             tree_str += "/\n"
             extension = "    " if is_last else "│   "
             tree_str += generate_ascii_tree(full_path, prefix + extension)
         else:
             tree_str += "\n"
-            
+
     return tree_str
 
 def should_ignore_file(file_path):
@@ -313,21 +312,21 @@ def should_ignore_file(file_path):
     综合判断文件是否应该被忽略
     """
     filename = file_path.name
-    
+
     # 1. 检查路径中是否包含忽略的文件夹
     for part in file_path.parts:
         if part in IGNORE_DIRS:
             return True
-    
+
     # 2. 检查是否在永久忽略列表中
     if filename in IGNORE_FILES_ALWAYS:
         return True
-        
+
     # 3. 特殊逻辑：Markdown 文件白名单检查
     if filename.lower().endswith('.md'):
         if filename not in MD_WHITELIST:
             return True # 不在白名单的 .md 文件忽略
-            
+
     return False
 
 def get_file_content(file_path):
@@ -354,21 +353,21 @@ def get_file_content(file_path):
 
 def main():
     root_dir = Path('.')
-    
+
     print(f"🚀 开始扫描 Rust 项目: {root_dir.absolute()}")
     print(f"🚫 忽略的文件夹: {', '.join(sorted(IGNORE_DIRS))}")
     print(f"🚫 忽略的文件: {', '.join(sorted(IGNORE_FILES_ALWAYS))}")
     print(f"✅ 保留的 Markdown 文件 (白名单): {', '.join(sorted(MD_WHITELIST))}")
     print(f"⚠️  其他所有 .md 文件将被忽略")
-    
+
     md_content = []
-    
+
     # 1. 生成标题
     md_content.append("# 项目结构与文件内容导出 (Rust Project)\n\n")
     md_content.append(f"**生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     md_content.append(f"**根目录**: `{root_dir.absolute()}`\n")
     md_content.append("---\n\n")
-    
+
     # 2. 生成 ASCII 树形图
     md_content.append("## 📂 项目结构图\n\n")
     md_content.append("```text\n")
@@ -377,39 +376,39 @@ def main():
     md_content.append(tree_art)
     md_content.append("```\n\n")
     md_content.append("---\n\n")
-    
+
     # 3. 递归抓取文件内容
     md_content.append("## 📄 文件详细内容\n\n")
-    
+
     files_to_process = []
-    
+
     print("🔍 正在遍历文件...")
     for f in root_dir.rglob('*'):
         if not f.is_file():
             continue
-            
+
         if f.name in [OUTPUT_FILENAME, SCRIPT_FILENAME]:
             continue
-            
+
         if should_ignore_file(f):
             continue
-            
+
         files_to_process.append(f)
-    
+
     files_to_process.sort(key=lambda x: str(x))
-    
+
     print(f"✅ 找到 {len(files_to_process)} 个有效文件，开始写入内容...")
-    
+
     for idx, file_path in enumerate(files_to_process):
         rel_path = file_path.relative_to(root_dir)
-        
+
         if (idx + 1) % 50 == 0:
             print(f"   处理中: {idx + 1}/{len(files_to_process)} ...")
-        
+
         md_content.append(f"### 📄 文件: `{rel_path}`\n\n")
-        
+
         content = get_file_content(str(file_path))
-        
+
         suffix = file_path.suffix.lower()
         lang_map = {
             '.rs': 'rust',
@@ -432,8 +431,8 @@ def main():
             '.cfg': 'ini',
             '.env': 'bash',
         }
-        lang = lang_map.get(suffix, '') 
-        
+        lang = lang_map.get(suffix, '')
+
         md_content.append(f"```{lang}\n{content}\n```\n\n")
         md_content.append("---\n\n")
 
@@ -449,7 +448,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
+````
 
 ---
 
@@ -470,7 +469,6 @@ if __name__ == "__main__":
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
 ```
 
 ---
@@ -851,15 +849,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.27.3.tgz",
       "integrity": "sha512-9fJMTNFTWZMh5qwrBItuziu834eOCUcEqymSH7pY+zoMVEZg3gcPuBNxH1EvfVYe9h0x/Ptw8KBzv7qxb7l8dg==",
-      "cpu": [
-        "ppc64"
-      ],
+      "cpu": ["ppc64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "aix"
-      ],
+      "os": ["aix"],
       "engines": {
         "node": ">=18"
       }
@@ -868,15 +862,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.27.3.tgz",
       "integrity": "sha512-i5D1hPY7GIQmXlXhs2w8AWHhenb00+GxjxRncS2ZM7YNVGNfaMxgzSGuO8o8SJzRc/oZwU2bcScvVERk03QhzA==",
-      "cpu": [
-        "arm"
-      ],
+      "cpu": ["arm"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "android"
-      ],
+      "os": ["android"],
       "engines": {
         "node": ">=18"
       }
@@ -885,15 +875,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.27.3.tgz",
       "integrity": "sha512-YdghPYUmj/FX2SYKJ0OZxf+iaKgMsKHVPF1MAq/P8WirnSpCStzKJFjOjzsW0QQ7oIAiccHdcqjbHmJxRb/dmg==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "android"
-      ],
+      "os": ["android"],
       "engines": {
         "node": ">=18"
       }
@@ -902,15 +888,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.27.3.tgz",
       "integrity": "sha512-IN/0BNTkHtk8lkOM8JWAYFg4ORxBkZQf9zXiEOfERX/CzxW3Vg1ewAhU7QSWQpVIzTW+b8Xy+lGzdYXV6UZObQ==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "android"
-      ],
+      "os": ["android"],
       "engines": {
         "node": ">=18"
       }
@@ -919,15 +901,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.27.3.tgz",
       "integrity": "sha512-Re491k7ByTVRy0t3EKWajdLIr0gz2kKKfzafkth4Q8A5n1xTHrkqZgLLjFEHVD+AXdUGgQMq+Godfq45mGpCKg==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "darwin"
-      ],
+      "os": ["darwin"],
       "engines": {
         "node": ">=18"
       }
@@ -936,15 +914,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.27.3.tgz",
       "integrity": "sha512-vHk/hA7/1AckjGzRqi6wbo+jaShzRowYip6rt6q7VYEDX4LEy1pZfDpdxCBnGtl+A5zq8iXDcyuxwtv3hNtHFg==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "darwin"
-      ],
+      "os": ["darwin"],
       "engines": {
         "node": ">=18"
       }
@@ -953,15 +927,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.27.3.tgz",
       "integrity": "sha512-ipTYM2fjt3kQAYOvo6vcxJx3nBYAzPjgTCk7QEgZG8AUO3ydUhvelmhrbOheMnGOlaSFUoHXB6un+A7q4ygY9w==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "freebsd"
-      ],
+      "os": ["freebsd"],
       "engines": {
         "node": ">=18"
       }
@@ -970,15 +940,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.27.3.tgz",
       "integrity": "sha512-dDk0X87T7mI6U3K9VjWtHOXqwAMJBNN2r7bejDsc+j03SEjtD9HrOl8gVFByeM0aJksoUuUVU9TBaZa2rgj0oA==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "freebsd"
-      ],
+      "os": ["freebsd"],
       "engines": {
         "node": ">=18"
       }
@@ -987,15 +953,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.27.3.tgz",
       "integrity": "sha512-s6nPv2QkSupJwLYyfS+gwdirm0ukyTFNl3KTgZEAiJDd+iHZcbTPPcWCcRYH+WlNbwChgH2QkE9NSlNrMT8Gfw==",
-      "cpu": [
-        "arm"
-      ],
+      "cpu": ["arm"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1004,15 +966,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.27.3.tgz",
       "integrity": "sha512-sZOuFz/xWnZ4KH3YfFrKCf1WyPZHakVzTiqji3WDc0BCl2kBwiJLCXpzLzUBLgmp4veFZdvN5ChW4Eq/8Fc2Fg==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1021,15 +979,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.27.3.tgz",
       "integrity": "sha512-yGlQYjdxtLdh0a3jHjuwOrxQjOZYD/C9PfdbgJJF3TIZWnm/tMd/RcNiLngiu4iwcBAOezdnSLAwQDPqTmtTYg==",
-      "cpu": [
-        "ia32"
-      ],
+      "cpu": ["ia32"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1038,15 +992,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.27.3.tgz",
       "integrity": "sha512-WO60Sn8ly3gtzhyjATDgieJNet/KqsDlX5nRC5Y3oTFcS1l0KWba+SEa9Ja1GfDqSF1z6hif/SkpQJbL63cgOA==",
-      "cpu": [
-        "loong64"
-      ],
+      "cpu": ["loong64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1055,15 +1005,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.27.3.tgz",
       "integrity": "sha512-APsymYA6sGcZ4pD6k+UxbDjOFSvPWyZhjaiPyl/f79xKxwTnrn5QUnXR5prvetuaSMsb4jgeHewIDCIWljrSxw==",
-      "cpu": [
-        "mips64el"
-      ],
+      "cpu": ["mips64el"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1072,15 +1018,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.27.3.tgz",
       "integrity": "sha512-eizBnTeBefojtDb9nSh4vvVQ3V9Qf9Df01PfawPcRzJH4gFSgrObw+LveUyDoKU3kxi5+9RJTCWlj4FjYXVPEA==",
-      "cpu": [
-        "ppc64"
-      ],
+      "cpu": ["ppc64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1089,15 +1031,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.27.3.tgz",
       "integrity": "sha512-3Emwh0r5wmfm3ssTWRQSyVhbOHvqegUDRd0WhmXKX2mkHJe1SFCMJhagUleMq+Uci34wLSipf8Lagt4LlpRFWQ==",
-      "cpu": [
-        "riscv64"
-      ],
+      "cpu": ["riscv64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1106,15 +1044,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.27.3.tgz",
       "integrity": "sha512-pBHUx9LzXWBc7MFIEEL0yD/ZVtNgLytvx60gES28GcWMqil8ElCYR4kvbV2BDqsHOvVDRrOxGySBM9Fcv744hw==",
-      "cpu": [
-        "s390x"
-      ],
+      "cpu": ["s390x"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1123,15 +1057,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.27.3.tgz",
       "integrity": "sha512-Czi8yzXUWIQYAtL/2y6vogER8pvcsOsk5cpwL4Gk5nJqH5UZiVByIY8Eorm5R13gq+DQKYg0+JyQoytLQas4dA==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">=18"
       }
@@ -1140,15 +1070,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.27.3.tgz",
       "integrity": "sha512-sDpk0RgmTCR/5HguIZa9n9u+HVKf40fbEUt+iTzSnCaGvY9kFP0YKBWZtJaraonFnqef5SlJ8/TiPAxzyS+UoA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "netbsd"
-      ],
+      "os": ["netbsd"],
       "engines": {
         "node": ">=18"
       }
@@ -1157,15 +1083,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.27.3.tgz",
       "integrity": "sha512-P14lFKJl/DdaE00LItAukUdZO5iqNH7+PjoBm+fLQjtxfcfFE20Xf5CrLsmZdq5LFFZzb5JMZ9grUwvtVYzjiA==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "netbsd"
-      ],
+      "os": ["netbsd"],
       "engines": {
         "node": ">=18"
       }
@@ -1174,15 +1096,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.27.3.tgz",
       "integrity": "sha512-AIcMP77AvirGbRl/UZFTq5hjXK+2wC7qFRGoHSDrZ5v5b8DK/GYpXW3CPRL53NkvDqb9D+alBiC/dV0Fb7eJcw==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "openbsd"
-      ],
+      "os": ["openbsd"],
       "engines": {
         "node": ">=18"
       }
@@ -1191,15 +1109,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.27.3.tgz",
       "integrity": "sha512-DnW2sRrBzA+YnE70LKqnM3P+z8vehfJWHXECbwBmH/CU51z6FiqTQTHFenPlHmo3a8UgpLyH3PT+87OViOh1AQ==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "openbsd"
-      ],
+      "os": ["openbsd"],
       "engines": {
         "node": ">=18"
       }
@@ -1208,15 +1122,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.27.3.tgz",
       "integrity": "sha512-NinAEgr/etERPTsZJ7aEZQvvg/A6IsZG/LgZy+81wON2huV7SrK3e63dU0XhyZP4RKGyTm7aOgmQk0bGp0fy2g==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "openharmony"
-      ],
+      "os": ["openharmony"],
       "engines": {
         "node": ">=18"
       }
@@ -1225,15 +1135,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.27.3.tgz",
       "integrity": "sha512-PanZ+nEz+eWoBJ8/f8HKxTTD172SKwdXebZ0ndd953gt1HRBbhMsaNqjTyYLGLPdoWHy4zLU7bDVJztF5f3BHA==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "sunos"
-      ],
+      "os": ["sunos"],
       "engines": {
         "node": ">=18"
       }
@@ -1242,15 +1148,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.27.3.tgz",
       "integrity": "sha512-B2t59lWWYrbRDw/tjiWOuzSsFh1Y/E95ofKz7rIVYSQkUYBjfSgf6oeYPNWHToFRr2zx52JKApIcAS/D5TUBnA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ],
+      "os": ["win32"],
       "engines": {
         "node": ">=18"
       }
@@ -1259,15 +1161,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.27.3.tgz",
       "integrity": "sha512-QLKSFeXNS8+tHW7tZpMtjlNb7HKau0QDpwm49u0vUp9y1WOF+PEzkU84y9GqYaAVW8aH8f3GcBck26jh54cX4Q==",
-      "cpu": [
-        "ia32"
-      ],
+      "cpu": ["ia32"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ],
+      "os": ["win32"],
       "engines": {
         "node": ">=18"
       }
@@ -1276,15 +1174,11 @@ if __name__ == "__main__":
       "version": "0.27.3",
       "resolved": "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.3.tgz",
       "integrity": "sha512-4uJGhsxuptu3OcpVAzli+/gWusVGwZZHTlS63hh++ehExkVT8SgiEf7/uC/PclrPPkLhZqGgCTjd0VWLo6xMqA==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ],
+      "os": ["win32"],
       "engines": {
         "node": ">=18"
       }
@@ -2745,351 +2639,251 @@ if __name__ == "__main__":
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.59.0.tgz",
       "integrity": "sha512-upnNBkA6ZH2VKGcBj9Fyl9IGNPULcjXRlg0LLeaioQWueH30p6IXtJEbKAgvyv+mJaMxSm1l6xwDXYjpEMiLMg==",
-      "cpu": [
-        "arm"
-      ],
+      "cpu": ["arm"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "android"
-      ]
+      "os": ["android"]
     },
     "node_modules/@rollup/rollup-android-arm64": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-android-arm64/-/rollup-android-arm64-4.59.0.tgz",
       "integrity": "sha512-hZ+Zxj3SySm4A/DylsDKZAeVg0mvi++0PYVceVyX7hemkw7OreKdCvW2oQ3T1FMZvCaQXqOTHb8qmBShoqk69Q==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "android"
-      ]
+      "os": ["android"]
     },
     "node_modules/@rollup/rollup-darwin-arm64": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-darwin-arm64/-/rollup-darwin-arm64-4.59.0.tgz",
       "integrity": "sha512-W2Psnbh1J8ZJw0xKAd8zdNgF9HRLkdWwwdWqubSVk0pUuQkoHnv7rx4GiF9rT4t5DIZGAsConRE3AxCdJ4m8rg==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "darwin"
-      ]
+      "os": ["darwin"]
     },
     "node_modules/@rollup/rollup-darwin-x64": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-darwin-x64/-/rollup-darwin-x64-4.59.0.tgz",
       "integrity": "sha512-ZW2KkwlS4lwTv7ZVsYDiARfFCnSGhzYPdiOU4IM2fDbL+QGlyAbjgSFuqNRbSthybLbIJ915UtZBtmuLrQAT/w==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "darwin"
-      ]
+      "os": ["darwin"]
     },
     "node_modules/@rollup/rollup-freebsd-arm64": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-freebsd-arm64/-/rollup-freebsd-arm64-4.59.0.tgz",
       "integrity": "sha512-EsKaJ5ytAu9jI3lonzn3BgG8iRBjV4LxZexygcQbpiU0wU0ATxhNVEpXKfUa0pS05gTcSDMKpn3Sx+QB9RlTTA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "freebsd"
-      ]
+      "os": ["freebsd"]
     },
     "node_modules/@rollup/rollup-freebsd-x64": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-freebsd-x64/-/rollup-freebsd-x64-4.59.0.tgz",
       "integrity": "sha512-d3DuZi2KzTMjImrxoHIAODUZYoUUMsuUiY4SRRcJy6NJoZ6iIqWnJu9IScV9jXysyGMVuW+KNzZvBLOcpdl3Vg==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "freebsd"
-      ]
+      "os": ["freebsd"]
     },
     "node_modules/@rollup/rollup-linux-arm-gnueabihf": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm-gnueabihf/-/rollup-linux-arm-gnueabihf-4.59.0.tgz",
       "integrity": "sha512-t4ONHboXi/3E0rT6OZl1pKbl2Vgxf9vJfWgmUoCEVQVxhW6Cw/c8I6hbbu7DAvgp82RKiH7TpLwxnJeKv2pbsw==",
-      "cpu": [
-        "arm"
-      ],
+      "cpu": ["arm"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-arm-musleabihf": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm-musleabihf/-/rollup-linux-arm-musleabihf-4.59.0.tgz",
       "integrity": "sha512-CikFT7aYPA2ufMD086cVORBYGHffBo4K8MQ4uPS/ZnY54GKj36i196u8U+aDVT2LX4eSMbyHtyOh7D7Zvk2VvA==",
-      "cpu": [
-        "arm"
-      ],
+      "cpu": ["arm"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-arm64-gnu": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.59.0.tgz",
       "integrity": "sha512-jYgUGk5aLd1nUb1CtQ8E+t5JhLc9x5WdBKew9ZgAXg7DBk0ZHErLHdXM24rfX+bKrFe+Xp5YuJo54I5HFjGDAA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-arm64-musl": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.59.0.tgz",
       "integrity": "sha512-peZRVEdnFWZ5Bh2KeumKG9ty7aCXzzEsHShOZEFiCQlDEepP1dpUl/SrUNXNg13UmZl+gzVDPsiCwnV1uI0RUA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-loong64-gnu": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-gnu/-/rollup-linux-loong64-gnu-4.59.0.tgz",
       "integrity": "sha512-gbUSW/97f7+r4gHy3Jlup8zDG190AuodsWnNiXErp9mT90iCy9NKKU0Xwx5k8VlRAIV2uU9CsMnEFg/xXaOfXg==",
-      "cpu": [
-        "loong64"
-      ],
+      "cpu": ["loong64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-loong64-musl": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-musl/-/rollup-linux-loong64-musl-4.59.0.tgz",
       "integrity": "sha512-yTRONe79E+o0FWFijasoTjtzG9EBedFXJMl888NBEDCDV9I2wGbFFfJQQe63OijbFCUZqxpHz1GzpbtSFikJ4Q==",
-      "cpu": [
-        "loong64"
-      ],
+      "cpu": ["loong64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-ppc64-gnu": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-gnu/-/rollup-linux-ppc64-gnu-4.59.0.tgz",
       "integrity": "sha512-sw1o3tfyk12k3OEpRddF68a1unZ5VCN7zoTNtSn2KndUE+ea3m3ROOKRCZxEpmT9nsGnogpFP9x6mnLTCaoLkA==",
-      "cpu": [
-        "ppc64"
-      ],
+      "cpu": ["ppc64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-ppc64-musl": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-musl/-/rollup-linux-ppc64-musl-4.59.0.tgz",
       "integrity": "sha512-+2kLtQ4xT3AiIxkzFVFXfsmlZiG5FXYW7ZyIIvGA7Bdeuh9Z0aN4hVyXS/G1E9bTP/vqszNIN/pUKCk/BTHsKA==",
-      "cpu": [
-        "ppc64"
-      ],
+      "cpu": ["ppc64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-riscv64-gnu": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-gnu/-/rollup-linux-riscv64-gnu-4.59.0.tgz",
       "integrity": "sha512-NDYMpsXYJJaj+I7UdwIuHHNxXZ/b/N2hR15NyH3m2qAtb/hHPA4g4SuuvrdxetTdndfj9b1WOmy73kcPRoERUg==",
-      "cpu": [
-        "riscv64"
-      ],
+      "cpu": ["riscv64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-riscv64-musl": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-musl/-/rollup-linux-riscv64-musl-4.59.0.tgz",
       "integrity": "sha512-nLckB8WOqHIf1bhymk+oHxvM9D3tyPndZH8i8+35p/1YiVoVswPid2yLzgX7ZJP0KQvnkhM4H6QZ5m0LzbyIAg==",
-      "cpu": [
-        "riscv64"
-      ],
+      "cpu": ["riscv64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-s390x-gnu": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-s390x-gnu/-/rollup-linux-s390x-gnu-4.59.0.tgz",
       "integrity": "sha512-oF87Ie3uAIvORFBpwnCvUzdeYUqi2wY6jRFWJAy1qus/udHFYIkplYRW+wo+GRUP4sKzYdmE1Y3+rY5Gc4ZO+w==",
-      "cpu": [
-        "s390x"
-      ],
+      "cpu": ["s390x"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-x64-gnu": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.59.0.tgz",
       "integrity": "sha512-3AHmtQq/ppNuUspKAlvA8HtLybkDflkMuLK4DPo77DfthRb71V84/c4MlWJXixZz4uruIH4uaa07IqoAkG64fg==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-linux-x64-musl": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.59.0.tgz",
       "integrity": "sha512-2UdiwS/9cTAx7qIUZB/fWtToJwvt0Vbo0zmnYt7ED35KPg13Q0ym1g442THLC7VyI6JfYTP4PiSOWyoMdV2/xg==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@rollup/rollup-openbsd-x64": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-openbsd-x64/-/rollup-openbsd-x64-4.59.0.tgz",
       "integrity": "sha512-M3bLRAVk6GOwFlPTIxVBSYKUaqfLrn8l0psKinkCFxl4lQvOSz8ZrKDz2gxcBwHFpci0B6rttydI4IpS4IS/jQ==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "openbsd"
-      ]
+      "os": ["openbsd"]
     },
     "node_modules/@rollup/rollup-openharmony-arm64": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-openharmony-arm64/-/rollup-openharmony-arm64-4.59.0.tgz",
       "integrity": "sha512-tt9KBJqaqp5i5HUZzoafHZX8b5Q2Fe7UjYERADll83O4fGqJ49O1FsL6LpdzVFQcpwvnyd0i+K/VSwu/o/nWlA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "openharmony"
-      ]
+      "os": ["openharmony"]
     },
     "node_modules/@rollup/rollup-win32-arm64-msvc": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-arm64-msvc/-/rollup-win32-arm64-msvc-4.59.0.tgz",
       "integrity": "sha512-V5B6mG7OrGTwnxaNUzZTDTjDS7F75PO1ae6MJYdiMu60sq0CqN5CVeVsbhPxalupvTX8gXVSU9gq+Rx1/hvu6A==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ]
+      "os": ["win32"]
     },
     "node_modules/@rollup/rollup-win32-ia32-msvc": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-ia32-msvc/-/rollup-win32-ia32-msvc-4.59.0.tgz",
       "integrity": "sha512-UKFMHPuM9R0iBegwzKF4y0C4J9u8C6MEJgFuXTBerMk7EJ92GFVFYBfOZaSGLu6COf7FxpQNqhNS4c4icUPqxA==",
-      "cpu": [
-        "ia32"
-      ],
+      "cpu": ["ia32"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ]
+      "os": ["win32"]
     },
     "node_modules/@rollup/rollup-win32-x64-gnu": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-x64-gnu/-/rollup-win32-x64-gnu-4.59.0.tgz",
       "integrity": "sha512-laBkYlSS1n2L8fSo1thDNGrCTQMmxjYY5G0WFWjFFYZkKPjsMBsgJfGf4TLxXrF6RyhI60L8TMOjBMvXiTcxeA==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ]
+      "os": ["win32"]
     },
     "node_modules/@rollup/rollup-win32-x64-msvc": {
       "version": "4.59.0",
       "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.59.0.tgz",
       "integrity": "sha512-2HRCml6OztYXyJXAvdDXPKcawukWY2GpR5/nxKp4iBgiO3wcoEGkAaqctIbZcNB6KlUQBIqt8VYkNSj2397EfA==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ]
+      "os": ["win32"]
     },
     "node_modules/@standard-schema/spec": {
       "version": "1.1.0",
@@ -3175,15 +2969,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-darwin-arm64/-/cli-darwin-arm64-2.10.0.tgz",
       "integrity": "sha512-avqHD4HRjrMamE/7R/kzJPcAJnZs0IIS+1nkDP5b+TNBn3py7N2aIo9LIpy+VQq0AkN8G5dDpZtOOBkmWt/zjA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "darwin"
-      ],
+      "os": ["darwin"],
       "engines": {
         "node": ">= 10"
       }
@@ -3192,15 +2982,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-darwin-x64/-/cli-darwin-x64-2.10.0.tgz",
       "integrity": "sha512-keDmlvJRStzVFjZTd0xYkBONLtgBC9eMTpmXnBXzsHuawV2q9PvDo2x6D5mhuoMVrJ9QWjgaPKBBCFks4dK71Q==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "darwin"
-      ],
+      "os": ["darwin"],
       "engines": {
         "node": ">= 10"
       }
@@ -3209,15 +2995,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-linux-arm-gnueabihf/-/cli-linux-arm-gnueabihf-2.10.0.tgz",
       "integrity": "sha512-e5u0VfLZsMAC9iHaOEANumgl6lfnJx0Dtjkd8IJpysZ8jp0tJ6wrIkto2OzQgzcYyRCKgX72aKE0PFgZputA8g==",
-      "cpu": [
-        "arm"
-      ],
+      "cpu": ["arm"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 10"
       }
@@ -3226,15 +3008,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-linux-arm64-gnu/-/cli-linux-arm64-gnu-2.10.0.tgz",
       "integrity": "sha512-YrYYk2dfmBs5m+OIMCrb+JH/oo+4FtlpcrTCgiFYc7vcs6m3QDd1TTyWu0u01ewsCtK2kOdluhr/zKku+KP7HA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 10"
       }
@@ -3243,15 +3021,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-linux-arm64-musl/-/cli-linux-arm64-musl-2.10.0.tgz",
       "integrity": "sha512-GUoPdVJmrJRIXFfW3Rkt+eGK9ygOdyISACZfC/bCSfOnGt8kNdQIQr5WRH9QUaTVFIwxMlQyV3m+yXYP+xhSVA==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 10"
       }
@@ -3260,15 +3034,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-linux-riscv64-gnu/-/cli-linux-riscv64-gnu-2.10.0.tgz",
       "integrity": "sha512-JO7s3TlSxshwsoKNCDkyvsx5gw2QAs/Y2GbR5UE2d5kkU138ATKoPOtxn8G1fFT1aDW4LH0rYAAfBpGkDyJJnw==",
-      "cpu": [
-        "riscv64"
-      ],
+      "cpu": ["riscv64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 10"
       }
@@ -3277,15 +3047,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-linux-x64-gnu/-/cli-linux-x64-gnu-2.10.0.tgz",
       "integrity": "sha512-Uvh4SUUp4A6DVRSMWjelww0GnZI3PlVy7VS+DRF5napKuIehVjGl9XD0uKoCoxwAQBLctvipyEK+pDXpJeoHng==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 10"
       }
@@ -3294,15 +3060,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-linux-x64-musl/-/cli-linux-x64-musl-2.10.0.tgz",
       "integrity": "sha512-AP0KRK6bJuTpQ8kMNWvhIpKUkQJfcPFeba7QshOQZjJ8wOS6emwTN4K5g/d3AbCMo0RRdnZWwu67MlmtJyxC1Q==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 10"
       }
@@ -3311,15 +3073,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-win32-arm64-msvc/-/cli-win32-arm64-msvc-2.10.0.tgz",
       "integrity": "sha512-97DXVU3dJystrq7W41IX+82JEorLNY+3+ECYxvXWqkq7DBN6FsA08x/EFGE8N/b0LTOui9X2dvpGGoeZKKV08g==",
-      "cpu": [
-        "arm64"
-      ],
+      "cpu": ["arm64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ],
+      "os": ["win32"],
       "engines": {
         "node": ">= 10"
       }
@@ -3328,15 +3086,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-win32-ia32-msvc/-/cli-win32-ia32-msvc-2.10.0.tgz",
       "integrity": "sha512-EHyQ1iwrWy1CwMalEm9z2a6L5isQ121pe7FcA2xe4VWMJp+GHSDDGvbTv/OPdkt2Lyr7DAZBpZHM6nvlHXEc4A==",
-      "cpu": [
-        "ia32"
-      ],
+      "cpu": ["ia32"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ],
+      "os": ["win32"],
       "engines": {
         "node": ">= 10"
       }
@@ -3345,15 +3099,11 @@ if __name__ == "__main__":
       "version": "2.10.0",
       "resolved": "https://registry.npmjs.org/@tauri-apps/cli-win32-x64-msvc/-/cli-win32-x64-msvc-2.10.0.tgz",
       "integrity": "sha512-NTpyQxkpzGmU6ceWBTY2xRIEaS0ZLbVx1HE1zTA3TY/pV3+cPoPPOs+7YScr4IMzXMtOw7tLw5LEXo5oIG3qaQ==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "dev": true,
       "license": "Apache-2.0 OR MIT",
       "optional": true,
-      "os": [
-        "win32"
-      ],
+      "os": ["win32"],
       "engines": {
         "node": ">= 10"
       }
@@ -4392,9 +4142,7 @@ if __name__ == "__main__":
       "hasInstallScript": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "darwin"
-      ],
+      "os": ["darwin"],
       "engines": {
         "node": "^8.16.0 || ^10.6.0 || >=11.0.0"
       }
@@ -5926,7 +5674,6 @@ if __name__ == "__main__":
     }
   }
 }
-
 ```
 
 ---
@@ -6002,7 +5749,6 @@ if __name__ == "__main__":
     "vitest": "^4.0.18"
   }
 }
-
 ```
 
 ---
@@ -6015,7 +5761,7 @@ export default {
     tailwindcss: {},
     autoprefixer: {},
   },
-}
+};
 ```
 
 ---
@@ -11661,23 +11407,3797 @@ fn main() {
 
 ### 📄 文件: `src-tauri\gen\schemas\acl-manifests.json`
 
-```json
-{"core":{"default_permission":{"identifier":"default","description":"Default core plugins set.","permissions":["core:path:default","core:event:default","core:window:default","core:webview:default","core:app:default","core:image:default","core:resources:default","core:menu:default","core:tray:default"]},"permissions":{},"permission_sets":{},"global_scope_schema":null},"core:app":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin.","permissions":["allow-version","allow-name","allow-tauri-version","allow-identifier","allow-bundle-type","allow-register-listener","allow-remove-listener"]},"permissions":{"allow-app-hide":{"identifier":"allow-app-hide","description":"Enables the app_hide command without any pre-configured scope.","commands":{"allow":["app_hide"],"deny":[]}},"allow-app-show":{"identifier":"allow-app-show","description":"Enables the app_show command without any pre-configured scope.","commands":{"allow":["app_show"],"deny":[]}},"allow-bundle-type":{"identifier":"allow-bundle-type","description":"Enables the bundle_type command without any pre-configured scope.","commands":{"allow":["bundle_type"],"deny":[]}},"allow-default-window-icon":{"identifier":"allow-default-window-icon","description":"Enables the default_window_icon command without any pre-configured scope.","commands":{"allow":["default_window_icon"],"deny":[]}},"allow-fetch-data-store-identifiers":{"identifier":"allow-fetch-data-store-identifiers","description":"Enables the fetch_data_store_identifiers command without any pre-configured scope.","commands":{"allow":["fetch_data_store_identifiers"],"deny":[]}},"allow-identifier":{"identifier":"allow-identifier","description":"Enables the identifier command without any pre-configured scope.","commands":{"allow":["identifier"],"deny":[]}},"allow-name":{"identifier":"allow-name","description":"Enables the name command without any pre-configured scope.","commands":{"allow":["name"],"deny":[]}},"allow-register-listener":{"identifier":"allow-register-listener","description":"Enables the register_listener command without any pre-configured scope.","commands":{"allow":["register_listener"],"deny":[]}},"allow-remove-data-store":{"identifier":"allow-remove-data-store","description":"Enables the remove_data_store command without any pre-configured scope.","commands":{"allow":["remove_data_store"],"deny":[]}},"allow-remove-listener":{"identifier":"allow-remove-listener","description":"Enables the remove_listener command without any pre-configured scope.","commands":{"allow":["remove_listener"],"deny":[]}},"allow-set-app-theme":{"identifier":"allow-set-app-theme","description":"Enables the set_app_theme command without any pre-configured scope.","commands":{"allow":["set_app_theme"],"deny":[]}},"allow-set-dock-visibility":{"identifier":"allow-set-dock-visibility","description":"Enables the set_dock_visibility command without any pre-configured scope.","commands":{"allow":["set_dock_visibility"],"deny":[]}},"allow-tauri-version":{"identifier":"allow-tauri-version","description":"Enables the tauri_version command without any pre-configured scope.","commands":{"allow":["tauri_version"],"deny":[]}},"allow-version":{"identifier":"allow-version","description":"Enables the version command without any pre-configured scope.","commands":{"allow":["version"],"deny":[]}},"deny-app-hide":{"identifier":"deny-app-hide","description":"Denies the app_hide command without any pre-configured scope.","commands":{"allow":[],"deny":["app_hide"]}},"deny-app-show":{"identifier":"deny-app-show","description":"Denies the app_show command without any pre-configured scope.","commands":{"allow":[],"deny":["app_show"]}},"deny-bundle-type":{"identifier":"deny-bundle-type","description":"Denies the bundle_type command without any pre-configured scope.","commands":{"allow":[],"deny":["bundle_type"]}},"deny-default-window-icon":{"identifier":"deny-default-window-icon","description":"Denies the default_window_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["default_window_icon"]}},"deny-fetch-data-store-identifiers":{"identifier":"deny-fetch-data-store-identifiers","description":"Denies the fetch_data_store_identifiers command without any pre-configured scope.","commands":{"allow":[],"deny":["fetch_data_store_identifiers"]}},"deny-identifier":{"identifier":"deny-identifier","description":"Denies the identifier command without any pre-configured scope.","commands":{"allow":[],"deny":["identifier"]}},"deny-name":{"identifier":"deny-name","description":"Denies the name command without any pre-configured scope.","commands":{"allow":[],"deny":["name"]}},"deny-register-listener":{"identifier":"deny-register-listener","description":"Denies the register_listener command without any pre-configured scope.","commands":{"allow":[],"deny":["register_listener"]}},"deny-remove-data-store":{"identifier":"deny-remove-data-store","description":"Denies the remove_data_store command without any pre-configured scope.","commands":{"allow":[],"deny":["remove_data_store"]}},"deny-remove-listener":{"identifier":"deny-remove-listener","description":"Denies the remove_listener command without any pre-configured scope.","commands":{"allow":[],"deny":["remove_listener"]}},"deny-set-app-theme":{"identifier":"deny-set-app-theme","description":"Denies the set_app_theme command without any pre-configured scope.","commands":{"allow":[],"deny":["set_app_theme"]}},"deny-set-dock-visibility":{"identifier":"deny-set-dock-visibility","description":"Denies the set_dock_visibility command without any pre-configured scope.","commands":{"allow":[],"deny":["set_dock_visibility"]}},"deny-tauri-version":{"identifier":"deny-tauri-version","description":"Denies the tauri_version command without any pre-configured scope.","commands":{"allow":[],"deny":["tauri_version"]}},"deny-version":{"identifier":"deny-version","description":"Denies the version command without any pre-configured scope.","commands":{"allow":[],"deny":["version"]}}},"permission_sets":{},"global_scope_schema":null},"core:event":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-listen","allow-unlisten","allow-emit","allow-emit-to"]},"permissions":{"allow-emit":{"identifier":"allow-emit","description":"Enables the emit command without any pre-configured scope.","commands":{"allow":["emit"],"deny":[]}},"allow-emit-to":{"identifier":"allow-emit-to","description":"Enables the emit_to command without any pre-configured scope.","commands":{"allow":["emit_to"],"deny":[]}},"allow-listen":{"identifier":"allow-listen","description":"Enables the listen command without any pre-configured scope.","commands":{"allow":["listen"],"deny":[]}},"allow-unlisten":{"identifier":"allow-unlisten","description":"Enables the unlisten command without any pre-configured scope.","commands":{"allow":["unlisten"],"deny":[]}},"deny-emit":{"identifier":"deny-emit","description":"Denies the emit command without any pre-configured scope.","commands":{"allow":[],"deny":["emit"]}},"deny-emit-to":{"identifier":"deny-emit-to","description":"Denies the emit_to command without any pre-configured scope.","commands":{"allow":[],"deny":["emit_to"]}},"deny-listen":{"identifier":"deny-listen","description":"Denies the listen command without any pre-configured scope.","commands":{"allow":[],"deny":["listen"]}},"deny-unlisten":{"identifier":"deny-unlisten","description":"Denies the unlisten command without any pre-configured scope.","commands":{"allow":[],"deny":["unlisten"]}}},"permission_sets":{},"global_scope_schema":null},"core:image":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-new","allow-from-bytes","allow-from-path","allow-rgba","allow-size"]},"permissions":{"allow-from-bytes":{"identifier":"allow-from-bytes","description":"Enables the from_bytes command without any pre-configured scope.","commands":{"allow":["from_bytes"],"deny":[]}},"allow-from-path":{"identifier":"allow-from-path","description":"Enables the from_path command without any pre-configured scope.","commands":{"allow":["from_path"],"deny":[]}},"allow-new":{"identifier":"allow-new","description":"Enables the new command without any pre-configured scope.","commands":{"allow":["new"],"deny":[]}},"allow-rgba":{"identifier":"allow-rgba","description":"Enables the rgba command without any pre-configured scope.","commands":{"allow":["rgba"],"deny":[]}},"allow-size":{"identifier":"allow-size","description":"Enables the size command without any pre-configured scope.","commands":{"allow":["size"],"deny":[]}},"deny-from-bytes":{"identifier":"deny-from-bytes","description":"Denies the from_bytes command without any pre-configured scope.","commands":{"allow":[],"deny":["from_bytes"]}},"deny-from-path":{"identifier":"deny-from-path","description":"Denies the from_path command without any pre-configured scope.","commands":{"allow":[],"deny":["from_path"]}},"deny-new":{"identifier":"deny-new","description":"Denies the new command without any pre-configured scope.","commands":{"allow":[],"deny":["new"]}},"deny-rgba":{"identifier":"deny-rgba","description":"Denies the rgba command without any pre-configured scope.","commands":{"allow":[],"deny":["rgba"]}},"deny-size":{"identifier":"deny-size","description":"Denies the size command without any pre-configured scope.","commands":{"allow":[],"deny":["size"]}}},"permission_sets":{},"global_scope_schema":null},"core:menu":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-new","allow-append","allow-prepend","allow-insert","allow-remove","allow-remove-at","allow-items","allow-get","allow-popup","allow-create-default","allow-set-as-app-menu","allow-set-as-window-menu","allow-text","allow-set-text","allow-is-enabled","allow-set-enabled","allow-set-accelerator","allow-set-as-windows-menu-for-nsapp","allow-set-as-help-menu-for-nsapp","allow-is-checked","allow-set-checked","allow-set-icon"]},"permissions":{"allow-append":{"identifier":"allow-append","description":"Enables the append command without any pre-configured scope.","commands":{"allow":["append"],"deny":[]}},"allow-create-default":{"identifier":"allow-create-default","description":"Enables the create_default command without any pre-configured scope.","commands":{"allow":["create_default"],"deny":[]}},"allow-get":{"identifier":"allow-get","description":"Enables the get command without any pre-configured scope.","commands":{"allow":["get"],"deny":[]}},"allow-insert":{"identifier":"allow-insert","description":"Enables the insert command without any pre-configured scope.","commands":{"allow":["insert"],"deny":[]}},"allow-is-checked":{"identifier":"allow-is-checked","description":"Enables the is_checked command without any pre-configured scope.","commands":{"allow":["is_checked"],"deny":[]}},"allow-is-enabled":{"identifier":"allow-is-enabled","description":"Enables the is_enabled command without any pre-configured scope.","commands":{"allow":["is_enabled"],"deny":[]}},"allow-items":{"identifier":"allow-items","description":"Enables the items command without any pre-configured scope.","commands":{"allow":["items"],"deny":[]}},"allow-new":{"identifier":"allow-new","description":"Enables the new command without any pre-configured scope.","commands":{"allow":["new"],"deny":[]}},"allow-popup":{"identifier":"allow-popup","description":"Enables the popup command without any pre-configured scope.","commands":{"allow":["popup"],"deny":[]}},"allow-prepend":{"identifier":"allow-prepend","description":"Enables the prepend command without any pre-configured scope.","commands":{"allow":["prepend"],"deny":[]}},"allow-remove":{"identifier":"allow-remove","description":"Enables the remove command without any pre-configured scope.","commands":{"allow":["remove"],"deny":[]}},"allow-remove-at":{"identifier":"allow-remove-at","description":"Enables the remove_at command without any pre-configured scope.","commands":{"allow":["remove_at"],"deny":[]}},"allow-set-accelerator":{"identifier":"allow-set-accelerator","description":"Enables the set_accelerator command without any pre-configured scope.","commands":{"allow":["set_accelerator"],"deny":[]}},"allow-set-as-app-menu":{"identifier":"allow-set-as-app-menu","description":"Enables the set_as_app_menu command without any pre-configured scope.","commands":{"allow":["set_as_app_menu"],"deny":[]}},"allow-set-as-help-menu-for-nsapp":{"identifier":"allow-set-as-help-menu-for-nsapp","description":"Enables the set_as_help_menu_for_nsapp command without any pre-configured scope.","commands":{"allow":["set_as_help_menu_for_nsapp"],"deny":[]}},"allow-set-as-window-menu":{"identifier":"allow-set-as-window-menu","description":"Enables the set_as_window_menu command without any pre-configured scope.","commands":{"allow":["set_as_window_menu"],"deny":[]}},"allow-set-as-windows-menu-for-nsapp":{"identifier":"allow-set-as-windows-menu-for-nsapp","description":"Enables the set_as_windows_menu_for_nsapp command without any pre-configured scope.","commands":{"allow":["set_as_windows_menu_for_nsapp"],"deny":[]}},"allow-set-checked":{"identifier":"allow-set-checked","description":"Enables the set_checked command without any pre-configured scope.","commands":{"allow":["set_checked"],"deny":[]}},"allow-set-enabled":{"identifier":"allow-set-enabled","description":"Enables the set_enabled command without any pre-configured scope.","commands":{"allow":["set_enabled"],"deny":[]}},"allow-set-icon":{"identifier":"allow-set-icon","description":"Enables the set_icon command without any pre-configured scope.","commands":{"allow":["set_icon"],"deny":[]}},"allow-set-text":{"identifier":"allow-set-text","description":"Enables the set_text command without any pre-configured scope.","commands":{"allow":["set_text"],"deny":[]}},"allow-text":{"identifier":"allow-text","description":"Enables the text command without any pre-configured scope.","commands":{"allow":["text"],"deny":[]}},"deny-append":{"identifier":"deny-append","description":"Denies the append command without any pre-configured scope.","commands":{"allow":[],"deny":["append"]}},"deny-create-default":{"identifier":"deny-create-default","description":"Denies the create_default command without any pre-configured scope.","commands":{"allow":[],"deny":["create_default"]}},"deny-get":{"identifier":"deny-get","description":"Denies the get command without any pre-configured scope.","commands":{"allow":[],"deny":["get"]}},"deny-insert":{"identifier":"deny-insert","description":"Denies the insert command without any pre-configured scope.","commands":{"allow":[],"deny":["insert"]}},"deny-is-checked":{"identifier":"deny-is-checked","description":"Denies the is_checked command without any pre-configured scope.","commands":{"allow":[],"deny":["is_checked"]}},"deny-is-enabled":{"identifier":"deny-is-enabled","description":"Denies the is_enabled command without any pre-configured scope.","commands":{"allow":[],"deny":["is_enabled"]}},"deny-items":{"identifier":"deny-items","description":"Denies the items command without any pre-configured scope.","commands":{"allow":[],"deny":["items"]}},"deny-new":{"identifier":"deny-new","description":"Denies the new command without any pre-configured scope.","commands":{"allow":[],"deny":["new"]}},"deny-popup":{"identifier":"deny-popup","description":"Denies the popup command without any pre-configured scope.","commands":{"allow":[],"deny":["popup"]}},"deny-prepend":{"identifier":"deny-prepend","description":"Denies the prepend command without any pre-configured scope.","commands":{"allow":[],"deny":["prepend"]}},"deny-remove":{"identifier":"deny-remove","description":"Denies the remove command without any pre-configured scope.","commands":{"allow":[],"deny":["remove"]}},"deny-remove-at":{"identifier":"deny-remove-at","description":"Denies the remove_at command without any pre-configured scope.","commands":{"allow":[],"deny":["remove_at"]}},"deny-set-accelerator":{"identifier":"deny-set-accelerator","description":"Denies the set_accelerator command without any pre-configured scope.","commands":{"allow":[],"deny":["set_accelerator"]}},"deny-set-as-app-menu":{"identifier":"deny-set-as-app-menu","description":"Denies the set_as_app_menu command without any pre-configured scope.","commands":{"allow":[],"deny":["set_as_app_menu"]}},"deny-set-as-help-menu-for-nsapp":{"identifier":"deny-set-as-help-menu-for-nsapp","description":"Denies the set_as_help_menu_for_nsapp command without any pre-configured scope.","commands":{"allow":[],"deny":["set_as_help_menu_for_nsapp"]}},"deny-set-as-window-menu":{"identifier":"deny-set-as-window-menu","description":"Denies the set_as_window_menu command without any pre-configured scope.","commands":{"allow":[],"deny":["set_as_window_menu"]}},"deny-set-as-windows-menu-for-nsapp":{"identifier":"deny-set-as-windows-menu-for-nsapp","description":"Denies the set_as_windows_menu_for_nsapp command without any pre-configured scope.","commands":{"allow":[],"deny":["set_as_windows_menu_for_nsapp"]}},"deny-set-checked":{"identifier":"deny-set-checked","description":"Denies the set_checked command without any pre-configured scope.","commands":{"allow":[],"deny":["set_checked"]}},"deny-set-enabled":{"identifier":"deny-set-enabled","description":"Denies the set_enabled command without any pre-configured scope.","commands":{"allow":[],"deny":["set_enabled"]}},"deny-set-icon":{"identifier":"deny-set-icon","description":"Denies the set_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_icon"]}},"deny-set-text":{"identifier":"deny-set-text","description":"Denies the set_text command without any pre-configured scope.","commands":{"allow":[],"deny":["set_text"]}},"deny-text":{"identifier":"deny-text","description":"Denies the text command without any pre-configured scope.","commands":{"allow":[],"deny":["text"]}}},"permission_sets":{},"global_scope_schema":null},"core:path":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-resolve-directory","allow-resolve","allow-normalize","allow-join","allow-dirname","allow-extname","allow-basename","allow-is-absolute"]},"permissions":{"allow-basename":{"identifier":"allow-basename","description":"Enables the basename command without any pre-configured scope.","commands":{"allow":["basename"],"deny":[]}},"allow-dirname":{"identifier":"allow-dirname","description":"Enables the dirname command without any pre-configured scope.","commands":{"allow":["dirname"],"deny":[]}},"allow-extname":{"identifier":"allow-extname","description":"Enables the extname command without any pre-configured scope.","commands":{"allow":["extname"],"deny":[]}},"allow-is-absolute":{"identifier":"allow-is-absolute","description":"Enables the is_absolute command without any pre-configured scope.","commands":{"allow":["is_absolute"],"deny":[]}},"allow-join":{"identifier":"allow-join","description":"Enables the join command without any pre-configured scope.","commands":{"allow":["join"],"deny":[]}},"allow-normalize":{"identifier":"allow-normalize","description":"Enables the normalize command without any pre-configured scope.","commands":{"allow":["normalize"],"deny":[]}},"allow-resolve":{"identifier":"allow-resolve","description":"Enables the resolve command without any pre-configured scope.","commands":{"allow":["resolve"],"deny":[]}},"allow-resolve-directory":{"identifier":"allow-resolve-directory","description":"Enables the resolve_directory command without any pre-configured scope.","commands":{"allow":["resolve_directory"],"deny":[]}},"deny-basename":{"identifier":"deny-basename","description":"Denies the basename command without any pre-configured scope.","commands":{"allow":[],"deny":["basename"]}},"deny-dirname":{"identifier":"deny-dirname","description":"Denies the dirname command without any pre-configured scope.","commands":{"allow":[],"deny":["dirname"]}},"deny-extname":{"identifier":"deny-extname","description":"Denies the extname command without any pre-configured scope.","commands":{"allow":[],"deny":["extname"]}},"deny-is-absolute":{"identifier":"deny-is-absolute","description":"Denies the is_absolute command without any pre-configured scope.","commands":{"allow":[],"deny":["is_absolute"]}},"deny-join":{"identifier":"deny-join","description":"Denies the join command without any pre-configured scope.","commands":{"allow":[],"deny":["join"]}},"deny-normalize":{"identifier":"deny-normalize","description":"Denies the normalize command without any pre-configured scope.","commands":{"allow":[],"deny":["normalize"]}},"deny-resolve":{"identifier":"deny-resolve","description":"Denies the resolve command without any pre-configured scope.","commands":{"allow":[],"deny":["resolve"]}},"deny-resolve-directory":{"identifier":"deny-resolve-directory","description":"Denies the resolve_directory command without any pre-configured scope.","commands":{"allow":[],"deny":["resolve_directory"]}}},"permission_sets":{},"global_scope_schema":null},"core:resources":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-close"]},"permissions":{"allow-close":{"identifier":"allow-close","description":"Enables the close command without any pre-configured scope.","commands":{"allow":["close"],"deny":[]}},"deny-close":{"identifier":"deny-close","description":"Denies the close command without any pre-configured scope.","commands":{"allow":[],"deny":["close"]}}},"permission_sets":{},"global_scope_schema":null},"core:tray":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-new","allow-get-by-id","allow-remove-by-id","allow-set-icon","allow-set-menu","allow-set-tooltip","allow-set-title","allow-set-visible","allow-set-temp-dir-path","allow-set-icon-as-template","allow-set-show-menu-on-left-click"]},"permissions":{"allow-get-by-id":{"identifier":"allow-get-by-id","description":"Enables the get_by_id command without any pre-configured scope.","commands":{"allow":["get_by_id"],"deny":[]}},"allow-new":{"identifier":"allow-new","description":"Enables the new command without any pre-configured scope.","commands":{"allow":["new"],"deny":[]}},"allow-remove-by-id":{"identifier":"allow-remove-by-id","description":"Enables the remove_by_id command without any pre-configured scope.","commands":{"allow":["remove_by_id"],"deny":[]}},"allow-set-icon":{"identifier":"allow-set-icon","description":"Enables the set_icon command without any pre-configured scope.","commands":{"allow":["set_icon"],"deny":[]}},"allow-set-icon-as-template":{"identifier":"allow-set-icon-as-template","description":"Enables the set_icon_as_template command without any pre-configured scope.","commands":{"allow":["set_icon_as_template"],"deny":[]}},"allow-set-menu":{"identifier":"allow-set-menu","description":"Enables the set_menu command without any pre-configured scope.","commands":{"allow":["set_menu"],"deny":[]}},"allow-set-show-menu-on-left-click":{"identifier":"allow-set-show-menu-on-left-click","description":"Enables the set_show_menu_on_left_click command without any pre-configured scope.","commands":{"allow":["set_show_menu_on_left_click"],"deny":[]}},"allow-set-temp-dir-path":{"identifier":"allow-set-temp-dir-path","description":"Enables the set_temp_dir_path command without any pre-configured scope.","commands":{"allow":["set_temp_dir_path"],"deny":[]}},"allow-set-title":{"identifier":"allow-set-title","description":"Enables the set_title command without any pre-configured scope.","commands":{"allow":["set_title"],"deny":[]}},"allow-set-tooltip":{"identifier":"allow-set-tooltip","description":"Enables the set_tooltip command without any pre-configured scope.","commands":{"allow":["set_tooltip"],"deny":[]}},"allow-set-visible":{"identifier":"allow-set-visible","description":"Enables the set_visible command without any pre-configured scope.","commands":{"allow":["set_visible"],"deny":[]}},"deny-get-by-id":{"identifier":"deny-get-by-id","description":"Denies the get_by_id command without any pre-configured scope.","commands":{"allow":[],"deny":["get_by_id"]}},"deny-new":{"identifier":"deny-new","description":"Denies the new command without any pre-configured scope.","commands":{"allow":[],"deny":["new"]}},"deny-remove-by-id":{"identifier":"deny-remove-by-id","description":"Denies the remove_by_id command without any pre-configured scope.","commands":{"allow":[],"deny":["remove_by_id"]}},"deny-set-icon":{"identifier":"deny-set-icon","description":"Denies the set_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_icon"]}},"deny-set-icon-as-template":{"identifier":"deny-set-icon-as-template","description":"Denies the set_icon_as_template command without any pre-configured scope.","commands":{"allow":[],"deny":["set_icon_as_template"]}},"deny-set-menu":{"identifier":"deny-set-menu","description":"Denies the set_menu command without any pre-configured scope.","commands":{"allow":[],"deny":["set_menu"]}},"deny-set-show-menu-on-left-click":{"identifier":"deny-set-show-menu-on-left-click","description":"Denies the set_show_menu_on_left_click command without any pre-configured scope.","commands":{"allow":[],"deny":["set_show_menu_on_left_click"]}},"deny-set-temp-dir-path":{"identifier":"deny-set-temp-dir-path","description":"Denies the set_temp_dir_path command without any pre-configured scope.","commands":{"allow":[],"deny":["set_temp_dir_path"]}},"deny-set-title":{"identifier":"deny-set-title","description":"Denies the set_title command without any pre-configured scope.","commands":{"allow":[],"deny":["set_title"]}},"deny-set-tooltip":{"identifier":"deny-set-tooltip","description":"Denies the set_tooltip command without any pre-configured scope.","commands":{"allow":[],"deny":["set_tooltip"]}},"deny-set-visible":{"identifier":"deny-set-visible","description":"Denies the set_visible command without any pre-configured scope.","commands":{"allow":[],"deny":["set_visible"]}}},"permission_sets":{},"global_scope_schema":null},"core:webview":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin.","permissions":["allow-get-all-webviews","allow-webview-position","allow-webview-size","allow-internal-toggle-devtools"]},"permissions":{"allow-clear-all-browsing-data":{"identifier":"allow-clear-all-browsing-data","description":"Enables the clear_all_browsing_data command without any pre-configured scope.","commands":{"allow":["clear_all_browsing_data"],"deny":[]}},"allow-create-webview":{"identifier":"allow-create-webview","description":"Enables the create_webview command without any pre-configured scope.","commands":{"allow":["create_webview"],"deny":[]}},"allow-create-webview-window":{"identifier":"allow-create-webview-window","description":"Enables the create_webview_window command without any pre-configured scope.","commands":{"allow":["create_webview_window"],"deny":[]}},"allow-get-all-webviews":{"identifier":"allow-get-all-webviews","description":"Enables the get_all_webviews command without any pre-configured scope.","commands":{"allow":["get_all_webviews"],"deny":[]}},"allow-internal-toggle-devtools":{"identifier":"allow-internal-toggle-devtools","description":"Enables the internal_toggle_devtools command without any pre-configured scope.","commands":{"allow":["internal_toggle_devtools"],"deny":[]}},"allow-print":{"identifier":"allow-print","description":"Enables the print command without any pre-configured scope.","commands":{"allow":["print"],"deny":[]}},"allow-reparent":{"identifier":"allow-reparent","description":"Enables the reparent command without any pre-configured scope.","commands":{"allow":["reparent"],"deny":[]}},"allow-set-webview-auto-resize":{"identifier":"allow-set-webview-auto-resize","description":"Enables the set_webview_auto_resize command without any pre-configured scope.","commands":{"allow":["set_webview_auto_resize"],"deny":[]}},"allow-set-webview-background-color":{"identifier":"allow-set-webview-background-color","description":"Enables the set_webview_background_color command without any pre-configured scope.","commands":{"allow":["set_webview_background_color"],"deny":[]}},"allow-set-webview-focus":{"identifier":"allow-set-webview-focus","description":"Enables the set_webview_focus command without any pre-configured scope.","commands":{"allow":["set_webview_focus"],"deny":[]}},"allow-set-webview-position":{"identifier":"allow-set-webview-position","description":"Enables the set_webview_position command without any pre-configured scope.","commands":{"allow":["set_webview_position"],"deny":[]}},"allow-set-webview-size":{"identifier":"allow-set-webview-size","description":"Enables the set_webview_size command without any pre-configured scope.","commands":{"allow":["set_webview_size"],"deny":[]}},"allow-set-webview-zoom":{"identifier":"allow-set-webview-zoom","description":"Enables the set_webview_zoom command without any pre-configured scope.","commands":{"allow":["set_webview_zoom"],"deny":[]}},"allow-webview-close":{"identifier":"allow-webview-close","description":"Enables the webview_close command without any pre-configured scope.","commands":{"allow":["webview_close"],"deny":[]}},"allow-webview-hide":{"identifier":"allow-webview-hide","description":"Enables the webview_hide command without any pre-configured scope.","commands":{"allow":["webview_hide"],"deny":[]}},"allow-webview-position":{"identifier":"allow-webview-position","description":"Enables the webview_position command without any pre-configured scope.","commands":{"allow":["webview_position"],"deny":[]}},"allow-webview-show":{"identifier":"allow-webview-show","description":"Enables the webview_show command without any pre-configured scope.","commands":{"allow":["webview_show"],"deny":[]}},"allow-webview-size":{"identifier":"allow-webview-size","description":"Enables the webview_size command without any pre-configured scope.","commands":{"allow":["webview_size"],"deny":[]}},"deny-clear-all-browsing-data":{"identifier":"deny-clear-all-browsing-data","description":"Denies the clear_all_browsing_data command without any pre-configured scope.","commands":{"allow":[],"deny":["clear_all_browsing_data"]}},"deny-create-webview":{"identifier":"deny-create-webview","description":"Denies the create_webview command without any pre-configured scope.","commands":{"allow":[],"deny":["create_webview"]}},"deny-create-webview-window":{"identifier":"deny-create-webview-window","description":"Denies the create_webview_window command without any pre-configured scope.","commands":{"allow":[],"deny":["create_webview_window"]}},"deny-get-all-webviews":{"identifier":"deny-get-all-webviews","description":"Denies the get_all_webviews command without any pre-configured scope.","commands":{"allow":[],"deny":["get_all_webviews"]}},"deny-internal-toggle-devtools":{"identifier":"deny-internal-toggle-devtools","description":"Denies the internal_toggle_devtools command without any pre-configured scope.","commands":{"allow":[],"deny":["internal_toggle_devtools"]}},"deny-print":{"identifier":"deny-print","description":"Denies the print command without any pre-configured scope.","commands":{"allow":[],"deny":["print"]}},"deny-reparent":{"identifier":"deny-reparent","description":"Denies the reparent command without any pre-configured scope.","commands":{"allow":[],"deny":["reparent"]}},"deny-set-webview-auto-resize":{"identifier":"deny-set-webview-auto-resize","description":"Denies the set_webview_auto_resize command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_auto_resize"]}},"deny-set-webview-background-color":{"identifier":"deny-set-webview-background-color","description":"Denies the set_webview_background_color command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_background_color"]}},"deny-set-webview-focus":{"identifier":"deny-set-webview-focus","description":"Denies the set_webview_focus command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_focus"]}},"deny-set-webview-position":{"identifier":"deny-set-webview-position","description":"Denies the set_webview_position command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_position"]}},"deny-set-webview-size":{"identifier":"deny-set-webview-size","description":"Denies the set_webview_size command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_size"]}},"deny-set-webview-zoom":{"identifier":"deny-set-webview-zoom","description":"Denies the set_webview_zoom command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_zoom"]}},"deny-webview-close":{"identifier":"deny-webview-close","description":"Denies the webview_close command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_close"]}},"deny-webview-hide":{"identifier":"deny-webview-hide","description":"Denies the webview_hide command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_hide"]}},"deny-webview-position":{"identifier":"deny-webview-position","description":"Denies the webview_position command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_position"]}},"deny-webview-show":{"identifier":"deny-webview-show","description":"Denies the webview_show command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_show"]}},"deny-webview-size":{"identifier":"deny-webview-size","description":"Denies the webview_size command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_size"]}}},"permission_sets":{},"global_scope_schema":null},"core:window":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin.","permissions":["allow-get-all-windows","allow-scale-factor","allow-inner-position","allow-outer-position","allow-inner-size","allow-outer-size","allow-is-fullscreen","allow-is-minimized","allow-is-maximized","allow-is-focused","allow-is-decorated","allow-is-resizable","allow-is-maximizable","allow-is-minimizable","allow-is-closable","allow-is-visible","allow-is-enabled","allow-title","allow-current-monitor","allow-primary-monitor","allow-monitor-from-point","allow-available-monitors","allow-cursor-position","allow-theme","allow-is-always-on-top","allow-internal-toggle-maximize"]},"permissions":{"allow-available-monitors":{"identifier":"allow-available-monitors","description":"Enables the available_monitors command without any pre-configured scope.","commands":{"allow":["available_monitors"],"deny":[]}},"allow-center":{"identifier":"allow-center","description":"Enables the center command without any pre-configured scope.","commands":{"allow":["center"],"deny":[]}},"allow-close":{"identifier":"allow-close","description":"Enables the close command without any pre-configured scope.","commands":{"allow":["close"],"deny":[]}},"allow-create":{"identifier":"allow-create","description":"Enables the create command without any pre-configured scope.","commands":{"allow":["create"],"deny":[]}},"allow-current-monitor":{"identifier":"allow-current-monitor","description":"Enables the current_monitor command without any pre-configured scope.","commands":{"allow":["current_monitor"],"deny":[]}},"allow-cursor-position":{"identifier":"allow-cursor-position","description":"Enables the cursor_position command without any pre-configured scope.","commands":{"allow":["cursor_position"],"deny":[]}},"allow-destroy":{"identifier":"allow-destroy","description":"Enables the destroy command without any pre-configured scope.","commands":{"allow":["destroy"],"deny":[]}},"allow-get-all-windows":{"identifier":"allow-get-all-windows","description":"Enables the get_all_windows command without any pre-configured scope.","commands":{"allow":["get_all_windows"],"deny":[]}},"allow-hide":{"identifier":"allow-hide","description":"Enables the hide command without any pre-configured scope.","commands":{"allow":["hide"],"deny":[]}},"allow-inner-position":{"identifier":"allow-inner-position","description":"Enables the inner_position command without any pre-configured scope.","commands":{"allow":["inner_position"],"deny":[]}},"allow-inner-size":{"identifier":"allow-inner-size","description":"Enables the inner_size command without any pre-configured scope.","commands":{"allow":["inner_size"],"deny":[]}},"allow-internal-toggle-maximize":{"identifier":"allow-internal-toggle-maximize","description":"Enables the internal_toggle_maximize command without any pre-configured scope.","commands":{"allow":["internal_toggle_maximize"],"deny":[]}},"allow-is-always-on-top":{"identifier":"allow-is-always-on-top","description":"Enables the is_always_on_top command without any pre-configured scope.","commands":{"allow":["is_always_on_top"],"deny":[]}},"allow-is-closable":{"identifier":"allow-is-closable","description":"Enables the is_closable command without any pre-configured scope.","commands":{"allow":["is_closable"],"deny":[]}},"allow-is-decorated":{"identifier":"allow-is-decorated","description":"Enables the is_decorated command without any pre-configured scope.","commands":{"allow":["is_decorated"],"deny":[]}},"allow-is-enabled":{"identifier":"allow-is-enabled","description":"Enables the is_enabled command without any pre-configured scope.","commands":{"allow":["is_enabled"],"deny":[]}},"allow-is-focused":{"identifier":"allow-is-focused","description":"Enables the is_focused command without any pre-configured scope.","commands":{"allow":["is_focused"],"deny":[]}},"allow-is-fullscreen":{"identifier":"allow-is-fullscreen","description":"Enables the is_fullscreen command without any pre-configured scope.","commands":{"allow":["is_fullscreen"],"deny":[]}},"allow-is-maximizable":{"identifier":"allow-is-maximizable","description":"Enables the is_maximizable command without any pre-configured scope.","commands":{"allow":["is_maximizable"],"deny":[]}},"allow-is-maximized":{"identifier":"allow-is-maximized","description":"Enables the is_maximized command without any pre-configured scope.","commands":{"allow":["is_maximized"],"deny":[]}},"allow-is-minimizable":{"identifier":"allow-is-minimizable","description":"Enables the is_minimizable command without any pre-configured scope.","commands":{"allow":["is_minimizable"],"deny":[]}},"allow-is-minimized":{"identifier":"allow-is-minimized","description":"Enables the is_minimized command without any pre-configured scope.","commands":{"allow":["is_minimized"],"deny":[]}},"allow-is-resizable":{"identifier":"allow-is-resizable","description":"Enables the is_resizable command without any pre-configured scope.","commands":{"allow":["is_resizable"],"deny":[]}},"allow-is-visible":{"identifier":"allow-is-visible","description":"Enables the is_visible command without any pre-configured scope.","commands":{"allow":["is_visible"],"deny":[]}},"allow-maximize":{"identifier":"allow-maximize","description":"Enables the maximize command without any pre-configured scope.","commands":{"allow":["maximize"],"deny":[]}},"allow-minimize":{"identifier":"allow-minimize","description":"Enables the minimize command without any pre-configured scope.","commands":{"allow":["minimize"],"deny":[]}},"allow-monitor-from-point":{"identifier":"allow-monitor-from-point","description":"Enables the monitor_from_point command without any pre-configured scope.","commands":{"allow":["monitor_from_point"],"deny":[]}},"allow-outer-position":{"identifier":"allow-outer-position","description":"Enables the outer_position command without any pre-configured scope.","commands":{"allow":["outer_position"],"deny":[]}},"allow-outer-size":{"identifier":"allow-outer-size","description":"Enables the outer_size command without any pre-configured scope.","commands":{"allow":["outer_size"],"deny":[]}},"allow-primary-monitor":{"identifier":"allow-primary-monitor","description":"Enables the primary_monitor command without any pre-configured scope.","commands":{"allow":["primary_monitor"],"deny":[]}},"allow-request-user-attention":{"identifier":"allow-request-user-attention","description":"Enables the request_user_attention command without any pre-configured scope.","commands":{"allow":["request_user_attention"],"deny":[]}},"allow-scale-factor":{"identifier":"allow-scale-factor","description":"Enables the scale_factor command without any pre-configured scope.","commands":{"allow":["scale_factor"],"deny":[]}},"allow-set-always-on-bottom":{"identifier":"allow-set-always-on-bottom","description":"Enables the set_always_on_bottom command without any pre-configured scope.","commands":{"allow":["set_always_on_bottom"],"deny":[]}},"allow-set-always-on-top":{"identifier":"allow-set-always-on-top","description":"Enables the set_always_on_top command without any pre-configured scope.","commands":{"allow":["set_always_on_top"],"deny":[]}},"allow-set-background-color":{"identifier":"allow-set-background-color","description":"Enables the set_background_color command without any pre-configured scope.","commands":{"allow":["set_background_color"],"deny":[]}},"allow-set-badge-count":{"identifier":"allow-set-badge-count","description":"Enables the set_badge_count command without any pre-configured scope.","commands":{"allow":["set_badge_count"],"deny":[]}},"allow-set-badge-label":{"identifier":"allow-set-badge-label","description":"Enables the set_badge_label command without any pre-configured scope.","commands":{"allow":["set_badge_label"],"deny":[]}},"allow-set-closable":{"identifier":"allow-set-closable","description":"Enables the set_closable command without any pre-configured scope.","commands":{"allow":["set_closable"],"deny":[]}},"allow-set-content-protected":{"identifier":"allow-set-content-protected","description":"Enables the set_content_protected command without any pre-configured scope.","commands":{"allow":["set_content_protected"],"deny":[]}},"allow-set-cursor-grab":{"identifier":"allow-set-cursor-grab","description":"Enables the set_cursor_grab command without any pre-configured scope.","commands":{"allow":["set_cursor_grab"],"deny":[]}},"allow-set-cursor-icon":{"identifier":"allow-set-cursor-icon","description":"Enables the set_cursor_icon command without any pre-configured scope.","commands":{"allow":["set_cursor_icon"],"deny":[]}},"allow-set-cursor-position":{"identifier":"allow-set-cursor-position","description":"Enables the set_cursor_position command without any pre-configured scope.","commands":{"allow":["set_cursor_position"],"deny":[]}},"allow-set-cursor-visible":{"identifier":"allow-set-cursor-visible","description":"Enables the set_cursor_visible command without any pre-configured scope.","commands":{"allow":["set_cursor_visible"],"deny":[]}},"allow-set-decorations":{"identifier":"allow-set-decorations","description":"Enables the set_decorations command without any pre-configured scope.","commands":{"allow":["set_decorations"],"deny":[]}},"allow-set-effects":{"identifier":"allow-set-effects","description":"Enables the set_effects command without any pre-configured scope.","commands":{"allow":["set_effects"],"deny":[]}},"allow-set-enabled":{"identifier":"allow-set-enabled","description":"Enables the set_enabled command without any pre-configured scope.","commands":{"allow":["set_enabled"],"deny":[]}},"allow-set-focus":{"identifier":"allow-set-focus","description":"Enables the set_focus command without any pre-configured scope.","commands":{"allow":["set_focus"],"deny":[]}},"allow-set-focusable":{"identifier":"allow-set-focusable","description":"Enables the set_focusable command without any pre-configured scope.","commands":{"allow":["set_focusable"],"deny":[]}},"allow-set-fullscreen":{"identifier":"allow-set-fullscreen","description":"Enables the set_fullscreen command without any pre-configured scope.","commands":{"allow":["set_fullscreen"],"deny":[]}},"allow-set-icon":{"identifier":"allow-set-icon","description":"Enables the set_icon command without any pre-configured scope.","commands":{"allow":["set_icon"],"deny":[]}},"allow-set-ignore-cursor-events":{"identifier":"allow-set-ignore-cursor-events","description":"Enables the set_ignore_cursor_events command without any pre-configured scope.","commands":{"allow":["set_ignore_cursor_events"],"deny":[]}},"allow-set-max-size":{"identifier":"allow-set-max-size","description":"Enables the set_max_size command without any pre-configured scope.","commands":{"allow":["set_max_size"],"deny":[]}},"allow-set-maximizable":{"identifier":"allow-set-maximizable","description":"Enables the set_maximizable command without any pre-configured scope.","commands":{"allow":["set_maximizable"],"deny":[]}},"allow-set-min-size":{"identifier":"allow-set-min-size","description":"Enables the set_min_size command without any pre-configured scope.","commands":{"allow":["set_min_size"],"deny":[]}},"allow-set-minimizable":{"identifier":"allow-set-minimizable","description":"Enables the set_minimizable command without any pre-configured scope.","commands":{"allow":["set_minimizable"],"deny":[]}},"allow-set-overlay-icon":{"identifier":"allow-set-overlay-icon","description":"Enables the set_overlay_icon command without any pre-configured scope.","commands":{"allow":["set_overlay_icon"],"deny":[]}},"allow-set-position":{"identifier":"allow-set-position","description":"Enables the set_position command without any pre-configured scope.","commands":{"allow":["set_position"],"deny":[]}},"allow-set-progress-bar":{"identifier":"allow-set-progress-bar","description":"Enables the set_progress_bar command without any pre-configured scope.","commands":{"allow":["set_progress_bar"],"deny":[]}},"allow-set-resizable":{"identifier":"allow-set-resizable","description":"Enables the set_resizable command without any pre-configured scope.","commands":{"allow":["set_resizable"],"deny":[]}},"allow-set-shadow":{"identifier":"allow-set-shadow","description":"Enables the set_shadow command without any pre-configured scope.","commands":{"allow":["set_shadow"],"deny":[]}},"allow-set-simple-fullscreen":{"identifier":"allow-set-simple-fullscreen","description":"Enables the set_simple_fullscreen command without any pre-configured scope.","commands":{"allow":["set_simple_fullscreen"],"deny":[]}},"allow-set-size":{"identifier":"allow-set-size","description":"Enables the set_size command without any pre-configured scope.","commands":{"allow":["set_size"],"deny":[]}},"allow-set-size-constraints":{"identifier":"allow-set-size-constraints","description":"Enables the set_size_constraints command without any pre-configured scope.","commands":{"allow":["set_size_constraints"],"deny":[]}},"allow-set-skip-taskbar":{"identifier":"allow-set-skip-taskbar","description":"Enables the set_skip_taskbar command without any pre-configured scope.","commands":{"allow":["set_skip_taskbar"],"deny":[]}},"allow-set-theme":{"identifier":"allow-set-theme","description":"Enables the set_theme command without any pre-configured scope.","commands":{"allow":["set_theme"],"deny":[]}},"allow-set-title":{"identifier":"allow-set-title","description":"Enables the set_title command without any pre-configured scope.","commands":{"allow":["set_title"],"deny":[]}},"allow-set-title-bar-style":{"identifier":"allow-set-title-bar-style","description":"Enables the set_title_bar_style command without any pre-configured scope.","commands":{"allow":["set_title_bar_style"],"deny":[]}},"allow-set-visible-on-all-workspaces":{"identifier":"allow-set-visible-on-all-workspaces","description":"Enables the set_visible_on_all_workspaces command without any pre-configured scope.","commands":{"allow":["set_visible_on_all_workspaces"],"deny":[]}},"allow-show":{"identifier":"allow-show","description":"Enables the show command without any pre-configured scope.","commands":{"allow":["show"],"deny":[]}},"allow-start-dragging":{"identifier":"allow-start-dragging","description":"Enables the start_dragging command without any pre-configured scope.","commands":{"allow":["start_dragging"],"deny":[]}},"allow-start-resize-dragging":{"identifier":"allow-start-resize-dragging","description":"Enables the start_resize_dragging command without any pre-configured scope.","commands":{"allow":["start_resize_dragging"],"deny":[]}},"allow-theme":{"identifier":"allow-theme","description":"Enables the theme command without any pre-configured scope.","commands":{"allow":["theme"],"deny":[]}},"allow-title":{"identifier":"allow-title","description":"Enables the title command without any pre-configured scope.","commands":{"allow":["title"],"deny":[]}},"allow-toggle-maximize":{"identifier":"allow-toggle-maximize","description":"Enables the toggle_maximize command without any pre-configured scope.","commands":{"allow":["toggle_maximize"],"deny":[]}},"allow-unmaximize":{"identifier":"allow-unmaximize","description":"Enables the unmaximize command without any pre-configured scope.","commands":{"allow":["unmaximize"],"deny":[]}},"allow-unminimize":{"identifier":"allow-unminimize","description":"Enables the unminimize command without any pre-configured scope.","commands":{"allow":["unminimize"],"deny":[]}},"deny-available-monitors":{"identifier":"deny-available-monitors","description":"Denies the available_monitors command without any pre-configured scope.","commands":{"allow":[],"deny":["available_monitors"]}},"deny-center":{"identifier":"deny-center","description":"Denies the center command without any pre-configured scope.","commands":{"allow":[],"deny":["center"]}},"deny-close":{"identifier":"deny-close","description":"Denies the close command without any pre-configured scope.","commands":{"allow":[],"deny":["close"]}},"deny-create":{"identifier":"deny-create","description":"Denies the create command without any pre-configured scope.","commands":{"allow":[],"deny":["create"]}},"deny-current-monitor":{"identifier":"deny-current-monitor","description":"Denies the current_monitor command without any pre-configured scope.","commands":{"allow":[],"deny":["current_monitor"]}},"deny-cursor-position":{"identifier":"deny-cursor-position","description":"Denies the cursor_position command without any pre-configured scope.","commands":{"allow":[],"deny":["cursor_position"]}},"deny-destroy":{"identifier":"deny-destroy","description":"Denies the destroy command without any pre-configured scope.","commands":{"allow":[],"deny":["destroy"]}},"deny-get-all-windows":{"identifier":"deny-get-all-windows","description":"Denies the get_all_windows command without any pre-configured scope.","commands":{"allow":[],"deny":["get_all_windows"]}},"deny-hide":{"identifier":"deny-hide","description":"Denies the hide command without any pre-configured scope.","commands":{"allow":[],"deny":["hide"]}},"deny-inner-position":{"identifier":"deny-inner-position","description":"Denies the inner_position command without any pre-configured scope.","commands":{"allow":[],"deny":["inner_position"]}},"deny-inner-size":{"identifier":"deny-inner-size","description":"Denies the inner_size command without any pre-configured scope.","commands":{"allow":[],"deny":["inner_size"]}},"deny-internal-toggle-maximize":{"identifier":"deny-internal-toggle-maximize","description":"Denies the internal_toggle_maximize command without any pre-configured scope.","commands":{"allow":[],"deny":["internal_toggle_maximize"]}},"deny-is-always-on-top":{"identifier":"deny-is-always-on-top","description":"Denies the is_always_on_top command without any pre-configured scope.","commands":{"allow":[],"deny":["is_always_on_top"]}},"deny-is-closable":{"identifier":"deny-is-closable","description":"Denies the is_closable command without any pre-configured scope.","commands":{"allow":[],"deny":["is_closable"]}},"deny-is-decorated":{"identifier":"deny-is-decorated","description":"Denies the is_decorated command without any pre-configured scope.","commands":{"allow":[],"deny":["is_decorated"]}},"deny-is-enabled":{"identifier":"deny-is-enabled","description":"Denies the is_enabled command without any pre-configured scope.","commands":{"allow":[],"deny":["is_enabled"]}},"deny-is-focused":{"identifier":"deny-is-focused","description":"Denies the is_focused command without any pre-configured scope.","commands":{"allow":[],"deny":["is_focused"]}},"deny-is-fullscreen":{"identifier":"deny-is-fullscreen","description":"Denies the is_fullscreen command without any pre-configured scope.","commands":{"allow":[],"deny":["is_fullscreen"]}},"deny-is-maximizable":{"identifier":"deny-is-maximizable","description":"Denies the is_maximizable command without any pre-configured scope.","commands":{"allow":[],"deny":["is_maximizable"]}},"deny-is-maximized":{"identifier":"deny-is-maximized","description":"Denies the is_maximized command without any pre-configured scope.","commands":{"allow":[],"deny":["is_maximized"]}},"deny-is-minimizable":{"identifier":"deny-is-minimizable","description":"Denies the is_minimizable command without any pre-configured scope.","commands":{"allow":[],"deny":["is_minimizable"]}},"deny-is-minimized":{"identifier":"deny-is-minimized","description":"Denies the is_minimized command without any pre-configured scope.","commands":{"allow":[],"deny":["is_minimized"]}},"deny-is-resizable":{"identifier":"deny-is-resizable","description":"Denies the is_resizable command without any pre-configured scope.","commands":{"allow":[],"deny":["is_resizable"]}},"deny-is-visible":{"identifier":"deny-is-visible","description":"Denies the is_visible command without any pre-configured scope.","commands":{"allow":[],"deny":["is_visible"]}},"deny-maximize":{"identifier":"deny-maximize","description":"Denies the maximize command without any pre-configured scope.","commands":{"allow":[],"deny":["maximize"]}},"deny-minimize":{"identifier":"deny-minimize","description":"Denies the minimize command without any pre-configured scope.","commands":{"allow":[],"deny":["minimize"]}},"deny-monitor-from-point":{"identifier":"deny-monitor-from-point","description":"Denies the monitor_from_point command without any pre-configured scope.","commands":{"allow":[],"deny":["monitor_from_point"]}},"deny-outer-position":{"identifier":"deny-outer-position","description":"Denies the outer_position command without any pre-configured scope.","commands":{"allow":[],"deny":["outer_position"]}},"deny-outer-size":{"identifier":"deny-outer-size","description":"Denies the outer_size command without any pre-configured scope.","commands":{"allow":[],"deny":["outer_size"]}},"deny-primary-monitor":{"identifier":"deny-primary-monitor","description":"Denies the primary_monitor command without any pre-configured scope.","commands":{"allow":[],"deny":["primary_monitor"]}},"deny-request-user-attention":{"identifier":"deny-request-user-attention","description":"Denies the request_user_attention command without any pre-configured scope.","commands":{"allow":[],"deny":["request_user_attention"]}},"deny-scale-factor":{"identifier":"deny-scale-factor","description":"Denies the scale_factor command without any pre-configured scope.","commands":{"allow":[],"deny":["scale_factor"]}},"deny-set-always-on-bottom":{"identifier":"deny-set-always-on-bottom","description":"Denies the set_always_on_bottom command without any pre-configured scope.","commands":{"allow":[],"deny":["set_always_on_bottom"]}},"deny-set-always-on-top":{"identifier":"deny-set-always-on-top","description":"Denies the set_always_on_top command without any pre-configured scope.","commands":{"allow":[],"deny":["set_always_on_top"]}},"deny-set-background-color":{"identifier":"deny-set-background-color","description":"Denies the set_background_color command without any pre-configured scope.","commands":{"allow":[],"deny":["set_background_color"]}},"deny-set-badge-count":{"identifier":"deny-set-badge-count","description":"Denies the set_badge_count command without any pre-configured scope.","commands":{"allow":[],"deny":["set_badge_count"]}},"deny-set-badge-label":{"identifier":"deny-set-badge-label","description":"Denies the set_badge_label command without any pre-configured scope.","commands":{"allow":[],"deny":["set_badge_label"]}},"deny-set-closable":{"identifier":"deny-set-closable","description":"Denies the set_closable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_closable"]}},"deny-set-content-protected":{"identifier":"deny-set-content-protected","description":"Denies the set_content_protected command without any pre-configured scope.","commands":{"allow":[],"deny":["set_content_protected"]}},"deny-set-cursor-grab":{"identifier":"deny-set-cursor-grab","description":"Denies the set_cursor_grab command without any pre-configured scope.","commands":{"allow":[],"deny":["set_cursor_grab"]}},"deny-set-cursor-icon":{"identifier":"deny-set-cursor-icon","description":"Denies the set_cursor_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_cursor_icon"]}},"deny-set-cursor-position":{"identifier":"deny-set-cursor-position","description":"Denies the set_cursor_position command without any pre-configured scope.","commands":{"allow":[],"deny":["set_cursor_position"]}},"deny-set-cursor-visible":{"identifier":"deny-set-cursor-visible","description":"Denies the set_cursor_visible command without any pre-configured scope.","commands":{"allow":[],"deny":["set_cursor_visible"]}},"deny-set-decorations":{"identifier":"deny-set-decorations","description":"Denies the set_decorations command without any pre-configured scope.","commands":{"allow":[],"deny":["set_decorations"]}},"deny-set-effects":{"identifier":"deny-set-effects","description":"Denies the set_effects command without any pre-configured scope.","commands":{"allow":[],"deny":["set_effects"]}},"deny-set-enabled":{"identifier":"deny-set-enabled","description":"Denies the set_enabled command without any pre-configured scope.","commands":{"allow":[],"deny":["set_enabled"]}},"deny-set-focus":{"identifier":"deny-set-focus","description":"Denies the set_focus command without any pre-configured scope.","commands":{"allow":[],"deny":["set_focus"]}},"deny-set-focusable":{"identifier":"deny-set-focusable","description":"Denies the set_focusable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_focusable"]}},"deny-set-fullscreen":{"identifier":"deny-set-fullscreen","description":"Denies the set_fullscreen command without any pre-configured scope.","commands":{"allow":[],"deny":["set_fullscreen"]}},"deny-set-icon":{"identifier":"deny-set-icon","description":"Denies the set_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_icon"]}},"deny-set-ignore-cursor-events":{"identifier":"deny-set-ignore-cursor-events","description":"Denies the set_ignore_cursor_events command without any pre-configured scope.","commands":{"allow":[],"deny":["set_ignore_cursor_events"]}},"deny-set-max-size":{"identifier":"deny-set-max-size","description":"Denies the set_max_size command without any pre-configured scope.","commands":{"allow":[],"deny":["set_max_size"]}},"deny-set-maximizable":{"identifier":"deny-set-maximizable","description":"Denies the set_maximizable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_maximizable"]}},"deny-set-min-size":{"identifier":"deny-set-min-size","description":"Denies the set_min_size command without any pre-configured scope.","commands":{"allow":[],"deny":["set_min_size"]}},"deny-set-minimizable":{"identifier":"deny-set-minimizable","description":"Denies the set_minimizable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_minimizable"]}},"deny-set-overlay-icon":{"identifier":"deny-set-overlay-icon","description":"Denies the set_overlay_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_overlay_icon"]}},"deny-set-position":{"identifier":"deny-set-position","description":"Denies the set_position command without any pre-configured scope.","commands":{"allow":[],"deny":["set_position"]}},"deny-set-progress-bar":{"identifier":"deny-set-progress-bar","description":"Denies the set_progress_bar command without any pre-configured scope.","commands":{"allow":[],"deny":["set_progress_bar"]}},"deny-set-resizable":{"identifier":"deny-set-resizable","description":"Denies the set_resizable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_resizable"]}},"deny-set-shadow":{"identifier":"deny-set-shadow","description":"Denies the set_shadow command without any pre-configured scope.","commands":{"allow":[],"deny":["set_shadow"]}},"deny-set-simple-fullscreen":{"identifier":"deny-set-simple-fullscreen","description":"Denies the set_simple_fullscreen command without any pre-configured scope.","commands":{"allow":[],"deny":["set_simple_fullscreen"]}},"deny-set-size":{"identifier":"deny-set-size","description":"Denies the set_size command without any pre-configured scope.","commands":{"allow":[],"deny":["set_size"]}},"deny-set-size-constraints":{"identifier":"deny-set-size-constraints","description":"Denies the set_size_constraints command without any pre-configured scope.","commands":{"allow":[],"deny":["set_size_constraints"]}},"deny-set-skip-taskbar":{"identifier":"deny-set-skip-taskbar","description":"Denies the set_skip_taskbar command without any pre-configured scope.","commands":{"allow":[],"deny":["set_skip_taskbar"]}},"deny-set-theme":{"identifier":"deny-set-theme","description":"Denies the set_theme command without any pre-configured scope.","commands":{"allow":[],"deny":["set_theme"]}},"deny-set-title":{"identifier":"deny-set-title","description":"Denies the set_title command without any pre-configured scope.","commands":{"allow":[],"deny":["set_title"]}},"deny-set-title-bar-style":{"identifier":"deny-set-title-bar-style","description":"Denies the set_title_bar_style command without any pre-configured scope.","commands":{"allow":[],"deny":["set_title_bar_style"]}},"deny-set-visible-on-all-workspaces":{"identifier":"deny-set-visible-on-all-workspaces","description":"Denies the set_visible_on_all_workspaces command without any pre-configured scope.","commands":{"allow":[],"deny":["set_visible_on_all_workspaces"]}},"deny-show":{"identifier":"deny-show","description":"Denies the show command without any pre-configured scope.","commands":{"allow":[],"deny":["show"]}},"deny-start-dragging":{"identifier":"deny-start-dragging","description":"Denies the start_dragging command without any pre-configured scope.","commands":{"allow":[],"deny":["start_dragging"]}},"deny-start-resize-dragging":{"identifier":"deny-start-resize-dragging","description":"Denies the start_resize_dragging command without any pre-configured scope.","commands":{"allow":[],"deny":["start_resize_dragging"]}},"deny-theme":{"identifier":"deny-theme","description":"Denies the theme command without any pre-configured scope.","commands":{"allow":[],"deny":["theme"]}},"deny-title":{"identifier":"deny-title","description":"Denies the title command without any pre-configured scope.","commands":{"allow":[],"deny":["title"]}},"deny-toggle-maximize":{"identifier":"deny-toggle-maximize","description":"Denies the toggle_maximize command without any pre-configured scope.","commands":{"allow":[],"deny":["toggle_maximize"]}},"deny-unmaximize":{"identifier":"deny-unmaximize","description":"Denies the unmaximize command without any pre-configured scope.","commands":{"allow":[],"deny":["unmaximize"]}},"deny-unminimize":{"identifier":"deny-unminimize","description":"Denies the unminimize command without any pre-configured scope.","commands":{"allow":[],"deny":["unminimize"]}}},"permission_sets":{},"global_scope_schema":null},"fs":{"default_permission":{"identifier":"default","description":"This set of permissions describes the what kind of\nfile system access the `fs` plugin has enabled or denied by default.\n\n#### Granted Permissions\n\nThis default permission set enables read access to the\napplication specific directories (AppConfig, AppData, AppLocalData, AppCache,\nAppLog) and all files and sub directories created in it.\nThe location of these directories depends on the operating system,\nwhere the application is run.\n\nIn general these directories need to be manually created\nby the application at runtime, before accessing files or folders\nin it is possible.\n\nTherefore, it is also allowed to create all of these folders via\nthe `mkdir` command.\n\n#### Denied Permissions\n\nThis default permission set prevents access to critical components\nof the Tauri application by default.\nOn Windows the webview data folder access is denied.\n","permissions":["create-app-specific-dirs","read-app-specific-dirs-recursive","deny-default"]},"permissions":{"allow-copy-file":{"identifier":"allow-copy-file","description":"Enables the copy_file command without any pre-configured scope.","commands":{"allow":["copy_file"],"deny":[]}},"allow-create":{"identifier":"allow-create","description":"Enables the create command without any pre-configured scope.","commands":{"allow":["create"],"deny":[]}},"allow-exists":{"identifier":"allow-exists","description":"Enables the exists command without any pre-configured scope.","commands":{"allow":["exists"],"deny":[]}},"allow-fstat":{"identifier":"allow-fstat","description":"Enables the fstat command without any pre-configured scope.","commands":{"allow":["fstat"],"deny":[]}},"allow-ftruncate":{"identifier":"allow-ftruncate","description":"Enables the ftruncate command without any pre-configured scope.","commands":{"allow":["ftruncate"],"deny":[]}},"allow-lstat":{"identifier":"allow-lstat","description":"Enables the lstat command without any pre-configured scope.","commands":{"allow":["lstat"],"deny":[]}},"allow-mkdir":{"identifier":"allow-mkdir","description":"Enables the mkdir command without any pre-configured scope.","commands":{"allow":["mkdir"],"deny":[]}},"allow-open":{"identifier":"allow-open","description":"Enables the open command without any pre-configured scope.","commands":{"allow":["open"],"deny":[]}},"allow-read":{"identifier":"allow-read","description":"Enables the read command without any pre-configured scope.","commands":{"allow":["read"],"deny":[]}},"allow-read-dir":{"identifier":"allow-read-dir","description":"Enables the read_dir command without any pre-configured scope.","commands":{"allow":["read_dir"],"deny":[]}},"allow-read-file":{"identifier":"allow-read-file","description":"Enables the read_file command without any pre-configured scope.","commands":{"allow":["read_file"],"deny":[]}},"allow-read-text-file":{"identifier":"allow-read-text-file","description":"Enables the read_text_file command without any pre-configured scope.","commands":{"allow":["read_text_file"],"deny":[]}},"allow-read-text-file-lines":{"identifier":"allow-read-text-file-lines","description":"Enables the read_text_file_lines command without any pre-configured scope.","commands":{"allow":["read_text_file_lines","read_text_file_lines_next"],"deny":[]}},"allow-read-text-file-lines-next":{"identifier":"allow-read-text-file-lines-next","description":"Enables the read_text_file_lines_next command without any pre-configured scope.","commands":{"allow":["read_text_file_lines_next"],"deny":[]}},"allow-remove":{"identifier":"allow-remove","description":"Enables the remove command without any pre-configured scope.","commands":{"allow":["remove"],"deny":[]}},"allow-rename":{"identifier":"allow-rename","description":"Enables the rename command without any pre-configured scope.","commands":{"allow":["rename"],"deny":[]}},"allow-seek":{"identifier":"allow-seek","description":"Enables the seek command without any pre-configured scope.","commands":{"allow":["seek"],"deny":[]}},"allow-size":{"identifier":"allow-size","description":"Enables the size command without any pre-configured scope.","commands":{"allow":["size"],"deny":[]}},"allow-stat":{"identifier":"allow-stat","description":"Enables the stat command without any pre-configured scope.","commands":{"allow":["stat"],"deny":[]}},"allow-truncate":{"identifier":"allow-truncate","description":"Enables the truncate command without any pre-configured scope.","commands":{"allow":["truncate"],"deny":[]}},"allow-unwatch":{"identifier":"allow-unwatch","description":"Enables the unwatch command without any pre-configured scope.","commands":{"allow":["unwatch"],"deny":[]}},"allow-watch":{"identifier":"allow-watch","description":"Enables the watch command without any pre-configured scope.","commands":{"allow":["watch"],"deny":[]}},"allow-write":{"identifier":"allow-write","description":"Enables the write command without any pre-configured scope.","commands":{"allow":["write"],"deny":[]}},"allow-write-file":{"identifier":"allow-write-file","description":"Enables the write_file command without any pre-configured scope.","commands":{"allow":["write_file","open","write"],"deny":[]}},"allow-write-text-file":{"identifier":"allow-write-text-file","description":"Enables the write_text_file command without any pre-configured scope.","commands":{"allow":["write_text_file"],"deny":[]}},"create-app-specific-dirs":{"identifier":"create-app-specific-dirs","description":"This permissions allows to create the application specific directories.\n","commands":{"allow":["mkdir","scope-app-index"],"deny":[]}},"deny-copy-file":{"identifier":"deny-copy-file","description":"Denies the copy_file command without any pre-configured scope.","commands":{"allow":[],"deny":["copy_file"]}},"deny-create":{"identifier":"deny-create","description":"Denies the create command without any pre-configured scope.","commands":{"allow":[],"deny":["create"]}},"deny-exists":{"identifier":"deny-exists","description":"Denies the exists command without any pre-configured scope.","commands":{"allow":[],"deny":["exists"]}},"deny-fstat":{"identifier":"deny-fstat","description":"Denies the fstat command without any pre-configured scope.","commands":{"allow":[],"deny":["fstat"]}},"deny-ftruncate":{"identifier":"deny-ftruncate","description":"Denies the ftruncate command without any pre-configured scope.","commands":{"allow":[],"deny":["ftruncate"]}},"deny-lstat":{"identifier":"deny-lstat","description":"Denies the lstat command without any pre-configured scope.","commands":{"allow":[],"deny":["lstat"]}},"deny-mkdir":{"identifier":"deny-mkdir","description":"Denies the mkdir command without any pre-configured scope.","commands":{"allow":[],"deny":["mkdir"]}},"deny-open":{"identifier":"deny-open","description":"Denies the open command without any pre-configured scope.","commands":{"allow":[],"deny":["open"]}},"deny-read":{"identifier":"deny-read","description":"Denies the read command without any pre-configured scope.","commands":{"allow":[],"deny":["read"]}},"deny-read-dir":{"identifier":"deny-read-dir","description":"Denies the read_dir command without any pre-configured scope.","commands":{"allow":[],"deny":["read_dir"]}},"deny-read-file":{"identifier":"deny-read-file","description":"Denies the read_file command without any pre-configured scope.","commands":{"allow":[],"deny":["read_file"]}},"deny-read-text-file":{"identifier":"deny-read-text-file","description":"Denies the read_text_file command without any pre-configured scope.","commands":{"allow":[],"deny":["read_text_file"]}},"deny-read-text-file-lines":{"identifier":"deny-read-text-file-lines","description":"Denies the read_text_file_lines command without any pre-configured scope.","commands":{"allow":[],"deny":["read_text_file_lines"]}},"deny-read-text-file-lines-next":{"identifier":"deny-read-text-file-lines-next","description":"Denies the read_text_file_lines_next command without any pre-configured scope.","commands":{"allow":[],"deny":["read_text_file_lines_next"]}},"deny-remove":{"identifier":"deny-remove","description":"Denies the remove command without any pre-configured scope.","commands":{"allow":[],"deny":["remove"]}},"deny-rename":{"identifier":"deny-rename","description":"Denies the rename command without any pre-configured scope.","commands":{"allow":[],"deny":["rename"]}},"deny-seek":{"identifier":"deny-seek","description":"Denies the seek command without any pre-configured scope.","commands":{"allow":[],"deny":["seek"]}},"deny-size":{"identifier":"deny-size","description":"Denies the size command without any pre-configured scope.","commands":{"allow":[],"deny":["size"]}},"deny-stat":{"identifier":"deny-stat","description":"Denies the stat command without any pre-configured scope.","commands":{"allow":[],"deny":["stat"]}},"deny-truncate":{"identifier":"deny-truncate","description":"Denies the truncate command without any pre-configured scope.","commands":{"allow":[],"deny":["truncate"]}},"deny-unwatch":{"identifier":"deny-unwatch","description":"Denies the unwatch command without any pre-configured scope.","commands":{"allow":[],"deny":["unwatch"]}},"deny-watch":{"identifier":"deny-watch","description":"Denies the watch command without any pre-configured scope.","commands":{"allow":[],"deny":["watch"]}},"deny-webview-data-linux":{"identifier":"deny-webview-data-linux","description":"This denies read access to the\n`$APPLOCALDATA` folder on linux as the webview data and configuration values are stored here.\nAllowing access can lead to sensitive information disclosure and should be well considered.","commands":{"allow":[],"deny":[]}},"deny-webview-data-windows":{"identifier":"deny-webview-data-windows","description":"This denies read access to the\n`$APPLOCALDATA/EBWebView` folder on windows as the webview data and configuration values are stored here.\nAllowing access can lead to sensitive information disclosure and should be well considered.","commands":{"allow":[],"deny":[]}},"deny-write":{"identifier":"deny-write","description":"Denies the write command without any pre-configured scope.","commands":{"allow":[],"deny":["write"]}},"deny-write-file":{"identifier":"deny-write-file","description":"Denies the write_file command without any pre-configured scope.","commands":{"allow":[],"deny":["write_file"]}},"deny-write-text-file":{"identifier":"deny-write-text-file","description":"Denies the write_text_file command without any pre-configured scope.","commands":{"allow":[],"deny":["write_text_file"]}},"read-all":{"identifier":"read-all","description":"This enables all read related commands without any pre-configured accessible paths.","commands":{"allow":["read_dir","read_file","read","open","read_text_file","read_text_file_lines","read_text_file_lines_next","seek","stat","lstat","fstat","exists","watch","unwatch"],"deny":[]}},"read-app-specific-dirs-recursive":{"identifier":"read-app-specific-dirs-recursive","description":"This permission allows recursive read functionality on the application\nspecific base directories. \n","commands":{"allow":["read_dir","read_file","read_text_file","read_text_file_lines","read_text_file_lines_next","exists","scope-app-recursive"],"deny":[]}},"read-dirs":{"identifier":"read-dirs","description":"This enables directory read and file metadata related commands without any pre-configured accessible paths.","commands":{"allow":["read_dir","stat","lstat","fstat","exists"],"deny":[]}},"read-files":{"identifier":"read-files","description":"This enables file read related commands without any pre-configured accessible paths.","commands":{"allow":["read_file","read","open","read_text_file","read_text_file_lines","read_text_file_lines_next","seek","stat","lstat","fstat","exists"],"deny":[]}},"read-meta":{"identifier":"read-meta","description":"This enables all index or metadata related commands without any pre-configured accessible paths.","commands":{"allow":["read_dir","stat","lstat","fstat","exists","size"],"deny":[]}},"scope":{"identifier":"scope","description":"An empty permission you can use to modify the global scope.\n\n## Example\n\n```json\n{\n  \"identifier\": \"read-documents\",\n  \"windows\": [\"main\"],\n  \"permissions\": [\n    \"fs:allow-read\",\n    {\n      \"identifier\": \"fs:scope\",\n      \"allow\": [\n        \"$APPDATA/documents/**/*\"\n      ],\n      \"deny\": [\n        \"$APPDATA/documents/secret.txt\"\n      ]\n    }\n  ]\n}\n```\n","commands":{"allow":[],"deny":[]}},"scope-app":{"identifier":"scope-app","description":"This scope permits access to all files and list content of top level directories in the application folders.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPCONFIG/*"},{"path":"$APPDATA"},{"path":"$APPDATA/*"},{"path":"$APPLOCALDATA"},{"path":"$APPLOCALDATA/*"},{"path":"$APPCACHE"},{"path":"$APPCACHE/*"},{"path":"$APPLOG"},{"path":"$APPLOG/*"}]}},"scope-app-index":{"identifier":"scope-app-index","description":"This scope permits to list all files and folders in the application directories.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPDATA"},{"path":"$APPLOCALDATA"},{"path":"$APPCACHE"},{"path":"$APPLOG"}]}},"scope-app-recursive":{"identifier":"scope-app-recursive","description":"This scope permits recursive access to the complete application folders, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPCONFIG/**"},{"path":"$APPDATA"},{"path":"$APPDATA/**"},{"path":"$APPLOCALDATA"},{"path":"$APPLOCALDATA/**"},{"path":"$APPCACHE"},{"path":"$APPCACHE/**"},{"path":"$APPLOG"},{"path":"$APPLOG/**"}]}},"scope-appcache":{"identifier":"scope-appcache","description":"This scope permits access to all files and list content of top level directories in the `$APPCACHE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCACHE"},{"path":"$APPCACHE/*"}]}},"scope-appcache-index":{"identifier":"scope-appcache-index","description":"This scope permits to list all files and folders in the `$APPCACHE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCACHE"}]}},"scope-appcache-recursive":{"identifier":"scope-appcache-recursive","description":"This scope permits recursive access to the complete `$APPCACHE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCACHE"},{"path":"$APPCACHE/**"}]}},"scope-appconfig":{"identifier":"scope-appconfig","description":"This scope permits access to all files and list content of top level directories in the `$APPCONFIG` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPCONFIG/*"}]}},"scope-appconfig-index":{"identifier":"scope-appconfig-index","description":"This scope permits to list all files and folders in the `$APPCONFIG`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"}]}},"scope-appconfig-recursive":{"identifier":"scope-appconfig-recursive","description":"This scope permits recursive access to the complete `$APPCONFIG` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPCONFIG/**"}]}},"scope-appdata":{"identifier":"scope-appdata","description":"This scope permits access to all files and list content of top level directories in the `$APPDATA` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPDATA"},{"path":"$APPDATA/*"}]}},"scope-appdata-index":{"identifier":"scope-appdata-index","description":"This scope permits to list all files and folders in the `$APPDATA`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPDATA"}]}},"scope-appdata-recursive":{"identifier":"scope-appdata-recursive","description":"This scope permits recursive access to the complete `$APPDATA` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPDATA"},{"path":"$APPDATA/**"}]}},"scope-applocaldata":{"identifier":"scope-applocaldata","description":"This scope permits access to all files and list content of top level directories in the `$APPLOCALDATA` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOCALDATA"},{"path":"$APPLOCALDATA/*"}]}},"scope-applocaldata-index":{"identifier":"scope-applocaldata-index","description":"This scope permits to list all files and folders in the `$APPLOCALDATA`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOCALDATA"}]}},"scope-applocaldata-recursive":{"identifier":"scope-applocaldata-recursive","description":"This scope permits recursive access to the complete `$APPLOCALDATA` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOCALDATA"},{"path":"$APPLOCALDATA/**"}]}},"scope-applog":{"identifier":"scope-applog","description":"This scope permits access to all files and list content of top level directories in the `$APPLOG` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOG"},{"path":"$APPLOG/*"}]}},"scope-applog-index":{"identifier":"scope-applog-index","description":"This scope permits to list all files and folders in the `$APPLOG`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOG"}]}},"scope-applog-recursive":{"identifier":"scope-applog-recursive","description":"This scope permits recursive access to the complete `$APPLOG` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOG"},{"path":"$APPLOG/**"}]}},"scope-audio":{"identifier":"scope-audio","description":"This scope permits access to all files and list content of top level directories in the `$AUDIO` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$AUDIO"},{"path":"$AUDIO/*"}]}},"scope-audio-index":{"identifier":"scope-audio-index","description":"This scope permits to list all files and folders in the `$AUDIO`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$AUDIO"}]}},"scope-audio-recursive":{"identifier":"scope-audio-recursive","description":"This scope permits recursive access to the complete `$AUDIO` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$AUDIO"},{"path":"$AUDIO/**"}]}},"scope-cache":{"identifier":"scope-cache","description":"This scope permits access to all files and list content of top level directories in the `$CACHE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CACHE"},{"path":"$CACHE/*"}]}},"scope-cache-index":{"identifier":"scope-cache-index","description":"This scope permits to list all files and folders in the `$CACHE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CACHE"}]}},"scope-cache-recursive":{"identifier":"scope-cache-recursive","description":"This scope permits recursive access to the complete `$CACHE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CACHE"},{"path":"$CACHE/**"}]}},"scope-config":{"identifier":"scope-config","description":"This scope permits access to all files and list content of top level directories in the `$CONFIG` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CONFIG"},{"path":"$CONFIG/*"}]}},"scope-config-index":{"identifier":"scope-config-index","description":"This scope permits to list all files and folders in the `$CONFIG`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CONFIG"}]}},"scope-config-recursive":{"identifier":"scope-config-recursive","description":"This scope permits recursive access to the complete `$CONFIG` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CONFIG"},{"path":"$CONFIG/**"}]}},"scope-data":{"identifier":"scope-data","description":"This scope permits access to all files and list content of top level directories in the `$DATA` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DATA"},{"path":"$DATA/*"}]}},"scope-data-index":{"identifier":"scope-data-index","description":"This scope permits to list all files and folders in the `$DATA`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DATA"}]}},"scope-data-recursive":{"identifier":"scope-data-recursive","description":"This scope permits recursive access to the complete `$DATA` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DATA"},{"path":"$DATA/**"}]}},"scope-desktop":{"identifier":"scope-desktop","description":"This scope permits access to all files and list content of top level directories in the `$DESKTOP` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DESKTOP"},{"path":"$DESKTOP/*"}]}},"scope-desktop-index":{"identifier":"scope-desktop-index","description":"This scope permits to list all files and folders in the `$DESKTOP`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DESKTOP"}]}},"scope-desktop-recursive":{"identifier":"scope-desktop-recursive","description":"This scope permits recursive access to the complete `$DESKTOP` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DESKTOP"},{"path":"$DESKTOP/**"}]}},"scope-document":{"identifier":"scope-document","description":"This scope permits access to all files and list content of top level directories in the `$DOCUMENT` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOCUMENT"},{"path":"$DOCUMENT/*"}]}},"scope-document-index":{"identifier":"scope-document-index","description":"This scope permits to list all files and folders in the `$DOCUMENT`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOCUMENT"}]}},"scope-document-recursive":{"identifier":"scope-document-recursive","description":"This scope permits recursive access to the complete `$DOCUMENT` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOCUMENT"},{"path":"$DOCUMENT/**"}]}},"scope-download":{"identifier":"scope-download","description":"This scope permits access to all files and list content of top level directories in the `$DOWNLOAD` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOWNLOAD"},{"path":"$DOWNLOAD/*"}]}},"scope-download-index":{"identifier":"scope-download-index","description":"This scope permits to list all files and folders in the `$DOWNLOAD`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOWNLOAD"}]}},"scope-download-recursive":{"identifier":"scope-download-recursive","description":"This scope permits recursive access to the complete `$DOWNLOAD` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOWNLOAD"},{"path":"$DOWNLOAD/**"}]}},"scope-exe":{"identifier":"scope-exe","description":"This scope permits access to all files and list content of top level directories in the `$EXE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$EXE"},{"path":"$EXE/*"}]}},"scope-exe-index":{"identifier":"scope-exe-index","description":"This scope permits to list all files and folders in the `$EXE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$EXE"}]}},"scope-exe-recursive":{"identifier":"scope-exe-recursive","description":"This scope permits recursive access to the complete `$EXE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$EXE"},{"path":"$EXE/**"}]}},"scope-font":{"identifier":"scope-font","description":"This scope permits access to all files and list content of top level directories in the `$FONT` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$FONT"},{"path":"$FONT/*"}]}},"scope-font-index":{"identifier":"scope-font-index","description":"This scope permits to list all files and folders in the `$FONT`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$FONT"}]}},"scope-font-recursive":{"identifier":"scope-font-recursive","description":"This scope permits recursive access to the complete `$FONT` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$FONT"},{"path":"$FONT/**"}]}},"scope-home":{"identifier":"scope-home","description":"This scope permits access to all files and list content of top level directories in the `$HOME` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$HOME"},{"path":"$HOME/*"}]}},"scope-home-index":{"identifier":"scope-home-index","description":"This scope permits to list all files and folders in the `$HOME`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$HOME"}]}},"scope-home-recursive":{"identifier":"scope-home-recursive","description":"This scope permits recursive access to the complete `$HOME` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$HOME"},{"path":"$HOME/**"}]}},"scope-localdata":{"identifier":"scope-localdata","description":"This scope permits access to all files and list content of top level directories in the `$LOCALDATA` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOCALDATA"},{"path":"$LOCALDATA/*"}]}},"scope-localdata-index":{"identifier":"scope-localdata-index","description":"This scope permits to list all files and folders in the `$LOCALDATA`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOCALDATA"}]}},"scope-localdata-recursive":{"identifier":"scope-localdata-recursive","description":"This scope permits recursive access to the complete `$LOCALDATA` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOCALDATA"},{"path":"$LOCALDATA/**"}]}},"scope-log":{"identifier":"scope-log","description":"This scope permits access to all files and list content of top level directories in the `$LOG` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOG"},{"path":"$LOG/*"}]}},"scope-log-index":{"identifier":"scope-log-index","description":"This scope permits to list all files and folders in the `$LOG`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOG"}]}},"scope-log-recursive":{"identifier":"scope-log-recursive","description":"This scope permits recursive access to the complete `$LOG` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOG"},{"path":"$LOG/**"}]}},"scope-picture":{"identifier":"scope-picture","description":"This scope permits access to all files and list content of top level directories in the `$PICTURE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PICTURE"},{"path":"$PICTURE/*"}]}},"scope-picture-index":{"identifier":"scope-picture-index","description":"This scope permits to list all files and folders in the `$PICTURE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PICTURE"}]}},"scope-picture-recursive":{"identifier":"scope-picture-recursive","description":"This scope permits recursive access to the complete `$PICTURE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PICTURE"},{"path":"$PICTURE/**"}]}},"scope-public":{"identifier":"scope-public","description":"This scope permits access to all files and list content of top level directories in the `$PUBLIC` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PUBLIC"},{"path":"$PUBLIC/*"}]}},"scope-public-index":{"identifier":"scope-public-index","description":"This scope permits to list all files and folders in the `$PUBLIC`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PUBLIC"}]}},"scope-public-recursive":{"identifier":"scope-public-recursive","description":"This scope permits recursive access to the complete `$PUBLIC` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PUBLIC"},{"path":"$PUBLIC/**"}]}},"scope-resource":{"identifier":"scope-resource","description":"This scope permits access to all files and list content of top level directories in the `$RESOURCE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RESOURCE"},{"path":"$RESOURCE/*"}]}},"scope-resource-index":{"identifier":"scope-resource-index","description":"This scope permits to list all files and folders in the `$RESOURCE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RESOURCE"}]}},"scope-resource-recursive":{"identifier":"scope-resource-recursive","description":"This scope permits recursive access to the complete `$RESOURCE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RESOURCE"},{"path":"$RESOURCE/**"}]}},"scope-runtime":{"identifier":"scope-runtime","description":"This scope permits access to all files and list content of top level directories in the `$RUNTIME` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RUNTIME"},{"path":"$RUNTIME/*"}]}},"scope-runtime-index":{"identifier":"scope-runtime-index","description":"This scope permits to list all files and folders in the `$RUNTIME`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RUNTIME"}]}},"scope-runtime-recursive":{"identifier":"scope-runtime-recursive","description":"This scope permits recursive access to the complete `$RUNTIME` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RUNTIME"},{"path":"$RUNTIME/**"}]}},"scope-temp":{"identifier":"scope-temp","description":"This scope permits access to all files and list content of top level directories in the `$TEMP` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMP"},{"path":"$TEMP/*"}]}},"scope-temp-index":{"identifier":"scope-temp-index","description":"This scope permits to list all files and folders in the `$TEMP`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMP"}]}},"scope-temp-recursive":{"identifier":"scope-temp-recursive","description":"This scope permits recursive access to the complete `$TEMP` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMP"},{"path":"$TEMP/**"}]}},"scope-template":{"identifier":"scope-template","description":"This scope permits access to all files and list content of top level directories in the `$TEMPLATE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMPLATE"},{"path":"$TEMPLATE/*"}]}},"scope-template-index":{"identifier":"scope-template-index","description":"This scope permits to list all files and folders in the `$TEMPLATE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMPLATE"}]}},"scope-template-recursive":{"identifier":"scope-template-recursive","description":"This scope permits recursive access to the complete `$TEMPLATE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMPLATE"},{"path":"$TEMPLATE/**"}]}},"scope-video":{"identifier":"scope-video","description":"This scope permits access to all files and list content of top level directories in the `$VIDEO` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$VIDEO"},{"path":"$VIDEO/*"}]}},"scope-video-index":{"identifier":"scope-video-index","description":"This scope permits to list all files and folders in the `$VIDEO`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$VIDEO"}]}},"scope-video-recursive":{"identifier":"scope-video-recursive","description":"This scope permits recursive access to the complete `$VIDEO` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$VIDEO"},{"path":"$VIDEO/**"}]}},"write-all":{"identifier":"write-all","description":"This enables all write related commands without any pre-configured accessible paths.","commands":{"allow":["mkdir","create","copy_file","remove","rename","truncate","ftruncate","write","write_file","write_text_file"],"deny":[]}},"write-files":{"identifier":"write-files","description":"This enables all file write related commands without any pre-configured accessible paths.","commands":{"allow":["create","copy_file","remove","rename","truncate","ftruncate","write","write_file","write_text_file"],"deny":[]}}},"permission_sets":{"allow-app-meta":{"identifier":"allow-app-meta","description":"This allows non-recursive read access to metadata of the application folders, including file listing and statistics.","permissions":["read-meta","scope-app-index"]},"allow-app-meta-recursive":{"identifier":"allow-app-meta-recursive","description":"This allows full recursive read access to metadata of the application folders, including file listing and statistics.","permissions":["read-meta","scope-app-recursive"]},"allow-app-read":{"identifier":"allow-app-read","description":"This allows non-recursive read access to the application folders.","permissions":["read-all","scope-app"]},"allow-app-read-recursive":{"identifier":"allow-app-read-recursive","description":"This allows full recursive read access to the complete application folders, files and subdirectories.","permissions":["read-all","scope-app-recursive"]},"allow-app-write":{"identifier":"allow-app-write","description":"This allows non-recursive write access to the application folders.","permissions":["write-all","scope-app"]},"allow-app-write-recursive":{"identifier":"allow-app-write-recursive","description":"This allows full recursive write access to the complete application folders, files and subdirectories.","permissions":["write-all","scope-app-recursive"]},"allow-appcache-meta":{"identifier":"allow-appcache-meta","description":"This allows non-recursive read access to metadata of the `$APPCACHE` folder, including file listing and statistics.","permissions":["read-meta","scope-appcache-index"]},"allow-appcache-meta-recursive":{"identifier":"allow-appcache-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPCACHE` folder, including file listing and statistics.","permissions":["read-meta","scope-appcache-recursive"]},"allow-appcache-read":{"identifier":"allow-appcache-read","description":"This allows non-recursive read access to the `$APPCACHE` folder.","permissions":["read-all","scope-appcache"]},"allow-appcache-read-recursive":{"identifier":"allow-appcache-read-recursive","description":"This allows full recursive read access to the complete `$APPCACHE` folder, files and subdirectories.","permissions":["read-all","scope-appcache-recursive"]},"allow-appcache-write":{"identifier":"allow-appcache-write","description":"This allows non-recursive write access to the `$APPCACHE` folder.","permissions":["write-all","scope-appcache"]},"allow-appcache-write-recursive":{"identifier":"allow-appcache-write-recursive","description":"This allows full recursive write access to the complete `$APPCACHE` folder, files and subdirectories.","permissions":["write-all","scope-appcache-recursive"]},"allow-appconfig-meta":{"identifier":"allow-appconfig-meta","description":"This allows non-recursive read access to metadata of the `$APPCONFIG` folder, including file listing and statistics.","permissions":["read-meta","scope-appconfig-index"]},"allow-appconfig-meta-recursive":{"identifier":"allow-appconfig-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPCONFIG` folder, including file listing and statistics.","permissions":["read-meta","scope-appconfig-recursive"]},"allow-appconfig-read":{"identifier":"allow-appconfig-read","description":"This allows non-recursive read access to the `$APPCONFIG` folder.","permissions":["read-all","scope-appconfig"]},"allow-appconfig-read-recursive":{"identifier":"allow-appconfig-read-recursive","description":"This allows full recursive read access to the complete `$APPCONFIG` folder, files and subdirectories.","permissions":["read-all","scope-appconfig-recursive"]},"allow-appconfig-write":{"identifier":"allow-appconfig-write","description":"This allows non-recursive write access to the `$APPCONFIG` folder.","permissions":["write-all","scope-appconfig"]},"allow-appconfig-write-recursive":{"identifier":"allow-appconfig-write-recursive","description":"This allows full recursive write access to the complete `$APPCONFIG` folder, files and subdirectories.","permissions":["write-all","scope-appconfig-recursive"]},"allow-appdata-meta":{"identifier":"allow-appdata-meta","description":"This allows non-recursive read access to metadata of the `$APPDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-appdata-index"]},"allow-appdata-meta-recursive":{"identifier":"allow-appdata-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-appdata-recursive"]},"allow-appdata-read":{"identifier":"allow-appdata-read","description":"This allows non-recursive read access to the `$APPDATA` folder.","permissions":["read-all","scope-appdata"]},"allow-appdata-read-recursive":{"identifier":"allow-appdata-read-recursive","description":"This allows full recursive read access to the complete `$APPDATA` folder, files and subdirectories.","permissions":["read-all","scope-appdata-recursive"]},"allow-appdata-write":{"identifier":"allow-appdata-write","description":"This allows non-recursive write access to the `$APPDATA` folder.","permissions":["write-all","scope-appdata"]},"allow-appdata-write-recursive":{"identifier":"allow-appdata-write-recursive","description":"This allows full recursive write access to the complete `$APPDATA` folder, files and subdirectories.","permissions":["write-all","scope-appdata-recursive"]},"allow-applocaldata-meta":{"identifier":"allow-applocaldata-meta","description":"This allows non-recursive read access to metadata of the `$APPLOCALDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-applocaldata-index"]},"allow-applocaldata-meta-recursive":{"identifier":"allow-applocaldata-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPLOCALDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-applocaldata-recursive"]},"allow-applocaldata-read":{"identifier":"allow-applocaldata-read","description":"This allows non-recursive read access to the `$APPLOCALDATA` folder.","permissions":["read-all","scope-applocaldata"]},"allow-applocaldata-read-recursive":{"identifier":"allow-applocaldata-read-recursive","description":"This allows full recursive read access to the complete `$APPLOCALDATA` folder, files and subdirectories.","permissions":["read-all","scope-applocaldata-recursive"]},"allow-applocaldata-write":{"identifier":"allow-applocaldata-write","description":"This allows non-recursive write access to the `$APPLOCALDATA` folder.","permissions":["write-all","scope-applocaldata"]},"allow-applocaldata-write-recursive":{"identifier":"allow-applocaldata-write-recursive","description":"This allows full recursive write access to the complete `$APPLOCALDATA` folder, files and subdirectories.","permissions":["write-all","scope-applocaldata-recursive"]},"allow-applog-meta":{"identifier":"allow-applog-meta","description":"This allows non-recursive read access to metadata of the `$APPLOG` folder, including file listing and statistics.","permissions":["read-meta","scope-applog-index"]},"allow-applog-meta-recursive":{"identifier":"allow-applog-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPLOG` folder, including file listing and statistics.","permissions":["read-meta","scope-applog-recursive"]},"allow-applog-read":{"identifier":"allow-applog-read","description":"This allows non-recursive read access to the `$APPLOG` folder.","permissions":["read-all","scope-applog"]},"allow-applog-read-recursive":{"identifier":"allow-applog-read-recursive","description":"This allows full recursive read access to the complete `$APPLOG` folder, files and subdirectories.","permissions":["read-all","scope-applog-recursive"]},"allow-applog-write":{"identifier":"allow-applog-write","description":"This allows non-recursive write access to the `$APPLOG` folder.","permissions":["write-all","scope-applog"]},"allow-applog-write-recursive":{"identifier":"allow-applog-write-recursive","description":"This allows full recursive write access to the complete `$APPLOG` folder, files and subdirectories.","permissions":["write-all","scope-applog-recursive"]},"allow-audio-meta":{"identifier":"allow-audio-meta","description":"This allows non-recursive read access to metadata of the `$AUDIO` folder, including file listing and statistics.","permissions":["read-meta","scope-audio-index"]},"allow-audio-meta-recursive":{"identifier":"allow-audio-meta-recursive","description":"This allows full recursive read access to metadata of the `$AUDIO` folder, including file listing and statistics.","permissions":["read-meta","scope-audio-recursive"]},"allow-audio-read":{"identifier":"allow-audio-read","description":"This allows non-recursive read access to the `$AUDIO` folder.","permissions":["read-all","scope-audio"]},"allow-audio-read-recursive":{"identifier":"allow-audio-read-recursive","description":"This allows full recursive read access to the complete `$AUDIO` folder, files and subdirectories.","permissions":["read-all","scope-audio-recursive"]},"allow-audio-write":{"identifier":"allow-audio-write","description":"This allows non-recursive write access to the `$AUDIO` folder.","permissions":["write-all","scope-audio"]},"allow-audio-write-recursive":{"identifier":"allow-audio-write-recursive","description":"This allows full recursive write access to the complete `$AUDIO` folder, files and subdirectories.","permissions":["write-all","scope-audio-recursive"]},"allow-cache-meta":{"identifier":"allow-cache-meta","description":"This allows non-recursive read access to metadata of the `$CACHE` folder, including file listing and statistics.","permissions":["read-meta","scope-cache-index"]},"allow-cache-meta-recursive":{"identifier":"allow-cache-meta-recursive","description":"This allows full recursive read access to metadata of the `$CACHE` folder, including file listing and statistics.","permissions":["read-meta","scope-cache-recursive"]},"allow-cache-read":{"identifier":"allow-cache-read","description":"This allows non-recursive read access to the `$CACHE` folder.","permissions":["read-all","scope-cache"]},"allow-cache-read-recursive":{"identifier":"allow-cache-read-recursive","description":"This allows full recursive read access to the complete `$CACHE` folder, files and subdirectories.","permissions":["read-all","scope-cache-recursive"]},"allow-cache-write":{"identifier":"allow-cache-write","description":"This allows non-recursive write access to the `$CACHE` folder.","permissions":["write-all","scope-cache"]},"allow-cache-write-recursive":{"identifier":"allow-cache-write-recursive","description":"This allows full recursive write access to the complete `$CACHE` folder, files and subdirectories.","permissions":["write-all","scope-cache-recursive"]},"allow-config-meta":{"identifier":"allow-config-meta","description":"This allows non-recursive read access to metadata of the `$CONFIG` folder, including file listing and statistics.","permissions":["read-meta","scope-config-index"]},"allow-config-meta-recursive":{"identifier":"allow-config-meta-recursive","description":"This allows full recursive read access to metadata of the `$CONFIG` folder, including file listing and statistics.","permissions":["read-meta","scope-config-recursive"]},"allow-config-read":{"identifier":"allow-config-read","description":"This allows non-recursive read access to the `$CONFIG` folder.","permissions":["read-all","scope-config"]},"allow-config-read-recursive":{"identifier":"allow-config-read-recursive","description":"This allows full recursive read access to the complete `$CONFIG` folder, files and subdirectories.","permissions":["read-all","scope-config-recursive"]},"allow-config-write":{"identifier":"allow-config-write","description":"This allows non-recursive write access to the `$CONFIG` folder.","permissions":["write-all","scope-config"]},"allow-config-write-recursive":{"identifier":"allow-config-write-recursive","description":"This allows full recursive write access to the complete `$CONFIG` folder, files and subdirectories.","permissions":["write-all","scope-config-recursive"]},"allow-data-meta":{"identifier":"allow-data-meta","description":"This allows non-recursive read access to metadata of the `$DATA` folder, including file listing and statistics.","permissions":["read-meta","scope-data-index"]},"allow-data-meta-recursive":{"identifier":"allow-data-meta-recursive","description":"This allows full recursive read access to metadata of the `$DATA` folder, including file listing and statistics.","permissions":["read-meta","scope-data-recursive"]},"allow-data-read":{"identifier":"allow-data-read","description":"This allows non-recursive read access to the `$DATA` folder.","permissions":["read-all","scope-data"]},"allow-data-read-recursive":{"identifier":"allow-data-read-recursive","description":"This allows full recursive read access to the complete `$DATA` folder, files and subdirectories.","permissions":["read-all","scope-data-recursive"]},"allow-data-write":{"identifier":"allow-data-write","description":"This allows non-recursive write access to the `$DATA` folder.","permissions":["write-all","scope-data"]},"allow-data-write-recursive":{"identifier":"allow-data-write-recursive","description":"This allows full recursive write access to the complete `$DATA` folder, files and subdirectories.","permissions":["write-all","scope-data-recursive"]},"allow-desktop-meta":{"identifier":"allow-desktop-meta","description":"This allows non-recursive read access to metadata of the `$DESKTOP` folder, including file listing and statistics.","permissions":["read-meta","scope-desktop-index"]},"allow-desktop-meta-recursive":{"identifier":"allow-desktop-meta-recursive","description":"This allows full recursive read access to metadata of the `$DESKTOP` folder, including file listing and statistics.","permissions":["read-meta","scope-desktop-recursive"]},"allow-desktop-read":{"identifier":"allow-desktop-read","description":"This allows non-recursive read access to the `$DESKTOP` folder.","permissions":["read-all","scope-desktop"]},"allow-desktop-read-recursive":{"identifier":"allow-desktop-read-recursive","description":"This allows full recursive read access to the complete `$DESKTOP` folder, files and subdirectories.","permissions":["read-all","scope-desktop-recursive"]},"allow-desktop-write":{"identifier":"allow-desktop-write","description":"This allows non-recursive write access to the `$DESKTOP` folder.","permissions":["write-all","scope-desktop"]},"allow-desktop-write-recursive":{"identifier":"allow-desktop-write-recursive","description":"This allows full recursive write access to the complete `$DESKTOP` folder, files and subdirectories.","permissions":["write-all","scope-desktop-recursive"]},"allow-document-meta":{"identifier":"allow-document-meta","description":"This allows non-recursive read access to metadata of the `$DOCUMENT` folder, including file listing and statistics.","permissions":["read-meta","scope-document-index"]},"allow-document-meta-recursive":{"identifier":"allow-document-meta-recursive","description":"This allows full recursive read access to metadata of the `$DOCUMENT` folder, including file listing and statistics.","permissions":["read-meta","scope-document-recursive"]},"allow-document-read":{"identifier":"allow-document-read","description":"This allows non-recursive read access to the `$DOCUMENT` folder.","permissions":["read-all","scope-document"]},"allow-document-read-recursive":{"identifier":"allow-document-read-recursive","description":"This allows full recursive read access to the complete `$DOCUMENT` folder, files and subdirectories.","permissions":["read-all","scope-document-recursive"]},"allow-document-write":{"identifier":"allow-document-write","description":"This allows non-recursive write access to the `$DOCUMENT` folder.","permissions":["write-all","scope-document"]},"allow-document-write-recursive":{"identifier":"allow-document-write-recursive","description":"This allows full recursive write access to the complete `$DOCUMENT` folder, files and subdirectories.","permissions":["write-all","scope-document-recursive"]},"allow-download-meta":{"identifier":"allow-download-meta","description":"This allows non-recursive read access to metadata of the `$DOWNLOAD` folder, including file listing and statistics.","permissions":["read-meta","scope-download-index"]},"allow-download-meta-recursive":{"identifier":"allow-download-meta-recursive","description":"This allows full recursive read access to metadata of the `$DOWNLOAD` folder, including file listing and statistics.","permissions":["read-meta","scope-download-recursive"]},"allow-download-read":{"identifier":"allow-download-read","description":"This allows non-recursive read access to the `$DOWNLOAD` folder.","permissions":["read-all","scope-download"]},"allow-download-read-recursive":{"identifier":"allow-download-read-recursive","description":"This allows full recursive read access to the complete `$DOWNLOAD` folder, files and subdirectories.","permissions":["read-all","scope-download-recursive"]},"allow-download-write":{"identifier":"allow-download-write","description":"This allows non-recursive write access to the `$DOWNLOAD` folder.","permissions":["write-all","scope-download"]},"allow-download-write-recursive":{"identifier":"allow-download-write-recursive","description":"This allows full recursive write access to the complete `$DOWNLOAD` folder, files and subdirectories.","permissions":["write-all","scope-download-recursive"]},"allow-exe-meta":{"identifier":"allow-exe-meta","description":"This allows non-recursive read access to metadata of the `$EXE` folder, including file listing and statistics.","permissions":["read-meta","scope-exe-index"]},"allow-exe-meta-recursive":{"identifier":"allow-exe-meta-recursive","description":"This allows full recursive read access to metadata of the `$EXE` folder, including file listing and statistics.","permissions":["read-meta","scope-exe-recursive"]},"allow-exe-read":{"identifier":"allow-exe-read","description":"This allows non-recursive read access to the `$EXE` folder.","permissions":["read-all","scope-exe"]},"allow-exe-read-recursive":{"identifier":"allow-exe-read-recursive","description":"This allows full recursive read access to the complete `$EXE` folder, files and subdirectories.","permissions":["read-all","scope-exe-recursive"]},"allow-exe-write":{"identifier":"allow-exe-write","description":"This allows non-recursive write access to the `$EXE` folder.","permissions":["write-all","scope-exe"]},"allow-exe-write-recursive":{"identifier":"allow-exe-write-recursive","description":"This allows full recursive write access to the complete `$EXE` folder, files and subdirectories.","permissions":["write-all","scope-exe-recursive"]},"allow-font-meta":{"identifier":"allow-font-meta","description":"This allows non-recursive read access to metadata of the `$FONT` folder, including file listing and statistics.","permissions":["read-meta","scope-font-index"]},"allow-font-meta-recursive":{"identifier":"allow-font-meta-recursive","description":"This allows full recursive read access to metadata of the `$FONT` folder, including file listing and statistics.","permissions":["read-meta","scope-font-recursive"]},"allow-font-read":{"identifier":"allow-font-read","description":"This allows non-recursive read access to the `$FONT` folder.","permissions":["read-all","scope-font"]},"allow-font-read-recursive":{"identifier":"allow-font-read-recursive","description":"This allows full recursive read access to the complete `$FONT` folder, files and subdirectories.","permissions":["read-all","scope-font-recursive"]},"allow-font-write":{"identifier":"allow-font-write","description":"This allows non-recursive write access to the `$FONT` folder.","permissions":["write-all","scope-font"]},"allow-font-write-recursive":{"identifier":"allow-font-write-recursive","description":"This allows full recursive write access to the complete `$FONT` folder, files and subdirectories.","permissions":["write-all","scope-font-recursive"]},"allow-home-meta":{"identifier":"allow-home-meta","description":"This allows non-recursive read access to metadata of the `$HOME` folder, including file listing and statistics.","permissions":["read-meta","scope-home-index"]},"allow-home-meta-recursive":{"identifier":"allow-home-meta-recursive","description":"This allows full recursive read access to metadata of the `$HOME` folder, including file listing and statistics.","permissions":["read-meta","scope-home-recursive"]},"allow-home-read":{"identifier":"allow-home-read","description":"This allows non-recursive read access to the `$HOME` folder.","permissions":["read-all","scope-home"]},"allow-home-read-recursive":{"identifier":"allow-home-read-recursive","description":"This allows full recursive read access to the complete `$HOME` folder, files and subdirectories.","permissions":["read-all","scope-home-recursive"]},"allow-home-write":{"identifier":"allow-home-write","description":"This allows non-recursive write access to the `$HOME` folder.","permissions":["write-all","scope-home"]},"allow-home-write-recursive":{"identifier":"allow-home-write-recursive","description":"This allows full recursive write access to the complete `$HOME` folder, files and subdirectories.","permissions":["write-all","scope-home-recursive"]},"allow-localdata-meta":{"identifier":"allow-localdata-meta","description":"This allows non-recursive read access to metadata of the `$LOCALDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-localdata-index"]},"allow-localdata-meta-recursive":{"identifier":"allow-localdata-meta-recursive","description":"This allows full recursive read access to metadata of the `$LOCALDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-localdata-recursive"]},"allow-localdata-read":{"identifier":"allow-localdata-read","description":"This allows non-recursive read access to the `$LOCALDATA` folder.","permissions":["read-all","scope-localdata"]},"allow-localdata-read-recursive":{"identifier":"allow-localdata-read-recursive","description":"This allows full recursive read access to the complete `$LOCALDATA` folder, files and subdirectories.","permissions":["read-all","scope-localdata-recursive"]},"allow-localdata-write":{"identifier":"allow-localdata-write","description":"This allows non-recursive write access to the `$LOCALDATA` folder.","permissions":["write-all","scope-localdata"]},"allow-localdata-write-recursive":{"identifier":"allow-localdata-write-recursive","description":"This allows full recursive write access to the complete `$LOCALDATA` folder, files and subdirectories.","permissions":["write-all","scope-localdata-recursive"]},"allow-log-meta":{"identifier":"allow-log-meta","description":"This allows non-recursive read access to metadata of the `$LOG` folder, including file listing and statistics.","permissions":["read-meta","scope-log-index"]},"allow-log-meta-recursive":{"identifier":"allow-log-meta-recursive","description":"This allows full recursive read access to metadata of the `$LOG` folder, including file listing and statistics.","permissions":["read-meta","scope-log-recursive"]},"allow-log-read":{"identifier":"allow-log-read","description":"This allows non-recursive read access to the `$LOG` folder.","permissions":["read-all","scope-log"]},"allow-log-read-recursive":{"identifier":"allow-log-read-recursive","description":"This allows full recursive read access to the complete `$LOG` folder, files and subdirectories.","permissions":["read-all","scope-log-recursive"]},"allow-log-write":{"identifier":"allow-log-write","description":"This allows non-recursive write access to the `$LOG` folder.","permissions":["write-all","scope-log"]},"allow-log-write-recursive":{"identifier":"allow-log-write-recursive","description":"This allows full recursive write access to the complete `$LOG` folder, files and subdirectories.","permissions":["write-all","scope-log-recursive"]},"allow-picture-meta":{"identifier":"allow-picture-meta","description":"This allows non-recursive read access to metadata of the `$PICTURE` folder, including file listing and statistics.","permissions":["read-meta","scope-picture-index"]},"allow-picture-meta-recursive":{"identifier":"allow-picture-meta-recursive","description":"This allows full recursive read access to metadata of the `$PICTURE` folder, including file listing and statistics.","permissions":["read-meta","scope-picture-recursive"]},"allow-picture-read":{"identifier":"allow-picture-read","description":"This allows non-recursive read access to the `$PICTURE` folder.","permissions":["read-all","scope-picture"]},"allow-picture-read-recursive":{"identifier":"allow-picture-read-recursive","description":"This allows full recursive read access to the complete `$PICTURE` folder, files and subdirectories.","permissions":["read-all","scope-picture-recursive"]},"allow-picture-write":{"identifier":"allow-picture-write","description":"This allows non-recursive write access to the `$PICTURE` folder.","permissions":["write-all","scope-picture"]},"allow-picture-write-recursive":{"identifier":"allow-picture-write-recursive","description":"This allows full recursive write access to the complete `$PICTURE` folder, files and subdirectories.","permissions":["write-all","scope-picture-recursive"]},"allow-public-meta":{"identifier":"allow-public-meta","description":"This allows non-recursive read access to metadata of the `$PUBLIC` folder, including file listing and statistics.","permissions":["read-meta","scope-public-index"]},"allow-public-meta-recursive":{"identifier":"allow-public-meta-recursive","description":"This allows full recursive read access to metadata of the `$PUBLIC` folder, including file listing and statistics.","permissions":["read-meta","scope-public-recursive"]},"allow-public-read":{"identifier":"allow-public-read","description":"This allows non-recursive read access to the `$PUBLIC` folder.","permissions":["read-all","scope-public"]},"allow-public-read-recursive":{"identifier":"allow-public-read-recursive","description":"This allows full recursive read access to the complete `$PUBLIC` folder, files and subdirectories.","permissions":["read-all","scope-public-recursive"]},"allow-public-write":{"identifier":"allow-public-write","description":"This allows non-recursive write access to the `$PUBLIC` folder.","permissions":["write-all","scope-public"]},"allow-public-write-recursive":{"identifier":"allow-public-write-recursive","description":"This allows full recursive write access to the complete `$PUBLIC` folder, files and subdirectories.","permissions":["write-all","scope-public-recursive"]},"allow-resource-meta":{"identifier":"allow-resource-meta","description":"This allows non-recursive read access to metadata of the `$RESOURCE` folder, including file listing and statistics.","permissions":["read-meta","scope-resource-index"]},"allow-resource-meta-recursive":{"identifier":"allow-resource-meta-recursive","description":"This allows full recursive read access to metadata of the `$RESOURCE` folder, including file listing and statistics.","permissions":["read-meta","scope-resource-recursive"]},"allow-resource-read":{"identifier":"allow-resource-read","description":"This allows non-recursive read access to the `$RESOURCE` folder.","permissions":["read-all","scope-resource"]},"allow-resource-read-recursive":{"identifier":"allow-resource-read-recursive","description":"This allows full recursive read access to the complete `$RESOURCE` folder, files and subdirectories.","permissions":["read-all","scope-resource-recursive"]},"allow-resource-write":{"identifier":"allow-resource-write","description":"This allows non-recursive write access to the `$RESOURCE` folder.","permissions":["write-all","scope-resource"]},"allow-resource-write-recursive":{"identifier":"allow-resource-write-recursive","description":"This allows full recursive write access to the complete `$RESOURCE` folder, files and subdirectories.","permissions":["write-all","scope-resource-recursive"]},"allow-runtime-meta":{"identifier":"allow-runtime-meta","description":"This allows non-recursive read access to metadata of the `$RUNTIME` folder, including file listing and statistics.","permissions":["read-meta","scope-runtime-index"]},"allow-runtime-meta-recursive":{"identifier":"allow-runtime-meta-recursive","description":"This allows full recursive read access to metadata of the `$RUNTIME` folder, including file listing and statistics.","permissions":["read-meta","scope-runtime-recursive"]},"allow-runtime-read":{"identifier":"allow-runtime-read","description":"This allows non-recursive read access to the `$RUNTIME` folder.","permissions":["read-all","scope-runtime"]},"allow-runtime-read-recursive":{"identifier":"allow-runtime-read-recursive","description":"This allows full recursive read access to the complete `$RUNTIME` folder, files and subdirectories.","permissions":["read-all","scope-runtime-recursive"]},"allow-runtime-write":{"identifier":"allow-runtime-write","description":"This allows non-recursive write access to the `$RUNTIME` folder.","permissions":["write-all","scope-runtime"]},"allow-runtime-write-recursive":{"identifier":"allow-runtime-write-recursive","description":"This allows full recursive write access to the complete `$RUNTIME` folder, files and subdirectories.","permissions":["write-all","scope-runtime-recursive"]},"allow-temp-meta":{"identifier":"allow-temp-meta","description":"This allows non-recursive read access to metadata of the `$TEMP` folder, including file listing and statistics.","permissions":["read-meta","scope-temp-index"]},"allow-temp-meta-recursive":{"identifier":"allow-temp-meta-recursive","description":"This allows full recursive read access to metadata of the `$TEMP` folder, including file listing and statistics.","permissions":["read-meta","scope-temp-recursive"]},"allow-temp-read":{"identifier":"allow-temp-read","description":"This allows non-recursive read access to the `$TEMP` folder.","permissions":["read-all","scope-temp"]},"allow-temp-read-recursive":{"identifier":"allow-temp-read-recursive","description":"This allows full recursive read access to the complete `$TEMP` folder, files and subdirectories.","permissions":["read-all","scope-temp-recursive"]},"allow-temp-write":{"identifier":"allow-temp-write","description":"This allows non-recursive write access to the `$TEMP` folder.","permissions":["write-all","scope-temp"]},"allow-temp-write-recursive":{"identifier":"allow-temp-write-recursive","description":"This allows full recursive write access to the complete `$TEMP` folder, files and subdirectories.","permissions":["write-all","scope-temp-recursive"]},"allow-template-meta":{"identifier":"allow-template-meta","description":"This allows non-recursive read access to metadata of the `$TEMPLATE` folder, including file listing and statistics.","permissions":["read-meta","scope-template-index"]},"allow-template-meta-recursive":{"identifier":"allow-template-meta-recursive","description":"This allows full recursive read access to metadata of the `$TEMPLATE` folder, including file listing and statistics.","permissions":["read-meta","scope-template-recursive"]},"allow-template-read":{"identifier":"allow-template-read","description":"This allows non-recursive read access to the `$TEMPLATE` folder.","permissions":["read-all","scope-template"]},"allow-template-read-recursive":{"identifier":"allow-template-read-recursive","description":"This allows full recursive read access to the complete `$TEMPLATE` folder, files and subdirectories.","permissions":["read-all","scope-template-recursive"]},"allow-template-write":{"identifier":"allow-template-write","description":"This allows non-recursive write access to the `$TEMPLATE` folder.","permissions":["write-all","scope-template"]},"allow-template-write-recursive":{"identifier":"allow-template-write-recursive","description":"This allows full recursive write access to the complete `$TEMPLATE` folder, files and subdirectories.","permissions":["write-all","scope-template-recursive"]},"allow-video-meta":{"identifier":"allow-video-meta","description":"This allows non-recursive read access to metadata of the `$VIDEO` folder, including file listing and statistics.","permissions":["read-meta","scope-video-index"]},"allow-video-meta-recursive":{"identifier":"allow-video-meta-recursive","description":"This allows full recursive read access to metadata of the `$VIDEO` folder, including file listing and statistics.","permissions":["read-meta","scope-video-recursive"]},"allow-video-read":{"identifier":"allow-video-read","description":"This allows non-recursive read access to the `$VIDEO` folder.","permissions":["read-all","scope-video"]},"allow-video-read-recursive":{"identifier":"allow-video-read-recursive","description":"This allows full recursive read access to the complete `$VIDEO` folder, files and subdirectories.","permissions":["read-all","scope-video-recursive"]},"allow-video-write":{"identifier":"allow-video-write","description":"This allows non-recursive write access to the `$VIDEO` folder.","permissions":["write-all","scope-video"]},"allow-video-write-recursive":{"identifier":"allow-video-write-recursive","description":"This allows full recursive write access to the complete `$VIDEO` folder, files and subdirectories.","permissions":["write-all","scope-video-recursive"]},"deny-default":{"identifier":"deny-default","description":"This denies access to dangerous Tauri relevant files and folders by default.","permissions":["deny-webview-data-linux","deny-webview-data-windows"]}},"global_scope_schema":{"$schema":"http://json-schema.org/draft-07/schema#","anyOf":[{"description":"A path that can be accessed by the webview when using the fs APIs. FS scope path pattern.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.","type":"string"},{"properties":{"path":{"description":"A path that can be accessed by the webview when using the fs APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.","type":"string"}},"required":["path"],"type":"object"}],"description":"FS scope entry.","title":"FsScopeEntry"}},"opener":{"default_permission":{"identifier":"default","description":"This permission set allows opening `mailto:`, `tel:`, `https://` and `http://` urls using their default application\nas well as reveal file in directories using default file explorer","permissions":["allow-open-url","allow-reveal-item-in-dir","allow-default-urls"]},"permissions":{"allow-default-urls":{"identifier":"allow-default-urls","description":"This enables opening `mailto:`, `tel:`, `https://` and `http://` urls using their default application.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"url":"mailto:*"},{"url":"tel:*"},{"url":"http://*"},{"url":"https://*"}]}},"allow-open-path":{"identifier":"allow-open-path","description":"Enables the open_path command without any pre-configured scope.","commands":{"allow":["open_path"],"deny":[]}},"allow-open-url":{"identifier":"allow-open-url","description":"Enables the open_url command without any pre-configured scope.","commands":{"allow":["open_url"],"deny":[]}},"allow-reveal-item-in-dir":{"identifier":"allow-reveal-item-in-dir","description":"Enables the reveal_item_in_dir command without any pre-configured scope.","commands":{"allow":["reveal_item_in_dir"],"deny":[]}},"deny-open-path":{"identifier":"deny-open-path","description":"Denies the open_path command without any pre-configured scope.","commands":{"allow":[],"deny":["open_path"]}},"deny-open-url":{"identifier":"deny-open-url","description":"Denies the open_url command without any pre-configured scope.","commands":{"allow":[],"deny":["open_url"]}},"deny-reveal-item-in-dir":{"identifier":"deny-reveal-item-in-dir","description":"Denies the reveal_item_in_dir command without any pre-configured scope.","commands":{"allow":[],"deny":["reveal_item_in_dir"]}}},"permission_sets":{},"global_scope_schema":{"$schema":"http://json-schema.org/draft-07/schema#","anyOf":[{"properties":{"app":{"allOf":[{"$ref":"#/definitions/Application"}],"description":"An application to open this url with, for example: firefox."},"url":{"description":"A URL that can be opened by the webview when using the Opener APIs.\n\nWildcards can be used following the UNIX glob pattern.\n\nExamples:\n\n- \"https://*\" : allows all HTTPS origin\n\n- \"https://*.github.com/tauri-apps/tauri\": allows any subdomain of \"github.com\" with the \"tauri-apps/api\" path\n\n- \"https://myapi.service.com/users/*\": allows access to any URLs that begins with \"https://myapi.service.com/users/\"","type":"string"}},"required":["url"],"type":"object"},{"properties":{"app":{"allOf":[{"$ref":"#/definitions/Application"}],"description":"An application to open this path with, for example: xdg-open."},"path":{"description":"A path that can be opened by the webview when using the Opener APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.","type":"string"}},"required":["path"],"type":"object"}],"definitions":{"Application":{"anyOf":[{"description":"Open in default application.","type":"null"},{"description":"If true, allow open with any application.","type":"boolean"},{"description":"Allow specific application to open with.","type":"string"}],"description":"Opener scope application."}},"description":"Opener scope entry.","title":"OpenerScopeEntry"}},"shell":{"default_permission":{"identifier":"default","description":"This permission set configures which\nshell functionality is exposed by default.\n\n#### Granted Permissions\n\nIt allows to use the `open` functionality with a reasonable\nscope pre-configured. It will allow opening `http(s)://`,\n`tel:` and `mailto:` links.\n","permissions":["allow-open"]},"permissions":{"allow-execute":{"identifier":"allow-execute","description":"Enables the execute command without any pre-configured scope.","commands":{"allow":["execute"],"deny":[]}},"allow-kill":{"identifier":"allow-kill","description":"Enables the kill command without any pre-configured scope.","commands":{"allow":["kill"],"deny":[]}},"allow-open":{"identifier":"allow-open","description":"Enables the open command without any pre-configured scope.","commands":{"allow":["open"],"deny":[]}},"allow-spawn":{"identifier":"allow-spawn","description":"Enables the spawn command without any pre-configured scope.","commands":{"allow":["spawn"],"deny":[]}},"allow-stdin-write":{"identifier":"allow-stdin-write","description":"Enables the stdin_write command without any pre-configured scope.","commands":{"allow":["stdin_write"],"deny":[]}},"deny-execute":{"identifier":"deny-execute","description":"Denies the execute command without any pre-configured scope.","commands":{"allow":[],"deny":["execute"]}},"deny-kill":{"identifier":"deny-kill","description":"Denies the kill command without any pre-configured scope.","commands":{"allow":[],"deny":["kill"]}},"deny-open":{"identifier":"deny-open","description":"Denies the open command without any pre-configured scope.","commands":{"allow":[],"deny":["open"]}},"deny-spawn":{"identifier":"deny-spawn","description":"Denies the spawn command without any pre-configured scope.","commands":{"allow":[],"deny":["spawn"]}},"deny-stdin-write":{"identifier":"deny-stdin-write","description":"Denies the stdin_write command without any pre-configured scope.","commands":{"allow":[],"deny":["stdin_write"]}}},"permission_sets":{},"global_scope_schema":{"$schema":"http://json-schema.org/draft-07/schema#","anyOf":[{"additionalProperties":false,"properties":{"args":{"allOf":[{"$ref":"#/definitions/ShellScopeEntryAllowedArgs"}],"description":"The allowed arguments for the command execution."},"cmd":{"description":"The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.","type":"string"},"name":{"description":"The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.","type":"string"}},"required":["cmd","name"],"type":"object"},{"additionalProperties":false,"properties":{"args":{"allOf":[{"$ref":"#/definitions/ShellScopeEntryAllowedArgs"}],"description":"The allowed arguments for the command execution."},"name":{"description":"The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.","type":"string"},"sidecar":{"description":"If this command is a sidecar command.","type":"boolean"}},"required":["name","sidecar"],"type":"object"}],"definitions":{"ShellScopeEntryAllowedArg":{"anyOf":[{"description":"A non-configurable argument that is passed to the command in the order it was specified.","type":"string"},{"additionalProperties":false,"description":"A variable that is set while calling the command from the webview API.","properties":{"raw":{"default":false,"description":"Marks the validator as a raw regex, meaning the plugin should not make any modification at runtime.\n\nThis means the regex will not match on the entire string by default, which might be exploited if your regex allow unexpected input to be considered valid. When using this option, make sure your regex is correct.","type":"boolean"},"validator":{"description":"[regex] validator to require passed values to conform to an expected input.\n\nThis will require the argument value passed to this variable to match the `validator` regex before it will be executed.\n\nThe regex string is by default surrounded by `^...$` to match the full string. For example the `https?://\\w+` regex would be registered as `^https?://\\w+$`.\n\n[regex]: <https://docs.rs/regex/latest/regex/#syntax>","type":"string"}},"required":["validator"],"type":"object"}],"description":"A command argument allowed to be executed by the webview API."},"ShellScopeEntryAllowedArgs":{"anyOf":[{"description":"Use a simple boolean to allow all or disable all arguments to this command configuration.","type":"boolean"},{"description":"A specific set of [`ShellScopeEntryAllowedArg`] that are valid to call for the command configuration.","items":{"$ref":"#/definitions/ShellScopeEntryAllowedArg"},"type":"array"}],"description":"A set of command arguments allowed to be executed by the webview API.\n\nA value of `true` will allow any arguments to be passed to the command. `false` will disable all arguments. A list of [`ShellScopeEntryAllowedArg`] will set those arguments as the only valid arguments to be passed to the attached command configuration."}},"description":"Shell scope entry.","title":"ShellScopeEntry"}}}
-```
+````json
+{
+  "core": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default core plugins set.",
+      "permissions": [
+        "core:path:default",
+        "core:event:default",
+        "core:window:default",
+        "core:webview:default",
+        "core:app:default",
+        "core:image:default",
+        "core:resources:default",
+        "core:menu:default",
+        "core:tray:default"
+      ]
+    },
+    "permissions": {},
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:app": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin.",
+      "permissions": [
+        "allow-version",
+        "allow-name",
+        "allow-tauri-version",
+        "allow-identifier",
+        "allow-bundle-type",
+        "allow-register-listener",
+        "allow-remove-listener"
+      ]
+    },
+    "permissions": {
+      "allow-app-hide": {
+        "identifier": "allow-app-hide",
+        "description": "Enables the app_hide command without any pre-configured scope.",
+        "commands": { "allow": ["app_hide"], "deny": [] }
+      },
+      "allow-app-show": {
+        "identifier": "allow-app-show",
+        "description": "Enables the app_show command without any pre-configured scope.",
+        "commands": { "allow": ["app_show"], "deny": [] }
+      },
+      "allow-bundle-type": {
+        "identifier": "allow-bundle-type",
+        "description": "Enables the bundle_type command without any pre-configured scope.",
+        "commands": { "allow": ["bundle_type"], "deny": [] }
+      },
+      "allow-default-window-icon": {
+        "identifier": "allow-default-window-icon",
+        "description": "Enables the default_window_icon command without any pre-configured scope.",
+        "commands": { "allow": ["default_window_icon"], "deny": [] }
+      },
+      "allow-fetch-data-store-identifiers": {
+        "identifier": "allow-fetch-data-store-identifiers",
+        "description": "Enables the fetch_data_store_identifiers command without any pre-configured scope.",
+        "commands": { "allow": ["fetch_data_store_identifiers"], "deny": [] }
+      },
+      "allow-identifier": {
+        "identifier": "allow-identifier",
+        "description": "Enables the identifier command without any pre-configured scope.",
+        "commands": { "allow": ["identifier"], "deny": [] }
+      },
+      "allow-name": {
+        "identifier": "allow-name",
+        "description": "Enables the name command without any pre-configured scope.",
+        "commands": { "allow": ["name"], "deny": [] }
+      },
+      "allow-register-listener": {
+        "identifier": "allow-register-listener",
+        "description": "Enables the register_listener command without any pre-configured scope.",
+        "commands": { "allow": ["register_listener"], "deny": [] }
+      },
+      "allow-remove-data-store": {
+        "identifier": "allow-remove-data-store",
+        "description": "Enables the remove_data_store command without any pre-configured scope.",
+        "commands": { "allow": ["remove_data_store"], "deny": [] }
+      },
+      "allow-remove-listener": {
+        "identifier": "allow-remove-listener",
+        "description": "Enables the remove_listener command without any pre-configured scope.",
+        "commands": { "allow": ["remove_listener"], "deny": [] }
+      },
+      "allow-set-app-theme": {
+        "identifier": "allow-set-app-theme",
+        "description": "Enables the set_app_theme command without any pre-configured scope.",
+        "commands": { "allow": ["set_app_theme"], "deny": [] }
+      },
+      "allow-set-dock-visibility": {
+        "identifier": "allow-set-dock-visibility",
+        "description": "Enables the set_dock_visibility command without any pre-configured scope.",
+        "commands": { "allow": ["set_dock_visibility"], "deny": [] }
+      },
+      "allow-tauri-version": {
+        "identifier": "allow-tauri-version",
+        "description": "Enables the tauri_version command without any pre-configured scope.",
+        "commands": { "allow": ["tauri_version"], "deny": [] }
+      },
+      "allow-version": {
+        "identifier": "allow-version",
+        "description": "Enables the version command without any pre-configured scope.",
+        "commands": { "allow": ["version"], "deny": [] }
+      },
+      "deny-app-hide": {
+        "identifier": "deny-app-hide",
+        "description": "Denies the app_hide command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["app_hide"] }
+      },
+      "deny-app-show": {
+        "identifier": "deny-app-show",
+        "description": "Denies the app_show command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["app_show"] }
+      },
+      "deny-bundle-type": {
+        "identifier": "deny-bundle-type",
+        "description": "Denies the bundle_type command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["bundle_type"] }
+      },
+      "deny-default-window-icon": {
+        "identifier": "deny-default-window-icon",
+        "description": "Denies the default_window_icon command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["default_window_icon"] }
+      },
+      "deny-fetch-data-store-identifiers": {
+        "identifier": "deny-fetch-data-store-identifiers",
+        "description": "Denies the fetch_data_store_identifiers command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["fetch_data_store_identifiers"] }
+      },
+      "deny-identifier": {
+        "identifier": "deny-identifier",
+        "description": "Denies the identifier command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["identifier"] }
+      },
+      "deny-name": {
+        "identifier": "deny-name",
+        "description": "Denies the name command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["name"] }
+      },
+      "deny-register-listener": {
+        "identifier": "deny-register-listener",
+        "description": "Denies the register_listener command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["register_listener"] }
+      },
+      "deny-remove-data-store": {
+        "identifier": "deny-remove-data-store",
+        "description": "Denies the remove_data_store command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["remove_data_store"] }
+      },
+      "deny-remove-listener": {
+        "identifier": "deny-remove-listener",
+        "description": "Denies the remove_listener command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["remove_listener"] }
+      },
+      "deny-set-app-theme": {
+        "identifier": "deny-set-app-theme",
+        "description": "Denies the set_app_theme command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_app_theme"] }
+      },
+      "deny-set-dock-visibility": {
+        "identifier": "deny-set-dock-visibility",
+        "description": "Denies the set_dock_visibility command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_dock_visibility"] }
+      },
+      "deny-tauri-version": {
+        "identifier": "deny-tauri-version",
+        "description": "Denies the tauri_version command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["tauri_version"] }
+      },
+      "deny-version": {
+        "identifier": "deny-version",
+        "description": "Denies the version command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["version"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:event": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin, which enables all commands.",
+      "permissions": [
+        "allow-listen",
+        "allow-unlisten",
+        "allow-emit",
+        "allow-emit-to"
+      ]
+    },
+    "permissions": {
+      "allow-emit": {
+        "identifier": "allow-emit",
+        "description": "Enables the emit command without any pre-configured scope.",
+        "commands": { "allow": ["emit"], "deny": [] }
+      },
+      "allow-emit-to": {
+        "identifier": "allow-emit-to",
+        "description": "Enables the emit_to command without any pre-configured scope.",
+        "commands": { "allow": ["emit_to"], "deny": [] }
+      },
+      "allow-listen": {
+        "identifier": "allow-listen",
+        "description": "Enables the listen command without any pre-configured scope.",
+        "commands": { "allow": ["listen"], "deny": [] }
+      },
+      "allow-unlisten": {
+        "identifier": "allow-unlisten",
+        "description": "Enables the unlisten command without any pre-configured scope.",
+        "commands": { "allow": ["unlisten"], "deny": [] }
+      },
+      "deny-emit": {
+        "identifier": "deny-emit",
+        "description": "Denies the emit command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["emit"] }
+      },
+      "deny-emit-to": {
+        "identifier": "deny-emit-to",
+        "description": "Denies the emit_to command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["emit_to"] }
+      },
+      "deny-listen": {
+        "identifier": "deny-listen",
+        "description": "Denies the listen command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["listen"] }
+      },
+      "deny-unlisten": {
+        "identifier": "deny-unlisten",
+        "description": "Denies the unlisten command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["unlisten"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:image": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin, which enables all commands.",
+      "permissions": [
+        "allow-new",
+        "allow-from-bytes",
+        "allow-from-path",
+        "allow-rgba",
+        "allow-size"
+      ]
+    },
+    "permissions": {
+      "allow-from-bytes": {
+        "identifier": "allow-from-bytes",
+        "description": "Enables the from_bytes command without any pre-configured scope.",
+        "commands": { "allow": ["from_bytes"], "deny": [] }
+      },
+      "allow-from-path": {
+        "identifier": "allow-from-path",
+        "description": "Enables the from_path command without any pre-configured scope.",
+        "commands": { "allow": ["from_path"], "deny": [] }
+      },
+      "allow-new": {
+        "identifier": "allow-new",
+        "description": "Enables the new command without any pre-configured scope.",
+        "commands": { "allow": ["new"], "deny": [] }
+      },
+      "allow-rgba": {
+        "identifier": "allow-rgba",
+        "description": "Enables the rgba command without any pre-configured scope.",
+        "commands": { "allow": ["rgba"], "deny": [] }
+      },
+      "allow-size": {
+        "identifier": "allow-size",
+        "description": "Enables the size command without any pre-configured scope.",
+        "commands": { "allow": ["size"], "deny": [] }
+      },
+      "deny-from-bytes": {
+        "identifier": "deny-from-bytes",
+        "description": "Denies the from_bytes command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["from_bytes"] }
+      },
+      "deny-from-path": {
+        "identifier": "deny-from-path",
+        "description": "Denies the from_path command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["from_path"] }
+      },
+      "deny-new": {
+        "identifier": "deny-new",
+        "description": "Denies the new command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["new"] }
+      },
+      "deny-rgba": {
+        "identifier": "deny-rgba",
+        "description": "Denies the rgba command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["rgba"] }
+      },
+      "deny-size": {
+        "identifier": "deny-size",
+        "description": "Denies the size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["size"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:menu": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin, which enables all commands.",
+      "permissions": [
+        "allow-new",
+        "allow-append",
+        "allow-prepend",
+        "allow-insert",
+        "allow-remove",
+        "allow-remove-at",
+        "allow-items",
+        "allow-get",
+        "allow-popup",
+        "allow-create-default",
+        "allow-set-as-app-menu",
+        "allow-set-as-window-menu",
+        "allow-text",
+        "allow-set-text",
+        "allow-is-enabled",
+        "allow-set-enabled",
+        "allow-set-accelerator",
+        "allow-set-as-windows-menu-for-nsapp",
+        "allow-set-as-help-menu-for-nsapp",
+        "allow-is-checked",
+        "allow-set-checked",
+        "allow-set-icon"
+      ]
+    },
+    "permissions": {
+      "allow-append": {
+        "identifier": "allow-append",
+        "description": "Enables the append command without any pre-configured scope.",
+        "commands": { "allow": ["append"], "deny": [] }
+      },
+      "allow-create-default": {
+        "identifier": "allow-create-default",
+        "description": "Enables the create_default command without any pre-configured scope.",
+        "commands": { "allow": ["create_default"], "deny": [] }
+      },
+      "allow-get": {
+        "identifier": "allow-get",
+        "description": "Enables the get command without any pre-configured scope.",
+        "commands": { "allow": ["get"], "deny": [] }
+      },
+      "allow-insert": {
+        "identifier": "allow-insert",
+        "description": "Enables the insert command without any pre-configured scope.",
+        "commands": { "allow": ["insert"], "deny": [] }
+      },
+      "allow-is-checked": {
+        "identifier": "allow-is-checked",
+        "description": "Enables the is_checked command without any pre-configured scope.",
+        "commands": { "allow": ["is_checked"], "deny": [] }
+      },
+      "allow-is-enabled": {
+        "identifier": "allow-is-enabled",
+        "description": "Enables the is_enabled command without any pre-configured scope.",
+        "commands": { "allow": ["is_enabled"], "deny": [] }
+      },
+      "allow-items": {
+        "identifier": "allow-items",
+        "description": "Enables the items command without any pre-configured scope.",
+        "commands": { "allow": ["items"], "deny": [] }
+      },
+      "allow-new": {
+        "identifier": "allow-new",
+        "description": "Enables the new command without any pre-configured scope.",
+        "commands": { "allow": ["new"], "deny": [] }
+      },
+      "allow-popup": {
+        "identifier": "allow-popup",
+        "description": "Enables the popup command without any pre-configured scope.",
+        "commands": { "allow": ["popup"], "deny": [] }
+      },
+      "allow-prepend": {
+        "identifier": "allow-prepend",
+        "description": "Enables the prepend command without any pre-configured scope.",
+        "commands": { "allow": ["prepend"], "deny": [] }
+      },
+      "allow-remove": {
+        "identifier": "allow-remove",
+        "description": "Enables the remove command without any pre-configured scope.",
+        "commands": { "allow": ["remove"], "deny": [] }
+      },
+      "allow-remove-at": {
+        "identifier": "allow-remove-at",
+        "description": "Enables the remove_at command without any pre-configured scope.",
+        "commands": { "allow": ["remove_at"], "deny": [] }
+      },
+      "allow-set-accelerator": {
+        "identifier": "allow-set-accelerator",
+        "description": "Enables the set_accelerator command without any pre-configured scope.",
+        "commands": { "allow": ["set_accelerator"], "deny": [] }
+      },
+      "allow-set-as-app-menu": {
+        "identifier": "allow-set-as-app-menu",
+        "description": "Enables the set_as_app_menu command without any pre-configured scope.",
+        "commands": { "allow": ["set_as_app_menu"], "deny": [] }
+      },
+      "allow-set-as-help-menu-for-nsapp": {
+        "identifier": "allow-set-as-help-menu-for-nsapp",
+        "description": "Enables the set_as_help_menu_for_nsapp command without any pre-configured scope.",
+        "commands": { "allow": ["set_as_help_menu_for_nsapp"], "deny": [] }
+      },
+      "allow-set-as-window-menu": {
+        "identifier": "allow-set-as-window-menu",
+        "description": "Enables the set_as_window_menu command without any pre-configured scope.",
+        "commands": { "allow": ["set_as_window_menu"], "deny": [] }
+      },
+      "allow-set-as-windows-menu-for-nsapp": {
+        "identifier": "allow-set-as-windows-menu-for-nsapp",
+        "description": "Enables the set_as_windows_menu_for_nsapp command without any pre-configured scope.",
+        "commands": { "allow": ["set_as_windows_menu_for_nsapp"], "deny": [] }
+      },
+      "allow-set-checked": {
+        "identifier": "allow-set-checked",
+        "description": "Enables the set_checked command without any pre-configured scope.",
+        "commands": { "allow": ["set_checked"], "deny": [] }
+      },
+      "allow-set-enabled": {
+        "identifier": "allow-set-enabled",
+        "description": "Enables the set_enabled command without any pre-configured scope.",
+        "commands": { "allow": ["set_enabled"], "deny": [] }
+      },
+      "allow-set-icon": {
+        "identifier": "allow-set-icon",
+        "description": "Enables the set_icon command without any pre-configured scope.",
+        "commands": { "allow": ["set_icon"], "deny": [] }
+      },
+      "allow-set-text": {
+        "identifier": "allow-set-text",
+        "description": "Enables the set_text command without any pre-configured scope.",
+        "commands": { "allow": ["set_text"], "deny": [] }
+      },
+      "allow-text": {
+        "identifier": "allow-text",
+        "description": "Enables the text command without any pre-configured scope.",
+        "commands": { "allow": ["text"], "deny": [] }
+      },
+      "deny-append": {
+        "identifier": "deny-append",
+        "description": "Denies the append command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["append"] }
+      },
+      "deny-create-default": {
+        "identifier": "deny-create-default",
+        "description": "Denies the create_default command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["create_default"] }
+      },
+      "deny-get": {
+        "identifier": "deny-get",
+        "description": "Denies the get command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["get"] }
+      },
+      "deny-insert": {
+        "identifier": "deny-insert",
+        "description": "Denies the insert command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["insert"] }
+      },
+      "deny-is-checked": {
+        "identifier": "deny-is-checked",
+        "description": "Denies the is_checked command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_checked"] }
+      },
+      "deny-is-enabled": {
+        "identifier": "deny-is-enabled",
+        "description": "Denies the is_enabled command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_enabled"] }
+      },
+      "deny-items": {
+        "identifier": "deny-items",
+        "description": "Denies the items command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["items"] }
+      },
+      "deny-new": {
+        "identifier": "deny-new",
+        "description": "Denies the new command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["new"] }
+      },
+      "deny-popup": {
+        "identifier": "deny-popup",
+        "description": "Denies the popup command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["popup"] }
+      },
+      "deny-prepend": {
+        "identifier": "deny-prepend",
+        "description": "Denies the prepend command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["prepend"] }
+      },
+      "deny-remove": {
+        "identifier": "deny-remove",
+        "description": "Denies the remove command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["remove"] }
+      },
+      "deny-remove-at": {
+        "identifier": "deny-remove-at",
+        "description": "Denies the remove_at command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["remove_at"] }
+      },
+      "deny-set-accelerator": {
+        "identifier": "deny-set-accelerator",
+        "description": "Denies the set_accelerator command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_accelerator"] }
+      },
+      "deny-set-as-app-menu": {
+        "identifier": "deny-set-as-app-menu",
+        "description": "Denies the set_as_app_menu command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_as_app_menu"] }
+      },
+      "deny-set-as-help-menu-for-nsapp": {
+        "identifier": "deny-set-as-help-menu-for-nsapp",
+        "description": "Denies the set_as_help_menu_for_nsapp command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_as_help_menu_for_nsapp"] }
+      },
+      "deny-set-as-window-menu": {
+        "identifier": "deny-set-as-window-menu",
+        "description": "Denies the set_as_window_menu command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_as_window_menu"] }
+      },
+      "deny-set-as-windows-menu-for-nsapp": {
+        "identifier": "deny-set-as-windows-menu-for-nsapp",
+        "description": "Denies the set_as_windows_menu_for_nsapp command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_as_windows_menu_for_nsapp"] }
+      },
+      "deny-set-checked": {
+        "identifier": "deny-set-checked",
+        "description": "Denies the set_checked command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_checked"] }
+      },
+      "deny-set-enabled": {
+        "identifier": "deny-set-enabled",
+        "description": "Denies the set_enabled command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_enabled"] }
+      },
+      "deny-set-icon": {
+        "identifier": "deny-set-icon",
+        "description": "Denies the set_icon command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_icon"] }
+      },
+      "deny-set-text": {
+        "identifier": "deny-set-text",
+        "description": "Denies the set_text command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_text"] }
+      },
+      "deny-text": {
+        "identifier": "deny-text",
+        "description": "Denies the text command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["text"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:path": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin, which enables all commands.",
+      "permissions": [
+        "allow-resolve-directory",
+        "allow-resolve",
+        "allow-normalize",
+        "allow-join",
+        "allow-dirname",
+        "allow-extname",
+        "allow-basename",
+        "allow-is-absolute"
+      ]
+    },
+    "permissions": {
+      "allow-basename": {
+        "identifier": "allow-basename",
+        "description": "Enables the basename command without any pre-configured scope.",
+        "commands": { "allow": ["basename"], "deny": [] }
+      },
+      "allow-dirname": {
+        "identifier": "allow-dirname",
+        "description": "Enables the dirname command without any pre-configured scope.",
+        "commands": { "allow": ["dirname"], "deny": [] }
+      },
+      "allow-extname": {
+        "identifier": "allow-extname",
+        "description": "Enables the extname command without any pre-configured scope.",
+        "commands": { "allow": ["extname"], "deny": [] }
+      },
+      "allow-is-absolute": {
+        "identifier": "allow-is-absolute",
+        "description": "Enables the is_absolute command without any pre-configured scope.",
+        "commands": { "allow": ["is_absolute"], "deny": [] }
+      },
+      "allow-join": {
+        "identifier": "allow-join",
+        "description": "Enables the join command without any pre-configured scope.",
+        "commands": { "allow": ["join"], "deny": [] }
+      },
+      "allow-normalize": {
+        "identifier": "allow-normalize",
+        "description": "Enables the normalize command without any pre-configured scope.",
+        "commands": { "allow": ["normalize"], "deny": [] }
+      },
+      "allow-resolve": {
+        "identifier": "allow-resolve",
+        "description": "Enables the resolve command without any pre-configured scope.",
+        "commands": { "allow": ["resolve"], "deny": [] }
+      },
+      "allow-resolve-directory": {
+        "identifier": "allow-resolve-directory",
+        "description": "Enables the resolve_directory command without any pre-configured scope.",
+        "commands": { "allow": ["resolve_directory"], "deny": [] }
+      },
+      "deny-basename": {
+        "identifier": "deny-basename",
+        "description": "Denies the basename command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["basename"] }
+      },
+      "deny-dirname": {
+        "identifier": "deny-dirname",
+        "description": "Denies the dirname command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["dirname"] }
+      },
+      "deny-extname": {
+        "identifier": "deny-extname",
+        "description": "Denies the extname command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["extname"] }
+      },
+      "deny-is-absolute": {
+        "identifier": "deny-is-absolute",
+        "description": "Denies the is_absolute command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_absolute"] }
+      },
+      "deny-join": {
+        "identifier": "deny-join",
+        "description": "Denies the join command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["join"] }
+      },
+      "deny-normalize": {
+        "identifier": "deny-normalize",
+        "description": "Denies the normalize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["normalize"] }
+      },
+      "deny-resolve": {
+        "identifier": "deny-resolve",
+        "description": "Denies the resolve command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["resolve"] }
+      },
+      "deny-resolve-directory": {
+        "identifier": "deny-resolve-directory",
+        "description": "Denies the resolve_directory command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["resolve_directory"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:resources": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin, which enables all commands.",
+      "permissions": ["allow-close"]
+    },
+    "permissions": {
+      "allow-close": {
+        "identifier": "allow-close",
+        "description": "Enables the close command without any pre-configured scope.",
+        "commands": { "allow": ["close"], "deny": [] }
+      },
+      "deny-close": {
+        "identifier": "deny-close",
+        "description": "Denies the close command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["close"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:tray": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin, which enables all commands.",
+      "permissions": [
+        "allow-new",
+        "allow-get-by-id",
+        "allow-remove-by-id",
+        "allow-set-icon",
+        "allow-set-menu",
+        "allow-set-tooltip",
+        "allow-set-title",
+        "allow-set-visible",
+        "allow-set-temp-dir-path",
+        "allow-set-icon-as-template",
+        "allow-set-show-menu-on-left-click"
+      ]
+    },
+    "permissions": {
+      "allow-get-by-id": {
+        "identifier": "allow-get-by-id",
+        "description": "Enables the get_by_id command without any pre-configured scope.",
+        "commands": { "allow": ["get_by_id"], "deny": [] }
+      },
+      "allow-new": {
+        "identifier": "allow-new",
+        "description": "Enables the new command without any pre-configured scope.",
+        "commands": { "allow": ["new"], "deny": [] }
+      },
+      "allow-remove-by-id": {
+        "identifier": "allow-remove-by-id",
+        "description": "Enables the remove_by_id command without any pre-configured scope.",
+        "commands": { "allow": ["remove_by_id"], "deny": [] }
+      },
+      "allow-set-icon": {
+        "identifier": "allow-set-icon",
+        "description": "Enables the set_icon command without any pre-configured scope.",
+        "commands": { "allow": ["set_icon"], "deny": [] }
+      },
+      "allow-set-icon-as-template": {
+        "identifier": "allow-set-icon-as-template",
+        "description": "Enables the set_icon_as_template command without any pre-configured scope.",
+        "commands": { "allow": ["set_icon_as_template"], "deny": [] }
+      },
+      "allow-set-menu": {
+        "identifier": "allow-set-menu",
+        "description": "Enables the set_menu command without any pre-configured scope.",
+        "commands": { "allow": ["set_menu"], "deny": [] }
+      },
+      "allow-set-show-menu-on-left-click": {
+        "identifier": "allow-set-show-menu-on-left-click",
+        "description": "Enables the set_show_menu_on_left_click command without any pre-configured scope.",
+        "commands": { "allow": ["set_show_menu_on_left_click"], "deny": [] }
+      },
+      "allow-set-temp-dir-path": {
+        "identifier": "allow-set-temp-dir-path",
+        "description": "Enables the set_temp_dir_path command without any pre-configured scope.",
+        "commands": { "allow": ["set_temp_dir_path"], "deny": [] }
+      },
+      "allow-set-title": {
+        "identifier": "allow-set-title",
+        "description": "Enables the set_title command without any pre-configured scope.",
+        "commands": { "allow": ["set_title"], "deny": [] }
+      },
+      "allow-set-tooltip": {
+        "identifier": "allow-set-tooltip",
+        "description": "Enables the set_tooltip command without any pre-configured scope.",
+        "commands": { "allow": ["set_tooltip"], "deny": [] }
+      },
+      "allow-set-visible": {
+        "identifier": "allow-set-visible",
+        "description": "Enables the set_visible command without any pre-configured scope.",
+        "commands": { "allow": ["set_visible"], "deny": [] }
+      },
+      "deny-get-by-id": {
+        "identifier": "deny-get-by-id",
+        "description": "Denies the get_by_id command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["get_by_id"] }
+      },
+      "deny-new": {
+        "identifier": "deny-new",
+        "description": "Denies the new command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["new"] }
+      },
+      "deny-remove-by-id": {
+        "identifier": "deny-remove-by-id",
+        "description": "Denies the remove_by_id command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["remove_by_id"] }
+      },
+      "deny-set-icon": {
+        "identifier": "deny-set-icon",
+        "description": "Denies the set_icon command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_icon"] }
+      },
+      "deny-set-icon-as-template": {
+        "identifier": "deny-set-icon-as-template",
+        "description": "Denies the set_icon_as_template command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_icon_as_template"] }
+      },
+      "deny-set-menu": {
+        "identifier": "deny-set-menu",
+        "description": "Denies the set_menu command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_menu"] }
+      },
+      "deny-set-show-menu-on-left-click": {
+        "identifier": "deny-set-show-menu-on-left-click",
+        "description": "Denies the set_show_menu_on_left_click command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_show_menu_on_left_click"] }
+      },
+      "deny-set-temp-dir-path": {
+        "identifier": "deny-set-temp-dir-path",
+        "description": "Denies the set_temp_dir_path command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_temp_dir_path"] }
+      },
+      "deny-set-title": {
+        "identifier": "deny-set-title",
+        "description": "Denies the set_title command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_title"] }
+      },
+      "deny-set-tooltip": {
+        "identifier": "deny-set-tooltip",
+        "description": "Denies the set_tooltip command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_tooltip"] }
+      },
+      "deny-set-visible": {
+        "identifier": "deny-set-visible",
+        "description": "Denies the set_visible command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_visible"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:webview": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin.",
+      "permissions": [
+        "allow-get-all-webviews",
+        "allow-webview-position",
+        "allow-webview-size",
+        "allow-internal-toggle-devtools"
+      ]
+    },
+    "permissions": {
+      "allow-clear-all-browsing-data": {
+        "identifier": "allow-clear-all-browsing-data",
+        "description": "Enables the clear_all_browsing_data command without any pre-configured scope.",
+        "commands": { "allow": ["clear_all_browsing_data"], "deny": [] }
+      },
+      "allow-create-webview": {
+        "identifier": "allow-create-webview",
+        "description": "Enables the create_webview command without any pre-configured scope.",
+        "commands": { "allow": ["create_webview"], "deny": [] }
+      },
+      "allow-create-webview-window": {
+        "identifier": "allow-create-webview-window",
+        "description": "Enables the create_webview_window command without any pre-configured scope.",
+        "commands": { "allow": ["create_webview_window"], "deny": [] }
+      },
+      "allow-get-all-webviews": {
+        "identifier": "allow-get-all-webviews",
+        "description": "Enables the get_all_webviews command without any pre-configured scope.",
+        "commands": { "allow": ["get_all_webviews"], "deny": [] }
+      },
+      "allow-internal-toggle-devtools": {
+        "identifier": "allow-internal-toggle-devtools",
+        "description": "Enables the internal_toggle_devtools command without any pre-configured scope.",
+        "commands": { "allow": ["internal_toggle_devtools"], "deny": [] }
+      },
+      "allow-print": {
+        "identifier": "allow-print",
+        "description": "Enables the print command without any pre-configured scope.",
+        "commands": { "allow": ["print"], "deny": [] }
+      },
+      "allow-reparent": {
+        "identifier": "allow-reparent",
+        "description": "Enables the reparent command without any pre-configured scope.",
+        "commands": { "allow": ["reparent"], "deny": [] }
+      },
+      "allow-set-webview-auto-resize": {
+        "identifier": "allow-set-webview-auto-resize",
+        "description": "Enables the set_webview_auto_resize command without any pre-configured scope.",
+        "commands": { "allow": ["set_webview_auto_resize"], "deny": [] }
+      },
+      "allow-set-webview-background-color": {
+        "identifier": "allow-set-webview-background-color",
+        "description": "Enables the set_webview_background_color command without any pre-configured scope.",
+        "commands": { "allow": ["set_webview_background_color"], "deny": [] }
+      },
+      "allow-set-webview-focus": {
+        "identifier": "allow-set-webview-focus",
+        "description": "Enables the set_webview_focus command without any pre-configured scope.",
+        "commands": { "allow": ["set_webview_focus"], "deny": [] }
+      },
+      "allow-set-webview-position": {
+        "identifier": "allow-set-webview-position",
+        "description": "Enables the set_webview_position command without any pre-configured scope.",
+        "commands": { "allow": ["set_webview_position"], "deny": [] }
+      },
+      "allow-set-webview-size": {
+        "identifier": "allow-set-webview-size",
+        "description": "Enables the set_webview_size command without any pre-configured scope.",
+        "commands": { "allow": ["set_webview_size"], "deny": [] }
+      },
+      "allow-set-webview-zoom": {
+        "identifier": "allow-set-webview-zoom",
+        "description": "Enables the set_webview_zoom command without any pre-configured scope.",
+        "commands": { "allow": ["set_webview_zoom"], "deny": [] }
+      },
+      "allow-webview-close": {
+        "identifier": "allow-webview-close",
+        "description": "Enables the webview_close command without any pre-configured scope.",
+        "commands": { "allow": ["webview_close"], "deny": [] }
+      },
+      "allow-webview-hide": {
+        "identifier": "allow-webview-hide",
+        "description": "Enables the webview_hide command without any pre-configured scope.",
+        "commands": { "allow": ["webview_hide"], "deny": [] }
+      },
+      "allow-webview-position": {
+        "identifier": "allow-webview-position",
+        "description": "Enables the webview_position command without any pre-configured scope.",
+        "commands": { "allow": ["webview_position"], "deny": [] }
+      },
+      "allow-webview-show": {
+        "identifier": "allow-webview-show",
+        "description": "Enables the webview_show command without any pre-configured scope.",
+        "commands": { "allow": ["webview_show"], "deny": [] }
+      },
+      "allow-webview-size": {
+        "identifier": "allow-webview-size",
+        "description": "Enables the webview_size command without any pre-configured scope.",
+        "commands": { "allow": ["webview_size"], "deny": [] }
+      },
+      "deny-clear-all-browsing-data": {
+        "identifier": "deny-clear-all-browsing-data",
+        "description": "Denies the clear_all_browsing_data command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["clear_all_browsing_data"] }
+      },
+      "deny-create-webview": {
+        "identifier": "deny-create-webview",
+        "description": "Denies the create_webview command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["create_webview"] }
+      },
+      "deny-create-webview-window": {
+        "identifier": "deny-create-webview-window",
+        "description": "Denies the create_webview_window command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["create_webview_window"] }
+      },
+      "deny-get-all-webviews": {
+        "identifier": "deny-get-all-webviews",
+        "description": "Denies the get_all_webviews command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["get_all_webviews"] }
+      },
+      "deny-internal-toggle-devtools": {
+        "identifier": "deny-internal-toggle-devtools",
+        "description": "Denies the internal_toggle_devtools command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["internal_toggle_devtools"] }
+      },
+      "deny-print": {
+        "identifier": "deny-print",
+        "description": "Denies the print command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["print"] }
+      },
+      "deny-reparent": {
+        "identifier": "deny-reparent",
+        "description": "Denies the reparent command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["reparent"] }
+      },
+      "deny-set-webview-auto-resize": {
+        "identifier": "deny-set-webview-auto-resize",
+        "description": "Denies the set_webview_auto_resize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_webview_auto_resize"] }
+      },
+      "deny-set-webview-background-color": {
+        "identifier": "deny-set-webview-background-color",
+        "description": "Denies the set_webview_background_color command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_webview_background_color"] }
+      },
+      "deny-set-webview-focus": {
+        "identifier": "deny-set-webview-focus",
+        "description": "Denies the set_webview_focus command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_webview_focus"] }
+      },
+      "deny-set-webview-position": {
+        "identifier": "deny-set-webview-position",
+        "description": "Denies the set_webview_position command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_webview_position"] }
+      },
+      "deny-set-webview-size": {
+        "identifier": "deny-set-webview-size",
+        "description": "Denies the set_webview_size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_webview_size"] }
+      },
+      "deny-set-webview-zoom": {
+        "identifier": "deny-set-webview-zoom",
+        "description": "Denies the set_webview_zoom command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_webview_zoom"] }
+      },
+      "deny-webview-close": {
+        "identifier": "deny-webview-close",
+        "description": "Denies the webview_close command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["webview_close"] }
+      },
+      "deny-webview-hide": {
+        "identifier": "deny-webview-hide",
+        "description": "Denies the webview_hide command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["webview_hide"] }
+      },
+      "deny-webview-position": {
+        "identifier": "deny-webview-position",
+        "description": "Denies the webview_position command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["webview_position"] }
+      },
+      "deny-webview-show": {
+        "identifier": "deny-webview-show",
+        "description": "Denies the webview_show command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["webview_show"] }
+      },
+      "deny-webview-size": {
+        "identifier": "deny-webview-size",
+        "description": "Denies the webview_size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["webview_size"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "core:window": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "Default permissions for the plugin.",
+      "permissions": [
+        "allow-get-all-windows",
+        "allow-scale-factor",
+        "allow-inner-position",
+        "allow-outer-position",
+        "allow-inner-size",
+        "allow-outer-size",
+        "allow-is-fullscreen",
+        "allow-is-minimized",
+        "allow-is-maximized",
+        "allow-is-focused",
+        "allow-is-decorated",
+        "allow-is-resizable",
+        "allow-is-maximizable",
+        "allow-is-minimizable",
+        "allow-is-closable",
+        "allow-is-visible",
+        "allow-is-enabled",
+        "allow-title",
+        "allow-current-monitor",
+        "allow-primary-monitor",
+        "allow-monitor-from-point",
+        "allow-available-monitors",
+        "allow-cursor-position",
+        "allow-theme",
+        "allow-is-always-on-top",
+        "allow-internal-toggle-maximize"
+      ]
+    },
+    "permissions": {
+      "allow-available-monitors": {
+        "identifier": "allow-available-monitors",
+        "description": "Enables the available_monitors command without any pre-configured scope.",
+        "commands": { "allow": ["available_monitors"], "deny": [] }
+      },
+      "allow-center": {
+        "identifier": "allow-center",
+        "description": "Enables the center command without any pre-configured scope.",
+        "commands": { "allow": ["center"], "deny": [] }
+      },
+      "allow-close": {
+        "identifier": "allow-close",
+        "description": "Enables the close command without any pre-configured scope.",
+        "commands": { "allow": ["close"], "deny": [] }
+      },
+      "allow-create": {
+        "identifier": "allow-create",
+        "description": "Enables the create command without any pre-configured scope.",
+        "commands": { "allow": ["create"], "deny": [] }
+      },
+      "allow-current-monitor": {
+        "identifier": "allow-current-monitor",
+        "description": "Enables the current_monitor command without any pre-configured scope.",
+        "commands": { "allow": ["current_monitor"], "deny": [] }
+      },
+      "allow-cursor-position": {
+        "identifier": "allow-cursor-position",
+        "description": "Enables the cursor_position command without any pre-configured scope.",
+        "commands": { "allow": ["cursor_position"], "deny": [] }
+      },
+      "allow-destroy": {
+        "identifier": "allow-destroy",
+        "description": "Enables the destroy command without any pre-configured scope.",
+        "commands": { "allow": ["destroy"], "deny": [] }
+      },
+      "allow-get-all-windows": {
+        "identifier": "allow-get-all-windows",
+        "description": "Enables the get_all_windows command without any pre-configured scope.",
+        "commands": { "allow": ["get_all_windows"], "deny": [] }
+      },
+      "allow-hide": {
+        "identifier": "allow-hide",
+        "description": "Enables the hide command without any pre-configured scope.",
+        "commands": { "allow": ["hide"], "deny": [] }
+      },
+      "allow-inner-position": {
+        "identifier": "allow-inner-position",
+        "description": "Enables the inner_position command without any pre-configured scope.",
+        "commands": { "allow": ["inner_position"], "deny": [] }
+      },
+      "allow-inner-size": {
+        "identifier": "allow-inner-size",
+        "description": "Enables the inner_size command without any pre-configured scope.",
+        "commands": { "allow": ["inner_size"], "deny": [] }
+      },
+      "allow-internal-toggle-maximize": {
+        "identifier": "allow-internal-toggle-maximize",
+        "description": "Enables the internal_toggle_maximize command without any pre-configured scope.",
+        "commands": { "allow": ["internal_toggle_maximize"], "deny": [] }
+      },
+      "allow-is-always-on-top": {
+        "identifier": "allow-is-always-on-top",
+        "description": "Enables the is_always_on_top command without any pre-configured scope.",
+        "commands": { "allow": ["is_always_on_top"], "deny": [] }
+      },
+      "allow-is-closable": {
+        "identifier": "allow-is-closable",
+        "description": "Enables the is_closable command without any pre-configured scope.",
+        "commands": { "allow": ["is_closable"], "deny": [] }
+      },
+      "allow-is-decorated": {
+        "identifier": "allow-is-decorated",
+        "description": "Enables the is_decorated command without any pre-configured scope.",
+        "commands": { "allow": ["is_decorated"], "deny": [] }
+      },
+      "allow-is-enabled": {
+        "identifier": "allow-is-enabled",
+        "description": "Enables the is_enabled command without any pre-configured scope.",
+        "commands": { "allow": ["is_enabled"], "deny": [] }
+      },
+      "allow-is-focused": {
+        "identifier": "allow-is-focused",
+        "description": "Enables the is_focused command without any pre-configured scope.",
+        "commands": { "allow": ["is_focused"], "deny": [] }
+      },
+      "allow-is-fullscreen": {
+        "identifier": "allow-is-fullscreen",
+        "description": "Enables the is_fullscreen command without any pre-configured scope.",
+        "commands": { "allow": ["is_fullscreen"], "deny": [] }
+      },
+      "allow-is-maximizable": {
+        "identifier": "allow-is-maximizable",
+        "description": "Enables the is_maximizable command without any pre-configured scope.",
+        "commands": { "allow": ["is_maximizable"], "deny": [] }
+      },
+      "allow-is-maximized": {
+        "identifier": "allow-is-maximized",
+        "description": "Enables the is_maximized command without any pre-configured scope.",
+        "commands": { "allow": ["is_maximized"], "deny": [] }
+      },
+      "allow-is-minimizable": {
+        "identifier": "allow-is-minimizable",
+        "description": "Enables the is_minimizable command without any pre-configured scope.",
+        "commands": { "allow": ["is_minimizable"], "deny": [] }
+      },
+      "allow-is-minimized": {
+        "identifier": "allow-is-minimized",
+        "description": "Enables the is_minimized command without any pre-configured scope.",
+        "commands": { "allow": ["is_minimized"], "deny": [] }
+      },
+      "allow-is-resizable": {
+        "identifier": "allow-is-resizable",
+        "description": "Enables the is_resizable command without any pre-configured scope.",
+        "commands": { "allow": ["is_resizable"], "deny": [] }
+      },
+      "allow-is-visible": {
+        "identifier": "allow-is-visible",
+        "description": "Enables the is_visible command without any pre-configured scope.",
+        "commands": { "allow": ["is_visible"], "deny": [] }
+      },
+      "allow-maximize": {
+        "identifier": "allow-maximize",
+        "description": "Enables the maximize command without any pre-configured scope.",
+        "commands": { "allow": ["maximize"], "deny": [] }
+      },
+      "allow-minimize": {
+        "identifier": "allow-minimize",
+        "description": "Enables the minimize command without any pre-configured scope.",
+        "commands": { "allow": ["minimize"], "deny": [] }
+      },
+      "allow-monitor-from-point": {
+        "identifier": "allow-monitor-from-point",
+        "description": "Enables the monitor_from_point command without any pre-configured scope.",
+        "commands": { "allow": ["monitor_from_point"], "deny": [] }
+      },
+      "allow-outer-position": {
+        "identifier": "allow-outer-position",
+        "description": "Enables the outer_position command without any pre-configured scope.",
+        "commands": { "allow": ["outer_position"], "deny": [] }
+      },
+      "allow-outer-size": {
+        "identifier": "allow-outer-size",
+        "description": "Enables the outer_size command without any pre-configured scope.",
+        "commands": { "allow": ["outer_size"], "deny": [] }
+      },
+      "allow-primary-monitor": {
+        "identifier": "allow-primary-monitor",
+        "description": "Enables the primary_monitor command without any pre-configured scope.",
+        "commands": { "allow": ["primary_monitor"], "deny": [] }
+      },
+      "allow-request-user-attention": {
+        "identifier": "allow-request-user-attention",
+        "description": "Enables the request_user_attention command without any pre-configured scope.",
+        "commands": { "allow": ["request_user_attention"], "deny": [] }
+      },
+      "allow-scale-factor": {
+        "identifier": "allow-scale-factor",
+        "description": "Enables the scale_factor command without any pre-configured scope.",
+        "commands": { "allow": ["scale_factor"], "deny": [] }
+      },
+      "allow-set-always-on-bottom": {
+        "identifier": "allow-set-always-on-bottom",
+        "description": "Enables the set_always_on_bottom command without any pre-configured scope.",
+        "commands": { "allow": ["set_always_on_bottom"], "deny": [] }
+      },
+      "allow-set-always-on-top": {
+        "identifier": "allow-set-always-on-top",
+        "description": "Enables the set_always_on_top command without any pre-configured scope.",
+        "commands": { "allow": ["set_always_on_top"], "deny": [] }
+      },
+      "allow-set-background-color": {
+        "identifier": "allow-set-background-color",
+        "description": "Enables the set_background_color command without any pre-configured scope.",
+        "commands": { "allow": ["set_background_color"], "deny": [] }
+      },
+      "allow-set-badge-count": {
+        "identifier": "allow-set-badge-count",
+        "description": "Enables the set_badge_count command without any pre-configured scope.",
+        "commands": { "allow": ["set_badge_count"], "deny": [] }
+      },
+      "allow-set-badge-label": {
+        "identifier": "allow-set-badge-label",
+        "description": "Enables the set_badge_label command without any pre-configured scope.",
+        "commands": { "allow": ["set_badge_label"], "deny": [] }
+      },
+      "allow-set-closable": {
+        "identifier": "allow-set-closable",
+        "description": "Enables the set_closable command without any pre-configured scope.",
+        "commands": { "allow": ["set_closable"], "deny": [] }
+      },
+      "allow-set-content-protected": {
+        "identifier": "allow-set-content-protected",
+        "description": "Enables the set_content_protected command without any pre-configured scope.",
+        "commands": { "allow": ["set_content_protected"], "deny": [] }
+      },
+      "allow-set-cursor-grab": {
+        "identifier": "allow-set-cursor-grab",
+        "description": "Enables the set_cursor_grab command without any pre-configured scope.",
+        "commands": { "allow": ["set_cursor_grab"], "deny": [] }
+      },
+      "allow-set-cursor-icon": {
+        "identifier": "allow-set-cursor-icon",
+        "description": "Enables the set_cursor_icon command without any pre-configured scope.",
+        "commands": { "allow": ["set_cursor_icon"], "deny": [] }
+      },
+      "allow-set-cursor-position": {
+        "identifier": "allow-set-cursor-position",
+        "description": "Enables the set_cursor_position command without any pre-configured scope.",
+        "commands": { "allow": ["set_cursor_position"], "deny": [] }
+      },
+      "allow-set-cursor-visible": {
+        "identifier": "allow-set-cursor-visible",
+        "description": "Enables the set_cursor_visible command without any pre-configured scope.",
+        "commands": { "allow": ["set_cursor_visible"], "deny": [] }
+      },
+      "allow-set-decorations": {
+        "identifier": "allow-set-decorations",
+        "description": "Enables the set_decorations command without any pre-configured scope.",
+        "commands": { "allow": ["set_decorations"], "deny": [] }
+      },
+      "allow-set-effects": {
+        "identifier": "allow-set-effects",
+        "description": "Enables the set_effects command without any pre-configured scope.",
+        "commands": { "allow": ["set_effects"], "deny": [] }
+      },
+      "allow-set-enabled": {
+        "identifier": "allow-set-enabled",
+        "description": "Enables the set_enabled command without any pre-configured scope.",
+        "commands": { "allow": ["set_enabled"], "deny": [] }
+      },
+      "allow-set-focus": {
+        "identifier": "allow-set-focus",
+        "description": "Enables the set_focus command without any pre-configured scope.",
+        "commands": { "allow": ["set_focus"], "deny": [] }
+      },
+      "allow-set-focusable": {
+        "identifier": "allow-set-focusable",
+        "description": "Enables the set_focusable command without any pre-configured scope.",
+        "commands": { "allow": ["set_focusable"], "deny": [] }
+      },
+      "allow-set-fullscreen": {
+        "identifier": "allow-set-fullscreen",
+        "description": "Enables the set_fullscreen command without any pre-configured scope.",
+        "commands": { "allow": ["set_fullscreen"], "deny": [] }
+      },
+      "allow-set-icon": {
+        "identifier": "allow-set-icon",
+        "description": "Enables the set_icon command without any pre-configured scope.",
+        "commands": { "allow": ["set_icon"], "deny": [] }
+      },
+      "allow-set-ignore-cursor-events": {
+        "identifier": "allow-set-ignore-cursor-events",
+        "description": "Enables the set_ignore_cursor_events command without any pre-configured scope.",
+        "commands": { "allow": ["set_ignore_cursor_events"], "deny": [] }
+      },
+      "allow-set-max-size": {
+        "identifier": "allow-set-max-size",
+        "description": "Enables the set_max_size command without any pre-configured scope.",
+        "commands": { "allow": ["set_max_size"], "deny": [] }
+      },
+      "allow-set-maximizable": {
+        "identifier": "allow-set-maximizable",
+        "description": "Enables the set_maximizable command without any pre-configured scope.",
+        "commands": { "allow": ["set_maximizable"], "deny": [] }
+      },
+      "allow-set-min-size": {
+        "identifier": "allow-set-min-size",
+        "description": "Enables the set_min_size command without any pre-configured scope.",
+        "commands": { "allow": ["set_min_size"], "deny": [] }
+      },
+      "allow-set-minimizable": {
+        "identifier": "allow-set-minimizable",
+        "description": "Enables the set_minimizable command without any pre-configured scope.",
+        "commands": { "allow": ["set_minimizable"], "deny": [] }
+      },
+      "allow-set-overlay-icon": {
+        "identifier": "allow-set-overlay-icon",
+        "description": "Enables the set_overlay_icon command without any pre-configured scope.",
+        "commands": { "allow": ["set_overlay_icon"], "deny": [] }
+      },
+      "allow-set-position": {
+        "identifier": "allow-set-position",
+        "description": "Enables the set_position command without any pre-configured scope.",
+        "commands": { "allow": ["set_position"], "deny": [] }
+      },
+      "allow-set-progress-bar": {
+        "identifier": "allow-set-progress-bar",
+        "description": "Enables the set_progress_bar command without any pre-configured scope.",
+        "commands": { "allow": ["set_progress_bar"], "deny": [] }
+      },
+      "allow-set-resizable": {
+        "identifier": "allow-set-resizable",
+        "description": "Enables the set_resizable command without any pre-configured scope.",
+        "commands": { "allow": ["set_resizable"], "deny": [] }
+      },
+      "allow-set-shadow": {
+        "identifier": "allow-set-shadow",
+        "description": "Enables the set_shadow command without any pre-configured scope.",
+        "commands": { "allow": ["set_shadow"], "deny": [] }
+      },
+      "allow-set-simple-fullscreen": {
+        "identifier": "allow-set-simple-fullscreen",
+        "description": "Enables the set_simple_fullscreen command without any pre-configured scope.",
+        "commands": { "allow": ["set_simple_fullscreen"], "deny": [] }
+      },
+      "allow-set-size": {
+        "identifier": "allow-set-size",
+        "description": "Enables the set_size command without any pre-configured scope.",
+        "commands": { "allow": ["set_size"], "deny": [] }
+      },
+      "allow-set-size-constraints": {
+        "identifier": "allow-set-size-constraints",
+        "description": "Enables the set_size_constraints command without any pre-configured scope.",
+        "commands": { "allow": ["set_size_constraints"], "deny": [] }
+      },
+      "allow-set-skip-taskbar": {
+        "identifier": "allow-set-skip-taskbar",
+        "description": "Enables the set_skip_taskbar command without any pre-configured scope.",
+        "commands": { "allow": ["set_skip_taskbar"], "deny": [] }
+      },
+      "allow-set-theme": {
+        "identifier": "allow-set-theme",
+        "description": "Enables the set_theme command without any pre-configured scope.",
+        "commands": { "allow": ["set_theme"], "deny": [] }
+      },
+      "allow-set-title": {
+        "identifier": "allow-set-title",
+        "description": "Enables the set_title command without any pre-configured scope.",
+        "commands": { "allow": ["set_title"], "deny": [] }
+      },
+      "allow-set-title-bar-style": {
+        "identifier": "allow-set-title-bar-style",
+        "description": "Enables the set_title_bar_style command without any pre-configured scope.",
+        "commands": { "allow": ["set_title_bar_style"], "deny": [] }
+      },
+      "allow-set-visible-on-all-workspaces": {
+        "identifier": "allow-set-visible-on-all-workspaces",
+        "description": "Enables the set_visible_on_all_workspaces command without any pre-configured scope.",
+        "commands": { "allow": ["set_visible_on_all_workspaces"], "deny": [] }
+      },
+      "allow-show": {
+        "identifier": "allow-show",
+        "description": "Enables the show command without any pre-configured scope.",
+        "commands": { "allow": ["show"], "deny": [] }
+      },
+      "allow-start-dragging": {
+        "identifier": "allow-start-dragging",
+        "description": "Enables the start_dragging command without any pre-configured scope.",
+        "commands": { "allow": ["start_dragging"], "deny": [] }
+      },
+      "allow-start-resize-dragging": {
+        "identifier": "allow-start-resize-dragging",
+        "description": "Enables the start_resize_dragging command without any pre-configured scope.",
+        "commands": { "allow": ["start_resize_dragging"], "deny": [] }
+      },
+      "allow-theme": {
+        "identifier": "allow-theme",
+        "description": "Enables the theme command without any pre-configured scope.",
+        "commands": { "allow": ["theme"], "deny": [] }
+      },
+      "allow-title": {
+        "identifier": "allow-title",
+        "description": "Enables the title command without any pre-configured scope.",
+        "commands": { "allow": ["title"], "deny": [] }
+      },
+      "allow-toggle-maximize": {
+        "identifier": "allow-toggle-maximize",
+        "description": "Enables the toggle_maximize command without any pre-configured scope.",
+        "commands": { "allow": ["toggle_maximize"], "deny": [] }
+      },
+      "allow-unmaximize": {
+        "identifier": "allow-unmaximize",
+        "description": "Enables the unmaximize command without any pre-configured scope.",
+        "commands": { "allow": ["unmaximize"], "deny": [] }
+      },
+      "allow-unminimize": {
+        "identifier": "allow-unminimize",
+        "description": "Enables the unminimize command without any pre-configured scope.",
+        "commands": { "allow": ["unminimize"], "deny": [] }
+      },
+      "deny-available-monitors": {
+        "identifier": "deny-available-monitors",
+        "description": "Denies the available_monitors command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["available_monitors"] }
+      },
+      "deny-center": {
+        "identifier": "deny-center",
+        "description": "Denies the center command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["center"] }
+      },
+      "deny-close": {
+        "identifier": "deny-close",
+        "description": "Denies the close command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["close"] }
+      },
+      "deny-create": {
+        "identifier": "deny-create",
+        "description": "Denies the create command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["create"] }
+      },
+      "deny-current-monitor": {
+        "identifier": "deny-current-monitor",
+        "description": "Denies the current_monitor command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["current_monitor"] }
+      },
+      "deny-cursor-position": {
+        "identifier": "deny-cursor-position",
+        "description": "Denies the cursor_position command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["cursor_position"] }
+      },
+      "deny-destroy": {
+        "identifier": "deny-destroy",
+        "description": "Denies the destroy command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["destroy"] }
+      },
+      "deny-get-all-windows": {
+        "identifier": "deny-get-all-windows",
+        "description": "Denies the get_all_windows command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["get_all_windows"] }
+      },
+      "deny-hide": {
+        "identifier": "deny-hide",
+        "description": "Denies the hide command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["hide"] }
+      },
+      "deny-inner-position": {
+        "identifier": "deny-inner-position",
+        "description": "Denies the inner_position command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["inner_position"] }
+      },
+      "deny-inner-size": {
+        "identifier": "deny-inner-size",
+        "description": "Denies the inner_size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["inner_size"] }
+      },
+      "deny-internal-toggle-maximize": {
+        "identifier": "deny-internal-toggle-maximize",
+        "description": "Denies the internal_toggle_maximize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["internal_toggle_maximize"] }
+      },
+      "deny-is-always-on-top": {
+        "identifier": "deny-is-always-on-top",
+        "description": "Denies the is_always_on_top command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_always_on_top"] }
+      },
+      "deny-is-closable": {
+        "identifier": "deny-is-closable",
+        "description": "Denies the is_closable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_closable"] }
+      },
+      "deny-is-decorated": {
+        "identifier": "deny-is-decorated",
+        "description": "Denies the is_decorated command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_decorated"] }
+      },
+      "deny-is-enabled": {
+        "identifier": "deny-is-enabled",
+        "description": "Denies the is_enabled command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_enabled"] }
+      },
+      "deny-is-focused": {
+        "identifier": "deny-is-focused",
+        "description": "Denies the is_focused command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_focused"] }
+      },
+      "deny-is-fullscreen": {
+        "identifier": "deny-is-fullscreen",
+        "description": "Denies the is_fullscreen command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_fullscreen"] }
+      },
+      "deny-is-maximizable": {
+        "identifier": "deny-is-maximizable",
+        "description": "Denies the is_maximizable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_maximizable"] }
+      },
+      "deny-is-maximized": {
+        "identifier": "deny-is-maximized",
+        "description": "Denies the is_maximized command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_maximized"] }
+      },
+      "deny-is-minimizable": {
+        "identifier": "deny-is-minimizable",
+        "description": "Denies the is_minimizable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_minimizable"] }
+      },
+      "deny-is-minimized": {
+        "identifier": "deny-is-minimized",
+        "description": "Denies the is_minimized command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_minimized"] }
+      },
+      "deny-is-resizable": {
+        "identifier": "deny-is-resizable",
+        "description": "Denies the is_resizable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_resizable"] }
+      },
+      "deny-is-visible": {
+        "identifier": "deny-is-visible",
+        "description": "Denies the is_visible command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["is_visible"] }
+      },
+      "deny-maximize": {
+        "identifier": "deny-maximize",
+        "description": "Denies the maximize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["maximize"] }
+      },
+      "deny-minimize": {
+        "identifier": "deny-minimize",
+        "description": "Denies the minimize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["minimize"] }
+      },
+      "deny-monitor-from-point": {
+        "identifier": "deny-monitor-from-point",
+        "description": "Denies the monitor_from_point command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["monitor_from_point"] }
+      },
+      "deny-outer-position": {
+        "identifier": "deny-outer-position",
+        "description": "Denies the outer_position command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["outer_position"] }
+      },
+      "deny-outer-size": {
+        "identifier": "deny-outer-size",
+        "description": "Denies the outer_size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["outer_size"] }
+      },
+      "deny-primary-monitor": {
+        "identifier": "deny-primary-monitor",
+        "description": "Denies the primary_monitor command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["primary_monitor"] }
+      },
+      "deny-request-user-attention": {
+        "identifier": "deny-request-user-attention",
+        "description": "Denies the request_user_attention command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["request_user_attention"] }
+      },
+      "deny-scale-factor": {
+        "identifier": "deny-scale-factor",
+        "description": "Denies the scale_factor command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["scale_factor"] }
+      },
+      "deny-set-always-on-bottom": {
+        "identifier": "deny-set-always-on-bottom",
+        "description": "Denies the set_always_on_bottom command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_always_on_bottom"] }
+      },
+      "deny-set-always-on-top": {
+        "identifier": "deny-set-always-on-top",
+        "description": "Denies the set_always_on_top command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_always_on_top"] }
+      },
+      "deny-set-background-color": {
+        "identifier": "deny-set-background-color",
+        "description": "Denies the set_background_color command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_background_color"] }
+      },
+      "deny-set-badge-count": {
+        "identifier": "deny-set-badge-count",
+        "description": "Denies the set_badge_count command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_badge_count"] }
+      },
+      "deny-set-badge-label": {
+        "identifier": "deny-set-badge-label",
+        "description": "Denies the set_badge_label command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_badge_label"] }
+      },
+      "deny-set-closable": {
+        "identifier": "deny-set-closable",
+        "description": "Denies the set_closable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_closable"] }
+      },
+      "deny-set-content-protected": {
+        "identifier": "deny-set-content-protected",
+        "description": "Denies the set_content_protected command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_content_protected"] }
+      },
+      "deny-set-cursor-grab": {
+        "identifier": "deny-set-cursor-grab",
+        "description": "Denies the set_cursor_grab command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_cursor_grab"] }
+      },
+      "deny-set-cursor-icon": {
+        "identifier": "deny-set-cursor-icon",
+        "description": "Denies the set_cursor_icon command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_cursor_icon"] }
+      },
+      "deny-set-cursor-position": {
+        "identifier": "deny-set-cursor-position",
+        "description": "Denies the set_cursor_position command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_cursor_position"] }
+      },
+      "deny-set-cursor-visible": {
+        "identifier": "deny-set-cursor-visible",
+        "description": "Denies the set_cursor_visible command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_cursor_visible"] }
+      },
+      "deny-set-decorations": {
+        "identifier": "deny-set-decorations",
+        "description": "Denies the set_decorations command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_decorations"] }
+      },
+      "deny-set-effects": {
+        "identifier": "deny-set-effects",
+        "description": "Denies the set_effects command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_effects"] }
+      },
+      "deny-set-enabled": {
+        "identifier": "deny-set-enabled",
+        "description": "Denies the set_enabled command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_enabled"] }
+      },
+      "deny-set-focus": {
+        "identifier": "deny-set-focus",
+        "description": "Denies the set_focus command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_focus"] }
+      },
+      "deny-set-focusable": {
+        "identifier": "deny-set-focusable",
+        "description": "Denies the set_focusable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_focusable"] }
+      },
+      "deny-set-fullscreen": {
+        "identifier": "deny-set-fullscreen",
+        "description": "Denies the set_fullscreen command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_fullscreen"] }
+      },
+      "deny-set-icon": {
+        "identifier": "deny-set-icon",
+        "description": "Denies the set_icon command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_icon"] }
+      },
+      "deny-set-ignore-cursor-events": {
+        "identifier": "deny-set-ignore-cursor-events",
+        "description": "Denies the set_ignore_cursor_events command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_ignore_cursor_events"] }
+      },
+      "deny-set-max-size": {
+        "identifier": "deny-set-max-size",
+        "description": "Denies the set_max_size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_max_size"] }
+      },
+      "deny-set-maximizable": {
+        "identifier": "deny-set-maximizable",
+        "description": "Denies the set_maximizable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_maximizable"] }
+      },
+      "deny-set-min-size": {
+        "identifier": "deny-set-min-size",
+        "description": "Denies the set_min_size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_min_size"] }
+      },
+      "deny-set-minimizable": {
+        "identifier": "deny-set-minimizable",
+        "description": "Denies the set_minimizable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_minimizable"] }
+      },
+      "deny-set-overlay-icon": {
+        "identifier": "deny-set-overlay-icon",
+        "description": "Denies the set_overlay_icon command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_overlay_icon"] }
+      },
+      "deny-set-position": {
+        "identifier": "deny-set-position",
+        "description": "Denies the set_position command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_position"] }
+      },
+      "deny-set-progress-bar": {
+        "identifier": "deny-set-progress-bar",
+        "description": "Denies the set_progress_bar command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_progress_bar"] }
+      },
+      "deny-set-resizable": {
+        "identifier": "deny-set-resizable",
+        "description": "Denies the set_resizable command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_resizable"] }
+      },
+      "deny-set-shadow": {
+        "identifier": "deny-set-shadow",
+        "description": "Denies the set_shadow command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_shadow"] }
+      },
+      "deny-set-simple-fullscreen": {
+        "identifier": "deny-set-simple-fullscreen",
+        "description": "Denies the set_simple_fullscreen command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_simple_fullscreen"] }
+      },
+      "deny-set-size": {
+        "identifier": "deny-set-size",
+        "description": "Denies the set_size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_size"] }
+      },
+      "deny-set-size-constraints": {
+        "identifier": "deny-set-size-constraints",
+        "description": "Denies the set_size_constraints command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_size_constraints"] }
+      },
+      "deny-set-skip-taskbar": {
+        "identifier": "deny-set-skip-taskbar",
+        "description": "Denies the set_skip_taskbar command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_skip_taskbar"] }
+      },
+      "deny-set-theme": {
+        "identifier": "deny-set-theme",
+        "description": "Denies the set_theme command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_theme"] }
+      },
+      "deny-set-title": {
+        "identifier": "deny-set-title",
+        "description": "Denies the set_title command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_title"] }
+      },
+      "deny-set-title-bar-style": {
+        "identifier": "deny-set-title-bar-style",
+        "description": "Denies the set_title_bar_style command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_title_bar_style"] }
+      },
+      "deny-set-visible-on-all-workspaces": {
+        "identifier": "deny-set-visible-on-all-workspaces",
+        "description": "Denies the set_visible_on_all_workspaces command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["set_visible_on_all_workspaces"] }
+      },
+      "deny-show": {
+        "identifier": "deny-show",
+        "description": "Denies the show command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["show"] }
+      },
+      "deny-start-dragging": {
+        "identifier": "deny-start-dragging",
+        "description": "Denies the start_dragging command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["start_dragging"] }
+      },
+      "deny-start-resize-dragging": {
+        "identifier": "deny-start-resize-dragging",
+        "description": "Denies the start_resize_dragging command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["start_resize_dragging"] }
+      },
+      "deny-theme": {
+        "identifier": "deny-theme",
+        "description": "Denies the theme command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["theme"] }
+      },
+      "deny-title": {
+        "identifier": "deny-title",
+        "description": "Denies the title command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["title"] }
+      },
+      "deny-toggle-maximize": {
+        "identifier": "deny-toggle-maximize",
+        "description": "Denies the toggle_maximize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["toggle_maximize"] }
+      },
+      "deny-unmaximize": {
+        "identifier": "deny-unmaximize",
+        "description": "Denies the unmaximize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["unmaximize"] }
+      },
+      "deny-unminimize": {
+        "identifier": "deny-unminimize",
+        "description": "Denies the unminimize command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["unminimize"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": null
+  },
+  "fs": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "This set of permissions describes the what kind of\nfile system access the `fs` plugin has enabled or denied by default.\n\n#### Granted Permissions\n\nThis default permission set enables read access to the\napplication specific directories (AppConfig, AppData, AppLocalData, AppCache,\nAppLog) and all files and sub directories created in it.\nThe location of these directories depends on the operating system,\nwhere the application is run.\n\nIn general these directories need to be manually created\nby the application at runtime, before accessing files or folders\nin it is possible.\n\nTherefore, it is also allowed to create all of these folders via\nthe `mkdir` command.\n\n#### Denied Permissions\n\nThis default permission set prevents access to critical components\nof the Tauri application by default.\nOn Windows the webview data folder access is denied.\n",
+      "permissions": [
+        "create-app-specific-dirs",
+        "read-app-specific-dirs-recursive",
+        "deny-default"
+      ]
+    },
+    "permissions": {
+      "allow-copy-file": {
+        "identifier": "allow-copy-file",
+        "description": "Enables the copy_file command without any pre-configured scope.",
+        "commands": { "allow": ["copy_file"], "deny": [] }
+      },
+      "allow-create": {
+        "identifier": "allow-create",
+        "description": "Enables the create command without any pre-configured scope.",
+        "commands": { "allow": ["create"], "deny": [] }
+      },
+      "allow-exists": {
+        "identifier": "allow-exists",
+        "description": "Enables the exists command without any pre-configured scope.",
+        "commands": { "allow": ["exists"], "deny": [] }
+      },
+      "allow-fstat": {
+        "identifier": "allow-fstat",
+        "description": "Enables the fstat command without any pre-configured scope.",
+        "commands": { "allow": ["fstat"], "deny": [] }
+      },
+      "allow-ftruncate": {
+        "identifier": "allow-ftruncate",
+        "description": "Enables the ftruncate command without any pre-configured scope.",
+        "commands": { "allow": ["ftruncate"], "deny": [] }
+      },
+      "allow-lstat": {
+        "identifier": "allow-lstat",
+        "description": "Enables the lstat command without any pre-configured scope.",
+        "commands": { "allow": ["lstat"], "deny": [] }
+      },
+      "allow-mkdir": {
+        "identifier": "allow-mkdir",
+        "description": "Enables the mkdir command without any pre-configured scope.",
+        "commands": { "allow": ["mkdir"], "deny": [] }
+      },
+      "allow-open": {
+        "identifier": "allow-open",
+        "description": "Enables the open command without any pre-configured scope.",
+        "commands": { "allow": ["open"], "deny": [] }
+      },
+      "allow-read": {
+        "identifier": "allow-read",
+        "description": "Enables the read command without any pre-configured scope.",
+        "commands": { "allow": ["read"], "deny": [] }
+      },
+      "allow-read-dir": {
+        "identifier": "allow-read-dir",
+        "description": "Enables the read_dir command without any pre-configured scope.",
+        "commands": { "allow": ["read_dir"], "deny": [] }
+      },
+      "allow-read-file": {
+        "identifier": "allow-read-file",
+        "description": "Enables the read_file command without any pre-configured scope.",
+        "commands": { "allow": ["read_file"], "deny": [] }
+      },
+      "allow-read-text-file": {
+        "identifier": "allow-read-text-file",
+        "description": "Enables the read_text_file command without any pre-configured scope.",
+        "commands": { "allow": ["read_text_file"], "deny": [] }
+      },
+      "allow-read-text-file-lines": {
+        "identifier": "allow-read-text-file-lines",
+        "description": "Enables the read_text_file_lines command without any pre-configured scope.",
+        "commands": {
+          "allow": ["read_text_file_lines", "read_text_file_lines_next"],
+          "deny": []
+        }
+      },
+      "allow-read-text-file-lines-next": {
+        "identifier": "allow-read-text-file-lines-next",
+        "description": "Enables the read_text_file_lines_next command without any pre-configured scope.",
+        "commands": { "allow": ["read_text_file_lines_next"], "deny": [] }
+      },
+      "allow-remove": {
+        "identifier": "allow-remove",
+        "description": "Enables the remove command without any pre-configured scope.",
+        "commands": { "allow": ["remove"], "deny": [] }
+      },
+      "allow-rename": {
+        "identifier": "allow-rename",
+        "description": "Enables the rename command without any pre-configured scope.",
+        "commands": { "allow": ["rename"], "deny": [] }
+      },
+      "allow-seek": {
+        "identifier": "allow-seek",
+        "description": "Enables the seek command without any pre-configured scope.",
+        "commands": { "allow": ["seek"], "deny": [] }
+      },
+      "allow-size": {
+        "identifier": "allow-size",
+        "description": "Enables the size command without any pre-configured scope.",
+        "commands": { "allow": ["size"], "deny": [] }
+      },
+      "allow-stat": {
+        "identifier": "allow-stat",
+        "description": "Enables the stat command without any pre-configured scope.",
+        "commands": { "allow": ["stat"], "deny": [] }
+      },
+      "allow-truncate": {
+        "identifier": "allow-truncate",
+        "description": "Enables the truncate command without any pre-configured scope.",
+        "commands": { "allow": ["truncate"], "deny": [] }
+      },
+      "allow-unwatch": {
+        "identifier": "allow-unwatch",
+        "description": "Enables the unwatch command without any pre-configured scope.",
+        "commands": { "allow": ["unwatch"], "deny": [] }
+      },
+      "allow-watch": {
+        "identifier": "allow-watch",
+        "description": "Enables the watch command without any pre-configured scope.",
+        "commands": { "allow": ["watch"], "deny": [] }
+      },
+      "allow-write": {
+        "identifier": "allow-write",
+        "description": "Enables the write command without any pre-configured scope.",
+        "commands": { "allow": ["write"], "deny": [] }
+      },
+      "allow-write-file": {
+        "identifier": "allow-write-file",
+        "description": "Enables the write_file command without any pre-configured scope.",
+        "commands": { "allow": ["write_file", "open", "write"], "deny": [] }
+      },
+      "allow-write-text-file": {
+        "identifier": "allow-write-text-file",
+        "description": "Enables the write_text_file command without any pre-configured scope.",
+        "commands": { "allow": ["write_text_file"], "deny": [] }
+      },
+      "create-app-specific-dirs": {
+        "identifier": "create-app-specific-dirs",
+        "description": "This permissions allows to create the application specific directories.\n",
+        "commands": { "allow": ["mkdir", "scope-app-index"], "deny": [] }
+      },
+      "deny-copy-file": {
+        "identifier": "deny-copy-file",
+        "description": "Denies the copy_file command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["copy_file"] }
+      },
+      "deny-create": {
+        "identifier": "deny-create",
+        "description": "Denies the create command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["create"] }
+      },
+      "deny-exists": {
+        "identifier": "deny-exists",
+        "description": "Denies the exists command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["exists"] }
+      },
+      "deny-fstat": {
+        "identifier": "deny-fstat",
+        "description": "Denies the fstat command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["fstat"] }
+      },
+      "deny-ftruncate": {
+        "identifier": "deny-ftruncate",
+        "description": "Denies the ftruncate command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["ftruncate"] }
+      },
+      "deny-lstat": {
+        "identifier": "deny-lstat",
+        "description": "Denies the lstat command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["lstat"] }
+      },
+      "deny-mkdir": {
+        "identifier": "deny-mkdir",
+        "description": "Denies the mkdir command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["mkdir"] }
+      },
+      "deny-open": {
+        "identifier": "deny-open",
+        "description": "Denies the open command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["open"] }
+      },
+      "deny-read": {
+        "identifier": "deny-read",
+        "description": "Denies the read command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["read"] }
+      },
+      "deny-read-dir": {
+        "identifier": "deny-read-dir",
+        "description": "Denies the read_dir command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["read_dir"] }
+      },
+      "deny-read-file": {
+        "identifier": "deny-read-file",
+        "description": "Denies the read_file command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["read_file"] }
+      },
+      "deny-read-text-file": {
+        "identifier": "deny-read-text-file",
+        "description": "Denies the read_text_file command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["read_text_file"] }
+      },
+      "deny-read-text-file-lines": {
+        "identifier": "deny-read-text-file-lines",
+        "description": "Denies the read_text_file_lines command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["read_text_file_lines"] }
+      },
+      "deny-read-text-file-lines-next": {
+        "identifier": "deny-read-text-file-lines-next",
+        "description": "Denies the read_text_file_lines_next command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["read_text_file_lines_next"] }
+      },
+      "deny-remove": {
+        "identifier": "deny-remove",
+        "description": "Denies the remove command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["remove"] }
+      },
+      "deny-rename": {
+        "identifier": "deny-rename",
+        "description": "Denies the rename command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["rename"] }
+      },
+      "deny-seek": {
+        "identifier": "deny-seek",
+        "description": "Denies the seek command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["seek"] }
+      },
+      "deny-size": {
+        "identifier": "deny-size",
+        "description": "Denies the size command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["size"] }
+      },
+      "deny-stat": {
+        "identifier": "deny-stat",
+        "description": "Denies the stat command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["stat"] }
+      },
+      "deny-truncate": {
+        "identifier": "deny-truncate",
+        "description": "Denies the truncate command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["truncate"] }
+      },
+      "deny-unwatch": {
+        "identifier": "deny-unwatch",
+        "description": "Denies the unwatch command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["unwatch"] }
+      },
+      "deny-watch": {
+        "identifier": "deny-watch",
+        "description": "Denies the watch command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["watch"] }
+      },
+      "deny-webview-data-linux": {
+        "identifier": "deny-webview-data-linux",
+        "description": "This denies read access to the\n`$APPLOCALDATA` folder on linux as the webview data and configuration values are stored here.\nAllowing access can lead to sensitive information disclosure and should be well considered.",
+        "commands": { "allow": [], "deny": [] }
+      },
+      "deny-webview-data-windows": {
+        "identifier": "deny-webview-data-windows",
+        "description": "This denies read access to the\n`$APPLOCALDATA/EBWebView` folder on windows as the webview data and configuration values are stored here.\nAllowing access can lead to sensitive information disclosure and should be well considered.",
+        "commands": { "allow": [], "deny": [] }
+      },
+      "deny-write": {
+        "identifier": "deny-write",
+        "description": "Denies the write command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["write"] }
+      },
+      "deny-write-file": {
+        "identifier": "deny-write-file",
+        "description": "Denies the write_file command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["write_file"] }
+      },
+      "deny-write-text-file": {
+        "identifier": "deny-write-text-file",
+        "description": "Denies the write_text_file command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["write_text_file"] }
+      },
+      "read-all": {
+        "identifier": "read-all",
+        "description": "This enables all read related commands without any pre-configured accessible paths.",
+        "commands": {
+          "allow": [
+            "read_dir",
+            "read_file",
+            "read",
+            "open",
+            "read_text_file",
+            "read_text_file_lines",
+            "read_text_file_lines_next",
+            "seek",
+            "stat",
+            "lstat",
+            "fstat",
+            "exists",
+            "watch",
+            "unwatch"
+          ],
+          "deny": []
+        }
+      },
+      "read-app-specific-dirs-recursive": {
+        "identifier": "read-app-specific-dirs-recursive",
+        "description": "This permission allows recursive read functionality on the application\nspecific base directories. \n",
+        "commands": {
+          "allow": [
+            "read_dir",
+            "read_file",
+            "read_text_file",
+            "read_text_file_lines",
+            "read_text_file_lines_next",
+            "exists",
+            "scope-app-recursive"
+          ],
+          "deny": []
+        }
+      },
+      "read-dirs": {
+        "identifier": "read-dirs",
+        "description": "This enables directory read and file metadata related commands without any pre-configured accessible paths.",
+        "commands": {
+          "allow": ["read_dir", "stat", "lstat", "fstat", "exists"],
+          "deny": []
+        }
+      },
+      "read-files": {
+        "identifier": "read-files",
+        "description": "This enables file read related commands without any pre-configured accessible paths.",
+        "commands": {
+          "allow": [
+            "read_file",
+            "read",
+            "open",
+            "read_text_file",
+            "read_text_file_lines",
+            "read_text_file_lines_next",
+            "seek",
+            "stat",
+            "lstat",
+            "fstat",
+            "exists"
+          ],
+          "deny": []
+        }
+      },
+      "read-meta": {
+        "identifier": "read-meta",
+        "description": "This enables all index or metadata related commands without any pre-configured accessible paths.",
+        "commands": {
+          "allow": ["read_dir", "stat", "lstat", "fstat", "exists", "size"],
+          "deny": []
+        }
+      },
+      "scope": {
+        "identifier": "scope",
+        "description": "An empty permission you can use to modify the global scope.\n\n## Example\n\n```json\n{\n  \"identifier\": \"read-documents\",\n  \"windows\": [\"main\"],\n  \"permissions\": [\n    \"fs:allow-read\",\n    {\n      \"identifier\": \"fs:scope\",\n      \"allow\": [\n        \"$APPDATA/documents/**/*\"\n      ],\n      \"deny\": [\n        \"$APPDATA/documents/secret.txt\"\n      ]\n    }\n  ]\n}\n```\n",
+        "commands": { "allow": [], "deny": [] }
+      },
+      "scope-app": {
+        "identifier": "scope-app",
+        "description": "This scope permits access to all files and list content of top level directories in the application folders.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [
+            { "path": "$APPCONFIG" },
+            { "path": "$APPCONFIG/*" },
+            { "path": "$APPDATA" },
+            { "path": "$APPDATA/*" },
+            { "path": "$APPLOCALDATA" },
+            { "path": "$APPLOCALDATA/*" },
+            { "path": "$APPCACHE" },
+            { "path": "$APPCACHE/*" },
+            { "path": "$APPLOG" },
+            { "path": "$APPLOG/*" }
+          ]
+        }
+      },
+      "scope-app-index": {
+        "identifier": "scope-app-index",
+        "description": "This scope permits to list all files and folders in the application directories.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [
+            { "path": "$APPCONFIG" },
+            { "path": "$APPDATA" },
+            { "path": "$APPLOCALDATA" },
+            { "path": "$APPCACHE" },
+            { "path": "$APPLOG" }
+          ]
+        }
+      },
+      "scope-app-recursive": {
+        "identifier": "scope-app-recursive",
+        "description": "This scope permits recursive access to the complete application folders, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [
+            { "path": "$APPCONFIG" },
+            { "path": "$APPCONFIG/**" },
+            { "path": "$APPDATA" },
+            { "path": "$APPDATA/**" },
+            { "path": "$APPLOCALDATA" },
+            { "path": "$APPLOCALDATA/**" },
+            { "path": "$APPCACHE" },
+            { "path": "$APPCACHE/**" },
+            { "path": "$APPLOG" },
+            { "path": "$APPLOG/**" }
+          ]
+        }
+      },
+      "scope-appcache": {
+        "identifier": "scope-appcache",
+        "description": "This scope permits access to all files and list content of top level directories in the `$APPCACHE` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$APPCACHE" }, { "path": "$APPCACHE/*" }]
+        }
+      },
+      "scope-appcache-index": {
+        "identifier": "scope-appcache-index",
+        "description": "This scope permits to list all files and folders in the `$APPCACHE`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$APPCACHE" }] }
+      },
+      "scope-appcache-recursive": {
+        "identifier": "scope-appcache-recursive",
+        "description": "This scope permits recursive access to the complete `$APPCACHE` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$APPCACHE" }, { "path": "$APPCACHE/**" }]
+        }
+      },
+      "scope-appconfig": {
+        "identifier": "scope-appconfig",
+        "description": "This scope permits access to all files and list content of top level directories in the `$APPCONFIG` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$APPCONFIG" }, { "path": "$APPCONFIG/*" }]
+        }
+      },
+      "scope-appconfig-index": {
+        "identifier": "scope-appconfig-index",
+        "description": "This scope permits to list all files and folders in the `$APPCONFIG`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$APPCONFIG" }] }
+      },
+      "scope-appconfig-recursive": {
+        "identifier": "scope-appconfig-recursive",
+        "description": "This scope permits recursive access to the complete `$APPCONFIG` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$APPCONFIG" }, { "path": "$APPCONFIG/**" }]
+        }
+      },
+      "scope-appdata": {
+        "identifier": "scope-appdata",
+        "description": "This scope permits access to all files and list content of top level directories in the `$APPDATA` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$APPDATA" }, { "path": "$APPDATA/*" }] }
+      },
+      "scope-appdata-index": {
+        "identifier": "scope-appdata-index",
+        "description": "This scope permits to list all files and folders in the `$APPDATA`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$APPDATA" }] }
+      },
+      "scope-appdata-recursive": {
+        "identifier": "scope-appdata-recursive",
+        "description": "This scope permits recursive access to the complete `$APPDATA` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$APPDATA" }, { "path": "$APPDATA/**" }]
+        }
+      },
+      "scope-applocaldata": {
+        "identifier": "scope-applocaldata",
+        "description": "This scope permits access to all files and list content of top level directories in the `$APPLOCALDATA` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$APPLOCALDATA" }, { "path": "$APPLOCALDATA/*" }]
+        }
+      },
+      "scope-applocaldata-index": {
+        "identifier": "scope-applocaldata-index",
+        "description": "This scope permits to list all files and folders in the `$APPLOCALDATA`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$APPLOCALDATA" }] }
+      },
+      "scope-applocaldata-recursive": {
+        "identifier": "scope-applocaldata-recursive",
+        "description": "This scope permits recursive access to the complete `$APPLOCALDATA` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$APPLOCALDATA" }, { "path": "$APPLOCALDATA/**" }]
+        }
+      },
+      "scope-applog": {
+        "identifier": "scope-applog",
+        "description": "This scope permits access to all files and list content of top level directories in the `$APPLOG` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$APPLOG" }, { "path": "$APPLOG/*" }] }
+      },
+      "scope-applog-index": {
+        "identifier": "scope-applog-index",
+        "description": "This scope permits to list all files and folders in the `$APPLOG`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$APPLOG" }] }
+      },
+      "scope-applog-recursive": {
+        "identifier": "scope-applog-recursive",
+        "description": "This scope permits recursive access to the complete `$APPLOG` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$APPLOG" }, { "path": "$APPLOG/**" }] }
+      },
+      "scope-audio": {
+        "identifier": "scope-audio",
+        "description": "This scope permits access to all files and list content of top level directories in the `$AUDIO` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$AUDIO" }, { "path": "$AUDIO/*" }] }
+      },
+      "scope-audio-index": {
+        "identifier": "scope-audio-index",
+        "description": "This scope permits to list all files and folders in the `$AUDIO`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$AUDIO" }] }
+      },
+      "scope-audio-recursive": {
+        "identifier": "scope-audio-recursive",
+        "description": "This scope permits recursive access to the complete `$AUDIO` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$AUDIO" }, { "path": "$AUDIO/**" }] }
+      },
+      "scope-cache": {
+        "identifier": "scope-cache",
+        "description": "This scope permits access to all files and list content of top level directories in the `$CACHE` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$CACHE" }, { "path": "$CACHE/*" }] }
+      },
+      "scope-cache-index": {
+        "identifier": "scope-cache-index",
+        "description": "This scope permits to list all files and folders in the `$CACHE`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$CACHE" }] }
+      },
+      "scope-cache-recursive": {
+        "identifier": "scope-cache-recursive",
+        "description": "This scope permits recursive access to the complete `$CACHE` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$CACHE" }, { "path": "$CACHE/**" }] }
+      },
+      "scope-config": {
+        "identifier": "scope-config",
+        "description": "This scope permits access to all files and list content of top level directories in the `$CONFIG` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$CONFIG" }, { "path": "$CONFIG/*" }] }
+      },
+      "scope-config-index": {
+        "identifier": "scope-config-index",
+        "description": "This scope permits to list all files and folders in the `$CONFIG`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$CONFIG" }] }
+      },
+      "scope-config-recursive": {
+        "identifier": "scope-config-recursive",
+        "description": "This scope permits recursive access to the complete `$CONFIG` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$CONFIG" }, { "path": "$CONFIG/**" }] }
+      },
+      "scope-data": {
+        "identifier": "scope-data",
+        "description": "This scope permits access to all files and list content of top level directories in the `$DATA` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$DATA" }, { "path": "$DATA/*" }] }
+      },
+      "scope-data-index": {
+        "identifier": "scope-data-index",
+        "description": "This scope permits to list all files and folders in the `$DATA`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$DATA" }] }
+      },
+      "scope-data-recursive": {
+        "identifier": "scope-data-recursive",
+        "description": "This scope permits recursive access to the complete `$DATA` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$DATA" }, { "path": "$DATA/**" }] }
+      },
+      "scope-desktop": {
+        "identifier": "scope-desktop",
+        "description": "This scope permits access to all files and list content of top level directories in the `$DESKTOP` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$DESKTOP" }, { "path": "$DESKTOP/*" }] }
+      },
+      "scope-desktop-index": {
+        "identifier": "scope-desktop-index",
+        "description": "This scope permits to list all files and folders in the `$DESKTOP`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$DESKTOP" }] }
+      },
+      "scope-desktop-recursive": {
+        "identifier": "scope-desktop-recursive",
+        "description": "This scope permits recursive access to the complete `$DESKTOP` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$DESKTOP" }, { "path": "$DESKTOP/**" }]
+        }
+      },
+      "scope-document": {
+        "identifier": "scope-document",
+        "description": "This scope permits access to all files and list content of top level directories in the `$DOCUMENT` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$DOCUMENT" }, { "path": "$DOCUMENT/*" }]
+        }
+      },
+      "scope-document-index": {
+        "identifier": "scope-document-index",
+        "description": "This scope permits to list all files and folders in the `$DOCUMENT`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$DOCUMENT" }] }
+      },
+      "scope-document-recursive": {
+        "identifier": "scope-document-recursive",
+        "description": "This scope permits recursive access to the complete `$DOCUMENT` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$DOCUMENT" }, { "path": "$DOCUMENT/**" }]
+        }
+      },
+      "scope-download": {
+        "identifier": "scope-download",
+        "description": "This scope permits access to all files and list content of top level directories in the `$DOWNLOAD` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$DOWNLOAD" }, { "path": "$DOWNLOAD/*" }]
+        }
+      },
+      "scope-download-index": {
+        "identifier": "scope-download-index",
+        "description": "This scope permits to list all files and folders in the `$DOWNLOAD`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$DOWNLOAD" }] }
+      },
+      "scope-download-recursive": {
+        "identifier": "scope-download-recursive",
+        "description": "This scope permits recursive access to the complete `$DOWNLOAD` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$DOWNLOAD" }, { "path": "$DOWNLOAD/**" }]
+        }
+      },
+      "scope-exe": {
+        "identifier": "scope-exe",
+        "description": "This scope permits access to all files and list content of top level directories in the `$EXE` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$EXE" }, { "path": "$EXE/*" }] }
+      },
+      "scope-exe-index": {
+        "identifier": "scope-exe-index",
+        "description": "This scope permits to list all files and folders in the `$EXE`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$EXE" }] }
+      },
+      "scope-exe-recursive": {
+        "identifier": "scope-exe-recursive",
+        "description": "This scope permits recursive access to the complete `$EXE` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$EXE" }, { "path": "$EXE/**" }] }
+      },
+      "scope-font": {
+        "identifier": "scope-font",
+        "description": "This scope permits access to all files and list content of top level directories in the `$FONT` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$FONT" }, { "path": "$FONT/*" }] }
+      },
+      "scope-font-index": {
+        "identifier": "scope-font-index",
+        "description": "This scope permits to list all files and folders in the `$FONT`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$FONT" }] }
+      },
+      "scope-font-recursive": {
+        "identifier": "scope-font-recursive",
+        "description": "This scope permits recursive access to the complete `$FONT` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$FONT" }, { "path": "$FONT/**" }] }
+      },
+      "scope-home": {
+        "identifier": "scope-home",
+        "description": "This scope permits access to all files and list content of top level directories in the `$HOME` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$HOME" }, { "path": "$HOME/*" }] }
+      },
+      "scope-home-index": {
+        "identifier": "scope-home-index",
+        "description": "This scope permits to list all files and folders in the `$HOME`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$HOME" }] }
+      },
+      "scope-home-recursive": {
+        "identifier": "scope-home-recursive",
+        "description": "This scope permits recursive access to the complete `$HOME` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$HOME" }, { "path": "$HOME/**" }] }
+      },
+      "scope-localdata": {
+        "identifier": "scope-localdata",
+        "description": "This scope permits access to all files and list content of top level directories in the `$LOCALDATA` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$LOCALDATA" }, { "path": "$LOCALDATA/*" }]
+        }
+      },
+      "scope-localdata-index": {
+        "identifier": "scope-localdata-index",
+        "description": "This scope permits to list all files and folders in the `$LOCALDATA`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$LOCALDATA" }] }
+      },
+      "scope-localdata-recursive": {
+        "identifier": "scope-localdata-recursive",
+        "description": "This scope permits recursive access to the complete `$LOCALDATA` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$LOCALDATA" }, { "path": "$LOCALDATA/**" }]
+        }
+      },
+      "scope-log": {
+        "identifier": "scope-log",
+        "description": "This scope permits access to all files and list content of top level directories in the `$LOG` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$LOG" }, { "path": "$LOG/*" }] }
+      },
+      "scope-log-index": {
+        "identifier": "scope-log-index",
+        "description": "This scope permits to list all files and folders in the `$LOG`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$LOG" }] }
+      },
+      "scope-log-recursive": {
+        "identifier": "scope-log-recursive",
+        "description": "This scope permits recursive access to the complete `$LOG` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$LOG" }, { "path": "$LOG/**" }] }
+      },
+      "scope-picture": {
+        "identifier": "scope-picture",
+        "description": "This scope permits access to all files and list content of top level directories in the `$PICTURE` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$PICTURE" }, { "path": "$PICTURE/*" }] }
+      },
+      "scope-picture-index": {
+        "identifier": "scope-picture-index",
+        "description": "This scope permits to list all files and folders in the `$PICTURE`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$PICTURE" }] }
+      },
+      "scope-picture-recursive": {
+        "identifier": "scope-picture-recursive",
+        "description": "This scope permits recursive access to the complete `$PICTURE` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$PICTURE" }, { "path": "$PICTURE/**" }]
+        }
+      },
+      "scope-public": {
+        "identifier": "scope-public",
+        "description": "This scope permits access to all files and list content of top level directories in the `$PUBLIC` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$PUBLIC" }, { "path": "$PUBLIC/*" }] }
+      },
+      "scope-public-index": {
+        "identifier": "scope-public-index",
+        "description": "This scope permits to list all files and folders in the `$PUBLIC`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$PUBLIC" }] }
+      },
+      "scope-public-recursive": {
+        "identifier": "scope-public-recursive",
+        "description": "This scope permits recursive access to the complete `$PUBLIC` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$PUBLIC" }, { "path": "$PUBLIC/**" }] }
+      },
+      "scope-resource": {
+        "identifier": "scope-resource",
+        "description": "This scope permits access to all files and list content of top level directories in the `$RESOURCE` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$RESOURCE" }, { "path": "$RESOURCE/*" }]
+        }
+      },
+      "scope-resource-index": {
+        "identifier": "scope-resource-index",
+        "description": "This scope permits to list all files and folders in the `$RESOURCE`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$RESOURCE" }] }
+      },
+      "scope-resource-recursive": {
+        "identifier": "scope-resource-recursive",
+        "description": "This scope permits recursive access to the complete `$RESOURCE` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$RESOURCE" }, { "path": "$RESOURCE/**" }]
+        }
+      },
+      "scope-runtime": {
+        "identifier": "scope-runtime",
+        "description": "This scope permits access to all files and list content of top level directories in the `$RUNTIME` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$RUNTIME" }, { "path": "$RUNTIME/*" }] }
+      },
+      "scope-runtime-index": {
+        "identifier": "scope-runtime-index",
+        "description": "This scope permits to list all files and folders in the `$RUNTIME`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$RUNTIME" }] }
+      },
+      "scope-runtime-recursive": {
+        "identifier": "scope-runtime-recursive",
+        "description": "This scope permits recursive access to the complete `$RUNTIME` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$RUNTIME" }, { "path": "$RUNTIME/**" }]
+        }
+      },
+      "scope-temp": {
+        "identifier": "scope-temp",
+        "description": "This scope permits access to all files and list content of top level directories in the `$TEMP` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$TEMP" }, { "path": "$TEMP/*" }] }
+      },
+      "scope-temp-index": {
+        "identifier": "scope-temp-index",
+        "description": "This scope permits to list all files and folders in the `$TEMP`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$TEMP" }] }
+      },
+      "scope-temp-recursive": {
+        "identifier": "scope-temp-recursive",
+        "description": "This scope permits recursive access to the complete `$TEMP` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$TEMP" }, { "path": "$TEMP/**" }] }
+      },
+      "scope-template": {
+        "identifier": "scope-template",
+        "description": "This scope permits access to all files and list content of top level directories in the `$TEMPLATE` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$TEMPLATE" }, { "path": "$TEMPLATE/*" }]
+        }
+      },
+      "scope-template-index": {
+        "identifier": "scope-template-index",
+        "description": "This scope permits to list all files and folders in the `$TEMPLATE`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$TEMPLATE" }] }
+      },
+      "scope-template-recursive": {
+        "identifier": "scope-template-recursive",
+        "description": "This scope permits recursive access to the complete `$TEMPLATE` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [{ "path": "$TEMPLATE" }, { "path": "$TEMPLATE/**" }]
+        }
+      },
+      "scope-video": {
+        "identifier": "scope-video",
+        "description": "This scope permits access to all files and list content of top level directories in the `$VIDEO` folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$VIDEO" }, { "path": "$VIDEO/*" }] }
+      },
+      "scope-video-index": {
+        "identifier": "scope-video-index",
+        "description": "This scope permits to list all files and folders in the `$VIDEO`folder.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$VIDEO" }] }
+      },
+      "scope-video-recursive": {
+        "identifier": "scope-video-recursive",
+        "description": "This scope permits recursive access to the complete `$VIDEO` folder, including sub directories and files.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": { "allow": [{ "path": "$VIDEO" }, { "path": "$VIDEO/**" }] }
+      },
+      "write-all": {
+        "identifier": "write-all",
+        "description": "This enables all write related commands without any pre-configured accessible paths.",
+        "commands": {
+          "allow": [
+            "mkdir",
+            "create",
+            "copy_file",
+            "remove",
+            "rename",
+            "truncate",
+            "ftruncate",
+            "write",
+            "write_file",
+            "write_text_file"
+          ],
+          "deny": []
+        }
+      },
+      "write-files": {
+        "identifier": "write-files",
+        "description": "This enables all file write related commands without any pre-configured accessible paths.",
+        "commands": {
+          "allow": [
+            "create",
+            "copy_file",
+            "remove",
+            "rename",
+            "truncate",
+            "ftruncate",
+            "write",
+            "write_file",
+            "write_text_file"
+          ],
+          "deny": []
+        }
+      }
+    },
+    "permission_sets": {
+      "allow-app-meta": {
+        "identifier": "allow-app-meta",
+        "description": "This allows non-recursive read access to metadata of the application folders, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-app-index"]
+      },
+      "allow-app-meta-recursive": {
+        "identifier": "allow-app-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the application folders, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-app-recursive"]
+      },
+      "allow-app-read": {
+        "identifier": "allow-app-read",
+        "description": "This allows non-recursive read access to the application folders.",
+        "permissions": ["read-all", "scope-app"]
+      },
+      "allow-app-read-recursive": {
+        "identifier": "allow-app-read-recursive",
+        "description": "This allows full recursive read access to the complete application folders, files and subdirectories.",
+        "permissions": ["read-all", "scope-app-recursive"]
+      },
+      "allow-app-write": {
+        "identifier": "allow-app-write",
+        "description": "This allows non-recursive write access to the application folders.",
+        "permissions": ["write-all", "scope-app"]
+      },
+      "allow-app-write-recursive": {
+        "identifier": "allow-app-write-recursive",
+        "description": "This allows full recursive write access to the complete application folders, files and subdirectories.",
+        "permissions": ["write-all", "scope-app-recursive"]
+      },
+      "allow-appcache-meta": {
+        "identifier": "allow-appcache-meta",
+        "description": "This allows non-recursive read access to metadata of the `$APPCACHE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-appcache-index"]
+      },
+      "allow-appcache-meta-recursive": {
+        "identifier": "allow-appcache-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$APPCACHE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-appcache-recursive"]
+      },
+      "allow-appcache-read": {
+        "identifier": "allow-appcache-read",
+        "description": "This allows non-recursive read access to the `$APPCACHE` folder.",
+        "permissions": ["read-all", "scope-appcache"]
+      },
+      "allow-appcache-read-recursive": {
+        "identifier": "allow-appcache-read-recursive",
+        "description": "This allows full recursive read access to the complete `$APPCACHE` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-appcache-recursive"]
+      },
+      "allow-appcache-write": {
+        "identifier": "allow-appcache-write",
+        "description": "This allows non-recursive write access to the `$APPCACHE` folder.",
+        "permissions": ["write-all", "scope-appcache"]
+      },
+      "allow-appcache-write-recursive": {
+        "identifier": "allow-appcache-write-recursive",
+        "description": "This allows full recursive write access to the complete `$APPCACHE` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-appcache-recursive"]
+      },
+      "allow-appconfig-meta": {
+        "identifier": "allow-appconfig-meta",
+        "description": "This allows non-recursive read access to metadata of the `$APPCONFIG` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-appconfig-index"]
+      },
+      "allow-appconfig-meta-recursive": {
+        "identifier": "allow-appconfig-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$APPCONFIG` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-appconfig-recursive"]
+      },
+      "allow-appconfig-read": {
+        "identifier": "allow-appconfig-read",
+        "description": "This allows non-recursive read access to the `$APPCONFIG` folder.",
+        "permissions": ["read-all", "scope-appconfig"]
+      },
+      "allow-appconfig-read-recursive": {
+        "identifier": "allow-appconfig-read-recursive",
+        "description": "This allows full recursive read access to the complete `$APPCONFIG` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-appconfig-recursive"]
+      },
+      "allow-appconfig-write": {
+        "identifier": "allow-appconfig-write",
+        "description": "This allows non-recursive write access to the `$APPCONFIG` folder.",
+        "permissions": ["write-all", "scope-appconfig"]
+      },
+      "allow-appconfig-write-recursive": {
+        "identifier": "allow-appconfig-write-recursive",
+        "description": "This allows full recursive write access to the complete `$APPCONFIG` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-appconfig-recursive"]
+      },
+      "allow-appdata-meta": {
+        "identifier": "allow-appdata-meta",
+        "description": "This allows non-recursive read access to metadata of the `$APPDATA` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-appdata-index"]
+      },
+      "allow-appdata-meta-recursive": {
+        "identifier": "allow-appdata-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$APPDATA` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-appdata-recursive"]
+      },
+      "allow-appdata-read": {
+        "identifier": "allow-appdata-read",
+        "description": "This allows non-recursive read access to the `$APPDATA` folder.",
+        "permissions": ["read-all", "scope-appdata"]
+      },
+      "allow-appdata-read-recursive": {
+        "identifier": "allow-appdata-read-recursive",
+        "description": "This allows full recursive read access to the complete `$APPDATA` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-appdata-recursive"]
+      },
+      "allow-appdata-write": {
+        "identifier": "allow-appdata-write",
+        "description": "This allows non-recursive write access to the `$APPDATA` folder.",
+        "permissions": ["write-all", "scope-appdata"]
+      },
+      "allow-appdata-write-recursive": {
+        "identifier": "allow-appdata-write-recursive",
+        "description": "This allows full recursive write access to the complete `$APPDATA` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-appdata-recursive"]
+      },
+      "allow-applocaldata-meta": {
+        "identifier": "allow-applocaldata-meta",
+        "description": "This allows non-recursive read access to metadata of the `$APPLOCALDATA` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-applocaldata-index"]
+      },
+      "allow-applocaldata-meta-recursive": {
+        "identifier": "allow-applocaldata-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$APPLOCALDATA` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-applocaldata-recursive"]
+      },
+      "allow-applocaldata-read": {
+        "identifier": "allow-applocaldata-read",
+        "description": "This allows non-recursive read access to the `$APPLOCALDATA` folder.",
+        "permissions": ["read-all", "scope-applocaldata"]
+      },
+      "allow-applocaldata-read-recursive": {
+        "identifier": "allow-applocaldata-read-recursive",
+        "description": "This allows full recursive read access to the complete `$APPLOCALDATA` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-applocaldata-recursive"]
+      },
+      "allow-applocaldata-write": {
+        "identifier": "allow-applocaldata-write",
+        "description": "This allows non-recursive write access to the `$APPLOCALDATA` folder.",
+        "permissions": ["write-all", "scope-applocaldata"]
+      },
+      "allow-applocaldata-write-recursive": {
+        "identifier": "allow-applocaldata-write-recursive",
+        "description": "This allows full recursive write access to the complete `$APPLOCALDATA` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-applocaldata-recursive"]
+      },
+      "allow-applog-meta": {
+        "identifier": "allow-applog-meta",
+        "description": "This allows non-recursive read access to metadata of the `$APPLOG` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-applog-index"]
+      },
+      "allow-applog-meta-recursive": {
+        "identifier": "allow-applog-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$APPLOG` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-applog-recursive"]
+      },
+      "allow-applog-read": {
+        "identifier": "allow-applog-read",
+        "description": "This allows non-recursive read access to the `$APPLOG` folder.",
+        "permissions": ["read-all", "scope-applog"]
+      },
+      "allow-applog-read-recursive": {
+        "identifier": "allow-applog-read-recursive",
+        "description": "This allows full recursive read access to the complete `$APPLOG` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-applog-recursive"]
+      },
+      "allow-applog-write": {
+        "identifier": "allow-applog-write",
+        "description": "This allows non-recursive write access to the `$APPLOG` folder.",
+        "permissions": ["write-all", "scope-applog"]
+      },
+      "allow-applog-write-recursive": {
+        "identifier": "allow-applog-write-recursive",
+        "description": "This allows full recursive write access to the complete `$APPLOG` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-applog-recursive"]
+      },
+      "allow-audio-meta": {
+        "identifier": "allow-audio-meta",
+        "description": "This allows non-recursive read access to metadata of the `$AUDIO` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-audio-index"]
+      },
+      "allow-audio-meta-recursive": {
+        "identifier": "allow-audio-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$AUDIO` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-audio-recursive"]
+      },
+      "allow-audio-read": {
+        "identifier": "allow-audio-read",
+        "description": "This allows non-recursive read access to the `$AUDIO` folder.",
+        "permissions": ["read-all", "scope-audio"]
+      },
+      "allow-audio-read-recursive": {
+        "identifier": "allow-audio-read-recursive",
+        "description": "This allows full recursive read access to the complete `$AUDIO` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-audio-recursive"]
+      },
+      "allow-audio-write": {
+        "identifier": "allow-audio-write",
+        "description": "This allows non-recursive write access to the `$AUDIO` folder.",
+        "permissions": ["write-all", "scope-audio"]
+      },
+      "allow-audio-write-recursive": {
+        "identifier": "allow-audio-write-recursive",
+        "description": "This allows full recursive write access to the complete `$AUDIO` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-audio-recursive"]
+      },
+      "allow-cache-meta": {
+        "identifier": "allow-cache-meta",
+        "description": "This allows non-recursive read access to metadata of the `$CACHE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-cache-index"]
+      },
+      "allow-cache-meta-recursive": {
+        "identifier": "allow-cache-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$CACHE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-cache-recursive"]
+      },
+      "allow-cache-read": {
+        "identifier": "allow-cache-read",
+        "description": "This allows non-recursive read access to the `$CACHE` folder.",
+        "permissions": ["read-all", "scope-cache"]
+      },
+      "allow-cache-read-recursive": {
+        "identifier": "allow-cache-read-recursive",
+        "description": "This allows full recursive read access to the complete `$CACHE` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-cache-recursive"]
+      },
+      "allow-cache-write": {
+        "identifier": "allow-cache-write",
+        "description": "This allows non-recursive write access to the `$CACHE` folder.",
+        "permissions": ["write-all", "scope-cache"]
+      },
+      "allow-cache-write-recursive": {
+        "identifier": "allow-cache-write-recursive",
+        "description": "This allows full recursive write access to the complete `$CACHE` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-cache-recursive"]
+      },
+      "allow-config-meta": {
+        "identifier": "allow-config-meta",
+        "description": "This allows non-recursive read access to metadata of the `$CONFIG` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-config-index"]
+      },
+      "allow-config-meta-recursive": {
+        "identifier": "allow-config-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$CONFIG` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-config-recursive"]
+      },
+      "allow-config-read": {
+        "identifier": "allow-config-read",
+        "description": "This allows non-recursive read access to the `$CONFIG` folder.",
+        "permissions": ["read-all", "scope-config"]
+      },
+      "allow-config-read-recursive": {
+        "identifier": "allow-config-read-recursive",
+        "description": "This allows full recursive read access to the complete `$CONFIG` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-config-recursive"]
+      },
+      "allow-config-write": {
+        "identifier": "allow-config-write",
+        "description": "This allows non-recursive write access to the `$CONFIG` folder.",
+        "permissions": ["write-all", "scope-config"]
+      },
+      "allow-config-write-recursive": {
+        "identifier": "allow-config-write-recursive",
+        "description": "This allows full recursive write access to the complete `$CONFIG` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-config-recursive"]
+      },
+      "allow-data-meta": {
+        "identifier": "allow-data-meta",
+        "description": "This allows non-recursive read access to metadata of the `$DATA` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-data-index"]
+      },
+      "allow-data-meta-recursive": {
+        "identifier": "allow-data-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$DATA` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-data-recursive"]
+      },
+      "allow-data-read": {
+        "identifier": "allow-data-read",
+        "description": "This allows non-recursive read access to the `$DATA` folder.",
+        "permissions": ["read-all", "scope-data"]
+      },
+      "allow-data-read-recursive": {
+        "identifier": "allow-data-read-recursive",
+        "description": "This allows full recursive read access to the complete `$DATA` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-data-recursive"]
+      },
+      "allow-data-write": {
+        "identifier": "allow-data-write",
+        "description": "This allows non-recursive write access to the `$DATA` folder.",
+        "permissions": ["write-all", "scope-data"]
+      },
+      "allow-data-write-recursive": {
+        "identifier": "allow-data-write-recursive",
+        "description": "This allows full recursive write access to the complete `$DATA` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-data-recursive"]
+      },
+      "allow-desktop-meta": {
+        "identifier": "allow-desktop-meta",
+        "description": "This allows non-recursive read access to metadata of the `$DESKTOP` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-desktop-index"]
+      },
+      "allow-desktop-meta-recursive": {
+        "identifier": "allow-desktop-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$DESKTOP` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-desktop-recursive"]
+      },
+      "allow-desktop-read": {
+        "identifier": "allow-desktop-read",
+        "description": "This allows non-recursive read access to the `$DESKTOP` folder.",
+        "permissions": ["read-all", "scope-desktop"]
+      },
+      "allow-desktop-read-recursive": {
+        "identifier": "allow-desktop-read-recursive",
+        "description": "This allows full recursive read access to the complete `$DESKTOP` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-desktop-recursive"]
+      },
+      "allow-desktop-write": {
+        "identifier": "allow-desktop-write",
+        "description": "This allows non-recursive write access to the `$DESKTOP` folder.",
+        "permissions": ["write-all", "scope-desktop"]
+      },
+      "allow-desktop-write-recursive": {
+        "identifier": "allow-desktop-write-recursive",
+        "description": "This allows full recursive write access to the complete `$DESKTOP` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-desktop-recursive"]
+      },
+      "allow-document-meta": {
+        "identifier": "allow-document-meta",
+        "description": "This allows non-recursive read access to metadata of the `$DOCUMENT` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-document-index"]
+      },
+      "allow-document-meta-recursive": {
+        "identifier": "allow-document-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$DOCUMENT` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-document-recursive"]
+      },
+      "allow-document-read": {
+        "identifier": "allow-document-read",
+        "description": "This allows non-recursive read access to the `$DOCUMENT` folder.",
+        "permissions": ["read-all", "scope-document"]
+      },
+      "allow-document-read-recursive": {
+        "identifier": "allow-document-read-recursive",
+        "description": "This allows full recursive read access to the complete `$DOCUMENT` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-document-recursive"]
+      },
+      "allow-document-write": {
+        "identifier": "allow-document-write",
+        "description": "This allows non-recursive write access to the `$DOCUMENT` folder.",
+        "permissions": ["write-all", "scope-document"]
+      },
+      "allow-document-write-recursive": {
+        "identifier": "allow-document-write-recursive",
+        "description": "This allows full recursive write access to the complete `$DOCUMENT` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-document-recursive"]
+      },
+      "allow-download-meta": {
+        "identifier": "allow-download-meta",
+        "description": "This allows non-recursive read access to metadata of the `$DOWNLOAD` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-download-index"]
+      },
+      "allow-download-meta-recursive": {
+        "identifier": "allow-download-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$DOWNLOAD` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-download-recursive"]
+      },
+      "allow-download-read": {
+        "identifier": "allow-download-read",
+        "description": "This allows non-recursive read access to the `$DOWNLOAD` folder.",
+        "permissions": ["read-all", "scope-download"]
+      },
+      "allow-download-read-recursive": {
+        "identifier": "allow-download-read-recursive",
+        "description": "This allows full recursive read access to the complete `$DOWNLOAD` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-download-recursive"]
+      },
+      "allow-download-write": {
+        "identifier": "allow-download-write",
+        "description": "This allows non-recursive write access to the `$DOWNLOAD` folder.",
+        "permissions": ["write-all", "scope-download"]
+      },
+      "allow-download-write-recursive": {
+        "identifier": "allow-download-write-recursive",
+        "description": "This allows full recursive write access to the complete `$DOWNLOAD` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-download-recursive"]
+      },
+      "allow-exe-meta": {
+        "identifier": "allow-exe-meta",
+        "description": "This allows non-recursive read access to metadata of the `$EXE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-exe-index"]
+      },
+      "allow-exe-meta-recursive": {
+        "identifier": "allow-exe-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$EXE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-exe-recursive"]
+      },
+      "allow-exe-read": {
+        "identifier": "allow-exe-read",
+        "description": "This allows non-recursive read access to the `$EXE` folder.",
+        "permissions": ["read-all", "scope-exe"]
+      },
+      "allow-exe-read-recursive": {
+        "identifier": "allow-exe-read-recursive",
+        "description": "This allows full recursive read access to the complete `$EXE` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-exe-recursive"]
+      },
+      "allow-exe-write": {
+        "identifier": "allow-exe-write",
+        "description": "This allows non-recursive write access to the `$EXE` folder.",
+        "permissions": ["write-all", "scope-exe"]
+      },
+      "allow-exe-write-recursive": {
+        "identifier": "allow-exe-write-recursive",
+        "description": "This allows full recursive write access to the complete `$EXE` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-exe-recursive"]
+      },
+      "allow-font-meta": {
+        "identifier": "allow-font-meta",
+        "description": "This allows non-recursive read access to metadata of the `$FONT` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-font-index"]
+      },
+      "allow-font-meta-recursive": {
+        "identifier": "allow-font-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$FONT` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-font-recursive"]
+      },
+      "allow-font-read": {
+        "identifier": "allow-font-read",
+        "description": "This allows non-recursive read access to the `$FONT` folder.",
+        "permissions": ["read-all", "scope-font"]
+      },
+      "allow-font-read-recursive": {
+        "identifier": "allow-font-read-recursive",
+        "description": "This allows full recursive read access to the complete `$FONT` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-font-recursive"]
+      },
+      "allow-font-write": {
+        "identifier": "allow-font-write",
+        "description": "This allows non-recursive write access to the `$FONT` folder.",
+        "permissions": ["write-all", "scope-font"]
+      },
+      "allow-font-write-recursive": {
+        "identifier": "allow-font-write-recursive",
+        "description": "This allows full recursive write access to the complete `$FONT` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-font-recursive"]
+      },
+      "allow-home-meta": {
+        "identifier": "allow-home-meta",
+        "description": "This allows non-recursive read access to metadata of the `$HOME` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-home-index"]
+      },
+      "allow-home-meta-recursive": {
+        "identifier": "allow-home-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$HOME` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-home-recursive"]
+      },
+      "allow-home-read": {
+        "identifier": "allow-home-read",
+        "description": "This allows non-recursive read access to the `$HOME` folder.",
+        "permissions": ["read-all", "scope-home"]
+      },
+      "allow-home-read-recursive": {
+        "identifier": "allow-home-read-recursive",
+        "description": "This allows full recursive read access to the complete `$HOME` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-home-recursive"]
+      },
+      "allow-home-write": {
+        "identifier": "allow-home-write",
+        "description": "This allows non-recursive write access to the `$HOME` folder.",
+        "permissions": ["write-all", "scope-home"]
+      },
+      "allow-home-write-recursive": {
+        "identifier": "allow-home-write-recursive",
+        "description": "This allows full recursive write access to the complete `$HOME` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-home-recursive"]
+      },
+      "allow-localdata-meta": {
+        "identifier": "allow-localdata-meta",
+        "description": "This allows non-recursive read access to metadata of the `$LOCALDATA` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-localdata-index"]
+      },
+      "allow-localdata-meta-recursive": {
+        "identifier": "allow-localdata-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$LOCALDATA` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-localdata-recursive"]
+      },
+      "allow-localdata-read": {
+        "identifier": "allow-localdata-read",
+        "description": "This allows non-recursive read access to the `$LOCALDATA` folder.",
+        "permissions": ["read-all", "scope-localdata"]
+      },
+      "allow-localdata-read-recursive": {
+        "identifier": "allow-localdata-read-recursive",
+        "description": "This allows full recursive read access to the complete `$LOCALDATA` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-localdata-recursive"]
+      },
+      "allow-localdata-write": {
+        "identifier": "allow-localdata-write",
+        "description": "This allows non-recursive write access to the `$LOCALDATA` folder.",
+        "permissions": ["write-all", "scope-localdata"]
+      },
+      "allow-localdata-write-recursive": {
+        "identifier": "allow-localdata-write-recursive",
+        "description": "This allows full recursive write access to the complete `$LOCALDATA` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-localdata-recursive"]
+      },
+      "allow-log-meta": {
+        "identifier": "allow-log-meta",
+        "description": "This allows non-recursive read access to metadata of the `$LOG` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-log-index"]
+      },
+      "allow-log-meta-recursive": {
+        "identifier": "allow-log-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$LOG` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-log-recursive"]
+      },
+      "allow-log-read": {
+        "identifier": "allow-log-read",
+        "description": "This allows non-recursive read access to the `$LOG` folder.",
+        "permissions": ["read-all", "scope-log"]
+      },
+      "allow-log-read-recursive": {
+        "identifier": "allow-log-read-recursive",
+        "description": "This allows full recursive read access to the complete `$LOG` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-log-recursive"]
+      },
+      "allow-log-write": {
+        "identifier": "allow-log-write",
+        "description": "This allows non-recursive write access to the `$LOG` folder.",
+        "permissions": ["write-all", "scope-log"]
+      },
+      "allow-log-write-recursive": {
+        "identifier": "allow-log-write-recursive",
+        "description": "This allows full recursive write access to the complete `$LOG` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-log-recursive"]
+      },
+      "allow-picture-meta": {
+        "identifier": "allow-picture-meta",
+        "description": "This allows non-recursive read access to metadata of the `$PICTURE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-picture-index"]
+      },
+      "allow-picture-meta-recursive": {
+        "identifier": "allow-picture-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$PICTURE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-picture-recursive"]
+      },
+      "allow-picture-read": {
+        "identifier": "allow-picture-read",
+        "description": "This allows non-recursive read access to the `$PICTURE` folder.",
+        "permissions": ["read-all", "scope-picture"]
+      },
+      "allow-picture-read-recursive": {
+        "identifier": "allow-picture-read-recursive",
+        "description": "This allows full recursive read access to the complete `$PICTURE` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-picture-recursive"]
+      },
+      "allow-picture-write": {
+        "identifier": "allow-picture-write",
+        "description": "This allows non-recursive write access to the `$PICTURE` folder.",
+        "permissions": ["write-all", "scope-picture"]
+      },
+      "allow-picture-write-recursive": {
+        "identifier": "allow-picture-write-recursive",
+        "description": "This allows full recursive write access to the complete `$PICTURE` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-picture-recursive"]
+      },
+      "allow-public-meta": {
+        "identifier": "allow-public-meta",
+        "description": "This allows non-recursive read access to metadata of the `$PUBLIC` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-public-index"]
+      },
+      "allow-public-meta-recursive": {
+        "identifier": "allow-public-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$PUBLIC` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-public-recursive"]
+      },
+      "allow-public-read": {
+        "identifier": "allow-public-read",
+        "description": "This allows non-recursive read access to the `$PUBLIC` folder.",
+        "permissions": ["read-all", "scope-public"]
+      },
+      "allow-public-read-recursive": {
+        "identifier": "allow-public-read-recursive",
+        "description": "This allows full recursive read access to the complete `$PUBLIC` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-public-recursive"]
+      },
+      "allow-public-write": {
+        "identifier": "allow-public-write",
+        "description": "This allows non-recursive write access to the `$PUBLIC` folder.",
+        "permissions": ["write-all", "scope-public"]
+      },
+      "allow-public-write-recursive": {
+        "identifier": "allow-public-write-recursive",
+        "description": "This allows full recursive write access to the complete `$PUBLIC` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-public-recursive"]
+      },
+      "allow-resource-meta": {
+        "identifier": "allow-resource-meta",
+        "description": "This allows non-recursive read access to metadata of the `$RESOURCE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-resource-index"]
+      },
+      "allow-resource-meta-recursive": {
+        "identifier": "allow-resource-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$RESOURCE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-resource-recursive"]
+      },
+      "allow-resource-read": {
+        "identifier": "allow-resource-read",
+        "description": "This allows non-recursive read access to the `$RESOURCE` folder.",
+        "permissions": ["read-all", "scope-resource"]
+      },
+      "allow-resource-read-recursive": {
+        "identifier": "allow-resource-read-recursive",
+        "description": "This allows full recursive read access to the complete `$RESOURCE` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-resource-recursive"]
+      },
+      "allow-resource-write": {
+        "identifier": "allow-resource-write",
+        "description": "This allows non-recursive write access to the `$RESOURCE` folder.",
+        "permissions": ["write-all", "scope-resource"]
+      },
+      "allow-resource-write-recursive": {
+        "identifier": "allow-resource-write-recursive",
+        "description": "This allows full recursive write access to the complete `$RESOURCE` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-resource-recursive"]
+      },
+      "allow-runtime-meta": {
+        "identifier": "allow-runtime-meta",
+        "description": "This allows non-recursive read access to metadata of the `$RUNTIME` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-runtime-index"]
+      },
+      "allow-runtime-meta-recursive": {
+        "identifier": "allow-runtime-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$RUNTIME` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-runtime-recursive"]
+      },
+      "allow-runtime-read": {
+        "identifier": "allow-runtime-read",
+        "description": "This allows non-recursive read access to the `$RUNTIME` folder.",
+        "permissions": ["read-all", "scope-runtime"]
+      },
+      "allow-runtime-read-recursive": {
+        "identifier": "allow-runtime-read-recursive",
+        "description": "This allows full recursive read access to the complete `$RUNTIME` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-runtime-recursive"]
+      },
+      "allow-runtime-write": {
+        "identifier": "allow-runtime-write",
+        "description": "This allows non-recursive write access to the `$RUNTIME` folder.",
+        "permissions": ["write-all", "scope-runtime"]
+      },
+      "allow-runtime-write-recursive": {
+        "identifier": "allow-runtime-write-recursive",
+        "description": "This allows full recursive write access to the complete `$RUNTIME` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-runtime-recursive"]
+      },
+      "allow-temp-meta": {
+        "identifier": "allow-temp-meta",
+        "description": "This allows non-recursive read access to metadata of the `$TEMP` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-temp-index"]
+      },
+      "allow-temp-meta-recursive": {
+        "identifier": "allow-temp-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$TEMP` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-temp-recursive"]
+      },
+      "allow-temp-read": {
+        "identifier": "allow-temp-read",
+        "description": "This allows non-recursive read access to the `$TEMP` folder.",
+        "permissions": ["read-all", "scope-temp"]
+      },
+      "allow-temp-read-recursive": {
+        "identifier": "allow-temp-read-recursive",
+        "description": "This allows full recursive read access to the complete `$TEMP` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-temp-recursive"]
+      },
+      "allow-temp-write": {
+        "identifier": "allow-temp-write",
+        "description": "This allows non-recursive write access to the `$TEMP` folder.",
+        "permissions": ["write-all", "scope-temp"]
+      },
+      "allow-temp-write-recursive": {
+        "identifier": "allow-temp-write-recursive",
+        "description": "This allows full recursive write access to the complete `$TEMP` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-temp-recursive"]
+      },
+      "allow-template-meta": {
+        "identifier": "allow-template-meta",
+        "description": "This allows non-recursive read access to metadata of the `$TEMPLATE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-template-index"]
+      },
+      "allow-template-meta-recursive": {
+        "identifier": "allow-template-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$TEMPLATE` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-template-recursive"]
+      },
+      "allow-template-read": {
+        "identifier": "allow-template-read",
+        "description": "This allows non-recursive read access to the `$TEMPLATE` folder.",
+        "permissions": ["read-all", "scope-template"]
+      },
+      "allow-template-read-recursive": {
+        "identifier": "allow-template-read-recursive",
+        "description": "This allows full recursive read access to the complete `$TEMPLATE` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-template-recursive"]
+      },
+      "allow-template-write": {
+        "identifier": "allow-template-write",
+        "description": "This allows non-recursive write access to the `$TEMPLATE` folder.",
+        "permissions": ["write-all", "scope-template"]
+      },
+      "allow-template-write-recursive": {
+        "identifier": "allow-template-write-recursive",
+        "description": "This allows full recursive write access to the complete `$TEMPLATE` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-template-recursive"]
+      },
+      "allow-video-meta": {
+        "identifier": "allow-video-meta",
+        "description": "This allows non-recursive read access to metadata of the `$VIDEO` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-video-index"]
+      },
+      "allow-video-meta-recursive": {
+        "identifier": "allow-video-meta-recursive",
+        "description": "This allows full recursive read access to metadata of the `$VIDEO` folder, including file listing and statistics.",
+        "permissions": ["read-meta", "scope-video-recursive"]
+      },
+      "allow-video-read": {
+        "identifier": "allow-video-read",
+        "description": "This allows non-recursive read access to the `$VIDEO` folder.",
+        "permissions": ["read-all", "scope-video"]
+      },
+      "allow-video-read-recursive": {
+        "identifier": "allow-video-read-recursive",
+        "description": "This allows full recursive read access to the complete `$VIDEO` folder, files and subdirectories.",
+        "permissions": ["read-all", "scope-video-recursive"]
+      },
+      "allow-video-write": {
+        "identifier": "allow-video-write",
+        "description": "This allows non-recursive write access to the `$VIDEO` folder.",
+        "permissions": ["write-all", "scope-video"]
+      },
+      "allow-video-write-recursive": {
+        "identifier": "allow-video-write-recursive",
+        "description": "This allows full recursive write access to the complete `$VIDEO` folder, files and subdirectories.",
+        "permissions": ["write-all", "scope-video-recursive"]
+      },
+      "deny-default": {
+        "identifier": "deny-default",
+        "description": "This denies access to dangerous Tauri relevant files and folders by default.",
+        "permissions": ["deny-webview-data-linux", "deny-webview-data-windows"]
+      }
+    },
+    "global_scope_schema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "anyOf": [
+        {
+          "description": "A path that can be accessed by the webview when using the fs APIs. FS scope path pattern.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
+          "type": "string"
+        },
+        {
+          "properties": {
+            "path": {
+              "description": "A path that can be accessed by the webview when using the fs APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
+              "type": "string"
+            }
+          },
+          "required": ["path"],
+          "type": "object"
+        }
+      ],
+      "description": "FS scope entry.",
+      "title": "FsScopeEntry"
+    }
+  },
+  "opener": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "This permission set allows opening `mailto:`, `tel:`, `https://` and `http://` urls using their default application\nas well as reveal file in directories using default file explorer",
+      "permissions": [
+        "allow-open-url",
+        "allow-reveal-item-in-dir",
+        "allow-default-urls"
+      ]
+    },
+    "permissions": {
+      "allow-default-urls": {
+        "identifier": "allow-default-urls",
+        "description": "This enables opening `mailto:`, `tel:`, `https://` and `http://` urls using their default application.",
+        "commands": { "allow": [], "deny": [] },
+        "scope": {
+          "allow": [
+            { "url": "mailto:*" },
+            { "url": "tel:*" },
+            { "url": "http://*" },
+            { "url": "https://*" }
+          ]
+        }
+      },
+      "allow-open-path": {
+        "identifier": "allow-open-path",
+        "description": "Enables the open_path command without any pre-configured scope.",
+        "commands": { "allow": ["open_path"], "deny": [] }
+      },
+      "allow-open-url": {
+        "identifier": "allow-open-url",
+        "description": "Enables the open_url command without any pre-configured scope.",
+        "commands": { "allow": ["open_url"], "deny": [] }
+      },
+      "allow-reveal-item-in-dir": {
+        "identifier": "allow-reveal-item-in-dir",
+        "description": "Enables the reveal_item_in_dir command without any pre-configured scope.",
+        "commands": { "allow": ["reveal_item_in_dir"], "deny": [] }
+      },
+      "deny-open-path": {
+        "identifier": "deny-open-path",
+        "description": "Denies the open_path command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["open_path"] }
+      },
+      "deny-open-url": {
+        "identifier": "deny-open-url",
+        "description": "Denies the open_url command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["open_url"] }
+      },
+      "deny-reveal-item-in-dir": {
+        "identifier": "deny-reveal-item-in-dir",
+        "description": "Denies the reveal_item_in_dir command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["reveal_item_in_dir"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "anyOf": [
+        {
+          "properties": {
+            "app": {
+              "allOf": [{ "$ref": "#/definitions/Application" }],
+              "description": "An application to open this url with, for example: firefox."
+            },
+            "url": {
+              "description": "A URL that can be opened by the webview when using the Opener APIs.\n\nWildcards can be used following the UNIX glob pattern.\n\nExamples:\n\n- \"https://*\" : allows all HTTPS origin\n\n- \"https://*.github.com/tauri-apps/tauri\": allows any subdomain of \"github.com\" with the \"tauri-apps/api\" path\n\n- \"https://myapi.service.com/users/*\": allows access to any URLs that begins with \"https://myapi.service.com/users/\"",
+              "type": "string"
+            }
+          },
+          "required": ["url"],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "app": {
+              "allOf": [{ "$ref": "#/definitions/Application" }],
+              "description": "An application to open this path with, for example: xdg-open."
+            },
+            "path": {
+              "description": "A path that can be opened by the webview when using the Opener APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
+              "type": "string"
+            }
+          },
+          "required": ["path"],
+          "type": "object"
+        }
+      ],
+      "definitions": {
+        "Application": {
+          "anyOf": [
+            { "description": "Open in default application.", "type": "null" },
+            {
+              "description": "If true, allow open with any application.",
+              "type": "boolean"
+            },
+            {
+              "description": "Allow specific application to open with.",
+              "type": "string"
+            }
+          ],
+          "description": "Opener scope application."
+        }
+      },
+      "description": "Opener scope entry.",
+      "title": "OpenerScopeEntry"
+    }
+  },
+  "shell": {
+    "default_permission": {
+      "identifier": "default",
+      "description": "This permission set configures which\nshell functionality is exposed by default.\n\n#### Granted Permissions\n\nIt allows to use the `open` functionality with a reasonable\nscope pre-configured. It will allow opening `http(s)://`,\n`tel:` and `mailto:` links.\n",
+      "permissions": ["allow-open"]
+    },
+    "permissions": {
+      "allow-execute": {
+        "identifier": "allow-execute",
+        "description": "Enables the execute command without any pre-configured scope.",
+        "commands": { "allow": ["execute"], "deny": [] }
+      },
+      "allow-kill": {
+        "identifier": "allow-kill",
+        "description": "Enables the kill command without any pre-configured scope.",
+        "commands": { "allow": ["kill"], "deny": [] }
+      },
+      "allow-open": {
+        "identifier": "allow-open",
+        "description": "Enables the open command without any pre-configured scope.",
+        "commands": { "allow": ["open"], "deny": [] }
+      },
+      "allow-spawn": {
+        "identifier": "allow-spawn",
+        "description": "Enables the spawn command without any pre-configured scope.",
+        "commands": { "allow": ["spawn"], "deny": [] }
+      },
+      "allow-stdin-write": {
+        "identifier": "allow-stdin-write",
+        "description": "Enables the stdin_write command without any pre-configured scope.",
+        "commands": { "allow": ["stdin_write"], "deny": [] }
+      },
+      "deny-execute": {
+        "identifier": "deny-execute",
+        "description": "Denies the execute command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["execute"] }
+      },
+      "deny-kill": {
+        "identifier": "deny-kill",
+        "description": "Denies the kill command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["kill"] }
+      },
+      "deny-open": {
+        "identifier": "deny-open",
+        "description": "Denies the open command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["open"] }
+      },
+      "deny-spawn": {
+        "identifier": "deny-spawn",
+        "description": "Denies the spawn command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["spawn"] }
+      },
+      "deny-stdin-write": {
+        "identifier": "deny-stdin-write",
+        "description": "Denies the stdin_write command without any pre-configured scope.",
+        "commands": { "allow": [], "deny": ["stdin_write"] }
+      }
+    },
+    "permission_sets": {},
+    "global_scope_schema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "args": {
+              "allOf": [{ "$ref": "#/definitions/ShellScopeEntryAllowedArgs" }],
+              "description": "The allowed arguments for the command execution."
+            },
+            "cmd": {
+              "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
+              "type": "string"
+            },
+            "name": {
+              "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
+              "type": "string"
+            }
+          },
+          "required": ["cmd", "name"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "args": {
+              "allOf": [{ "$ref": "#/definitions/ShellScopeEntryAllowedArgs" }],
+              "description": "The allowed arguments for the command execution."
+            },
+            "name": {
+              "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
+              "type": "string"
+            },
+            "sidecar": {
+              "description": "If this command is a sidecar command.",
+              "type": "boolean"
+            }
+          },
+          "required": ["name", "sidecar"],
+          "type": "object"
+        }
+      ],
+      "definitions": {
+        "ShellScopeEntryAllowedArg": {
+          "anyOf": [
+            {
+              "description": "A non-configurable argument that is passed to the command in the order it was specified.",
+              "type": "string"
+            },
+            {
+              "additionalProperties": false,
+              "description": "A variable that is set while calling the command from the webview API.",
+              "properties": {
+                "raw": {
+                  "default": false,
+                  "description": "Marks the validator as a raw regex, meaning the plugin should not make any modification at runtime.\n\nThis means the regex will not match on the entire string by default, which might be exploited if your regex allow unexpected input to be considered valid. When using this option, make sure your regex is correct.",
+                  "type": "boolean"
+                },
+                "validator": {
+                  "description": "[regex] validator to require passed values to conform to an expected input.\n\nThis will require the argument value passed to this variable to match the `validator` regex before it will be executed.\n\nThe regex string is by default surrounded by `^...$` to match the full string. For example the `https?://\\w+` regex would be registered as `^https?://\\w+$`.\n\n[regex]: <https://docs.rs/regex/latest/regex/#syntax>",
+                  "type": "string"
+                }
+              },
+              "required": ["validator"],
+              "type": "object"
+            }
+          ],
+          "description": "A command argument allowed to be executed by the webview API."
+        },
+        "ShellScopeEntryAllowedArgs": {
+          "anyOf": [
+            {
+              "description": "Use a simple boolean to allow all or disable all arguments to this command configuration.",
+              "type": "boolean"
+            },
+            {
+              "description": "A specific set of [`ShellScopeEntryAllowedArg`] that are valid to call for the command configuration.",
+              "items": { "$ref": "#/definitions/ShellScopeEntryAllowedArg" },
+              "type": "array"
+            }
+          ],
+          "description": "A set of command arguments allowed to be executed by the webview API.\n\nA value of `true` will allow any arguments to be passed to the command. `false` will disable all arguments. A list of [`ShellScopeEntryAllowedArg`] will set those arguments as the only valid arguments to be passed to the attached command configuration."
+        }
+      },
+      "description": "Shell scope entry.",
+      "title": "ShellScopeEntry"
+    }
+  }
+}
+````
 
 ---
 
 ### 📄 文件: `src-tauri\gen\schemas\capabilities.json`
 
 ```json
-{"default":{"identifier":"default","description":"Capability for the main window","local":true,"windows":["main"],"permissions":["core:default","shell:allow-open","shell:default","opener:default",{"identifier":"fs:scope","allow":["$HOME/**"]}]}}
+{
+  "default": {
+    "identifier": "default",
+    "description": "Capability for the main window",
+    "local": true,
+    "windows": ["main"],
+    "permissions": [
+      "core:default",
+      "shell:allow-open",
+      "shell:default",
+      "opener:default",
+      { "identifier": "fs:scope", "allow": ["$HOME/**"] }
+    ]
+  }
+}
 ```
 
 ---
 
 ### 📄 文件: `src-tauri\gen\schemas\desktop-schema.json`
 
-```json
+````json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CapabilityFile",
@@ -11701,9 +15221,7 @@ fn main() {
     {
       "description": "A list of capabilities.",
       "type": "object",
-      "required": [
-        "capabilities"
-      ],
+      "required": ["capabilities"],
       "properties": {
         "capabilities": {
           "description": "The list of capabilities.",
@@ -11719,10 +15237,7 @@ fn main() {
     "Capability": {
       "description": "A grouping and boundary mechanism developers can use to isolate access to the IPC layer.\n\nIt controls application windows' and webviews' fine grained access to the Tauri core, application, or plugin commands. If a webview or its window is not matching any capability then it has no access to the IPC layer at all.\n\nThis can be done to create groups of windows, based on their required system access, which can reduce impact of frontend vulnerabilities in less privileged windows. Windows can be added to a capability by exact name (e.g. `main-window`) or glob patterns like `*` or `admin-*`. A Window can have none, one, or multiple associated capabilities.\n\n## Example\n\n```json { \"identifier\": \"main-user-files-write\", \"description\": \"This capability allows the `main` window on macOS and Windows access to `filesystem` write related commands and `dialog` commands to enable programmatic access to files selected by the user.\", \"windows\": [ \"main\" ], \"permissions\": [ \"core:default\", \"dialog:open\", { \"identifier\": \"fs:allow-write-text-file\", \"allow\": [{ \"path\": \"$HOME/test.txt\" }] }, ], \"platforms\": [\"macOS\",\"windows\"] } ```",
       "type": "object",
-      "required": [
-        "identifier",
-        "permissions"
-      ],
+      "required": ["identifier", "permissions"],
       "properties": {
         "identifier": {
           "description": "Identifier of the capability.\n\n## Example\n\n`main-user-files-write`",
@@ -11773,10 +15288,7 @@ fn main() {
         },
         "platforms": {
           "description": "Limit which target platforms this capability applies to.\n\nBy default all platforms are targeted.\n\n## Example\n\n`[\"macOS\",\"windows\"]`",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/Target"
           }
@@ -11786,9 +15298,7 @@ fn main() {
     "CapabilityRemote": {
       "description": "Configuration for remote URLs that are associated with the capability.",
       "type": "object",
-      "required": [
-        "urls"
-      ],
+      "required": ["urls"],
       "properties": {
         "urls": {
           "description": "Remote domains this capability refers to using the [URLPattern standard](https://urlpattern.spec.whatwg.org/).\n\n## Examples\n\n- \"https://*.mydomain.dev\": allows subdomains of mydomain.dev - \"https://mydomain.dev/api/*\": allows any subpath of mydomain.dev/api",
@@ -13564,9 +17074,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "path"
-                          ],
+                          "required": ["path"],
                           "properties": {
                             "path": {
                               "description": "A path that can be accessed by the webview when using the fs APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
@@ -13588,9 +17096,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "path"
-                          ],
+                          "required": ["path"],
                           "properties": {
                             "path": {
                               "description": "A path that can be accessed by the webview when using the fs APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
@@ -13680,9 +17186,7 @@ fn main() {
                       "anyOf": [
                         {
                           "type": "object",
-                          "required": [
-                            "url"
-                          ],
+                          "required": ["url"],
                           "properties": {
                             "app": {
                               "description": "An application to open this url with, for example: firefox.",
@@ -13700,9 +17204,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "path"
-                          ],
+                          "required": ["path"],
                           "properties": {
                             "app": {
                               "description": "An application to open this path with, for example: xdg-open.",
@@ -13728,9 +17230,7 @@ fn main() {
                       "anyOf": [
                         {
                           "type": "object",
-                          "required": [
-                            "url"
-                          ],
+                          "required": ["url"],
                           "properties": {
                             "app": {
                               "description": "An application to open this url with, for example: firefox.",
@@ -13748,9 +17248,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "path"
-                          ],
+                          "required": ["path"],
                           "properties": {
                             "app": {
                               "description": "An application to open this path with, for example: xdg-open.",
@@ -13866,10 +17364,7 @@ fn main() {
                       "anyOf": [
                         {
                           "type": "object",
-                          "required": [
-                            "cmd",
-                            "name"
-                          ],
+                          "required": ["cmd", "name"],
                           "properties": {
                             "args": {
                               "description": "The allowed arguments for the command execution.",
@@ -13892,10 +17387,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "name",
-                            "sidecar"
-                          ],
+                          "required": ["name", "sidecar"],
                           "properties": {
                             "args": {
                               "description": "The allowed arguments for the command execution.",
@@ -13926,10 +17418,7 @@ fn main() {
                       "anyOf": [
                         {
                           "type": "object",
-                          "required": [
-                            "cmd",
-                            "name"
-                          ],
+                          "required": ["cmd", "name"],
                           "properties": {
                             "args": {
                               "description": "The allowed arguments for the command execution.",
@@ -13952,10 +17441,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "name",
-                            "sidecar"
-                          ],
+                          "required": ["name", "sidecar"],
                           "properties": {
                             "args": {
                               "description": "The allowed arguments for the command execution.",
@@ -14004,20 +17490,14 @@ fn main() {
                 },
                 "allow": {
                   "description": "Data that defines what is allowed by the scope.",
-                  "type": [
-                    "array",
-                    "null"
-                  ],
+                  "type": ["array", "null"],
                   "items": {
                     "$ref": "#/definitions/Value"
                   }
                 },
                 "deny": {
                   "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
-                  "type": [
-                    "array",
-                    "null"
-                  ],
+                  "type": ["array", "null"],
                   "items": {
                     "$ref": "#/definitions/Value"
                   }
@@ -14025,9 +17505,7 @@ fn main() {
               }
             }
           ],
-          "required": [
-            "identifier"
-          ]
+          "required": ["identifier"]
         }
       ]
     },
@@ -17906,37 +21384,27 @@ fn main() {
         {
           "description": "MacOS.",
           "type": "string",
-          "enum": [
-            "macOS"
-          ]
+          "enum": ["macOS"]
         },
         {
           "description": "Windows.",
           "type": "string",
-          "enum": [
-            "windows"
-          ]
+          "enum": ["windows"]
         },
         {
           "description": "Linux.",
           "type": "string",
-          "enum": [
-            "linux"
-          ]
+          "enum": ["linux"]
         },
         {
           "description": "Android.",
           "type": "string",
-          "enum": [
-            "android"
-          ]
+          "enum": ["android"]
         },
         {
           "description": "iOS.",
           "type": "string",
-          "enum": [
-            "iOS"
-          ]
+          "enum": ["iOS"]
         }
       ]
     },
@@ -17967,9 +21435,7 @@ fn main() {
         {
           "description": "A variable that is set while calling the command from the webview API.",
           "type": "object",
-          "required": [
-            "validator"
-          ],
+          "required": ["validator"],
           "properties": {
             "raw": {
               "description": "Marks the validator as a raw regex, meaning the plugin should not make any modification at runtime.\n\nThis means the regex will not match on the entire string by default, which might be exploited if your regex allow unexpected input to be considered valid. When using this option, make sure your regex is correct.",
@@ -18003,13 +21469,13 @@ fn main() {
     }
   }
 }
-```
+````
 
 ---
 
 ### 📄 文件: `src-tauri\gen\schemas\windows-schema.json`
 
-```json
+````json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CapabilityFile",
@@ -18033,9 +21499,7 @@ fn main() {
     {
       "description": "A list of capabilities.",
       "type": "object",
-      "required": [
-        "capabilities"
-      ],
+      "required": ["capabilities"],
       "properties": {
         "capabilities": {
           "description": "The list of capabilities.",
@@ -18051,10 +21515,7 @@ fn main() {
     "Capability": {
       "description": "A grouping and boundary mechanism developers can use to isolate access to the IPC layer.\n\nIt controls application windows' and webviews' fine grained access to the Tauri core, application, or plugin commands. If a webview or its window is not matching any capability then it has no access to the IPC layer at all.\n\nThis can be done to create groups of windows, based on their required system access, which can reduce impact of frontend vulnerabilities in less privileged windows. Windows can be added to a capability by exact name (e.g. `main-window`) or glob patterns like `*` or `admin-*`. A Window can have none, one, or multiple associated capabilities.\n\n## Example\n\n```json { \"identifier\": \"main-user-files-write\", \"description\": \"This capability allows the `main` window on macOS and Windows access to `filesystem` write related commands and `dialog` commands to enable programmatic access to files selected by the user.\", \"windows\": [ \"main\" ], \"permissions\": [ \"core:default\", \"dialog:open\", { \"identifier\": \"fs:allow-write-text-file\", \"allow\": [{ \"path\": \"$HOME/test.txt\" }] }, ], \"platforms\": [\"macOS\",\"windows\"] } ```",
       "type": "object",
-      "required": [
-        "identifier",
-        "permissions"
-      ],
+      "required": ["identifier", "permissions"],
       "properties": {
         "identifier": {
           "description": "Identifier of the capability.\n\n## Example\n\n`main-user-files-write`",
@@ -18105,10 +21566,7 @@ fn main() {
         },
         "platforms": {
           "description": "Limit which target platforms this capability applies to.\n\nBy default all platforms are targeted.\n\n## Example\n\n`[\"macOS\",\"windows\"]`",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/Target"
           }
@@ -18118,9 +21576,7 @@ fn main() {
     "CapabilityRemote": {
       "description": "Configuration for remote URLs that are associated with the capability.",
       "type": "object",
-      "required": [
-        "urls"
-      ],
+      "required": ["urls"],
       "properties": {
         "urls": {
           "description": "Remote domains this capability refers to using the [URLPattern standard](https://urlpattern.spec.whatwg.org/).\n\n## Examples\n\n- \"https://*.mydomain.dev\": allows subdomains of mydomain.dev - \"https://mydomain.dev/api/*\": allows any subpath of mydomain.dev/api",
@@ -19896,9 +23352,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "path"
-                          ],
+                          "required": ["path"],
                           "properties": {
                             "path": {
                               "description": "A path that can be accessed by the webview when using the fs APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
@@ -19920,9 +23374,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "path"
-                          ],
+                          "required": ["path"],
                           "properties": {
                             "path": {
                               "description": "A path that can be accessed by the webview when using the fs APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
@@ -20012,9 +23464,7 @@ fn main() {
                       "anyOf": [
                         {
                           "type": "object",
-                          "required": [
-                            "url"
-                          ],
+                          "required": ["url"],
                           "properties": {
                             "app": {
                               "description": "An application to open this url with, for example: firefox.",
@@ -20032,9 +23482,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "path"
-                          ],
+                          "required": ["path"],
                           "properties": {
                             "app": {
                               "description": "An application to open this path with, for example: xdg-open.",
@@ -20060,9 +23508,7 @@ fn main() {
                       "anyOf": [
                         {
                           "type": "object",
-                          "required": [
-                            "url"
-                          ],
+                          "required": ["url"],
                           "properties": {
                             "app": {
                               "description": "An application to open this url with, for example: firefox.",
@@ -20080,9 +23526,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "path"
-                          ],
+                          "required": ["path"],
                           "properties": {
                             "app": {
                               "description": "An application to open this path with, for example: xdg-open.",
@@ -20198,10 +23642,7 @@ fn main() {
                       "anyOf": [
                         {
                           "type": "object",
-                          "required": [
-                            "cmd",
-                            "name"
-                          ],
+                          "required": ["cmd", "name"],
                           "properties": {
                             "args": {
                               "description": "The allowed arguments for the command execution.",
@@ -20224,10 +23665,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "name",
-                            "sidecar"
-                          ],
+                          "required": ["name", "sidecar"],
                           "properties": {
                             "args": {
                               "description": "The allowed arguments for the command execution.",
@@ -20258,10 +23696,7 @@ fn main() {
                       "anyOf": [
                         {
                           "type": "object",
-                          "required": [
-                            "cmd",
-                            "name"
-                          ],
+                          "required": ["cmd", "name"],
                           "properties": {
                             "args": {
                               "description": "The allowed arguments for the command execution.",
@@ -20284,10 +23719,7 @@ fn main() {
                         },
                         {
                           "type": "object",
-                          "required": [
-                            "name",
-                            "sidecar"
-                          ],
+                          "required": ["name", "sidecar"],
                           "properties": {
                             "args": {
                               "description": "The allowed arguments for the command execution.",
@@ -20336,20 +23768,14 @@ fn main() {
                 },
                 "allow": {
                   "description": "Data that defines what is allowed by the scope.",
-                  "type": [
-                    "array",
-                    "null"
-                  ],
+                  "type": ["array", "null"],
                   "items": {
                     "$ref": "#/definitions/Value"
                   }
                 },
                 "deny": {
                   "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
-                  "type": [
-                    "array",
-                    "null"
-                  ],
+                  "type": ["array", "null"],
                   "items": {
                     "$ref": "#/definitions/Value"
                   }
@@ -20357,9 +23783,7 @@ fn main() {
               }
             }
           ],
-          "required": [
-            "identifier"
-          ]
+          "required": ["identifier"]
         }
       ]
     },
@@ -24238,37 +27662,27 @@ fn main() {
         {
           "description": "MacOS.",
           "type": "string",
-          "enum": [
-            "macOS"
-          ]
+          "enum": ["macOS"]
         },
         {
           "description": "Windows.",
           "type": "string",
-          "enum": [
-            "windows"
-          ]
+          "enum": ["windows"]
         },
         {
           "description": "Linux.",
           "type": "string",
-          "enum": [
-            "linux"
-          ]
+          "enum": ["linux"]
         },
         {
           "description": "Android.",
           "type": "string",
-          "enum": [
-            "android"
-          ]
+          "enum": ["android"]
         },
         {
           "description": "iOS.",
           "type": "string",
-          "enum": [
-            "iOS"
-          ]
+          "enum": ["iOS"]
         }
       ]
     },
@@ -24299,9 +27713,7 @@ fn main() {
         {
           "description": "A variable that is set while calling the command from the webview API.",
           "type": "object",
-          "required": [
-            "validator"
-          ],
+          "required": ["validator"],
           "properties": {
             "raw": {
               "description": "Marks the validator as a raw regex, meaning the plugin should not make any modification at runtime.\n\nThis means the regex will not match on the entire string by default, which might be exploited if your regex allow unexpected input to be considered valid. When using this option, make sure your regex is correct.",
@@ -24335,7 +27747,7 @@ fn main() {
     }
   }
 }
-```
+````
 
 ---
 
@@ -24480,8 +27892,8 @@ use tokio::sync::Mutex;
 
 #[cfg(target_os = "linux")]
 use lwg_core::{
-    ConfigManager as LwgConfigManager, 
-    controller::WallpaperController, 
+    ConfigManager as LwgConfigManager,
+    controller::WallpaperController,
     config::AppConfig as LwgAppConfig,
     wallpaper::WallpaperManager,
 };
@@ -24495,8 +27907,8 @@ pub struct Wallpaper {
     preview: String,
     wtype: String,
     path: String,
-    tags: Vec<String>, 
-    size: String,      
+    tags: Vec<String>,
+    size: String,
 }
 
 /// 跨平台配置结构体
@@ -24645,10 +28057,10 @@ impl From<AppConfig> for LwgAppConfig {
 struct AppState {
     #[cfg(target_os = "linux")]
     controller: Mutex<WallpaperController>,
-    
+
     #[cfg(target_os = "linux")]
     config_manager: Mutex<LwgConfigManager>,
-    
+
     #[cfg(not(target_os = "linux"))]
     _dummy: bool,
 }
@@ -24758,21 +28170,21 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
     #[cfg(target_os = "linux")]
     {
         println!("🐧 [Linux] 扫描壁纸库...");
-        
+
         // 从配置获取 workshop_path，否则使用默认路径
         let config_manager = _state.config_manager.lock().await;
         let workshop_path = config_manager.config().workshop_path
             .clone()
             .unwrap_or_else(|| get_default_workshop_path());
         drop(config_manager);
-        
+
         println!("📁 [Linux] Workshop 路径: {}", workshop_path);
-        
+
         // 使用 WallpaperManager 扫描
         let mut manager = WallpaperManager::new(&workshop_path);
         let wallpapers = manager.scan()
             .map_err(|e| format!("扫描失败: {:?}", e))?;
-        
+
         // 转换为前端需要的格式
         let result: Vec<Wallpaper> = wallpapers.values().map(|w| {
             Wallpaper {
@@ -24785,7 +28197,7 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
                 size: format_size(w.size),
             }
         }).collect();
-        
+
         println!("✅ [Linux] 扫描到 {} 张壁纸", result.len());
         Ok(result)
     }
@@ -24799,10 +28211,10 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
 
 #[tauri::command]
 async fn apply_wallpaper(
-    id: String, 
-    _state: State<'_, AppState> 
+    id: String,
+    _state: State<'_, AppState>
 ) -> Result<(), String> {
-    
+
     #[cfg(target_os = "linux")]
     {
         println!("▶️ [Rust] 正在应用壁纸: {}", id);
@@ -24816,7 +28228,7 @@ async fn apply_wallpaper(
     #[cfg(not(target_os = "linux"))]
     {
         println!("🪟 [Windows] 模拟应用成功: {}", id);
-        Ok(()) 
+        Ok(())
     }
 }
 
@@ -24861,31 +28273,31 @@ async fn save_settings(
     #[cfg(target_os = "linux")]
     {
         println!("💾 [Linux] 正在保存配置...");
-        
+
         let mut config_manager = _state.config_manager.lock().await;
         let old_config = config_manager.config().clone();
-        
+
         // 转换并更新配置
         let lwg_config: LwgAppConfig = config.into();
         *config_manager.config_mut() = lwg_config.clone();
-        
+
         // 保存到文件
         config_manager.save().map_err(|e| format!("保存失败: {:?}", e))?;
-        
+
         // 检查是否需要重启壁纸
         let needs_restart = needs_wallpaper_restart(&old_config, &lwg_config);
-        
+
         if needs_restart {
             println!("🔄 [Linux] 检测到壁纸相关配置变更，准备重启壁纸...");
             drop(config_manager); // 释放锁
-            
+
             let mut controller = _state.controller.lock().await;
             controller.restart_wallpapers().await.map_err(|e| format!("重启失败: {:?}", e))?;
             println!("✅ [Linux] 壁纸已重启");
         } else {
             println!("ℹ️ [Linux] 配置已保存（无需重启壁纸）");
         }
-        
+
         Ok(needs_restart)
     }
 
@@ -24921,23 +28333,23 @@ async fn set_autostart(enabled: bool, hidden: bool) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         use std::io::Write;
-        
+
         let autostart_dir = dirs::config_dir()
             .ok_or_else(|| "无法获取配置目录".to_string())?
             .join("autostart");
-        
+
         std::fs::create_dir_all(&autostart_dir)
             .map_err(|e| format!("创建 autostart 目录失败: {}", e))?;
-        
+
         let desktop_path = autostart_dir.join("linux-wallpaperengine-gui.desktop");
-        
+
         if enabled {
             let current_exe = std::env::current_exe()
                 .map_err(|e| format!("获取程序路径失败: {}", e))?;
             let exe_path = current_exe.to_string_lossy();
-            
+
             let hidden_arg = if hidden { " --hidden" } else { "" };
-            
+
             let desktop_content = format!(
                 r#"[Desktop Entry]
 Type=Application
@@ -24950,12 +28362,12 @@ Categories=Utility;
 "#,
                 exe_path, hidden_arg
             );
-            
+
             let mut file = std::fs::File::create(&desktop_path)
                 .map_err(|e| format!("创建 desktop 文件失败: {}", e))?;
             file.write_all(desktop_content.as_bytes())
                 .map_err(|e| format!("写入 desktop 文件失败: {}", e))?;
-            
+
             println!("✅ [Rust] Autostart 已启用: {:?}", desktop_path);
         } else {
             if desktop_path.exists() {
@@ -24964,7 +28376,7 @@ Categories=Utility;
             }
             println!("✅ [Rust] Autostart 已禁用");
         }
-        
+
         Ok(())
     }
 
@@ -25001,7 +28413,7 @@ pub fn run() {
         let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
         let controller = WallpaperController::new(shared_config);
-        AppState { 
+        AppState {
             controller: Mutex::new(controller),
             config_manager: Mutex::new(config_manager),
         }
@@ -25014,9 +28426,9 @@ pub fn run() {
     };
 
     tauri::Builder::default()
-        .manage(app_state) 
+        .manage(app_state)
         .invoke_handler(tauri::generate_handler![
-            get_wallpapers, 
+            get_wallpapers,
             apply_wallpaper,
             stop_wallpaper,
             // Settings commands
@@ -25062,9 +28474,9 @@ fn main() {
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
-"app": {
+  "app": {
     "withGlobalTauri": true,
-    
+
     "windows": [
       {
         "title": "Wallpaper Engine",
@@ -25078,14 +28490,10 @@ fn main() {
 
     "security": {
       "csp": "default-src 'self'; img-src * asset: http://asset.localhost blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';",
-      
+
       "assetProtocol": {
         "enable": true,
-        "scope": [
-          "**", 
-          "/home/**",
-          "/home/yua/.local/**" 
-        ]
+        "scope": ["**", "/home/**", "/home/yua/.local/**"]
       }
     }
   },
@@ -25101,7 +28509,6 @@ fn main() {
     ]
   }
 }
-
 ```
 
 ---
@@ -25225,7 +28632,6 @@ button {
     background-color: #0f0f0f69;
   }
 }
-
 ```
 
 ---
@@ -25268,31 +28674,31 @@ const pageTransition = {
 export function App() {
   // Local UI state
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Zustand store state and actions
   const activeTab = useAppStore((state) => state.activeTab);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
-  
+
   useEffect(() => {
     setIsLoading(true);
     loadWallpapers().finally(() => setIsLoading(false));
-  }, []); 
+  }, []);
 
   return (
     <>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <Layout 
-          navbar={<AppNavbar />} 
+        <Layout
+          navbar={<AppNavbar />}
           // 只有在 Library (wallpapers) 标签页时才显示侧边栏
           sidebar={activeTab === "wallpapers" ? <WallpaperSidebar /> : null}
         >
           <AnimatePresence mode="wait">
             {activeTab === "wallpapers" && (
-              <motion.div 
-                key="wallpapers" 
-                initial="initial" animate="in" exit="out" 
-                variants={pageVariants} transition={pageTransition} 
+              <motion.div
+                key="wallpapers"
+                initial="initial" animate="in" exit="out"
+                variants={pageVariants} transition={pageTransition}
                 className="h-full"
               >
                 <Library />
@@ -25300,10 +28706,10 @@ export function App() {
             )}
 
             {activeTab === "settings" && (
-              <motion.div 
-                key="settings" 
-                initial="initial" animate="in" exit="out" 
-                variants={pageVariants} transition={pageTransition} 
+              <motion.div
+                key="settings"
+                initial="initial" animate="in" exit="out"
+                variants={pageVariants} transition={pageTransition}
                 className="h-full"
               >
                 <Settings />
@@ -25311,10 +28717,10 @@ export function App() {
             )}
 
             {activeTab === "performance" && (
-              <motion.div 
-                key="performance" 
-                initial="initial" animate="in" exit="out" 
-                variants={pageVariants} transition={pageTransition} 
+              <motion.div
+                key="performance"
+                initial="initial" animate="in" exit="out"
+                variants={pageVariants} transition={pageTransition}
                 className="h-full"
               >
                 <Performance />
@@ -25335,7 +28741,7 @@ export function App() {
 ### 📄 文件: `src\api\wallpaper.ts`
 
 ```typescript
-﻿import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core";
 import { Wallpaper } from "../types";
 import { MOCK_WALLPAPERS } from "../mock/wallpapers";
 
@@ -25343,7 +28749,7 @@ import { MOCK_WALLPAPERS } from "../mock/wallpapers";
 
 // 🔴 开关 1：是否模拟“空空如也”的状态？
 // 设为 true -> 哪怕有数据也返回空数组，用于测试“无壁纸”时的 UI
-const FORCE_EMPTY = false; 
+const FORCE_EMPTY = false;
 
 // 🔵 开关 2：是否强制使用 Mock 数据？
 // 默认为自动检测 (Windows 下自动为 true)，你也可以手动改为 true 强制在 Linux 下调试 UI
@@ -25370,12 +28776,12 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
   try {
     console.log("🚀 [Prod] 请求真实壁纸数据...");
     const data = await invoke<any[]>("get_wallpapers");
-    
+
     // 调试：打印第一个壁纸的 preview 路径
     if (data.length > 0) {
       console.log("📷 [Debug] 第一张壁纸 preview 路径:", data[0].preview);
     }
-    
+
     return data.map((item) => ({
       id: item.id,
       title: item.title,
@@ -25394,7 +28800,7 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
 export async function applyWallpaper(id: string): Promise<void> {
   if (USE_MOCK || FORCE_EMPTY) {
     console.log(`🧪 [Debug] 模拟应用壁纸 ID: ${id}`);
-    const wp = MOCK_WALLPAPERS.find(w => w.id === id);
+    const wp = MOCK_WALLPAPERS.find((w) => w.id === id);
     if (wp) console.log(`   选中: ${wp.title}`);
     return;
   }
@@ -25484,9 +28890,9 @@ export default function ThreeDCardDemo() {
 ### 📄 文件: `src\components\AppnavBar.tsx`
 
 ```
-import { 
-  Search, Settings as SettingsIcon, Activity, Square, 
-  Shuffle, Camera, ImageIcon 
+import {
+  Search, Settings as SettingsIcon, Activity, Square,
+  Shuffle, Camera, ImageIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
@@ -25503,7 +28909,7 @@ export function AppNavbar() {
   // 修正：保持与原版一致的状态获取方式，确保响应式更新
   const getFilteredWallpapers = useAppStore((state) => state.getFilteredWallpapers);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
-  
+
   const filteredWallpapers = getFilteredWallpapers();
 
   // --- Stop Wallpaper Handler ---
@@ -25550,13 +28956,13 @@ export function AppNavbar() {
       </TabsList>
 
       <Separator orientation="vertical" className="h-6 mx-2" />
-      
+
       <InputGroup className="relative flex-1 max-w-md">
         <InputGroupAddon align="inline-start">
           <Search className="w-4 h-4" />
         </InputGroupAddon>
-        <InputGroupInput 
-          placeholder="Search..." 
+        <InputGroupInput
+          placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -25568,7 +28974,7 @@ export function AppNavbar() {
       </InputGroup>
 
       <div className="flex-1" />
-      
+
       {/* 右侧快速操作区 */}
       <TooltipProvider>
         <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border">
@@ -25628,7 +29034,7 @@ export function Layout({ navbar, sidebar, children }: LayoutProps) {
 
       {/* 下方主体区域 */}
       <div className="flex flex-1 overflow-hidden min-w-0">
-        
+
         {/* 左侧主内容：修复核心 - 移除了 flex flex-col 和 h-full */}
         <main className="flex-1 overflow-y-auto p-4 min-w-0 scrollbar-thin relative">
           {children}
@@ -25668,16 +29074,16 @@ export function WallpaperContextMenu({ children, onOpenFolder, onDelete, onPrope
       <ContextMenu.Trigger asChild>
         {children}
       </ContextMenu.Trigger>
-      
+
       <ContextMenu.Portal>
         <ContextMenu.Content className="min-w-[180px] bg-[#1e1e2e] rounded-lg border border-white/10 p-1.5 shadow-xl animate-in fade-in duration-200 z-50">
-          
+
           <Item onClick={onOpenFolder} icon={<Play size={14} />} label="Apply Wallpaper" />
           <ContextMenu.Separator className="h-px bg-white/10 my-1" />
-          
+
           <Item onClick={onOpenFolder} icon={<FolderOpen size={14} />} label="Open in Explorer" />
           <Item onClick={onProperties} icon={<Info size={14} />} label="Properties" />
-          
+
           <ContextMenu.Separator className="h-px bg-white/10 my-1" />
           <Item onClick={onDelete} icon={<Trash2 size={14} />} label="Delete" destructive />
 
@@ -25690,10 +29096,10 @@ export function WallpaperContextMenu({ children, onOpenFolder, onDelete, onPrope
 // 辅助组件：菜单项
 function Item({ icon, label, onClick, destructive }: any) {
   return (
-    <ContextMenu.Item 
+    <ContextMenu.Item
       className={`
         flex items-center gap-2 px-2 py-1.5 rounded text-sm outline-none cursor-pointer select-none
-        data-[highlighted]:bg-white/10 
+        data-[highlighted]:bg-white/10
         ${destructive ? 'text-red-400 data-[highlighted]:text-red-300' : 'text-gray-200'}
       `}
       onClick={onClick}
@@ -25745,7 +29151,7 @@ export function WallpaperSidebar() {
 
   // 修正：不要返回 null，否则 Layout 右侧会塌陷。
   // 保持原版结构，如果 selectedWallpaper 为空，内容区域会显示为空白或占位符，但容器还在。
-  
+
   return (
     <div className="h-full flex flex-col bg-card/30">
       <ScrollArea className="flex-1 p-6">
@@ -25753,9 +29159,9 @@ export function WallpaperSidebar() {
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
             {/* 图片容器 - 正方形，短边裁剪 */}
             <div className="aspect-square relative overflow-hidden border border-border shadow-2xl rounded-2xl bg-muted">
-              <img 
-                src={getPreviewUrl(selectedWallpaper.preview)} 
-                className="absolute inset-0 w-full h-full object-cover" 
+              <img
+                src={getPreviewUrl(selectedWallpaper.preview)}
+                className="absolute inset-0 w-full h-full object-cover"
                 alt={selectedWallpaper.title}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -25784,9 +29190,9 @@ export function WallpaperSidebar() {
           </div>
         )}
       </ScrollArea>
-      
+
       <div className="p-6 border-t bg-background/50">
-        <Button 
+        <Button
           onClick={handleApply}
           disabled={!selectedWallpaper}
           className="w-full h-12 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg shadow-pink-500/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -25836,7 +29242,7 @@ export function AppSidebar() {
   // 2. 处理应用壁纸逻辑
   const handleApply = async () => {
     if (!selectedWallpaper) return
-    
+
     try {
       console.log("Applying:", selectedWallpaper.title)
       await applyWallpaper(selectedWallpaper.id)
@@ -25846,7 +29252,7 @@ export function AppSidebar() {
       toast.error("应用失败，请检查后台日志")
     }
   }
-  
+
   // 3. 获取 setActiveTab
   const setActiveTab = useAppStore((state) => state.setActiveTab)
   const activeTab = useAppStore((state) => state.activeTab)
@@ -25867,7 +29273,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     onClick={() => setActiveTab(item.tab)}
                     isActive={activeTab === item.tab}
                   >
@@ -25897,8 +29303,8 @@ export function AppSidebar() {
             </div>
 
             {/* 应用按钮 */}
-            <Button 
-              onClick={handleApply} 
+            <Button
+              onClick={handleApply}
               className="w-full bg-pink-600 hover:bg-pink-700 text-white shadow-lg"
             >
               <Play className="w-4 h-4 mr-2 fill-current" />
@@ -25931,10 +29337,10 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => {
-    
+
     // 基础样式：圆角、居中、过渡动画
     const baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95";
-    
+
     // 变体样式 (Variants)
     const variants = {
       default: "bg-primary text-black hover:bg-blue-400 shadow-lg shadow-blue-900/20",
@@ -25998,24 +29404,24 @@ function getPreviewUrl(preview: string): string {
 export const WallpaperCard = memo(function WallpaperCard({ wp, isSelected, onSelect }: WallpaperCardProps) {
   // 使用 useMemo 缓存 URL，避免每次渲染重新计算
   const previewUrl = useMemo(() => getPreviewUrl(wp.preview), [wp.preview]);
-  
+
   return (
-    <div 
-      onClick={onSelect} 
+    <div
+      onClick={onSelect}
       className="cursor-pointer group"
     >
       <div className={`
         relative overflow-hidden rounded-2xl border-2 transition-all duration-300
-        ${isSelected 
-          ? 'ring-2 ring-pink-500 ring-offset-4 ring-offset-background border-pink-500' 
+        ${isSelected
+          ? 'ring-2 ring-pink-500 ring-offset-4 ring-offset-background border-pink-500'
           : 'border-border/50 hover:border-pink-500/50 hover:shadow-xl hover:shadow-pink-500/10'
         }
       `}>
         {/* 图片容器 - 正方形，短边裁剪 */}
         <div className="aspect-square relative overflow-hidden bg-muted">
-          <img 
-            src={previewUrl} 
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+          <img
+            src={previewUrl}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             alt={wp.title}
             loading="lazy"
             onError={(e) => {
@@ -26023,12 +29429,12 @@ export const WallpaperCard = memo(function WallpaperCard({ wp, isSelected, onSel
               target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
             }}
           />
-          
+
           {/* 底部渐变标题 */}
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-8">
             <p className="text-[11px] font-bold text-white truncate">{wp.title}</p>
           </div>
-          
+
           {/* 右上角类型图标 */}
           <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md p-1.5 rounded-lg border border-white/10">
               {wp.type === 'Video' ? <Video className="w-3 h-3 text-pink-400" /> : <ImageIcon className="w-3 h-3 text-emerald-400" />}
@@ -26047,8 +29453,8 @@ export const WallpaperCard = memo(function WallpaperCard({ wp, isSelected, onSel
 ```
 // src/components/performance/Chart.tsx
 import React, { memo } from "react";
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { ChartDataPoint } from "@/types/performance";
 
@@ -26060,8 +29466,8 @@ interface PerformanceChartProps {
   height?: number;
 }
 
-const PerformanceChart: React.FC<PerformanceChartProps> = memo(({ 
-  data, color, unit, title, height = 120 
+const PerformanceChart: React.FC<PerformanceChartProps> = memo(({
+  data, color, unit, title, height = 120
 }) => {
   return (
     <div style={{ height }} className="w-full">
@@ -26075,24 +29481,24 @@ const PerformanceChart: React.FC<PerformanceChartProps> = memo(({
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
-          <XAxis 
-            dataKey="time" 
-            hide 
+          <XAxis
+            dataKey="time"
+            hide
             axisLine={false}
             tickLine={false}
           />
-          <YAxis 
-            hide={false} 
-            width={30} 
+          <YAxis
+            hide={false}
+            width={30}
             axisLine={false}
             tickLine={false}
             tick={{fontSize: 10, fill: "hsl(var(--muted-foreground))"}}
             tickFormatter={(value) => `${value}`}
           />
-          <Tooltip 
-            contentStyle={{ 
-              backgroundColor: "hsl(var(--card))", 
-              borderColor: "hsl(var(--border))", 
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "hsl(var(--card))",
+              borderColor: "hsl(var(--border))",
               borderRadius: "6px",
               fontSize: "12px",
               padding: "4px 8px"
@@ -26101,12 +29507,12 @@ const PerformanceChart: React.FC<PerformanceChartProps> = memo(({
             formatter={(value: number) => [`${value.toFixed(1)}${unit}`, "Usage"]}
             labelStyle={{ display: 'none' }}
           />
-          <Area 
-            type="monotone" 
-            dataKey="value" 
-            stroke={color} 
-            strokeWidth={2} 
-            fill={`url(#grad-${color})`} 
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={2}
+            fill={`url(#grad-${color})`}
             isAnimationActive={false}
           />
         </AreaChart>
@@ -26195,7 +29601,7 @@ ThreadsCard.displayName = "ThreadsCard";
 ```
 // src/components/performance/ProcessList.tsx
 import React, { useState, memo } from "react";
-import { 
+import {
   Activity, Cpu, Layout, ArrowDownToLine, Monitor, Layers, Image as ImageIcon, Server
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -26225,11 +29631,11 @@ const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
           <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center shrink-0">
             {icon}
           </div>
-          
+
           <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
             <div className="col-span-3">
                <div className="font-bold text-base flex items-center gap-2">
-                 {data.name} 
+                 {data.name}
                  <Badge variant="outline" className="text-[10px] h-5 px-1 font-mono text-muted-foreground">
                    PID: {data.pid}
                  </Badge>
@@ -26278,7 +29684,7 @@ const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
         <Collapsible open={isOpen} className="space-y-2">
           <CollapsibleContent>
              <div className="pt-2 pl-[64px] pr-4 space-y-4">
-                
+
                 {/* Backend Specific Info */}
                 {type === 'backend' && (
                   <div className="rounded-lg bg-secondary/30 border p-4 flex gap-4">
@@ -26337,20 +29743,20 @@ export default function ProcessList({ processes }: { processes: SystemStats['pro
       <h2 className="text-lg font-semibold flex items-center gap-2">
         <Server className="w-5 h-5" /> Process Details
       </h2>
-      
-      <ProcessRow 
-        type="backend" 
-        data={processes.backend} 
+
+      <ProcessRow
+        type="backend"
+        data={processes.backend}
         icon={<Cpu className="text-orange-500" />}
       />
-      <ProcessRow 
-        type="frontend" 
-        data={processes.frontend} 
+      <ProcessRow
+        type="frontend"
+        data={processes.frontend}
         icon={<Layout className="text-blue-500" />}
       />
-      <ProcessRow 
-        type="tray" 
-        data={processes.tray} 
+      <ProcessRow
+        type="tray"
+        data={processes.tray}
         icon={<ArrowDownToLine className="text-purple-500" />}
       />
     </div>
@@ -27173,15 +30579,15 @@ export function SliderRow({ label, value, onValueChange, max, min = 0, step = 1,
   );
 }
 
-export function SelectField({ 
-  label, 
-  value, 
-  onValueChange, 
-  options 
-}: { 
-  label: string; 
-  value: string; 
-  onValueChange: (value: string) => void; 
+export function SelectField({
+  label,
+  value,
+  onValueChange,
+  options
+}: {
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
   options: readonly { value: string; label: string }[];
 }) {
   return (
@@ -29061,11 +32467,11 @@ interface ComboboxProps {
   className?: string
 }
 
-export function Combobox({ 
-  options, 
-  value, 
-  onChange, 
-  placeholder = "Select option...", 
+export function Combobox({
+  options,
+  value,
+  onChange,
+  placeholder = "Select option...",
   emptyText = "No option found.",
   className
 }: ComboboxProps) {
@@ -33109,7 +36515,11 @@ export function useIsMobile() {
 ```typescript
 // src/hooks/useSystemStats.ts
 import { useState, useEffect } from "react";
-import { SystemStats, ScreenshotRecord, ChartDataPoint } from "@/types/performance";
+import {
+  SystemStats,
+  ScreenshotRecord,
+  ChartDataPoint,
+} from "@/types/performance";
 
 export function useSystemStats() {
   const [stats, setStats] = useState<SystemStats | null>(null);
@@ -33117,26 +36527,48 @@ export function useSystemStats() {
 
   useEffect(() => {
     // 初始数据生成器
-    const initData = (len: number): ChartDataPoint[] => 
-      Array.from({ length: len }, (_, i) => ({ 
-        time: `${len - i}s`, 
-        value: 0 
+    const initData = (len: number): ChartDataPoint[] =>
+      Array.from({ length: len }, (_, i) => ({
+        time: `${len - i}s`,
+        value: 0,
       }));
-    
+
     // 初始化截图历史
     setHistory([
-      { id: 1, name: "Cyberpunk City", timestamp: "15:45:20", duration: 1.2, maxCpu: 45.2, maxMem: 600.5, path: "/tmp/s1.png" },
-      { id: 2, name: "Ocean Waves", timestamp: "14:20:10", duration: 0.8, maxCpu: 20.1, maxMem: 450.2, path: "/tmp/s2.png" },
+      {
+        id: 1,
+        name: "Cyberpunk City",
+        timestamp: "15:45:20",
+        duration: 1.2,
+        maxCpu: 45.2,
+        maxMem: 600.5,
+        path: "/tmp/s1.png",
+      },
+      {
+        id: 2,
+        name: "Ocean Waves",
+        timestamp: "14:20:10",
+        duration: 0.8,
+        maxCpu: 20.1,
+        maxMem: 450.2,
+        path: "/tmp/s2.png",
+      },
     ]);
 
     const timer = setInterval(() => {
-      setStats(prev => {
+      setStats((prev) => {
         const nowStr = "Now";
-        
-        const updateArr = (arr: ChartDataPoint[] | undefined, val: number, maxLen = 30) => {
+
+        const updateArr = (
+          arr: ChartDataPoint[] | undefined,
+          val: number,
+          maxLen = 30,
+        ) => {
           const current = arr || initData(maxLen);
           // 移动时间轴标签 (简单模拟)
-          const shifted = current.slice(1).map((p, i) => ({ ...p, time: `${maxLen - i}s` }));
+          const shifted = current
+            .slice(1)
+            .map((p, i) => ({ ...p, time: `${maxLen - i}s` }));
           return [...shifted, { time: nowStr, value: val }];
         };
 
@@ -33151,27 +36583,57 @@ export function useSystemStats() {
           memHistory: updateArr(prev?.memHistory, newMem),
           processes: {
             backend: {
-              pid: 2722, name: "Backend", cmd: "wallpaper-engine-backend", status: "Running",
-              cpu: Math.random() * 15, mem: 370 + Math.random() * 20,
-              cpuHistory: updateArr(prev?.processes.backend.cpuHistory, Math.random() * 15),
-              memHistory: updateArr(prev?.processes.backend.memHistory, 370 + Math.random() * 20),
-              threads: ["render-loop", "video-decoder", "audio-processor", "ipc-worker", "steam-callback"]
+              pid: 2722,
+              name: "Backend",
+              cmd: "wallpaper-engine-backend",
+              status: "Running",
+              cpu: Math.random() * 15,
+              mem: 370 + Math.random() * 20,
+              cpuHistory: updateArr(
+                prev?.processes.backend.cpuHistory,
+                Math.random() * 15,
+              ),
+              memHistory: updateArr(
+                prev?.processes.backend.memHistory,
+                370 + Math.random() * 20,
+              ),
+              threads: [
+                "render-loop",
+                "video-decoder",
+                "audio-processor",
+                "ipc-worker",
+                "steam-callback",
+              ],
             },
             frontend: {
-              pid: 5459, name: "Frontend", cmd: "wallpaper-engine-gui", status: "Sleeping",
-              cpu: Math.random() * 2, mem: 360 + Math.random() * 10,
-              cpuHistory: updateArr(prev?.processes.frontend.cpuHistory, Math.random() * 2),
-              memHistory: updateArr(prev?.processes.frontend.memHistory, 360 + Math.random() * 10),
-              threads: ["gui-main", "event-loop", "dbus-worker"]
+              pid: 5459,
+              name: "Frontend",
+              cmd: "wallpaper-engine-gui",
+              status: "Sleeping",
+              cpu: Math.random() * 2,
+              mem: 360 + Math.random() * 10,
+              cpuHistory: updateArr(
+                prev?.processes.frontend.cpuHistory,
+                Math.random() * 2,
+              ),
+              memHistory: updateArr(
+                prev?.processes.frontend.memHistory,
+                360 + Math.random() * 10,
+              ),
+              threads: ["gui-main", "event-loop", "dbus-worker"],
             },
             tray: {
-              pid: 1233, name: "Tray", cmd: "wallpaper-tray", status: "Running",
-              cpu: 0.1, mem: 65,
+              pid: 1233,
+              name: "Tray",
+              cmd: "wallpaper-tray",
+              status: "Running",
+              cpu: 0.1,
+              mem: 65,
               cpuHistory: updateArr(prev?.processes.tray.cpuHistory, 0.1),
               memHistory: updateArr(prev?.processes.tray.memHistory, 65),
-              threads: ["gtk-main"]
-            }
-          }
+              threads: ["gtk-main"],
+            },
+          },
         };
       });
     }, 1000);
@@ -33183,7 +36645,6 @@ export function useSystemStats() {
 
   return { stats, history, clearHistory };
 }
-
 ```
 
 ---
@@ -33250,7 +36711,7 @@ body {
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 222.2 84% 4.9%; /* 带蓝调的深色背景 */
     --foreground: 210 40% 98%;
@@ -33280,13 +36741,12 @@ body {
 ### 📄 文件: `src\lib\utils.ts`
 
 ```typescript
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
-
 ```
 
 ---
@@ -33318,7 +36778,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 ### 📄 文件: `src\mock\wallpapers.ts`
 
 ```typescript
-﻿// src/mock/wallpapers.ts
+// src/mock/wallpapers.ts
 export const MOCK_WALLPAPERS = Array.from({ length: 20 }).map((_, i) => {
   const images = [
     "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80", // 雾中山脉
@@ -33331,7 +36791,15 @@ export const MOCK_WALLPAPERS = Array.from({ length: 20 }).map((_, i) => {
 
   return {
     id: `wp-${i}`,
-    title: ["Misty Peaks", "Deep Forest", "Silent Ocean", "Neural Starfield", "Sunset Lake", "Hidden Grove"][i % 6] + ` #${i}`,
+    title:
+      [
+        "Misty Peaks",
+        "Deep Forest",
+        "Silent Ocean",
+        "Neural Starfield",
+        "Sunset Lake",
+        "Hidden Grove",
+      ][i % 6] + ` #${i}`,
     preview: images[i % images.length],
     type: (i % 3 === 0 ? "Video" : i % 3 === 1 ? "Scene" : "Web") as any,
     path: `/home/user/wallpapers/wp${i}.mp4`,
@@ -33355,19 +36823,19 @@ export function Library() {
   const searchQuery = useAppStore((state) => state.searchQuery);
   const selectedId = useAppStore((state) => state.selectedId);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
-  
+
   const filteredWallpapers = useMemo(() => {
     if (!searchQuery) return wallpapers;
     const lowerQ = searchQuery.toLowerCase();
-    return wallpapers.filter(w => 
+    return wallpapers.filter(w =>
       w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
     );
   }, [wallpapers, searchQuery]);
-  
+
   const selectedWallpaper = useMemo(() => {
     return wallpapers.find(w => w.id === selectedId) || null;
   }, [wallpapers, selectedId]);
-  
+
   const handleSelect = useCallback((id: string) => {
     setSelectedId(id);
   }, [setSelectedId]);
@@ -33395,11 +36863,11 @@ export function Library() {
         ) : (
           <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
             {filteredWallpapers.map((wp) => (
-              <WallpaperCard 
-                key={wp.id} 
-                wp={wp} 
-                isSelected={selectedId === wp.id} 
-                onSelect={() => handleSelect(wp.id)} 
+              <WallpaperCard
+                key={wp.id}
+                wp={wp}
+                isSelected={selectedId === wp.id}
+                onSelect={() => handleSelect(wp.id)}
               />
             ))}
           </div>
@@ -33436,7 +36904,7 @@ export function Performance() {
 
   return (
     <div className="flex flex-col h-full space-y-6 overflow-hidden">
-      
+
       <div className="flex flex-col space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">System Monitor</h1>
         <p className="text-sm text-muted-foreground">Real-time resource usage of Wallpaper Engine components.</p>
@@ -33444,24 +36912,24 @@ export function Performance() {
 
       <ScrollArea className="flex-1 -mx-6 px-6">
         <div className="space-y-8 pb-20">
-          
+
           {/* 1. 总览卡片 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <OverviewCard 
-              title="Total CPU" 
-              value={`${stats.totalCpu.toFixed(1)}%`} 
+            <OverviewCard
+              title="Total CPU"
+              value={`${stats.totalCpu.toFixed(1)}%`}
               sub="4 Cores Active"
-              icon={<Cpu className="text-primary" />} 
-              data={stats.cpuHistory} 
+              icon={<Cpu className="text-primary" />}
+              data={stats.cpuHistory}
               color="#ef4444"
               unit="%"
             />
-            <OverviewCard 
-              title="Total Memory" 
-              value={`${stats.totalMem.toFixed(0)} MB`} 
+            <OverviewCard
+              title="Total Memory"
+              value={`${stats.totalMem.toFixed(0)} MB`}
               sub="of 16 GB"
-              icon={<MemoryStick className="text-blue-500" />} 
-              data={stats.memHistory} 
+              icon={<MemoryStick className="text-blue-500" />}
+              data={stats.memHistory}
               color="#3b82f6"
               unit=" MB"
             />
@@ -33477,7 +36945,7 @@ export function Performance() {
 
           {/* 3. 截图历史 */}
           <ScreenshotHistory items={history} onClear={clearHistory} />
-          
+
         </div>
       </ScrollArea>
     </div>
@@ -33671,7 +37139,7 @@ useEffect(() => {
 }, []);
 
 // ... 在渲染 Card 的地方
-<div 
+<div
     onClick={() => setSelectedId(item.id)} // 👈 关键：点击选中
     className={`cursor-pointer border-2 ${selectedId === item.id ? 'border-pink-500' : 'border-transparent'}`}
 >
@@ -33684,42 +37152,42 @@ useEffect(() => {
 ### 📄 文件: `src\store\appStore.test.ts`
 
 ```typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { useAppStore } from './appStore';
-import { Wallpaper } from '../types';
+import { describe, it, expect, beforeEach } from "vitest";
+import { useAppStore } from "./appStore";
+import { Wallpaper } from "../types";
 
-describe('appStore - getSelectedWallpaper', () => {
+describe("appStore - getSelectedWallpaper", () => {
   beforeEach(() => {
     // Reset the store state before each test
     const { wallpapers, selectedId } = useAppStore.getState();
     useAppStore.setState({
       wallpapers: [],
-      selectedId: null
+      selectedId: null,
     });
   });
 
-  it('returns wallpaper when selectedId matches a wallpaper id', () => {
+  it("returns wallpaper when selectedId matches a wallpaper id", () => {
     // Setup: Add wallpapers to the store
     const mockWallpapers: Wallpaper[] = [
       {
-        id: 'wallpaper-1',
-        title: 'Ocean Wave',
-        preview: 'ocean.jpg',
-        type: 'Video',
-        path: '/path/to/ocean'
+        id: "wallpaper-1",
+        title: "Ocean Wave",
+        preview: "ocean.jpg",
+        type: "Video",
+        path: "/path/to/ocean",
       },
       {
-        id: 'wallpaper-2',
-        title: 'Forest Scene',
-        preview: 'forest.jpg',
-        type: 'Scene',
-        path: '/path/to/forest'
-      }
+        id: "wallpaper-2",
+        title: "Forest Scene",
+        preview: "forest.jpg",
+        type: "Scene",
+        path: "/path/to/forest",
+      },
     ];
 
     useAppStore.setState({
       wallpapers: mockWallpapers,
-      selectedId: 'wallpaper-1'
+      selectedId: "wallpaper-1",
     });
 
     // Act
@@ -33728,25 +37196,25 @@ describe('appStore - getSelectedWallpaper', () => {
     // Assert
     expect(result).toBeDefined();
     expect(result).toEqual(mockWallpapers[0]);
-    expect(result?.id).toBe('wallpaper-1');
-    expect(result?.title).toBe('Ocean Wave');
+    expect(result?.id).toBe("wallpaper-1");
+    expect(result?.title).toBe("Ocean Wave");
   });
 
-  it('returns null when selectedId is null', () => {
+  it("returns null when selectedId is null", () => {
     // Setup: Add wallpapers but leave selectedId as null
     const mockWallpapers: Wallpaper[] = [
       {
-        id: 'wallpaper-1',
-        title: 'Ocean Wave',
-        preview: 'ocean.jpg',
-        type: 'Video',
-        path: '/path/to/ocean'
-      }
+        id: "wallpaper-1",
+        title: "Ocean Wave",
+        preview: "ocean.jpg",
+        type: "Video",
+        path: "/path/to/ocean",
+      },
     ];
 
     useAppStore.setState({
       wallpapers: mockWallpapers,
-      selectedId: null
+      selectedId: null,
     });
 
     // Act
@@ -33756,28 +37224,28 @@ describe('appStore - getSelectedWallpaper', () => {
     expect(result).toBeNull();
   });
 
-  it('returns null when selectedId does not match any wallpaper', () => {
+  it("returns null when selectedId does not match any wallpaper", () => {
     // Setup: Add wallpapers with selectedId that doesn't exist
     const mockWallpapers: Wallpaper[] = [
       {
-        id: 'wallpaper-1',
-        title: 'Ocean Wave',
-        preview: 'ocean.jpg',
-        type: 'Video',
-        path: '/path/to/ocean'
+        id: "wallpaper-1",
+        title: "Ocean Wave",
+        preview: "ocean.jpg",
+        type: "Video",
+        path: "/path/to/ocean",
       },
       {
-        id: 'wallpaper-2',
-        title: 'Forest Scene',
-        preview: 'forest.jpg',
-        type: 'Scene',
-        path: '/path/to/forest'
-      }
+        id: "wallpaper-2",
+        title: "Forest Scene",
+        preview: "forest.jpg",
+        type: "Scene",
+        path: "/path/to/forest",
+      },
     ];
 
     useAppStore.setState({
       wallpapers: mockWallpapers,
-      selectedId: 'non-existent-id'
+      selectedId: "non-existent-id",
     });
 
     // Act
@@ -33787,7 +37255,6 @@ describe('appStore - getSelectedWallpaper', () => {
     expect(result).toBeNull();
   });
 });
-
 ```
 
 ---
@@ -33795,10 +37262,10 @@ describe('appStore - getSelectedWallpaper', () => {
 ### 📄 文件: `src\store\appStore.ts`
 
 ```typescript
-import { create } from 'zustand';
-import { invoke } from '@tauri-apps/api/core';
-import { Wallpaper, AppConfig } from '../types';
-import { scanWallpapers } from '../api/wallpaper';
+import { create } from "zustand";
+import { invoke } from "@tauri-apps/api/core";
+import { Wallpaper, AppConfig } from "../types";
+import { scanWallpapers } from "../api/wallpaper";
 
 interface AppState {
   // Wallpaper data
@@ -33806,23 +37273,26 @@ interface AppState {
   selectedId: string | null;
   searchQuery: string;
   activeTab: "wallpapers" | "settings" | "performance";
-  
+
   // Settings data
   settings: AppConfig | null;
   settingsLoading: boolean;
-  
+
   // Wallpaper actions
   loadWallpapers: () => Promise<void>;
   setSelectedId: (id: string | null) => void;
   setSearchQuery: (query: string) => void;
   setActiveTab: (tab: "wallpapers" | "settings" | "performance") => void;
-  
+
   // Settings actions
   fetchSettings: () => Promise<void>;
-  updateSetting: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => void;
+  updateSetting: <K extends keyof AppConfig>(
+    key: K,
+    value: AppConfig[K],
+  ) => void;
   saveSettings: () => Promise<void>;
   restartWallpapers: () => Promise<void>;
-  
+
   // Computed properties (Getter)
   getFilteredWallpapers: () => Wallpaper[];
   getSelectedWallpaper: () => Wallpaper | null;
@@ -33854,10 +37324,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchSettings: async () => {
     set({ settingsLoading: true });
     try {
-      const settings = await invoke<AppConfig>('get_settings');
+      const settings = await invoke<AppConfig>("get_settings");
       set({ settings, settingsLoading: false });
     } catch (error) {
-      console.error('Failed to fetch settings:', error);
+      console.error("Failed to fetch settings:", error);
       set({ settingsLoading: false });
       throw error;
     }
@@ -33873,21 +37343,21 @@ export const useAppStore = create<AppState>((set, get) => ({
   saveSettings: async () => {
     const settings = get().settings;
     if (!settings) {
-      throw new Error('No settings to save');
+      throw new Error("No settings to save");
     }
     try {
-      await invoke('save_settings', { config: settings });
+      await invoke("save_settings", { config: settings });
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error("Failed to save settings:", error);
       throw error;
     }
   },
 
   restartWallpapers: async () => {
     try {
-      await invoke('restart_wallpapers');
+      await invoke("restart_wallpapers");
     } catch (error) {
-      console.error('Failed to restart wallpapers:', error);
+      console.error("Failed to restart wallpapers:", error);
       throw error;
     }
   },
@@ -33896,15 +37366,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { wallpapers, searchQuery } = get();
     if (!searchQuery) return wallpapers;
     const lowerQ = searchQuery.toLowerCase();
-    return wallpapers.filter(w => 
-      w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
+    return wallpapers.filter(
+      (w) => w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ),
     );
   },
 
   getSelectedWallpaper: () => {
     const { wallpapers, selectedId } = get();
-    return wallpapers.find(w => w.id === selectedId) || null;
-  }
+    return wallpapers.find((w) => w.id === selectedId) || null;
+  },
 }));
 ```
 
@@ -33930,23 +37400,22 @@ export interface AppConfig {
   scaling: string;
   clamping: string;
 
-  
   noFullscreenPause: boolean;
   disableMouse: boolean;
   disableParallax: boolean;
   disableParticles: boolean;
-  
+
   // --- 2. Audio & Display ---
   volume: number;
-  muteAudio: boolean;           // silence -> muteAudio
-  noAutomute: boolean;          // no_auto_mute -> noAutomute
+  muteAudio: boolean; // silence -> muteAudio
+  noAutomute: boolean; // no_auto_mute -> noAutomute
   noAudioProcessing: boolean;
-  
+
   // --- 3. Monitor & Display ---
   lastScreen?: string | null;
   lastWallpaper?: string;
   activeMonitors: Record<string, string>;
-  
+
   // --- 4. Automation (Cycling) ---
   cycleEnabled: boolean;
   cycleInterval: number;
@@ -33959,12 +37428,12 @@ export interface AppConfig {
   // --- 6. System & Storage ---
   assetsPath: string | null;
   workshopPath: string | null;
-  
+
   // --- 7. Screenshot Tools ---
   screenshotDelay: number;
   screenshotRes: string;
   preferXvfb: boolean;
-  
+
   // --- 8. Wallpaper Properties ---
   wallpaperProperties: Record<string, any>;
   wallpaperNicknames: Record<string, string>;
@@ -33978,8 +37447,8 @@ export interface SystemIntegration {
 }
 
 export interface LogEntry {
-  id: number;           // 唯一标识，用于 React key
-  timestamp: string;    // "10:00:01"
+  id: number; // 唯一标识，用于 React key
+  timestamp: string; // "10:00:01"
   level: "info" | "warn" | "error" | "debug";
   source: "GUI" | "Core" | "Engine" | "Controller";
   message: string;
@@ -34033,7 +37502,6 @@ export interface ScreenshotRecord {
   maxMem: number;
   path: string;
 }
-
 ```
 
 ---
@@ -34042,7 +37510,6 @@ export interface ScreenshotRecord {
 
 ```typescript
 /// <reference types="vite/client" />
-
 ```
 
 ---
@@ -34052,76 +37519,73 @@ export interface ScreenshotRecord {
 ```javascript
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: ["class"],
-    content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  darkMode: ["class"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-  	extend: {
-  		colors: {
-  			background: 'hsl(var(--background))',
-  			surface: 'rgba(30, 30, 46, 0.8)',
-  			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
-  			},
-  			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
-  				foreground: 'hsl(var(--secondary-foreground))'
-  			},
-  			danger: '#f38ba8',
-  			foreground: 'hsl(var(--foreground))',
-  			card: {
-  				DEFAULT: 'hsl(var(--card))',
-  				foreground: 'hsl(var(--card-foreground))'
-  			},
-  			popover: {
-  				DEFAULT: 'hsl(var(--popover))',
-  				foreground: 'hsl(var(--popover-foreground))'
-  			},
-  			muted: {
-  				DEFAULT: 'hsl(var(--muted))',
-  				foreground: 'hsl(var(--muted-foreground))'
-  			},
-  			accent: {
-  				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
-  			},
-  			destructive: {
-  				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
-  			},
-  			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
-  			ring: 'hsl(var(--ring))',
-  			chart: {
-  				'1': 'hsl(var(--chart-1))',
-  				'2': 'hsl(var(--chart-2))',
-  				'3': 'hsl(var(--chart-3))',
-  				'4': 'hsl(var(--chart-4))',
-  				'5': 'hsl(var(--chart-5))'
-  			},
-  			sidebar: {
-  				DEFAULT: 'hsl(var(--sidebar-background))',
-  				foreground: 'hsl(var(--sidebar-foreground))',
-  				primary: 'hsl(var(--sidebar-primary))',
-  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-  				accent: 'hsl(var(--sidebar-accent))',
-  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-  				border: 'hsl(var(--sidebar-border))',
-  				ring: 'hsl(var(--sidebar-ring))'
-  			}
-  		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		}
-  	}
+    extend: {
+      colors: {
+        background: "hsl(var(--background))",
+        surface: "rgba(30, 30, 46, 0.8)",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        danger: "#f38ba8",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        chart: {
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+    },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
 ```
 
 ---
@@ -34151,15 +37615,15 @@ export default {
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": ".",                // 👈 添加这行
-    "paths": {                     // 👈 添加这块
+    "baseUrl": ".", // 👈 添加这行
+    "paths": {
+      // 👈 添加这块
       "@/*": ["./src/*"]
     }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
-
 ```
 
 ---
@@ -34177,7 +37641,6 @@ export default {
   },
   "include": ["vite.config.ts"]
 }
-
 ```
 
 ---
@@ -34187,7 +37650,7 @@ export default {
 ```typescript
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path"
+import path from "path";
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -34195,7 +37658,8 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig(async () => ({
   plugins: [react()],
 
-  resolve: {             // 👈 2. 添加 resolve 配置
+  resolve: {
+    // 👈 2. 添加 resolve 配置
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
@@ -34224,8 +37688,6 @@ export default defineConfig(async () => ({
     },
   },
 }));
-
 ```
 
 ---
-

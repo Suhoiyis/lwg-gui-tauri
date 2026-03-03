@@ -10,12 +10,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 // 引入公共组件
-import {
-  Header,
-  SwitchRow,
-  InputField,
-  PathInputField,
-} from "./Shared";
+import { Header, SwitchRow, InputField, PathInputField } from "./Shared";
 
 export function SystemSettings() {
   const { settings, updateSetting } = useAppStore();
@@ -24,7 +19,9 @@ export function SystemSettings() {
 
   useEffect(() => {
     // 获取自启动状态
-    invoke<boolean>("get_autostart_status").then(setAutostart).catch(() => {});
+    invoke<boolean>("get_autostart_status")
+      .then(setAutostart)
+      .catch(() => {});
   }, []);
 
   const handleAutostartChange = useCallback(
@@ -37,7 +34,7 @@ export function SystemSettings() {
         toast.error("Failed to change autostart");
       }
     },
-    [startHidden]
+    [startHidden],
   );
 
   if (!settings) return <div>Loading...</div>;

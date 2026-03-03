@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import {
-  PlayCircle, Monitor, Settings2, FileText, Zap, RotateCw, Save, Square
+  PlayCircle,
+  Monitor,
+  Settings2,
+  FileText,
+  Zap,
+  RotateCw,
+  Save,
+  Square,
 } from "lucide-react";
 
 import { useAppStore } from "@/store/appStore";
@@ -19,8 +26,13 @@ type SettingsTab = "playback" | "display" | "system" | "logs";
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("playback");
-  const { settings, fetchSettings, saveSettings, restartWallpapers, settingsLoading } =
-    useAppStore();
+  const {
+    settings,
+    fetchSettings,
+    saveSettings,
+    restartWallpapers,
+    settingsLoading,
+  } = useAppStore();
 
   useEffect(() => {
     if (!settings) {
@@ -105,7 +117,12 @@ export function Settings() {
             <Save className="w-4 h-4" /> Save Changes
           </Button>
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" className="gap-2" onClick={handleReload}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleReload}
+            >
               <RotateCw className="w-3 h-3" /> Reload
             </Button>
             <Button
@@ -133,7 +150,19 @@ export function Settings() {
 }
 
 // NavButton 是布局专用组件，保留在主文件中
-function NavButton({ active, onClick, icon, label, desc }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; desc: string }) {
+function NavButton({
+  active,
+  onClick,
+  icon,
+  label,
+  desc,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+  desc: string;
+}) {
   return (
     <Button
       variant={active ? "secondary" : "ghost"}
@@ -146,10 +175,14 @@ function NavButton({ active, onClick, icon, label, desc }: { active: boolean; on
         {icon}
       </div>
       <div className="text-left flex-1 min-w-0">
-        <div className={`font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}>
+        <div
+          className={`font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}
+        >
           {label}
         </div>
-        <div className="text-xs text-muted-foreground truncate opacity-70">{desc}</div>
+        <div className="text-xs text-muted-foreground truncate opacity-70">
+          {desc}
+        </div>
       </div>
     </Button>
   );

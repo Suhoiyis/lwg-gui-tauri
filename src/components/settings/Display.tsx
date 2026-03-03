@@ -14,7 +14,6 @@ import {
   THEME_OPTIONS,
 } from "./Shared";
 
-
 export function DisplaySettings() {
   const { theme, setTheme } = useTheme();
   const { settings, updateSetting } = useAppStore();
@@ -23,7 +22,10 @@ export function DisplaySettings() {
 
   return (
     <div className="space-y-6">
-      <Header title="Audio & Display" desc="Manage multi-monitor setup and audio processing." />
+      <Header
+        title="Audio & Display"
+        desc="Manage multi-monitor setup and audio processing."
+      />
 
       <Card>
         <CardHeader>
@@ -35,7 +37,9 @@ export function DisplaySettings() {
           <SelectField
             label="Target Monitor"
             value={settings.lastScreen || "all"}
-            onValueChange={(v) => updateSetting("lastScreen", v === "all" ? null : v)}
+            onValueChange={(v) =>
+              updateSetting("lastScreen", v === "all" ? null : v)
+            }
             options={MONITOR_OPTIONS}
           />
         </CardContent>
@@ -84,17 +88,26 @@ export function DisplaySettings() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />} Interface Theme
+            {theme === "dark" ? (
+              <Moon className="w-4 h-4" />
+            ) : (
+              <Sun className="w-4 h-4" />
+            )}{" "}
+            Interface Theme
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between space-x-4">
             <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">App Appearance</label>
-              <p className="text-xs text-muted-foreground">Light or Dark mode</p>
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                App Appearance
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Light or Dark mode
+              </p>
             </div>
             {/* 为了保持原 UI 样式（w-[180px]），这里稍微变通使用 SelectField 或直接内联 */}
-             <SelectField
+            <SelectField
               label=""
               value={theme}
               onValueChange={(v) => setTheme(v as "light" | "dark" | "system")}

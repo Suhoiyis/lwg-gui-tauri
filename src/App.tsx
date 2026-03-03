@@ -20,13 +20,13 @@ import { useAppStore } from "./store/appStore";
 const pageVariants = {
   initial: { opacity: 0, y: 10, scale: 0.99 },
   in: { opacity: 1, y: 0, scale: 1 },
-  out: { opacity: 0, y: -10, scale: 0.99 }
+  out: { opacity: 0, y: -10, scale: 0.99 },
 };
 
 const pageTransition = {
   type: "tween",
   ease: "circOut",
-  duration: 0.25
+  duration: 0.25,
 } as const;
 
 export function App() {
@@ -34,7 +34,7 @@ export function App() {
   const activeTab = useAppStore((state) => state.activeTab);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
-  const isCompactMode = useAppStore(s => s.isCompactMode);
+  const isCompactMode = useAppStore((s) => s.isCompactMode);
 
   useEffect(() => {
     setIsLoading(true);
@@ -58,19 +58,22 @@ export function App() {
 
   return (
     <>
-      <Tabs value={activeTab}
-      onValueChange={(value) => setActiveTab(value as "wallpapers" | "settings" | "performance")}
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) =>
+          setActiveTab(value as "wallpapers" | "settings" | "performance")
+        }
       >
-      <Layout
-          navbar={<AppNavbar />}
-          sidebar={null}
-        >
+        <Layout navbar={<AppNavbar />} sidebar={null}>
           <AnimatePresence mode="wait">
             {activeTab === "wallpapers" && (
               <motion.div
                 key="wallpapers"
-                initial="initial" animate="in" exit="out"
-                variants={pageVariants} transition={pageTransition}
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
                 className="h-full"
               >
                 <Library />
@@ -80,8 +83,11 @@ export function App() {
             {activeTab === "settings" && (
               <motion.div
                 key="settings"
-                initial="initial" animate="in" exit="out"
-                variants={pageVariants} transition={pageTransition}
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
                 className="h-full"
               >
                 <Settings />
@@ -91,8 +97,11 @@ export function App() {
             {activeTab === "performance" && (
               <motion.div
                 key="performance"
-                initial="initial" animate="in" exit="out"
-                variants={pageVariants} transition={pageTransition}
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
                 className="h-full"
               >
                 <Performance />

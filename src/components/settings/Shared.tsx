@@ -1,7 +1,13 @@
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -84,7 +90,12 @@ export const getLevelColor = (level: string): string => {
   return LOG_LEVEL_COLORS[level] || "text-gray-500";
 };
 
-export const formatLogEntry = (log: { timestamp: string; level: string; source: string; message: string }): string => {
+export const formatLogEntry = (log: {
+  timestamp: string;
+  level: string;
+  source: string;
+  message: string;
+}): string => {
   return `[${log.timestamp}] [${log.level.toUpperCase()}] [${log.source}] ${log.message}`;
 };
 
@@ -102,14 +113,22 @@ export function Header({ title, desc }: { title: string; desc: string }) {
   );
 }
 
-export function SwitchRow({ label, description, checked, onCheckedChange, icon }: SwitchRowProps) {
+export function SwitchRow({
+  label,
+  description,
+  checked,
+  onCheckedChange,
+  icon,
+}: SwitchRowProps) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         {icon}
         <div className="space-y-0.5">
           <Label>{label}</Label>
-          {description && <p className="text-xs text-muted-foreground">{description}</p>}
+          {description && (
+            <p className="text-xs text-muted-foreground">{description}</p>
+          )}
         </div>
       </div>
       <Switch checked={checked} onCheckedChange={onCheckedChange} />
@@ -117,13 +136,22 @@ export function SwitchRow({ label, description, checked, onCheckedChange, icon }
   );
 }
 
-export function SliderRow({ label, value, onValueChange, max, min = 0, step = 1, suffix = "" }: SliderRowProps) {
+export function SliderRow({
+  label,
+  value,
+  onValueChange,
+  max,
+  min = 0,
+  step = 1,
+  suffix = "",
+}: SliderRowProps) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <Label>{label}</Label>
         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {value}{suffix}
+          {value}
+          {suffix}
         </span>
       </div>
       <Slider
@@ -138,15 +166,15 @@ export function SliderRow({ label, value, onValueChange, max, min = 0, step = 1,
   );
 }
 
-export function SelectField({ 
-  label, 
-  value, 
-  onValueChange, 
-  options 
-}: { 
-  label: string; 
-  value: string; 
-  onValueChange: (value: string) => void; 
+export function SelectField({
+  label,
+  value,
+  onValueChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
   options: readonly { value: string; label: string }[];
 }) {
   return (

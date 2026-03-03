@@ -3,7 +3,13 @@ import { Filter, Copy, Check } from "lucide-react";
 import { LogEntry } from "@/types";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Header,
   LOG_FILTER_OPTIONS,
@@ -18,15 +24,33 @@ export function LogViewer() {
 
   useEffect(() => {
     setLogs([
-      { id: 1, timestamp: "10:00:01", level: "info", source: "GUI", message: "Application initialized" },
-      { id: 2, timestamp: "10:00:02", level: "info", source: "Core", message: "Connected to Wallpaper Engine Core" },
-      { id: 3, timestamp: "10:00:02", level: "warn", source: "Controller", message: "Steam API not detected" },
+      {
+        id: 1,
+        timestamp: "10:00:01",
+        level: "info",
+        source: "GUI",
+        message: "Application initialized",
+      },
+      {
+        id: 2,
+        timestamp: "10:00:02",
+        level: "info",
+        source: "Core",
+        message: "Connected to Wallpaper Engine Core",
+      },
+      {
+        id: 3,
+        timestamp: "10:00:02",
+        level: "warn",
+        source: "Controller",
+        message: "Steam API not detected",
+      },
     ]);
   }, []);
 
   const filteredLogs = useMemo(
     () => logs.filter((log) => filter === "All" || log.source === filter),
-    [logs, filter]
+    [logs, filter],
   );
 
   const handleCopy = useCallback(() => {
@@ -72,9 +96,20 @@ export function LogViewer() {
       </div>
 
       <div className="flex justify-between items-center pt-2">
-        <span className="text-[10px] text-muted-foreground">{filteredLogs.length} entries</span>
-        <Button variant="outline" size="sm" onClick={handleCopy} className="h-8 gap-2 text-xs">
-          {isCopied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+        <span className="text-[10px] text-muted-foreground">
+          {filteredLogs.length} entries
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopy}
+          className="h-8 gap-2 text-xs"
+        >
+          {isCopied ? (
+            <Check className="w-3 h-3 text-green-500" />
+          ) : (
+            <Copy className="w-3 h-3" />
+          )}
           {isCopied ? "Copied!" : "Copy"}
         </Button>
       </div>

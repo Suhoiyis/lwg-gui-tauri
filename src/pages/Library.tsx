@@ -12,33 +12,35 @@ export function Library() {
   const searchQuery = useAppStore((state) => state.searchQuery);
   const selectedId = useAppStore((state) => state.selectedId);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
-  
+
   const filteredWallpapers = useMemo(() => {
     if (!searchQuery) return wallpapers;
     const lowerQ = searchQuery.toLowerCase();
-    return wallpapers.filter(w => 
-      w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
+    return wallpapers.filter(
+      (w) => w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ),
     );
   }, [wallpapers, searchQuery]);
-  
+
   const selectedWallpaper = useMemo(() => {
-    return wallpapers.find(w => w.id === selectedId) || null;
+    return wallpapers.find((w) => w.id === selectedId) || null;
   }, [wallpapers, selectedId]);
-  
-  const handleSelect = useCallback((id: string) => {
-    setSelectedId(id);
-  }, [setSelectedId]);
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedId(id);
+    },
+    [setSelectedId],
+  );
 
   return (
     // 改为 Flex Row 布局
     <div className="h-full flex w-full">
-
       {/* 2. 右侧主内容区 */}
       <div className="flex-1 flex flex-col p-6 space-y-6 h-full overflow-hidden min-w-0">
         {/* 顶部状态栏 */}
-        <LibraryHeader 
-          currentTitle={selectedWallpaper?.title || ""} 
-          totalCount={filteredWallpapers.length} 
+        <LibraryHeader
+          currentTitle={selectedWallpaper?.title || ""}
+          totalCount={filteredWallpapers.length}
         />
 
         {/* 滚动列表 */}
@@ -50,11 +52,11 @@ export function Library() {
           ) : (
             <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
               {filteredWallpapers.map((wp) => (
-                <WallpaperCard 
-                  key={wp.id} 
-                  wp={wp} 
-                  isSelected={selectedId === wp.id} 
-                  onSelect={() => handleSelect(wp.id)} 
+                <WallpaperCard
+                  key={wp.id}
+                  wp={wp}
+                  isSelected={selectedId === wp.id}
+                  onSelect={() => handleSelect(wp.id)}
                 />
               ))}
             </div>
@@ -66,7 +68,6 @@ export function Library() {
       <aside className="w-64 border-l bg-muted/30 h-full hidden md:block flex-shrink-0">
         <WallpaperSidebar />
       </aside>
-
     </div>
   );
 }

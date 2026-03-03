@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { invoke } from '@tauri-apps/api/core';
-import { Wallpaper, AppConfig } from '../types';
-import { scanWallpapers } from '../api/wallpaper';
+import { create } from "zustand";
+import { invoke } from "@tauri-apps/api/core";
+import { Wallpaper, AppConfig } from "../types";
+import { scanWallpapers } from "../api/wallpaper";
 
 interface AppState {
   // Wallpaper data
@@ -9,23 +9,26 @@ interface AppState {
   selectedId: string | null;
   searchQuery: string;
   activeTab: "wallpapers" | "settings" | "performance";
-  
+
   // Settings data
   settings: AppConfig | null;
   settingsLoading: boolean;
-  
+
   // Wallpaper actions
   loadWallpapers: () => Promise<void>;
   setSelectedId: (id: string | null) => void;
   setSearchQuery: (query: string) => void;
   setActiveTab: (tab: "wallpapers" | "settings" | "performance") => void;
-  
+
   // Settings actions
   fetchSettings: () => Promise<void>;
-  updateSetting: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => void;
+  updateSetting: <K extends keyof AppConfig>(
+    key: K,
+    value: AppConfig[K],
+  ) => void;
   saveSettings: () => Promise<void>;
   restartWallpapers: () => Promise<void>;
-  
+
   // Computed properties (Getter)
   getFilteredWallpapers: () => Wallpaper[];
   getSelectedWallpaper: () => Wallpaper | null;
@@ -60,10 +63,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchSettings: async () => {
     set({ settingsLoading: true });
     try {
-      const settings = await invoke<AppConfig>('get_settings');
+      const settings = await invoke<AppConfig>("get_settings");
       set({ settings, settingsLoading: false });
     } catch (error) {
-      console.error('Failed to fetch settings:', error);
+      console.error("Failed to fetch settings:", error);
       set({ settingsLoading: false });
       throw error;
     }
@@ -79,21 +82,21 @@ export const useAppStore = create<AppState>((set, get) => ({
   saveSettings: async () => {
     const settings = get().settings;
     if (!settings) {
-      throw new Error('No settings to save');
+      throw new Error("No settings to save");
     }
     try {
-      await invoke('save_settings', { config: settings });
+      await invoke("save_settings", { config: settings });
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error("Failed to save settings:", error);
       throw error;
     }
   },
 
   restartWallpapers: async () => {
     try {
-      await invoke('restart_wallpapers');
+      await invoke("restart_wallpapers");
     } catch (error) {
-      console.error('Failed to restart wallpapers:', error);
+      console.error("Failed to restart wallpapers:", error);
       throw error;
     }
   },
@@ -102,14 +105,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { wallpapers, searchQuery } = get();
     if (!searchQuery) return wallpapers;
     const lowerQ = searchQuery.toLowerCase();
-    return wallpapers.filter(w =>
-      w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
+    return wallpapers.filter(
+      (w) => w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ),
     );
   },
 
   getSelectedWallpaper: () => {
     const { wallpapers, selectedId } = get();
-    return wallpapers.find(w => w.id === selectedId) || null;
+    return wallpapers.find((w) => w.id === selectedId) || null;
   },
 
   isCompactMode: false,

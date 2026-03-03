@@ -57,7 +57,7 @@ body {
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 222.2 84% 4.9%; /* 带蓝调的深色背景 */
     --foreground: 210 40% 98%;

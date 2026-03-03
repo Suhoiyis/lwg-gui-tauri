@@ -15,23 +15,22 @@ export interface AppConfig {
   scaling: string;
   clamping: string;
 
-  
   noFullscreenPause: boolean;
   disableMouse: boolean;
   disableParallax: boolean;
   disableParticles: boolean;
-  
+
   // --- 2. Audio & Display ---
   volume: number;
-  muteAudio: boolean;           // silence -> muteAudio
-  noAutomute: boolean;          // no_auto_mute -> noAutomute
+  muteAudio: boolean; // silence -> muteAudio
+  noAutomute: boolean; // no_auto_mute -> noAutomute
   noAudioProcessing: boolean;
-  
+
   // --- 3. Monitor & Display ---
   lastScreen?: string | null;
   lastWallpaper?: string;
   activeMonitors: Record<string, string>;
-  
+
   // --- 4. Automation (Cycling) ---
   cycleEnabled: boolean;
   cycleInterval: number;
@@ -44,12 +43,12 @@ export interface AppConfig {
   // --- 6. System & Storage ---
   assetsPath: string | null;
   workshopPath: string | null;
-  
+
   // --- 7. Screenshot Tools ---
   screenshotDelay: number;
   screenshotRes: string;
   preferXvfb: boolean;
-  
+
   // --- 8. Wallpaper Properties ---
   wallpaperProperties: Record<string, any>;
   wallpaperNicknames: Record<string, string>;
@@ -63,8 +62,8 @@ export interface SystemIntegration {
 }
 
 export interface LogEntry {
-  id: number;           // 唯一标识，用于 React key
-  timestamp: string;    // "10:00:01"
+  id: number; // 唯一标识，用于 React key
+  timestamp: string; // "10:00:01"
   level: "info" | "warn" | "error" | "debug";
   source: "GUI" | "Core" | "Engine" | "Controller";
   message: string;

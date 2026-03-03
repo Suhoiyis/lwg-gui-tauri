@@ -11,7 +11,15 @@ export const MOCK_WALLPAPERS = Array.from({ length: 20 }).map((_, i) => {
 
   return {
     id: `wp-${i}`,
-    title: ["Misty Peaks", "Deep Forest", "Silent Ocean", "Neural Starfield", "Sunset Lake", "Hidden Grove"][i % 6] + ` #${i}`,
+    title:
+      [
+        "Misty Peaks",
+        "Deep Forest",
+        "Silent Ocean",
+        "Neural Starfield",
+        "Sunset Lake",
+        "Hidden Grove",
+      ][i % 6] + ` #${i}`,
     preview: images[i % images.length],
     type: (i % 3 === 0 ? "Video" : i % 3 === 1 ? "Scene" : "Web") as any,
     path: `/home/user/wallpapers/wp${i}.mp4`,

@@ -6,7 +6,7 @@ import { MOCK_WALLPAPERS } from "../mock/wallpapers";
 
 // 🔴 开关 1：是否模拟“空空如也”的状态？
 // 设为 true -> 哪怕有数据也返回空数组，用于测试“无壁纸”时的 UI
-const FORCE_EMPTY = false; 
+const FORCE_EMPTY = false;
 
 // 🔵 开关 2：是否强制使用 Mock 数据？
 // 默认为自动检测 (Windows 下自动为 true)，你也可以手动改为 true 强制在 Linux 下调试 UI
@@ -33,12 +33,12 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
   try {
     console.log("🚀 [Prod] 请求真实壁纸数据...");
     const data = await invoke<any[]>("get_wallpapers");
-    
+
     // 调试：打印第一个壁纸的 preview 路径
     if (data.length > 0) {
       console.log("📷 [Debug] 第一张壁纸 preview 路径:", data[0].preview);
     }
-    
+
     return data.map((item) => ({
       id: item.id,
       title: item.title,
@@ -57,7 +57,7 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
 export async function applyWallpaper(id: string): Promise<void> {
   if (USE_MOCK || FORCE_EMPTY) {
     console.log(`🧪 [Debug] 模拟应用壁纸 ID: ${id}`);
-    const wp = MOCK_WALLPAPERS.find(w => w.id === id);
+    const wp = MOCK_WALLPAPERS.find((w) => w.id === id);
     if (wp) console.log(`   选中: ${wp.title}`);
     return;
   }

@@ -9,41 +9,49 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { Home, Settings, Activity, Play, Image as ImageIcon } from "lucide-react"
-import { useAppStore } from "@/store/appStore"
-import { applyWallpaper } from "@/api/wallpaper"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
+} from "@/components/ui/sidebar";
+import {
+  Home,
+  Settings,
+  Activity,
+  Play,
+  Image as ImageIcon,
+} from "lucide-react";
+import { useAppStore } from "@/store/appStore";
+import { applyWallpaper } from "@/api/wallpaper";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 // 菜单项配置
 const items = [
   { title: "Library", tab: "wallpapers", icon: Home },
   { title: "Performance", tab: "performance", icon: Activity },
   { title: "Settings", tab: "settings", icon: Settings },
-] as const
+] as const;
 
 export function AppSidebar() {
   // 1. 获取当前选中的壁纸
-  const selectedWallpaper = useAppStore((state) => state.getSelectedWallpaper())
+  const selectedWallpaper = useAppStore((state) =>
+    state.getSelectedWallpaper(),
+  );
 
   // 2. 处理应用壁纸逻辑
   const handleApply = async () => {
-    if (!selectedWallpaper) return
-    
+    if (!selectedWallpaper) return;
+
     try {
-      console.log("Applying:", selectedWallpaper.title)
-      await applyWallpaper(selectedWallpaper.id)
-      toast.success(`已应用: ${selectedWallpaper.title}`)
+      console.log("Applying:", selectedWallpaper.title);
+      await applyWallpaper(selectedWallpaper.id);
+      toast.success(`已应用: ${selectedWallpaper.title}`);
     } catch (error) {
-      console.error(error)
-      toast.error("应用失败，请检查后台日志")
+      console.error(error);
+      toast.error("应用失败，请检查后台日志");
     }
-  }
-  
+  };
+
   // 3. 获取 setActiveTab
-  const setActiveTab = useAppStore((state) => state.setActiveTab)
-  const activeTab = useAppStore((state) => state.activeTab)
+  const setActiveTab = useAppStore((state) => state.setActiveTab);
+  const activeTab = useAppStore((state) => state.activeTab);
 
   return (
     <Sidebar>
@@ -61,7 +69,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     onClick={() => setActiveTab(item.tab)}
                     isActive={activeTab === item.tab}
                   >
@@ -85,14 +93,14 @@ export function AppSidebar() {
                 {selectedWallpaper.title}
               </div>
               <div className="text-xs text-muted-foreground flex justify-between">
-                 <span>{selectedWallpaper.type}</span>
-                 <span>{selectedWallpaper.size}</span>
+                <span>{selectedWallpaper.type}</span>
+                <span>{selectedWallpaper.size}</span>
               </div>
             </div>
 
             {/* 应用按钮 */}
-            <Button 
-              onClick={handleApply} 
+            <Button
+              onClick={handleApply}
               className="w-full bg-pink-600 hover:bg-pink-700 text-white shadow-lg"
             >
               <Play className="w-4 h-4 mr-2 fill-current" />
@@ -106,5 +114,5 @@ export function AppSidebar() {
         )}
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

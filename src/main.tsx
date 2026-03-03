@@ -13,5 +13,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <App />
       <Toaster />
     </ThemeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
