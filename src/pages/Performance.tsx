@@ -1,5 +1,5 @@
 // src/pages/Performance.tsx
-import React from "react";
+
 import { Cpu, MemoryStick } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -16,14 +16,31 @@ import ProcessList from "@/components/performance/ProcessList";
 import ScreenshotHistory from "@/components/performance/ScreenshotHistory";
 
 export function Performance() {
-  const { stats, history, clearHistory } = useSystemStats();
+  const { stats, history, clearHistory, isLoading } = useSystemStats();
 
-  if (!stats)
-    return (
-      <div className="p-8 text-muted-foreground">
-        Initializing Performance Monitor...
+if (isLoading) {
+  return (
+    <div className="flex flex-col h-full items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="text-base text-muted-foreground">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+        <p className="text-muted-foreground">Initializing Performance Monitor...</p>
       </div>
-    );
+    </div>
+  );
+}
+
+if (!stats) {
+  return (
+    <div className="flex flex-col h-full items-center justify-center">
+      <div className="text-center space-y-2">
+        <p className="text-muted-foreground">Unable to load performance data</p>
+        <p className="text-sm text-muted-foreground/70">Please check if the backend is running</p>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="flex flex-col h-full space-y-6 overflow-hidden">

@@ -1,132 +1,143 @@
 // src/hooks/useSystemStats.ts
 import { useState, useEffect } from "react";
+import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
 import {
   SystemStats,
   ScreenshotRecord,
+  ProcessStats,
   ChartDataPoint,
 } from "@/types/performance";
+
+/**
+ * Raw event structure from Rust backend (snake_case)
+ * This matches what the Rust PerformanceMonitor::get_stats() emits
+ */
+interface RawPerformanceEvent {
+  total_cpu: number;
+  total_memory_mb: number;
+  total_threads: number;
+  cpu_history?: ChartDataPoint[];
+  mem_history?: ChartDataPoint[];
+  processes?: {
+    [key: string]: RawProcessStats;
+  };
+  timestamp?: number;
+}
+
+interface RawProcessStats {
+  pid: number;
+  name: string;
+  cmd: string;
+  status: string;
+  cpu: number;
+  memory_mb: number;
+  threads: number;
+  cpu_history?: ChartDataPoint[];
+  mem_history?: ChartDataPoint[];
+  thread_names?: string[];
+}
+
+/**
+ * Map raw Rust snake_case event to TypeScript camelCase format
+ */
+function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
+  const createDefaultProcess = (name: string): ProcessStats => ({
+    pid: 0,
+    name,
+    cmd: "N/A",
+    status: "Sleeping",
+    cpu: 0,
+    mem: 0,
+    cpuHistory: [],
+    memHistory: [],
+    threads: [],
+  });
+
+  const mapProcess = (raw: RawProcessStats | undefined, name: string): ProcessStats => {
+    if (!raw) return createDefaultProcess(name);
+    return {
+      pid: raw.pid,
+      name: raw.name || name,
+      cmd: raw.cmd,
+      status: (raw.status || "Sleeping") as "Running" | "Sleeping" | "Idle",
+      cpu: raw.cpu,
+      mem: raw.memory_mb,
+      cpuHistory: raw.cpu_history || [],
+      memHistory: raw.mem_history || [],
+      threads: raw.thread_names || [],
+    };
+  };
+
+  return {
+    totalCpu: raw.total_cpu ?? 0,
+    totalMem: raw.total_memory_mb ?? 0,
+    activeThreads: raw.total_threads ?? 0,
+    cpuHistory: raw.cpu_history ?? [],
+    memHistory: raw.mem_history ?? [],
+    processes: {
+      backend: mapProcess(raw.processes?.backend, "Backend"),
+      frontend: mapProcess(raw.processes?.frontend, "Frontend"),
+      tray: mapProcess(raw.processes?.tray, "Tray"),
+    },
+  };
+}
 
 export function useSystemStats() {
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [history, setHistory] = useState<ScreenshotRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 初始数据生成器
-    const initData = (len: number): ChartDataPoint[] =>
-      Array.from({ length: len }, (_, i) => ({
-        time: `${len - i}s`,
-        value: 0,
-      }));
+    let unlistenPerformance: (() => void) | null = null;
 
-    // 初始化截图历史
-    setHistory([
-      {
-        id: 1,
-        name: "Cyberpunk City",
-        timestamp: "15:45:20",
-        duration: 1.2,
-        maxCpu: 45.2,
-        maxMem: 600.5,
-        path: "/tmp/s1.png",
-      },
-      {
-        id: 2,
-        name: "Ocean Waves",
-        timestamp: "14:20:10",
-        duration: 0.8,
-        maxCpu: 20.1,
-        maxMem: 450.2,
-        path: "/tmp/s2.png",
-      },
-    ]);
+    const setupMonitoring = async () => {
+      try {
+        // Start the performance monitor on the backend
+        await invoke("start_performance_monitor");
 
-    const timer = setInterval(() => {
-      setStats((prev) => {
-        const nowStr = "Now";
+        // Subscribe to performance-update events
+        unlistenPerformance = await listen<RawPerformanceEvent>(
+          "performance-update",
+          (event) => {
+            const mappedStats = mapEventToStats(event.payload);
+            setStats(mappedStats);
+            setIsLoading(false);
+          }
+        );
 
-        const updateArr = (
-          arr: ChartDataPoint[] | undefined,
-          val: number,
-          maxLen = 30,
-        ) => {
-          const current = arr || initData(maxLen);
-          // 移动时间轴标签 (简单模拟)
-          const shifted = current
-            .slice(1)
-            .map((p, i) => ({ ...p, time: `${maxLen - i}s` }));
-          return [...shifted, { time: nowStr, value: val }];
-        };
+        // Fetch initial screenshot history
+        const screenshotHistory = await invoke<ScreenshotRecord[]>(
+          "get_screenshot_history"
+        );
+        setHistory(screenshotHistory);
+      } catch (error) {
+        console.error("Failed to setup performance monitoring:", error);
+        setIsLoading(false);
+      }
+    };
 
-        const newCpu = Math.random() * 30 + 5;
-        const newMem = Math.random() * 100 + 400;
+    setupMonitoring();
 
-        return {
-          totalCpu: newCpu,
-          totalMem: newMem,
-          activeThreads: 31,
-          cpuHistory: updateArr(prev?.cpuHistory, newCpu),
-          memHistory: updateArr(prev?.memHistory, newMem),
-          processes: {
-            backend: {
-              pid: 2722,
-              name: "Backend",
-              cmd: "wallpaper-engine-backend",
-              status: "Running",
-              cpu: Math.random() * 15,
-              mem: 370 + Math.random() * 20,
-              cpuHistory: updateArr(
-                prev?.processes.backend.cpuHistory,
-                Math.random() * 15,
-              ),
-              memHistory: updateArr(
-                prev?.processes.backend.memHistory,
-                370 + Math.random() * 20,
-              ),
-              threads: [
-                "render-loop",
-                "video-decoder",
-                "audio-processor",
-                "ipc-worker",
-                "steam-callback",
-              ],
-            },
-            frontend: {
-              pid: 5459,
-              name: "Frontend",
-              cmd: "wallpaper-engine-gui",
-              status: "Sleeping",
-              cpu: Math.random() * 2,
-              mem: 360 + Math.random() * 10,
-              cpuHistory: updateArr(
-                prev?.processes.frontend.cpuHistory,
-                Math.random() * 2,
-              ),
-              memHistory: updateArr(
-                prev?.processes.frontend.memHistory,
-                360 + Math.random() * 10,
-              ),
-              threads: ["gui-main", "event-loop", "dbus-worker"],
-            },
-            tray: {
-              pid: 1233,
-              name: "Tray",
-              cmd: "wallpaper-tray",
-              status: "Running",
-              cpu: 0.1,
-              mem: 65,
-              cpuHistory: updateArr(prev?.processes.tray.cpuHistory, 0.1),
-              memHistory: updateArr(prev?.processes.tray.memHistory, 65),
-              threads: ["gtk-main"],
-            },
-          },
-        };
+    // Cleanup: stop monitoring when component unmounts
+    return () => {
+      if (unlistenPerformance) {
+        unlistenPerformance();
+      }
+      invoke("stop_performance_monitor").catch((err) => {
+        console.error("Failed to stop performance monitor:", err);
       });
-    }, 1000);
-
-    return () => clearInterval(timer);
+    };
   }, []);
 
-  const clearHistory = () => setHistory([]);
+  const clearHistory = async () => {
+    try {
+      await invoke("clear_screenshot_history");
+      setHistory([]);
+    } catch (error) {
+      console.error("Failed to clear history:", error);
+    }
+  };
 
-  return { stats, history, clearHistory };
+  return { stats, history, clearHistory, isLoading };
 }
