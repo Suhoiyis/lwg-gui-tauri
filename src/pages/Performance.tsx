@@ -58,7 +58,7 @@ if (!stats) {
             <OverviewCard
               title="Total CPU"
               value={`${stats.totalCpu.toFixed(1)}%`}
-              sub="4 Cores Active"
+              sub={`${stats.cpuCores} Cores Active`}
               icon={<Cpu className="text-primary" />}
               data={stats.cpuHistory}
               color="#ef4444"
@@ -67,13 +67,13 @@ if (!stats) {
             <OverviewCard
               title="Total Memory"
               value={`${stats.totalMem.toFixed(0)} MB`}
-              sub="of 16 GB"
+              sub={`of ${stats.totalMemoryGb.toFixed(1)} GB`}
               icon={<MemoryStick className="text-blue-500" />}
               data={stats.memHistory}
               color="#3b82f6"
               unit=" MB"
             />
-            <ThreadsCard count={stats.activeThreads} />
+            <ThreadsCard count={stats.activeThreads} processCount={stats.processCount} />
           </div>
 
           <Separator />

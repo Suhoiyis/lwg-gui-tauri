@@ -45,7 +45,7 @@ export const OverviewCard: React.FC<OverviewCardProps> = memo(
 );
 OverviewCard.displayName = "OverviewCard";
 
-export const ThreadsCard = memo(({ count }: { count: number }) => {
+export const ThreadsCard = memo(({ count, processCount = 1 }: { count: number; processCount?: number }) => {
   return (
     <Card>
       <CardContent className="p-6 flex flex-col justify-between h-full">
@@ -60,7 +60,7 @@ export const ThreadsCard = memo(({ count }: { count: number }) => {
         <div>
           <div className="text-3xl font-bold">{count}</div>
           <div className="text-xs text-muted-foreground mt-1">
-            Across 3 processes
+            Across {processCount} process{processCount !== 1 ? "es" : ""}
           </div>
         </div>
         <div className="h-[100px] flex items-end gap-1 mt-2 opacity-30">

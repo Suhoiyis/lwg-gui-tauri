@@ -17,7 +17,7 @@ export interface ProcessStats {
   threads: string[];
 }
 
-export interface SystemStats {
+20#MW|export interface SystemStats {
   totalCpu: number;
   totalMem: number;
   activeThreads: number;
@@ -28,6 +28,10 @@ export interface SystemStats {
     frontend: ProcessStats;
     tray: ProcessStats;
   };
+  // System info
+  cpuCores: number;
+  totalMemoryGb: number;
+  processCount: number;
 }
 
 export interface ScreenshotRecord {

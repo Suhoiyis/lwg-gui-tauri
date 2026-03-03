@@ -9,20 +9,17 @@ import {
   ChartDataPoint,
 } from "@/types/performance";
 
-/**
- * Raw event structure from Rust backend (snake_case)
- * This matches what the Rust PerformanceMonitor::get_stats() emits
- */
 interface RawPerformanceEvent {
   total_cpu: number;
   total_memory_mb: number;
   total_threads: number;
-  cpu_history?: ChartDataPoint[];
-  mem_history?: ChartDataPoint[];
   processes?: {
     [key: string]: RawProcessStats;
   };
   timestamp?: number;
+  cpu_cores?: number;
+  total_memory_gb?: number;
+  process_count?: number;
 }
 
 interface RawProcessStats {
@@ -33,14 +30,11 @@ interface RawProcessStats {
   cpu: number;
   memory_mb: number;
   threads: number;
-  cpu_history?: ChartDataPoint[];
-  mem_history?: ChartDataPoint[];
+  cpu_history?: number[];
+  mem_history?: number[];
   thread_names?: string[];
 }
 
-/**
- * Map raw Rust snake_case event to TypeScript camelCase format
- */
 function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
   const createDefaultProcess = (name: string): ProcessStats => ({
     pid: 0,
@@ -54,6 +48,14 @@ function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
     threads: [],
   });
 
+  const toChartData = (values: number[] | undefined): ChartDataPoint[] => {
+    if (!values) return [];
+    return values.map((value, i) => ({
+      time: `${i + 1}s`,
+      value,
+    }));
+  };
+
   const mapProcess = (raw: RawProcessStats | undefined, name: string): ProcessStats => {
     if (!raw) return createDefaultProcess(name);
     return {
@@ -63,23 +65,51 @@ function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
       status: (raw.status || "Sleeping") as "Running" | "Sleeping" | "Idle",
       cpu: raw.cpu,
       mem: raw.memory_mb,
-      cpuHistory: raw.cpu_history || [],
-      memHistory: raw.mem_history || [],
+      cpuHistory: toChartData(raw.cpu_history),
+      memHistory: toChartData(raw.mem_history),
       threads: raw.thread_names || [],
     };
   };
+
+  const allProcesses = raw.processes || {};
+  const processValues = Object.values(allProcesses);
+  
+  const maxHistoryLen = Math.max(
+    ...processValues.map(p => p?.cpu_history?.length || 0),
+    60
+  );
+  
+  const cpuHistory: ChartDataPoint[] = [];
+  const memHistory: ChartDataPoint[] = [];
+  for (let i = 0; i < maxHistoryLen; i++) {
+    let totalCpu = 0;
+    let totalMem = 0;
+    for (const p of processValues) {
+      if (p?.cpu_history && i < p.cpu_history.length) {
+        totalCpu += p.cpu_history[i] || 0;
+      }
+      if (p?.mem_history && i < p.mem_history.length) {
+        totalMem += p.mem_history[i] || 0;
+      }
+    }
+    cpuHistory.push({ time: `${i + 1}s`, value: totalCpu });
+    memHistory.push({ time: `${i + 1}s`, value: totalMem });
+  }
 
   return {
     totalCpu: raw.total_cpu ?? 0,
     totalMem: raw.total_memory_mb ?? 0,
     activeThreads: raw.total_threads ?? 0,
-    cpuHistory: raw.cpu_history ?? [],
-    memHistory: raw.mem_history ?? [],
+    cpuHistory,
+    memHistory,
     processes: {
       backend: mapProcess(raw.processes?.backend, "Backend"),
       frontend: mapProcess(raw.processes?.frontend, "Frontend"),
       tray: mapProcess(raw.processes?.tray, "Tray"),
     },
+    cpuCores: raw.cpu_cores ?? 1,
+    totalMemoryGb: raw.total_memory_gb ?? 16,
+    processCount: raw.process_count ?? 1,
   };
 }
 
@@ -93,10 +123,8 @@ export function useSystemStats() {
 
     const setupMonitoring = async () => {
       try {
-        // Start the performance monitor on the backend
         await invoke("start_performance_monitor");
 
-        // Subscribe to performance-update events
         unlistenPerformance = await listen<RawPerformanceEvent>(
           "performance-update",
           (event) => {
@@ -106,7 +134,6 @@ export function useSystemStats() {
           }
         );
 
-        // Fetch initial screenshot history
         const screenshotHistory = await invoke<ScreenshotRecord[]>(
           "get_screenshot_history"
         );
@@ -119,7 +146,6 @@ export function useSystemStats() {
 
     setupMonitoring();
 
-    // Cleanup: stop monitoring when component unmounts
     return () => {
       if (unlistenPerformance) {
         unlistenPerformance();
