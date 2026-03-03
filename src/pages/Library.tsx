@@ -1,6 +1,8 @@
+// src/pages/Library.tsx
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty";
-import { WallpaperCard } from "@/components/WallpaperCard";
+import { WallpaperCard } from "@/components/library/WallpaperCard";
+import { LibraryHeader } from "@/components/library/LibraryHeader"; // 引入新组件
 import { useAppStore } from "@/store/appStore";
 import { useMemo, useCallback } from "react";
 
@@ -28,18 +30,11 @@ export function Library() {
 
   return (
     <div className="h-full flex flex-col p-6 space-y-6">
-      {/* 状态工具栏 */}
-      <div className="flex items-center justify-between bg-muted/20 px-4 py-2 rounded-xl border border-border/50">
-        <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest">
-          <span className="text-pink-500 uppercase">Currently Using</span>
-          <span className="text-foreground truncate max-w-[300px]">
-            {selectedWallpaper?.title || "None"}
-          </span>
-        </div>
-        <span className="text-xs font-mono text-muted-foreground/50">
-          {filteredWallpapers.length} wallpapers
-        </span>
-      </div>
+      {/* 顶部状态栏 */}
+      <LibraryHeader 
+        currentTitle={selectedWallpaper?.title || ""} 
+        totalCount={filteredWallpapers.length} 
+      />
 
       <ScrollArea className="flex-1">
         {filteredWallpapers.length === 0 ? (

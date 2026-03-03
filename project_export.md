@@ -1,14 +1,13 @@
 # 项目结构与文件内容导出 (Rust Project)
 
-**生成时间**: 2026-03-01 18:47:03
-**根目录**: `/home/yua/suw/lwg-gui-tauri`
+**生成时间**: 2026-03-03 12:31:22
+**根目录**: `C:\Users\i26248\Documents\lwg-gui-tauri`
 ---
 
 ## 📂 项目结构图
 
 ```text
 /
-├── .git
 ├── README.md
 ├── components.json
 ├── folder.py
@@ -28,10 +27,27 @@
 │   │   └── react.svg
 │   ├── components/
 │   │   ├── 3d-card-demo.tsx
+│   │   ├── AppnavBar.tsx
 │   │   ├── Layout.tsx
 │   │   ├── WallpaperContextMenu.tsx
+│   │   ├── WallpaperSidebar.tsx
 │   │   ├── app-sidebar.tsx
 │   │   ├── button.tsx
+│   │   ├── library/
+│   │   │   └── WallpaperCard.tsx
+│   │   ├── performance/
+│   │   │   ├── Chart.tsx
+│   │   │   ├── OverviewCard.tsx
+│   │   │   ├── ProcessList.tsx
+│   │   │   └── ScreenshotHistory.tsx
+│   │   ├── resizable-navbar-demo.tsx
+│   │   ├── settings/
+│   │   │   ├── Display.tsx
+│   │   │   ├── Logs.tsx
+│   │   │   ├── Playback.tsx
+│   │   │   ├── Shared.tsx
+│   │   │   └── System.tsx
+│   │   ├── stateful-button-demo.tsx
 │   │   ├── theme-provider.tsx
 │   │   └── ui/
 │   │       ├── 3d-card.tsx
@@ -61,6 +77,7 @@
 │   │       ├── navigation-menu.tsx
 │   │       ├── pagination.tsx
 │   │       ├── popover.tsx
+│   │       ├── resizable-navbar.tsx
 │   │       ├── resizable.tsx
 │   │       ├── scroll-area.tsx
 │   │       ├── select.tsx
@@ -71,6 +88,7 @@
 │   │       ├── slider.tsx
 │   │       ├── sonner.tsx
 │   │       ├── spinner.tsx
+│   │       ├── stateful-button.tsx
 │   │       ├── switch.tsx
 │   │       ├── table.tsx
 │   │       ├── tabs.tsx
@@ -78,7 +96,8 @@
 │   │       ├── toggle.tsx
 │   │       └── tooltip.tsx
 │   ├── hooks/
-│   │   └── use-mobile.tsx
+│   │   ├── use-mobile.tsx
+│   │   └── useSystemStats.ts
 │   ├── index.css
 │   ├── lib/
 │   │   └── utils.ts
@@ -86,12 +105,15 @@
 │   ├── mock/
 │   │   └── wallpapers.ts
 │   ├── pages/
+│   │   ├── Library.tsx
 │   │   ├── Performance.tsx
 │   │   ├── Settings.tsx
 │   │   └── Wallpapers.tsx
 │   ├── store/
 │   │   ├── appStore.test.ts
 │   │   └── appStore.ts
+│   ├── types/
+│   │   └── performance.ts
 │   ├── types.ts
 │   └── vite-env.d.ts
 ├── src-tauri/
@@ -107,7 +129,7 @@
 │   │       ├── acl-manifests.json
 │   │       ├── capabilities.json
 │   │       ├── desktop-schema.json
-│   │       └── linux-schema.json
+│   │       └── windows-schema.json
 │   ├── icons/
 │   │   ├── 128x128.png
 │   │   ├── 128x128@2x.png
@@ -487,7 +509,7 @@ if __name__ == "__main__":
         "@radix-ui/react-toggle": "^1.1.10",
         "@radix-ui/react-tooltip": "^1.2.8",
         "@tanstack/react-table": "^8.21.3",
-        "@tauri-apps/api": "^2",
+        "@tauri-apps/api": "^2.10.1",
         "@tauri-apps/plugin-opener": "^2",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -498,6 +520,7 @@ if __name__ == "__main__":
         "next-themes": "^0.4.6",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
+        "react-icons": "^5.5.0",
         "react-parallax-tilt": "^1.7.319",
         "react-resizable-panels": "^4.6.5",
         "recharts": "^2.15.4",
@@ -4996,6 +5019,15 @@ if __name__ == "__main__":
         "react": "^19.2.4"
       }
     },
+    "node_modules/react-icons": {
+      "version": "5.5.0",
+      "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-5.5.0.tgz",
+      "integrity": "sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==",
+      "license": "MIT",
+      "peerDependencies": {
+        "react": "*"
+      }
+    },
     "node_modules/react-is": {
       "version": "18.3.1",
       "resolved": "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz",
@@ -5935,7 +5967,7 @@ if __name__ == "__main__":
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-table": "^8.21.3",
-    "@tauri-apps/api": "^2",
+    "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/plugin-opener": "^2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -5946,6 +5978,7 @@ if __name__ == "__main__":
     "next-themes": "^0.4.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0",
     "react-parallax-tilt": "^1.7.319",
     "react-resizable-panels": "^4.6.5",
     "recharts": "^2.15.4",
@@ -5987,7 +6020,7 @@ export default {
 
 ---
 
-### 📄 文件: `public/tauri.svg`
+### 📄 文件: `public\tauri.svg`
 
 ```
 <svg width="206" height="231" viewBox="0 0 206 231" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -6001,7 +6034,7 @@ export default {
 
 ---
 
-### 📄 文件: `public/vite.svg`
+### 📄 文件: `public\vite.svg`
 
 ```
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
@@ -6009,7 +6042,7 @@ export default {
 
 ---
 
-### 📄 文件: `src-tauri/.cargo/config.toml`
+### 📄 文件: `src-tauri\.cargo\config.toml`
 
 ```toml
 [target.x86_64-pc-windows-gnu]
@@ -6019,7 +6052,7 @@ rustflags = ["-C", "link-arg=-fuse-ld=lld"]
 
 ---
 
-### 📄 文件: `src-tauri/Cargo.lock`
+### 📄 文件: `src-tauri\Cargo.lock`
 
 ```toml
 # This file is automatically @generated by Cargo.
@@ -6122,7 +6155,7 @@ dependencies = [
  "futures-lite",
  "parking",
  "polling",
- "rustix 1.1.4",
+ "rustix",
  "slab",
  "windows-sys 0.61.2",
 ]
@@ -6153,7 +6186,7 @@ dependencies = [
  "cfg-if",
  "event-listener",
  "futures-lite",
- "rustix 1.1.4",
+ "rustix",
 ]
 
 [[package]]
@@ -6179,7 +6212,7 @@ dependencies = [
  "cfg-if",
  "futures-core",
  "futures-io",
- "rustix 1.1.4",
+ "rustix",
  "signal-hook-registry",
  "slab",
  "windows-sys 0.61.2",
@@ -6460,10 +6493,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c673075a2e0e5f4a1dde27ce9dee1ea4558c7ffe648f576438a20ca1d2acc4b0"
 dependencies = [
  "iana-time-zone",
- "js-sys",
  "num-traits",
  "serde",
- "wasm-bindgen",
  "windows-link 0.2.1",
 ]
 
@@ -6565,25 +6596,6 @@ name = "crossbeam-channel"
 version = "0.5.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "82b8f8f868b36967f9606790d1903570de9ceaf870a7bf9fbbd3016d636a2cb2"
-dependencies = [
- "crossbeam-utils",
-]
-
-[[package]]
-name = "crossbeam-deque"
-version = "0.8.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9dd111b7b7f7d55b72c0a6ae361660ee5853c9af73f70c3c2ef6858b950e2e51"
-dependencies = [
- "crossbeam-epoch",
- "crossbeam-utils",
-]
-
-[[package]]
-name = "crossbeam-epoch"
-version = "0.9.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
 dependencies = [
  "crossbeam-utils",
 ]
@@ -6711,11 +6723,32 @@ dependencies = [
 
 [[package]]
 name = "dirs"
+version = "5.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "44c45a9d03d6676652bcb5e724c7e988de1acad23a711b5217ab9cbecbec2225"
+dependencies = [
+ "dirs-sys 0.4.1",
+]
+
+[[package]]
+name = "dirs"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3e8aa94d75141228480295a7d0e7feb620b1a5ad9f12bc40be62411e38cce4e"
 dependencies = [
- "dirs-sys",
+ "dirs-sys 0.5.0",
+]
+
+[[package]]
+name = "dirs-sys"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "520f05a5cbd335fae5a99ff7a6ab8627577660ee5cfd6a94a6a929b52ff0321c"
+dependencies = [
+ "libc",
+ "option-ext",
+ "redox_users 0.4.6",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -6726,7 +6759,7 @@ checksum = "e01a3366d27ee9890022452ee61b2b63a67e6f13f58900b651ff5665f0bb1fab"
 dependencies = [
  "libc",
  "option-ext",
- "redox_users",
+ "redox_users 0.5.2",
  "windows-sys 0.61.2",
 ]
 
@@ -6815,12 +6848,6 @@ name = "dyn-clone"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
-
-[[package]]
-name = "either"
-version = "1.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 
 [[package]]
 name = "embed-resource"
@@ -7468,15 +7495,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
-name = "home"
-version = "0.5.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc627f471c528ff0c4a49e1d5e60450c8f6461dd6d10ba9dcd3a61d3dff7728d"
-dependencies = [
- "windows-sys 0.61.2",
-]
-
-[[package]]
 name = "html5ever"
 version = "0.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7520,6 +7538,12 @@ dependencies = [
  "http-body",
  "pin-project-lite",
 ]
+
+[[package]]
+name = "http-range"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21dec9db110f5f872ed9699c3ecf50cf16f423502706ba5c72462e28d3157573"
 
 [[package]]
 name = "httparse"
@@ -7956,12 +7980,6 @@ dependencies = [
 
 [[package]]
 name = "linux-raw-sys"
-version = "0.4.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d26c52dbd32dccf2d10cac7725f8eae5296885fb5703b261f7d0a0739ec807ab"
-
-[[package]]
-name = "linux-raw-sys"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53"
@@ -7988,29 +8006,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
-name = "lwg-core"
-version = "2.0.0-pre.1"
-dependencies = [
- "chrono",
- "dirs",
- "num_cpus",
- "serde",
- "serde_json",
- "sysinfo",
- "tempfile",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "walkdir",
- "which",
-]
-
-[[package]]
 name = "lwg-gui-tauri"
 version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
- "lwg-core",
+ "dirs 5.0.1",
  "mime_guess",
  "serde",
  "serde_json",
@@ -8175,15 +8175,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72ef4a56884ca558e5ddb05a1d1e7e1bfd9a68d9ed024c21704cc98872dae1bb"
 
 [[package]]
-name = "ntapi"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3b335231dfd352ffb0f8017f3b6027a4917f7df785ea2143d8af2adc66980ae"
-dependencies = [
- "winapi",
-]
-
-[[package]]
 name = "num-conv"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8196,16 +8187,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
-]
-
-[[package]]
-name = "num_cpus"
-version = "1.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "91df4bbde75afed763b708b7eee1e8e7651e02d97f6d5dd763e89367e957b23b"
-dependencies = [
- "hermit-abi",
- "libc",
 ]
 
 [[package]]
@@ -8751,7 +8732,7 @@ dependencies = [
  "concurrent-queue",
  "hermit-abi",
  "pin-project-lite",
- "rustix 1.1.4",
+ "rustix",
  "windows-sys 0.61.2",
 ]
 
@@ -8975,32 +8956,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539"
 
 [[package]]
-name = "rayon"
-version = "1.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "368f01d005bf8fd9b1206fb6fa653e6c4a81ceb1466406b81792d87c5677a58f"
-dependencies = [
- "either",
- "rayon-core",
-]
-
-[[package]]
-name = "rayon-core"
-version = "1.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91"
-dependencies = [
- "crossbeam-deque",
- "crossbeam-utils",
-]
-
-[[package]]
 name = "redox_syscall"
 version = "0.5.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed2bf2547551a7053d6fdfafda3f938979645c44812fbfcda098faae3f1a362d"
 dependencies = [
  "bitflags 2.11.0",
+]
+
+[[package]]
+name = "redox_users"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba009ff324d1fc1b900bd1fdb31564febe58a8ccc8a6fdbb93b543d33b13ca43"
+dependencies = [
+ "getrandom 0.2.17",
+ "libredox",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -9108,19 +9080,6 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.38.44"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fdb5bc1ae2baa591800df16c9ca78619bf65c0488b41b96ccec5d11220d8c154"
-dependencies = [
- "bitflags 2.11.0",
- "errno",
- "libc",
- "linux-raw-sys 0.4.15",
- "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "rustix"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6fe4565b9518b83ef4f91bb47ce29620ca828bd32cb7e408f0062e9930ba190"
@@ -9128,7 +9087,7 @@ dependencies = [
  "bitflags 2.11.0",
  "errno",
  "libc",
- "linux-raw-sys 0.12.1",
+ "linux-raw-sys",
  "windows-sys 0.61.2",
 ]
 
@@ -9628,21 +9587,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sysinfo"
-version = "0.30.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a5b4ddaee55fb2bea2bf0e5000747e5f5c0de765e5a5ff87f4cd106439f4bb3"
-dependencies = [
- "cfg-if",
- "core-foundation-sys",
- "libc",
- "ntapi",
- "once_cell",
- "rayon",
- "windows 0.52.0",
-]
-
-[[package]]
 name = "system-deps"
 version = "6.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9689,7 +9633,7 @@ dependencies = [
  "tao-macros",
  "unicode-segmentation",
  "url",
- "windows 0.61.3",
+ "windows",
  "windows-core 0.61.2",
  "windows-version",
  "x11-dl",
@@ -9721,7 +9665,7 @@ dependencies = [
  "anyhow",
  "bytes",
  "cookie",
- "dirs",
+ "dirs 6.0.0",
  "dunce",
  "embed_plist",
  "getrandom 0.3.4",
@@ -9729,6 +9673,7 @@ dependencies = [
  "gtk",
  "heck 0.5.0",
  "http",
+ "http-range",
  "jni",
  "libc",
  "log",
@@ -9760,7 +9705,7 @@ dependencies = [
  "webkit2gtk",
  "webview2-com",
  "window-vibrancy",
- "windows 0.61.3",
+ "windows",
 ]
 
 [[package]]
@@ -9771,7 +9716,7 @@ checksum = "ca7bd893329425df750813e95bd2b643d5369d929438da96d5bbb7cc2c918f74"
 dependencies = [
  "anyhow",
  "cargo_toml",
- "dirs",
+ "dirs 6.0.0",
  "glob",
  "heck 0.5.0",
  "json-patch",
@@ -9883,7 +9828,7 @@ dependencies = [
  "tauri-plugin",
  "thiserror 2.0.18",
  "url",
- "windows 0.61.3",
+ "windows",
  "zbus",
 ]
 
@@ -9930,7 +9875,7 @@ dependencies = [
  "url",
  "webkit2gtk",
  "webview2-com",
- "windows 0.61.3",
+ "windows",
 ]
 
 [[package]]
@@ -9956,7 +9901,7 @@ dependencies = [
  "url",
  "webkit2gtk",
  "webview2-com",
- "windows 0.61.3",
+ "windows",
  "wry",
 ]
 
@@ -10018,7 +9963,7 @@ dependencies = [
  "fastrand",
  "getrandom 0.4.1",
  "once_cell",
- "rustix 1.1.4",
+ "rustix",
  "windows-sys 0.61.2",
 ]
 
@@ -10123,23 +10068,9 @@ dependencies = [
  "bytes",
  "libc",
  "mio",
- "parking_lot",
  "pin-project-lite",
- "signal-hook-registry",
  "socket2",
- "tokio-macros",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "tokio-macros"
-version = "2.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af407857209536a95c8e56f8231ef2c2e2aff839b22e07a1ffcbc617e9db9fa5"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.117",
 ]
 
 [[package]]
@@ -10334,7 +10265,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a5e85aa143ceb072062fc4d6356c1b520a51d636e7bc8e77ec94be3608e5e80c"
 dependencies = [
  "crossbeam-channel",
- "dirs",
+ "dirs 6.0.0",
  "libappindicator",
  "muda",
  "objc2",
@@ -10741,7 +10672,7 @@ checksum = "7130243a7a5b33c54a444e54842e6a9e133de08b5ad7b5861cd8ed9a6a5bc96a"
 dependencies = [
  "webview2-com-macros",
  "webview2-com-sys",
- "windows 0.61.3",
+ "windows",
  "windows-core 0.61.2",
  "windows-implement",
  "windows-interface",
@@ -10765,20 +10696,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "381336cfffd772377d291702245447a5251a2ffa5bad679c99e61bc48bacbf9c"
 dependencies = [
  "thiserror 2.0.18",
- "windows 0.61.3",
+ "windows",
  "windows-core 0.61.2",
-]
-
-[[package]]
-name = "which"
-version = "6.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4ee928febd44d98f2f459a4a79bd4d928591333a494a10a868418ac1b39cf1f"
-dependencies = [
- "either",
- "home",
- "rustix 0.38.44",
- "winsafe",
 ]
 
 [[package]]
@@ -10829,16 +10748,6 @@ dependencies = [
 
 [[package]]
 name = "windows"
-version = "0.52.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e48a53791691ab099e5e2ad123536d0fff50652600abaf43bbf952894110d0be"
-dependencies = [
- "windows-core 0.52.0",
- "windows-targets 0.52.6",
-]
-
-[[package]]
-name = "windows"
 version = "0.61.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9babd3a767a4c1aef6900409f85f5d53ce2544ccdfaa86dad48c91782c6d6893"
@@ -10857,15 +10766,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3beeceb5e5cfd9eb1d76b381630e82c4241ccd0d27f1a39ed41b2760b255c5e8"
 dependencies = [
  "windows-core 0.61.2",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.52.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
-dependencies = [
- "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -10996,6 +10896,15 @@ dependencies = [
 
 [[package]]
 name = "windows-sys"
+version = "0.48.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "677d2418bec65e3338edb076e806bc1ec15693c5d0104683f2efe857f61056a9"
+dependencies = [
+ "windows-targets 0.48.5",
+]
+
+[[package]]
+name = "windows-sys"
 version = "0.59.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b"
@@ -11034,6 +10943,21 @@ dependencies = [
  "windows_x86_64_gnu 0.42.2",
  "windows_x86_64_gnullvm 0.42.2",
  "windows_x86_64_msvc 0.42.2",
+]
+
+[[package]]
+name = "windows-targets"
+version = "0.48.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a2fa6e2155d7247be68c096456083145c183cbbbc2764150dda45a87197940c"
+dependencies = [
+ "windows_aarch64_gnullvm 0.48.5",
+ "windows_aarch64_msvc 0.48.5",
+ "windows_i686_gnu 0.48.5",
+ "windows_i686_msvc 0.48.5",
+ "windows_x86_64_gnu 0.48.5",
+ "windows_x86_64_gnullvm 0.48.5",
+ "windows_x86_64_msvc 0.48.5",
 ]
 
 [[package]]
@@ -11095,6 +11019,12 @@ checksum = "597a5118570b68bc08d8d59125332c54f1ba9d9adeedeef5b99b02ba2b0698f8"
 
 [[package]]
 name = "windows_aarch64_gnullvm"
+version = "0.48.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b38e32f0abccf9987a4e3079dfb67dcd799fb61361e53e2882c3cbaf0d905d8"
+
+[[package]]
+name = "windows_aarch64_gnullvm"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3"
@@ -11113,6 +11043,12 @@ checksum = "e08e8864a60f06ef0d0ff4ba04124db8b0fb3be5776a5cd47641e942e58c4d43"
 
 [[package]]
 name = "windows_aarch64_msvc"
+version = "0.48.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc35310971f3b2dbbf3f0690a219f40e2d9afcf64f9ab7cc1be722937c26b4bc"
+
+[[package]]
+name = "windows_aarch64_msvc"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469"
@@ -11128,6 +11064,12 @@ name = "windows_i686_gnu"
 version = "0.42.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c61d927d8da41da96a81f029489353e68739737d3beca43145c8afec9a31a84f"
+
+[[package]]
+name = "windows_i686_gnu"
+version = "0.48.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a75915e7def60c94dcef72200b9a8e58e5091744960da64ec734a6c6e9b3743e"
 
 [[package]]
 name = "windows_i686_gnu"
@@ -11161,6 +11103,12 @@ checksum = "44d840b6ec649f480a41c8d80f9c65108b92d89345dd94027bfe06ac444d1060"
 
 [[package]]
 name = "windows_i686_msvc"
+version = "0.48.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f55c233f70c4b27f66c523580f78f1004e8b5a8b659e05a4eb49d4166cca406"
+
+[[package]]
+name = "windows_i686_msvc"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
@@ -11176,6 +11124,12 @@ name = "windows_x86_64_gnu"
 version = "0.42.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8de912b8b8feb55c064867cf047dda097f92d51efad5b491dfb98f6bbb70cb36"
+
+[[package]]
+name = "windows_x86_64_gnu"
+version = "0.48.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53d40abd2583d23e4718fddf1ebec84dbff8381c07cae67ff7768bbf19c6718e"
 
 [[package]]
 name = "windows_x86_64_gnu"
@@ -11197,6 +11151,12 @@ checksum = "26d41b46a36d453748aedef1486d5c7a85db22e56aff34643984ea85514e94a3"
 
 [[package]]
 name = "windows_x86_64_gnullvm"
+version = "0.48.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b7b52767868a23d5bab768e390dc5f5c55825b6d30b86c844ff2dc7414044cc"
+
+[[package]]
+name = "windows_x86_64_gnullvm"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d"
@@ -11212,6 +11172,12 @@ name = "windows_x86_64_msvc"
 version = "0.42.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9aec5da331524158c6d1a4ac0ab1541149c0b9505fde06423b02f5ef0106b9f0"
+
+[[package]]
+name = "windows_x86_64_msvc"
+version = "0.48.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed94fce61571a4006852b7389a063ab983c02eb1bb37b47f8272ce92d06d9538"
 
 [[package]]
 name = "windows_x86_64_msvc"
@@ -11252,12 +11218,6 @@ dependencies = [
  "cfg-if",
  "windows-sys 0.59.0",
 ]
-
-[[package]]
-name = "winsafe"
-version = "0.0.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d135d17ab770252ad95e9a872d365cf3090e3be864a34ab46f48555993efc904"
 
 [[package]]
 name = "wit-bindgen"
@@ -11363,7 +11323,7 @@ dependencies = [
  "block2",
  "cookie",
  "crossbeam-channel",
- "dirs",
+ "dirs 6.0.0",
  "dpi",
  "dunce",
  "gdkx11",
@@ -11392,7 +11352,7 @@ dependencies = [
  "webkit2gtk",
  "webkit2gtk-sys",
  "webview2-com",
- "windows 0.61.3",
+ "windows",
  "windows-core 0.61.2",
  "windows-version",
  "x11-dl",
@@ -11464,7 +11424,7 @@ dependencies = [
  "hex",
  "libc",
  "ordered-stream",
- "rustix 1.1.4",
+ "rustix",
  "serde",
  "serde_repr",
  "tracing",
@@ -11627,7 +11587,7 @@ dependencies = [
 
 ---
 
-### 📄 文件: `src-tauri/Cargo.toml`
+### 📄 文件: `src-tauri\Cargo.toml`
 
 ```toml
 [package]
@@ -11645,25 +11605,26 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["protocol-asset"] }
 tauri-plugin-opener = "2"
-# 👇 新增：你代码里用了 shell 插件，这里必须加，否则 lib.rs 报错
-tauri-plugin-shell = "2" 
+
+tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-fs = "2.4.5"
 base64 = "0.22"
 mime_guess = "2.0"
 tokio = { version = "1", features = ["sync"] }
+dirs = "5"
 # 🔥 Linux 专用依赖
-[target.'cfg(target_os = "linux")'.dependencies]
-lwg-core = { path = "../../lwg-rs/crates/lwg-core" }
+#[target.'cfg(target_os = "linux")'.dependencies]
+#lwg-core = { path = "../../lwg-rs/crates/lwg-core" }
 
 ```
 
 ---
 
-### 📄 文件: `src-tauri/build.rs`
+### 📄 文件: `src-tauri\build.rs`
 
 ```rust
 fn main() {
@@ -11674,7 +11635,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/capabilities/default.json`
+### 📄 文件: `src-tauri\capabilities\default.json`
 
 ```json
 {
@@ -11698,7 +11659,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/gen/schemas/acl-manifests.json`
+### 📄 文件: `src-tauri\gen\schemas\acl-manifests.json`
 
 ```json
 {"core":{"default_permission":{"identifier":"default","description":"Default core plugins set.","permissions":["core:path:default","core:event:default","core:window:default","core:webview:default","core:app:default","core:image:default","core:resources:default","core:menu:default","core:tray:default"]},"permissions":{},"permission_sets":{},"global_scope_schema":null},"core:app":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin.","permissions":["allow-version","allow-name","allow-tauri-version","allow-identifier","allow-bundle-type","allow-register-listener","allow-remove-listener"]},"permissions":{"allow-app-hide":{"identifier":"allow-app-hide","description":"Enables the app_hide command without any pre-configured scope.","commands":{"allow":["app_hide"],"deny":[]}},"allow-app-show":{"identifier":"allow-app-show","description":"Enables the app_show command without any pre-configured scope.","commands":{"allow":["app_show"],"deny":[]}},"allow-bundle-type":{"identifier":"allow-bundle-type","description":"Enables the bundle_type command without any pre-configured scope.","commands":{"allow":["bundle_type"],"deny":[]}},"allow-default-window-icon":{"identifier":"allow-default-window-icon","description":"Enables the default_window_icon command without any pre-configured scope.","commands":{"allow":["default_window_icon"],"deny":[]}},"allow-fetch-data-store-identifiers":{"identifier":"allow-fetch-data-store-identifiers","description":"Enables the fetch_data_store_identifiers command without any pre-configured scope.","commands":{"allow":["fetch_data_store_identifiers"],"deny":[]}},"allow-identifier":{"identifier":"allow-identifier","description":"Enables the identifier command without any pre-configured scope.","commands":{"allow":["identifier"],"deny":[]}},"allow-name":{"identifier":"allow-name","description":"Enables the name command without any pre-configured scope.","commands":{"allow":["name"],"deny":[]}},"allow-register-listener":{"identifier":"allow-register-listener","description":"Enables the register_listener command without any pre-configured scope.","commands":{"allow":["register_listener"],"deny":[]}},"allow-remove-data-store":{"identifier":"allow-remove-data-store","description":"Enables the remove_data_store command without any pre-configured scope.","commands":{"allow":["remove_data_store"],"deny":[]}},"allow-remove-listener":{"identifier":"allow-remove-listener","description":"Enables the remove_listener command without any pre-configured scope.","commands":{"allow":["remove_listener"],"deny":[]}},"allow-set-app-theme":{"identifier":"allow-set-app-theme","description":"Enables the set_app_theme command without any pre-configured scope.","commands":{"allow":["set_app_theme"],"deny":[]}},"allow-set-dock-visibility":{"identifier":"allow-set-dock-visibility","description":"Enables the set_dock_visibility command without any pre-configured scope.","commands":{"allow":["set_dock_visibility"],"deny":[]}},"allow-tauri-version":{"identifier":"allow-tauri-version","description":"Enables the tauri_version command without any pre-configured scope.","commands":{"allow":["tauri_version"],"deny":[]}},"allow-version":{"identifier":"allow-version","description":"Enables the version command without any pre-configured scope.","commands":{"allow":["version"],"deny":[]}},"deny-app-hide":{"identifier":"deny-app-hide","description":"Denies the app_hide command without any pre-configured scope.","commands":{"allow":[],"deny":["app_hide"]}},"deny-app-show":{"identifier":"deny-app-show","description":"Denies the app_show command without any pre-configured scope.","commands":{"allow":[],"deny":["app_show"]}},"deny-bundle-type":{"identifier":"deny-bundle-type","description":"Denies the bundle_type command without any pre-configured scope.","commands":{"allow":[],"deny":["bundle_type"]}},"deny-default-window-icon":{"identifier":"deny-default-window-icon","description":"Denies the default_window_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["default_window_icon"]}},"deny-fetch-data-store-identifiers":{"identifier":"deny-fetch-data-store-identifiers","description":"Denies the fetch_data_store_identifiers command without any pre-configured scope.","commands":{"allow":[],"deny":["fetch_data_store_identifiers"]}},"deny-identifier":{"identifier":"deny-identifier","description":"Denies the identifier command without any pre-configured scope.","commands":{"allow":[],"deny":["identifier"]}},"deny-name":{"identifier":"deny-name","description":"Denies the name command without any pre-configured scope.","commands":{"allow":[],"deny":["name"]}},"deny-register-listener":{"identifier":"deny-register-listener","description":"Denies the register_listener command without any pre-configured scope.","commands":{"allow":[],"deny":["register_listener"]}},"deny-remove-data-store":{"identifier":"deny-remove-data-store","description":"Denies the remove_data_store command without any pre-configured scope.","commands":{"allow":[],"deny":["remove_data_store"]}},"deny-remove-listener":{"identifier":"deny-remove-listener","description":"Denies the remove_listener command without any pre-configured scope.","commands":{"allow":[],"deny":["remove_listener"]}},"deny-set-app-theme":{"identifier":"deny-set-app-theme","description":"Denies the set_app_theme command without any pre-configured scope.","commands":{"allow":[],"deny":["set_app_theme"]}},"deny-set-dock-visibility":{"identifier":"deny-set-dock-visibility","description":"Denies the set_dock_visibility command without any pre-configured scope.","commands":{"allow":[],"deny":["set_dock_visibility"]}},"deny-tauri-version":{"identifier":"deny-tauri-version","description":"Denies the tauri_version command without any pre-configured scope.","commands":{"allow":[],"deny":["tauri_version"]}},"deny-version":{"identifier":"deny-version","description":"Denies the version command without any pre-configured scope.","commands":{"allow":[],"deny":["version"]}}},"permission_sets":{},"global_scope_schema":null},"core:event":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-listen","allow-unlisten","allow-emit","allow-emit-to"]},"permissions":{"allow-emit":{"identifier":"allow-emit","description":"Enables the emit command without any pre-configured scope.","commands":{"allow":["emit"],"deny":[]}},"allow-emit-to":{"identifier":"allow-emit-to","description":"Enables the emit_to command without any pre-configured scope.","commands":{"allow":["emit_to"],"deny":[]}},"allow-listen":{"identifier":"allow-listen","description":"Enables the listen command without any pre-configured scope.","commands":{"allow":["listen"],"deny":[]}},"allow-unlisten":{"identifier":"allow-unlisten","description":"Enables the unlisten command without any pre-configured scope.","commands":{"allow":["unlisten"],"deny":[]}},"deny-emit":{"identifier":"deny-emit","description":"Denies the emit command without any pre-configured scope.","commands":{"allow":[],"deny":["emit"]}},"deny-emit-to":{"identifier":"deny-emit-to","description":"Denies the emit_to command without any pre-configured scope.","commands":{"allow":[],"deny":["emit_to"]}},"deny-listen":{"identifier":"deny-listen","description":"Denies the listen command without any pre-configured scope.","commands":{"allow":[],"deny":["listen"]}},"deny-unlisten":{"identifier":"deny-unlisten","description":"Denies the unlisten command without any pre-configured scope.","commands":{"allow":[],"deny":["unlisten"]}}},"permission_sets":{},"global_scope_schema":null},"core:image":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-new","allow-from-bytes","allow-from-path","allow-rgba","allow-size"]},"permissions":{"allow-from-bytes":{"identifier":"allow-from-bytes","description":"Enables the from_bytes command without any pre-configured scope.","commands":{"allow":["from_bytes"],"deny":[]}},"allow-from-path":{"identifier":"allow-from-path","description":"Enables the from_path command without any pre-configured scope.","commands":{"allow":["from_path"],"deny":[]}},"allow-new":{"identifier":"allow-new","description":"Enables the new command without any pre-configured scope.","commands":{"allow":["new"],"deny":[]}},"allow-rgba":{"identifier":"allow-rgba","description":"Enables the rgba command without any pre-configured scope.","commands":{"allow":["rgba"],"deny":[]}},"allow-size":{"identifier":"allow-size","description":"Enables the size command without any pre-configured scope.","commands":{"allow":["size"],"deny":[]}},"deny-from-bytes":{"identifier":"deny-from-bytes","description":"Denies the from_bytes command without any pre-configured scope.","commands":{"allow":[],"deny":["from_bytes"]}},"deny-from-path":{"identifier":"deny-from-path","description":"Denies the from_path command without any pre-configured scope.","commands":{"allow":[],"deny":["from_path"]}},"deny-new":{"identifier":"deny-new","description":"Denies the new command without any pre-configured scope.","commands":{"allow":[],"deny":["new"]}},"deny-rgba":{"identifier":"deny-rgba","description":"Denies the rgba command without any pre-configured scope.","commands":{"allow":[],"deny":["rgba"]}},"deny-size":{"identifier":"deny-size","description":"Denies the size command without any pre-configured scope.","commands":{"allow":[],"deny":["size"]}}},"permission_sets":{},"global_scope_schema":null},"core:menu":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-new","allow-append","allow-prepend","allow-insert","allow-remove","allow-remove-at","allow-items","allow-get","allow-popup","allow-create-default","allow-set-as-app-menu","allow-set-as-window-menu","allow-text","allow-set-text","allow-is-enabled","allow-set-enabled","allow-set-accelerator","allow-set-as-windows-menu-for-nsapp","allow-set-as-help-menu-for-nsapp","allow-is-checked","allow-set-checked","allow-set-icon"]},"permissions":{"allow-append":{"identifier":"allow-append","description":"Enables the append command without any pre-configured scope.","commands":{"allow":["append"],"deny":[]}},"allow-create-default":{"identifier":"allow-create-default","description":"Enables the create_default command without any pre-configured scope.","commands":{"allow":["create_default"],"deny":[]}},"allow-get":{"identifier":"allow-get","description":"Enables the get command without any pre-configured scope.","commands":{"allow":["get"],"deny":[]}},"allow-insert":{"identifier":"allow-insert","description":"Enables the insert command without any pre-configured scope.","commands":{"allow":["insert"],"deny":[]}},"allow-is-checked":{"identifier":"allow-is-checked","description":"Enables the is_checked command without any pre-configured scope.","commands":{"allow":["is_checked"],"deny":[]}},"allow-is-enabled":{"identifier":"allow-is-enabled","description":"Enables the is_enabled command without any pre-configured scope.","commands":{"allow":["is_enabled"],"deny":[]}},"allow-items":{"identifier":"allow-items","description":"Enables the items command without any pre-configured scope.","commands":{"allow":["items"],"deny":[]}},"allow-new":{"identifier":"allow-new","description":"Enables the new command without any pre-configured scope.","commands":{"allow":["new"],"deny":[]}},"allow-popup":{"identifier":"allow-popup","description":"Enables the popup command without any pre-configured scope.","commands":{"allow":["popup"],"deny":[]}},"allow-prepend":{"identifier":"allow-prepend","description":"Enables the prepend command without any pre-configured scope.","commands":{"allow":["prepend"],"deny":[]}},"allow-remove":{"identifier":"allow-remove","description":"Enables the remove command without any pre-configured scope.","commands":{"allow":["remove"],"deny":[]}},"allow-remove-at":{"identifier":"allow-remove-at","description":"Enables the remove_at command without any pre-configured scope.","commands":{"allow":["remove_at"],"deny":[]}},"allow-set-accelerator":{"identifier":"allow-set-accelerator","description":"Enables the set_accelerator command without any pre-configured scope.","commands":{"allow":["set_accelerator"],"deny":[]}},"allow-set-as-app-menu":{"identifier":"allow-set-as-app-menu","description":"Enables the set_as_app_menu command without any pre-configured scope.","commands":{"allow":["set_as_app_menu"],"deny":[]}},"allow-set-as-help-menu-for-nsapp":{"identifier":"allow-set-as-help-menu-for-nsapp","description":"Enables the set_as_help_menu_for_nsapp command without any pre-configured scope.","commands":{"allow":["set_as_help_menu_for_nsapp"],"deny":[]}},"allow-set-as-window-menu":{"identifier":"allow-set-as-window-menu","description":"Enables the set_as_window_menu command without any pre-configured scope.","commands":{"allow":["set_as_window_menu"],"deny":[]}},"allow-set-as-windows-menu-for-nsapp":{"identifier":"allow-set-as-windows-menu-for-nsapp","description":"Enables the set_as_windows_menu_for_nsapp command without any pre-configured scope.","commands":{"allow":["set_as_windows_menu_for_nsapp"],"deny":[]}},"allow-set-checked":{"identifier":"allow-set-checked","description":"Enables the set_checked command without any pre-configured scope.","commands":{"allow":["set_checked"],"deny":[]}},"allow-set-enabled":{"identifier":"allow-set-enabled","description":"Enables the set_enabled command without any pre-configured scope.","commands":{"allow":["set_enabled"],"deny":[]}},"allow-set-icon":{"identifier":"allow-set-icon","description":"Enables the set_icon command without any pre-configured scope.","commands":{"allow":["set_icon"],"deny":[]}},"allow-set-text":{"identifier":"allow-set-text","description":"Enables the set_text command without any pre-configured scope.","commands":{"allow":["set_text"],"deny":[]}},"allow-text":{"identifier":"allow-text","description":"Enables the text command without any pre-configured scope.","commands":{"allow":["text"],"deny":[]}},"deny-append":{"identifier":"deny-append","description":"Denies the append command without any pre-configured scope.","commands":{"allow":[],"deny":["append"]}},"deny-create-default":{"identifier":"deny-create-default","description":"Denies the create_default command without any pre-configured scope.","commands":{"allow":[],"deny":["create_default"]}},"deny-get":{"identifier":"deny-get","description":"Denies the get command without any pre-configured scope.","commands":{"allow":[],"deny":["get"]}},"deny-insert":{"identifier":"deny-insert","description":"Denies the insert command without any pre-configured scope.","commands":{"allow":[],"deny":["insert"]}},"deny-is-checked":{"identifier":"deny-is-checked","description":"Denies the is_checked command without any pre-configured scope.","commands":{"allow":[],"deny":["is_checked"]}},"deny-is-enabled":{"identifier":"deny-is-enabled","description":"Denies the is_enabled command without any pre-configured scope.","commands":{"allow":[],"deny":["is_enabled"]}},"deny-items":{"identifier":"deny-items","description":"Denies the items command without any pre-configured scope.","commands":{"allow":[],"deny":["items"]}},"deny-new":{"identifier":"deny-new","description":"Denies the new command without any pre-configured scope.","commands":{"allow":[],"deny":["new"]}},"deny-popup":{"identifier":"deny-popup","description":"Denies the popup command without any pre-configured scope.","commands":{"allow":[],"deny":["popup"]}},"deny-prepend":{"identifier":"deny-prepend","description":"Denies the prepend command without any pre-configured scope.","commands":{"allow":[],"deny":["prepend"]}},"deny-remove":{"identifier":"deny-remove","description":"Denies the remove command without any pre-configured scope.","commands":{"allow":[],"deny":["remove"]}},"deny-remove-at":{"identifier":"deny-remove-at","description":"Denies the remove_at command without any pre-configured scope.","commands":{"allow":[],"deny":["remove_at"]}},"deny-set-accelerator":{"identifier":"deny-set-accelerator","description":"Denies the set_accelerator command without any pre-configured scope.","commands":{"allow":[],"deny":["set_accelerator"]}},"deny-set-as-app-menu":{"identifier":"deny-set-as-app-menu","description":"Denies the set_as_app_menu command without any pre-configured scope.","commands":{"allow":[],"deny":["set_as_app_menu"]}},"deny-set-as-help-menu-for-nsapp":{"identifier":"deny-set-as-help-menu-for-nsapp","description":"Denies the set_as_help_menu_for_nsapp command without any pre-configured scope.","commands":{"allow":[],"deny":["set_as_help_menu_for_nsapp"]}},"deny-set-as-window-menu":{"identifier":"deny-set-as-window-menu","description":"Denies the set_as_window_menu command without any pre-configured scope.","commands":{"allow":[],"deny":["set_as_window_menu"]}},"deny-set-as-windows-menu-for-nsapp":{"identifier":"deny-set-as-windows-menu-for-nsapp","description":"Denies the set_as_windows_menu_for_nsapp command without any pre-configured scope.","commands":{"allow":[],"deny":["set_as_windows_menu_for_nsapp"]}},"deny-set-checked":{"identifier":"deny-set-checked","description":"Denies the set_checked command without any pre-configured scope.","commands":{"allow":[],"deny":["set_checked"]}},"deny-set-enabled":{"identifier":"deny-set-enabled","description":"Denies the set_enabled command without any pre-configured scope.","commands":{"allow":[],"deny":["set_enabled"]}},"deny-set-icon":{"identifier":"deny-set-icon","description":"Denies the set_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_icon"]}},"deny-set-text":{"identifier":"deny-set-text","description":"Denies the set_text command without any pre-configured scope.","commands":{"allow":[],"deny":["set_text"]}},"deny-text":{"identifier":"deny-text","description":"Denies the text command without any pre-configured scope.","commands":{"allow":[],"deny":["text"]}}},"permission_sets":{},"global_scope_schema":null},"core:path":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-resolve-directory","allow-resolve","allow-normalize","allow-join","allow-dirname","allow-extname","allow-basename","allow-is-absolute"]},"permissions":{"allow-basename":{"identifier":"allow-basename","description":"Enables the basename command without any pre-configured scope.","commands":{"allow":["basename"],"deny":[]}},"allow-dirname":{"identifier":"allow-dirname","description":"Enables the dirname command without any pre-configured scope.","commands":{"allow":["dirname"],"deny":[]}},"allow-extname":{"identifier":"allow-extname","description":"Enables the extname command without any pre-configured scope.","commands":{"allow":["extname"],"deny":[]}},"allow-is-absolute":{"identifier":"allow-is-absolute","description":"Enables the is_absolute command without any pre-configured scope.","commands":{"allow":["is_absolute"],"deny":[]}},"allow-join":{"identifier":"allow-join","description":"Enables the join command without any pre-configured scope.","commands":{"allow":["join"],"deny":[]}},"allow-normalize":{"identifier":"allow-normalize","description":"Enables the normalize command without any pre-configured scope.","commands":{"allow":["normalize"],"deny":[]}},"allow-resolve":{"identifier":"allow-resolve","description":"Enables the resolve command without any pre-configured scope.","commands":{"allow":["resolve"],"deny":[]}},"allow-resolve-directory":{"identifier":"allow-resolve-directory","description":"Enables the resolve_directory command without any pre-configured scope.","commands":{"allow":["resolve_directory"],"deny":[]}},"deny-basename":{"identifier":"deny-basename","description":"Denies the basename command without any pre-configured scope.","commands":{"allow":[],"deny":["basename"]}},"deny-dirname":{"identifier":"deny-dirname","description":"Denies the dirname command without any pre-configured scope.","commands":{"allow":[],"deny":["dirname"]}},"deny-extname":{"identifier":"deny-extname","description":"Denies the extname command without any pre-configured scope.","commands":{"allow":[],"deny":["extname"]}},"deny-is-absolute":{"identifier":"deny-is-absolute","description":"Denies the is_absolute command without any pre-configured scope.","commands":{"allow":[],"deny":["is_absolute"]}},"deny-join":{"identifier":"deny-join","description":"Denies the join command without any pre-configured scope.","commands":{"allow":[],"deny":["join"]}},"deny-normalize":{"identifier":"deny-normalize","description":"Denies the normalize command without any pre-configured scope.","commands":{"allow":[],"deny":["normalize"]}},"deny-resolve":{"identifier":"deny-resolve","description":"Denies the resolve command without any pre-configured scope.","commands":{"allow":[],"deny":["resolve"]}},"deny-resolve-directory":{"identifier":"deny-resolve-directory","description":"Denies the resolve_directory command without any pre-configured scope.","commands":{"allow":[],"deny":["resolve_directory"]}}},"permission_sets":{},"global_scope_schema":null},"core:resources":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-close"]},"permissions":{"allow-close":{"identifier":"allow-close","description":"Enables the close command without any pre-configured scope.","commands":{"allow":["close"],"deny":[]}},"deny-close":{"identifier":"deny-close","description":"Denies the close command without any pre-configured scope.","commands":{"allow":[],"deny":["close"]}}},"permission_sets":{},"global_scope_schema":null},"core:tray":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin, which enables all commands.","permissions":["allow-new","allow-get-by-id","allow-remove-by-id","allow-set-icon","allow-set-menu","allow-set-tooltip","allow-set-title","allow-set-visible","allow-set-temp-dir-path","allow-set-icon-as-template","allow-set-show-menu-on-left-click"]},"permissions":{"allow-get-by-id":{"identifier":"allow-get-by-id","description":"Enables the get_by_id command without any pre-configured scope.","commands":{"allow":["get_by_id"],"deny":[]}},"allow-new":{"identifier":"allow-new","description":"Enables the new command without any pre-configured scope.","commands":{"allow":["new"],"deny":[]}},"allow-remove-by-id":{"identifier":"allow-remove-by-id","description":"Enables the remove_by_id command without any pre-configured scope.","commands":{"allow":["remove_by_id"],"deny":[]}},"allow-set-icon":{"identifier":"allow-set-icon","description":"Enables the set_icon command without any pre-configured scope.","commands":{"allow":["set_icon"],"deny":[]}},"allow-set-icon-as-template":{"identifier":"allow-set-icon-as-template","description":"Enables the set_icon_as_template command without any pre-configured scope.","commands":{"allow":["set_icon_as_template"],"deny":[]}},"allow-set-menu":{"identifier":"allow-set-menu","description":"Enables the set_menu command without any pre-configured scope.","commands":{"allow":["set_menu"],"deny":[]}},"allow-set-show-menu-on-left-click":{"identifier":"allow-set-show-menu-on-left-click","description":"Enables the set_show_menu_on_left_click command without any pre-configured scope.","commands":{"allow":["set_show_menu_on_left_click"],"deny":[]}},"allow-set-temp-dir-path":{"identifier":"allow-set-temp-dir-path","description":"Enables the set_temp_dir_path command without any pre-configured scope.","commands":{"allow":["set_temp_dir_path"],"deny":[]}},"allow-set-title":{"identifier":"allow-set-title","description":"Enables the set_title command without any pre-configured scope.","commands":{"allow":["set_title"],"deny":[]}},"allow-set-tooltip":{"identifier":"allow-set-tooltip","description":"Enables the set_tooltip command without any pre-configured scope.","commands":{"allow":["set_tooltip"],"deny":[]}},"allow-set-visible":{"identifier":"allow-set-visible","description":"Enables the set_visible command without any pre-configured scope.","commands":{"allow":["set_visible"],"deny":[]}},"deny-get-by-id":{"identifier":"deny-get-by-id","description":"Denies the get_by_id command without any pre-configured scope.","commands":{"allow":[],"deny":["get_by_id"]}},"deny-new":{"identifier":"deny-new","description":"Denies the new command without any pre-configured scope.","commands":{"allow":[],"deny":["new"]}},"deny-remove-by-id":{"identifier":"deny-remove-by-id","description":"Denies the remove_by_id command without any pre-configured scope.","commands":{"allow":[],"deny":["remove_by_id"]}},"deny-set-icon":{"identifier":"deny-set-icon","description":"Denies the set_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_icon"]}},"deny-set-icon-as-template":{"identifier":"deny-set-icon-as-template","description":"Denies the set_icon_as_template command without any pre-configured scope.","commands":{"allow":[],"deny":["set_icon_as_template"]}},"deny-set-menu":{"identifier":"deny-set-menu","description":"Denies the set_menu command without any pre-configured scope.","commands":{"allow":[],"deny":["set_menu"]}},"deny-set-show-menu-on-left-click":{"identifier":"deny-set-show-menu-on-left-click","description":"Denies the set_show_menu_on_left_click command without any pre-configured scope.","commands":{"allow":[],"deny":["set_show_menu_on_left_click"]}},"deny-set-temp-dir-path":{"identifier":"deny-set-temp-dir-path","description":"Denies the set_temp_dir_path command without any pre-configured scope.","commands":{"allow":[],"deny":["set_temp_dir_path"]}},"deny-set-title":{"identifier":"deny-set-title","description":"Denies the set_title command without any pre-configured scope.","commands":{"allow":[],"deny":["set_title"]}},"deny-set-tooltip":{"identifier":"deny-set-tooltip","description":"Denies the set_tooltip command without any pre-configured scope.","commands":{"allow":[],"deny":["set_tooltip"]}},"deny-set-visible":{"identifier":"deny-set-visible","description":"Denies the set_visible command without any pre-configured scope.","commands":{"allow":[],"deny":["set_visible"]}}},"permission_sets":{},"global_scope_schema":null},"core:webview":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin.","permissions":["allow-get-all-webviews","allow-webview-position","allow-webview-size","allow-internal-toggle-devtools"]},"permissions":{"allow-clear-all-browsing-data":{"identifier":"allow-clear-all-browsing-data","description":"Enables the clear_all_browsing_data command without any pre-configured scope.","commands":{"allow":["clear_all_browsing_data"],"deny":[]}},"allow-create-webview":{"identifier":"allow-create-webview","description":"Enables the create_webview command without any pre-configured scope.","commands":{"allow":["create_webview"],"deny":[]}},"allow-create-webview-window":{"identifier":"allow-create-webview-window","description":"Enables the create_webview_window command without any pre-configured scope.","commands":{"allow":["create_webview_window"],"deny":[]}},"allow-get-all-webviews":{"identifier":"allow-get-all-webviews","description":"Enables the get_all_webviews command without any pre-configured scope.","commands":{"allow":["get_all_webviews"],"deny":[]}},"allow-internal-toggle-devtools":{"identifier":"allow-internal-toggle-devtools","description":"Enables the internal_toggle_devtools command without any pre-configured scope.","commands":{"allow":["internal_toggle_devtools"],"deny":[]}},"allow-print":{"identifier":"allow-print","description":"Enables the print command without any pre-configured scope.","commands":{"allow":["print"],"deny":[]}},"allow-reparent":{"identifier":"allow-reparent","description":"Enables the reparent command without any pre-configured scope.","commands":{"allow":["reparent"],"deny":[]}},"allow-set-webview-auto-resize":{"identifier":"allow-set-webview-auto-resize","description":"Enables the set_webview_auto_resize command without any pre-configured scope.","commands":{"allow":["set_webview_auto_resize"],"deny":[]}},"allow-set-webview-background-color":{"identifier":"allow-set-webview-background-color","description":"Enables the set_webview_background_color command without any pre-configured scope.","commands":{"allow":["set_webview_background_color"],"deny":[]}},"allow-set-webview-focus":{"identifier":"allow-set-webview-focus","description":"Enables the set_webview_focus command without any pre-configured scope.","commands":{"allow":["set_webview_focus"],"deny":[]}},"allow-set-webview-position":{"identifier":"allow-set-webview-position","description":"Enables the set_webview_position command without any pre-configured scope.","commands":{"allow":["set_webview_position"],"deny":[]}},"allow-set-webview-size":{"identifier":"allow-set-webview-size","description":"Enables the set_webview_size command without any pre-configured scope.","commands":{"allow":["set_webview_size"],"deny":[]}},"allow-set-webview-zoom":{"identifier":"allow-set-webview-zoom","description":"Enables the set_webview_zoom command without any pre-configured scope.","commands":{"allow":["set_webview_zoom"],"deny":[]}},"allow-webview-close":{"identifier":"allow-webview-close","description":"Enables the webview_close command without any pre-configured scope.","commands":{"allow":["webview_close"],"deny":[]}},"allow-webview-hide":{"identifier":"allow-webview-hide","description":"Enables the webview_hide command without any pre-configured scope.","commands":{"allow":["webview_hide"],"deny":[]}},"allow-webview-position":{"identifier":"allow-webview-position","description":"Enables the webview_position command without any pre-configured scope.","commands":{"allow":["webview_position"],"deny":[]}},"allow-webview-show":{"identifier":"allow-webview-show","description":"Enables the webview_show command without any pre-configured scope.","commands":{"allow":["webview_show"],"deny":[]}},"allow-webview-size":{"identifier":"allow-webview-size","description":"Enables the webview_size command without any pre-configured scope.","commands":{"allow":["webview_size"],"deny":[]}},"deny-clear-all-browsing-data":{"identifier":"deny-clear-all-browsing-data","description":"Denies the clear_all_browsing_data command without any pre-configured scope.","commands":{"allow":[],"deny":["clear_all_browsing_data"]}},"deny-create-webview":{"identifier":"deny-create-webview","description":"Denies the create_webview command without any pre-configured scope.","commands":{"allow":[],"deny":["create_webview"]}},"deny-create-webview-window":{"identifier":"deny-create-webview-window","description":"Denies the create_webview_window command without any pre-configured scope.","commands":{"allow":[],"deny":["create_webview_window"]}},"deny-get-all-webviews":{"identifier":"deny-get-all-webviews","description":"Denies the get_all_webviews command without any pre-configured scope.","commands":{"allow":[],"deny":["get_all_webviews"]}},"deny-internal-toggle-devtools":{"identifier":"deny-internal-toggle-devtools","description":"Denies the internal_toggle_devtools command without any pre-configured scope.","commands":{"allow":[],"deny":["internal_toggle_devtools"]}},"deny-print":{"identifier":"deny-print","description":"Denies the print command without any pre-configured scope.","commands":{"allow":[],"deny":["print"]}},"deny-reparent":{"identifier":"deny-reparent","description":"Denies the reparent command without any pre-configured scope.","commands":{"allow":[],"deny":["reparent"]}},"deny-set-webview-auto-resize":{"identifier":"deny-set-webview-auto-resize","description":"Denies the set_webview_auto_resize command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_auto_resize"]}},"deny-set-webview-background-color":{"identifier":"deny-set-webview-background-color","description":"Denies the set_webview_background_color command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_background_color"]}},"deny-set-webview-focus":{"identifier":"deny-set-webview-focus","description":"Denies the set_webview_focus command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_focus"]}},"deny-set-webview-position":{"identifier":"deny-set-webview-position","description":"Denies the set_webview_position command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_position"]}},"deny-set-webview-size":{"identifier":"deny-set-webview-size","description":"Denies the set_webview_size command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_size"]}},"deny-set-webview-zoom":{"identifier":"deny-set-webview-zoom","description":"Denies the set_webview_zoom command without any pre-configured scope.","commands":{"allow":[],"deny":["set_webview_zoom"]}},"deny-webview-close":{"identifier":"deny-webview-close","description":"Denies the webview_close command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_close"]}},"deny-webview-hide":{"identifier":"deny-webview-hide","description":"Denies the webview_hide command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_hide"]}},"deny-webview-position":{"identifier":"deny-webview-position","description":"Denies the webview_position command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_position"]}},"deny-webview-show":{"identifier":"deny-webview-show","description":"Denies the webview_show command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_show"]}},"deny-webview-size":{"identifier":"deny-webview-size","description":"Denies the webview_size command without any pre-configured scope.","commands":{"allow":[],"deny":["webview_size"]}}},"permission_sets":{},"global_scope_schema":null},"core:window":{"default_permission":{"identifier":"default","description":"Default permissions for the plugin.","permissions":["allow-get-all-windows","allow-scale-factor","allow-inner-position","allow-outer-position","allow-inner-size","allow-outer-size","allow-is-fullscreen","allow-is-minimized","allow-is-maximized","allow-is-focused","allow-is-decorated","allow-is-resizable","allow-is-maximizable","allow-is-minimizable","allow-is-closable","allow-is-visible","allow-is-enabled","allow-title","allow-current-monitor","allow-primary-monitor","allow-monitor-from-point","allow-available-monitors","allow-cursor-position","allow-theme","allow-is-always-on-top","allow-internal-toggle-maximize"]},"permissions":{"allow-available-monitors":{"identifier":"allow-available-monitors","description":"Enables the available_monitors command without any pre-configured scope.","commands":{"allow":["available_monitors"],"deny":[]}},"allow-center":{"identifier":"allow-center","description":"Enables the center command without any pre-configured scope.","commands":{"allow":["center"],"deny":[]}},"allow-close":{"identifier":"allow-close","description":"Enables the close command without any pre-configured scope.","commands":{"allow":["close"],"deny":[]}},"allow-create":{"identifier":"allow-create","description":"Enables the create command without any pre-configured scope.","commands":{"allow":["create"],"deny":[]}},"allow-current-monitor":{"identifier":"allow-current-monitor","description":"Enables the current_monitor command without any pre-configured scope.","commands":{"allow":["current_monitor"],"deny":[]}},"allow-cursor-position":{"identifier":"allow-cursor-position","description":"Enables the cursor_position command without any pre-configured scope.","commands":{"allow":["cursor_position"],"deny":[]}},"allow-destroy":{"identifier":"allow-destroy","description":"Enables the destroy command without any pre-configured scope.","commands":{"allow":["destroy"],"deny":[]}},"allow-get-all-windows":{"identifier":"allow-get-all-windows","description":"Enables the get_all_windows command without any pre-configured scope.","commands":{"allow":["get_all_windows"],"deny":[]}},"allow-hide":{"identifier":"allow-hide","description":"Enables the hide command without any pre-configured scope.","commands":{"allow":["hide"],"deny":[]}},"allow-inner-position":{"identifier":"allow-inner-position","description":"Enables the inner_position command without any pre-configured scope.","commands":{"allow":["inner_position"],"deny":[]}},"allow-inner-size":{"identifier":"allow-inner-size","description":"Enables the inner_size command without any pre-configured scope.","commands":{"allow":["inner_size"],"deny":[]}},"allow-internal-toggle-maximize":{"identifier":"allow-internal-toggle-maximize","description":"Enables the internal_toggle_maximize command without any pre-configured scope.","commands":{"allow":["internal_toggle_maximize"],"deny":[]}},"allow-is-always-on-top":{"identifier":"allow-is-always-on-top","description":"Enables the is_always_on_top command without any pre-configured scope.","commands":{"allow":["is_always_on_top"],"deny":[]}},"allow-is-closable":{"identifier":"allow-is-closable","description":"Enables the is_closable command without any pre-configured scope.","commands":{"allow":["is_closable"],"deny":[]}},"allow-is-decorated":{"identifier":"allow-is-decorated","description":"Enables the is_decorated command without any pre-configured scope.","commands":{"allow":["is_decorated"],"deny":[]}},"allow-is-enabled":{"identifier":"allow-is-enabled","description":"Enables the is_enabled command without any pre-configured scope.","commands":{"allow":["is_enabled"],"deny":[]}},"allow-is-focused":{"identifier":"allow-is-focused","description":"Enables the is_focused command without any pre-configured scope.","commands":{"allow":["is_focused"],"deny":[]}},"allow-is-fullscreen":{"identifier":"allow-is-fullscreen","description":"Enables the is_fullscreen command without any pre-configured scope.","commands":{"allow":["is_fullscreen"],"deny":[]}},"allow-is-maximizable":{"identifier":"allow-is-maximizable","description":"Enables the is_maximizable command without any pre-configured scope.","commands":{"allow":["is_maximizable"],"deny":[]}},"allow-is-maximized":{"identifier":"allow-is-maximized","description":"Enables the is_maximized command without any pre-configured scope.","commands":{"allow":["is_maximized"],"deny":[]}},"allow-is-minimizable":{"identifier":"allow-is-minimizable","description":"Enables the is_minimizable command without any pre-configured scope.","commands":{"allow":["is_minimizable"],"deny":[]}},"allow-is-minimized":{"identifier":"allow-is-minimized","description":"Enables the is_minimized command without any pre-configured scope.","commands":{"allow":["is_minimized"],"deny":[]}},"allow-is-resizable":{"identifier":"allow-is-resizable","description":"Enables the is_resizable command without any pre-configured scope.","commands":{"allow":["is_resizable"],"deny":[]}},"allow-is-visible":{"identifier":"allow-is-visible","description":"Enables the is_visible command without any pre-configured scope.","commands":{"allow":["is_visible"],"deny":[]}},"allow-maximize":{"identifier":"allow-maximize","description":"Enables the maximize command without any pre-configured scope.","commands":{"allow":["maximize"],"deny":[]}},"allow-minimize":{"identifier":"allow-minimize","description":"Enables the minimize command without any pre-configured scope.","commands":{"allow":["minimize"],"deny":[]}},"allow-monitor-from-point":{"identifier":"allow-monitor-from-point","description":"Enables the monitor_from_point command without any pre-configured scope.","commands":{"allow":["monitor_from_point"],"deny":[]}},"allow-outer-position":{"identifier":"allow-outer-position","description":"Enables the outer_position command without any pre-configured scope.","commands":{"allow":["outer_position"],"deny":[]}},"allow-outer-size":{"identifier":"allow-outer-size","description":"Enables the outer_size command without any pre-configured scope.","commands":{"allow":["outer_size"],"deny":[]}},"allow-primary-monitor":{"identifier":"allow-primary-monitor","description":"Enables the primary_monitor command without any pre-configured scope.","commands":{"allow":["primary_monitor"],"deny":[]}},"allow-request-user-attention":{"identifier":"allow-request-user-attention","description":"Enables the request_user_attention command without any pre-configured scope.","commands":{"allow":["request_user_attention"],"deny":[]}},"allow-scale-factor":{"identifier":"allow-scale-factor","description":"Enables the scale_factor command without any pre-configured scope.","commands":{"allow":["scale_factor"],"deny":[]}},"allow-set-always-on-bottom":{"identifier":"allow-set-always-on-bottom","description":"Enables the set_always_on_bottom command without any pre-configured scope.","commands":{"allow":["set_always_on_bottom"],"deny":[]}},"allow-set-always-on-top":{"identifier":"allow-set-always-on-top","description":"Enables the set_always_on_top command without any pre-configured scope.","commands":{"allow":["set_always_on_top"],"deny":[]}},"allow-set-background-color":{"identifier":"allow-set-background-color","description":"Enables the set_background_color command without any pre-configured scope.","commands":{"allow":["set_background_color"],"deny":[]}},"allow-set-badge-count":{"identifier":"allow-set-badge-count","description":"Enables the set_badge_count command without any pre-configured scope.","commands":{"allow":["set_badge_count"],"deny":[]}},"allow-set-badge-label":{"identifier":"allow-set-badge-label","description":"Enables the set_badge_label command without any pre-configured scope.","commands":{"allow":["set_badge_label"],"deny":[]}},"allow-set-closable":{"identifier":"allow-set-closable","description":"Enables the set_closable command without any pre-configured scope.","commands":{"allow":["set_closable"],"deny":[]}},"allow-set-content-protected":{"identifier":"allow-set-content-protected","description":"Enables the set_content_protected command without any pre-configured scope.","commands":{"allow":["set_content_protected"],"deny":[]}},"allow-set-cursor-grab":{"identifier":"allow-set-cursor-grab","description":"Enables the set_cursor_grab command without any pre-configured scope.","commands":{"allow":["set_cursor_grab"],"deny":[]}},"allow-set-cursor-icon":{"identifier":"allow-set-cursor-icon","description":"Enables the set_cursor_icon command without any pre-configured scope.","commands":{"allow":["set_cursor_icon"],"deny":[]}},"allow-set-cursor-position":{"identifier":"allow-set-cursor-position","description":"Enables the set_cursor_position command without any pre-configured scope.","commands":{"allow":["set_cursor_position"],"deny":[]}},"allow-set-cursor-visible":{"identifier":"allow-set-cursor-visible","description":"Enables the set_cursor_visible command without any pre-configured scope.","commands":{"allow":["set_cursor_visible"],"deny":[]}},"allow-set-decorations":{"identifier":"allow-set-decorations","description":"Enables the set_decorations command without any pre-configured scope.","commands":{"allow":["set_decorations"],"deny":[]}},"allow-set-effects":{"identifier":"allow-set-effects","description":"Enables the set_effects command without any pre-configured scope.","commands":{"allow":["set_effects"],"deny":[]}},"allow-set-enabled":{"identifier":"allow-set-enabled","description":"Enables the set_enabled command without any pre-configured scope.","commands":{"allow":["set_enabled"],"deny":[]}},"allow-set-focus":{"identifier":"allow-set-focus","description":"Enables the set_focus command without any pre-configured scope.","commands":{"allow":["set_focus"],"deny":[]}},"allow-set-focusable":{"identifier":"allow-set-focusable","description":"Enables the set_focusable command without any pre-configured scope.","commands":{"allow":["set_focusable"],"deny":[]}},"allow-set-fullscreen":{"identifier":"allow-set-fullscreen","description":"Enables the set_fullscreen command without any pre-configured scope.","commands":{"allow":["set_fullscreen"],"deny":[]}},"allow-set-icon":{"identifier":"allow-set-icon","description":"Enables the set_icon command without any pre-configured scope.","commands":{"allow":["set_icon"],"deny":[]}},"allow-set-ignore-cursor-events":{"identifier":"allow-set-ignore-cursor-events","description":"Enables the set_ignore_cursor_events command without any pre-configured scope.","commands":{"allow":["set_ignore_cursor_events"],"deny":[]}},"allow-set-max-size":{"identifier":"allow-set-max-size","description":"Enables the set_max_size command without any pre-configured scope.","commands":{"allow":["set_max_size"],"deny":[]}},"allow-set-maximizable":{"identifier":"allow-set-maximizable","description":"Enables the set_maximizable command without any pre-configured scope.","commands":{"allow":["set_maximizable"],"deny":[]}},"allow-set-min-size":{"identifier":"allow-set-min-size","description":"Enables the set_min_size command without any pre-configured scope.","commands":{"allow":["set_min_size"],"deny":[]}},"allow-set-minimizable":{"identifier":"allow-set-minimizable","description":"Enables the set_minimizable command without any pre-configured scope.","commands":{"allow":["set_minimizable"],"deny":[]}},"allow-set-overlay-icon":{"identifier":"allow-set-overlay-icon","description":"Enables the set_overlay_icon command without any pre-configured scope.","commands":{"allow":["set_overlay_icon"],"deny":[]}},"allow-set-position":{"identifier":"allow-set-position","description":"Enables the set_position command without any pre-configured scope.","commands":{"allow":["set_position"],"deny":[]}},"allow-set-progress-bar":{"identifier":"allow-set-progress-bar","description":"Enables the set_progress_bar command without any pre-configured scope.","commands":{"allow":["set_progress_bar"],"deny":[]}},"allow-set-resizable":{"identifier":"allow-set-resizable","description":"Enables the set_resizable command without any pre-configured scope.","commands":{"allow":["set_resizable"],"deny":[]}},"allow-set-shadow":{"identifier":"allow-set-shadow","description":"Enables the set_shadow command without any pre-configured scope.","commands":{"allow":["set_shadow"],"deny":[]}},"allow-set-simple-fullscreen":{"identifier":"allow-set-simple-fullscreen","description":"Enables the set_simple_fullscreen command without any pre-configured scope.","commands":{"allow":["set_simple_fullscreen"],"deny":[]}},"allow-set-size":{"identifier":"allow-set-size","description":"Enables the set_size command without any pre-configured scope.","commands":{"allow":["set_size"],"deny":[]}},"allow-set-size-constraints":{"identifier":"allow-set-size-constraints","description":"Enables the set_size_constraints command without any pre-configured scope.","commands":{"allow":["set_size_constraints"],"deny":[]}},"allow-set-skip-taskbar":{"identifier":"allow-set-skip-taskbar","description":"Enables the set_skip_taskbar command without any pre-configured scope.","commands":{"allow":["set_skip_taskbar"],"deny":[]}},"allow-set-theme":{"identifier":"allow-set-theme","description":"Enables the set_theme command without any pre-configured scope.","commands":{"allow":["set_theme"],"deny":[]}},"allow-set-title":{"identifier":"allow-set-title","description":"Enables the set_title command without any pre-configured scope.","commands":{"allow":["set_title"],"deny":[]}},"allow-set-title-bar-style":{"identifier":"allow-set-title-bar-style","description":"Enables the set_title_bar_style command without any pre-configured scope.","commands":{"allow":["set_title_bar_style"],"deny":[]}},"allow-set-visible-on-all-workspaces":{"identifier":"allow-set-visible-on-all-workspaces","description":"Enables the set_visible_on_all_workspaces command without any pre-configured scope.","commands":{"allow":["set_visible_on_all_workspaces"],"deny":[]}},"allow-show":{"identifier":"allow-show","description":"Enables the show command without any pre-configured scope.","commands":{"allow":["show"],"deny":[]}},"allow-start-dragging":{"identifier":"allow-start-dragging","description":"Enables the start_dragging command without any pre-configured scope.","commands":{"allow":["start_dragging"],"deny":[]}},"allow-start-resize-dragging":{"identifier":"allow-start-resize-dragging","description":"Enables the start_resize_dragging command without any pre-configured scope.","commands":{"allow":["start_resize_dragging"],"deny":[]}},"allow-theme":{"identifier":"allow-theme","description":"Enables the theme command without any pre-configured scope.","commands":{"allow":["theme"],"deny":[]}},"allow-title":{"identifier":"allow-title","description":"Enables the title command without any pre-configured scope.","commands":{"allow":["title"],"deny":[]}},"allow-toggle-maximize":{"identifier":"allow-toggle-maximize","description":"Enables the toggle_maximize command without any pre-configured scope.","commands":{"allow":["toggle_maximize"],"deny":[]}},"allow-unmaximize":{"identifier":"allow-unmaximize","description":"Enables the unmaximize command without any pre-configured scope.","commands":{"allow":["unmaximize"],"deny":[]}},"allow-unminimize":{"identifier":"allow-unminimize","description":"Enables the unminimize command without any pre-configured scope.","commands":{"allow":["unminimize"],"deny":[]}},"deny-available-monitors":{"identifier":"deny-available-monitors","description":"Denies the available_monitors command without any pre-configured scope.","commands":{"allow":[],"deny":["available_monitors"]}},"deny-center":{"identifier":"deny-center","description":"Denies the center command without any pre-configured scope.","commands":{"allow":[],"deny":["center"]}},"deny-close":{"identifier":"deny-close","description":"Denies the close command without any pre-configured scope.","commands":{"allow":[],"deny":["close"]}},"deny-create":{"identifier":"deny-create","description":"Denies the create command without any pre-configured scope.","commands":{"allow":[],"deny":["create"]}},"deny-current-monitor":{"identifier":"deny-current-monitor","description":"Denies the current_monitor command without any pre-configured scope.","commands":{"allow":[],"deny":["current_monitor"]}},"deny-cursor-position":{"identifier":"deny-cursor-position","description":"Denies the cursor_position command without any pre-configured scope.","commands":{"allow":[],"deny":["cursor_position"]}},"deny-destroy":{"identifier":"deny-destroy","description":"Denies the destroy command without any pre-configured scope.","commands":{"allow":[],"deny":["destroy"]}},"deny-get-all-windows":{"identifier":"deny-get-all-windows","description":"Denies the get_all_windows command without any pre-configured scope.","commands":{"allow":[],"deny":["get_all_windows"]}},"deny-hide":{"identifier":"deny-hide","description":"Denies the hide command without any pre-configured scope.","commands":{"allow":[],"deny":["hide"]}},"deny-inner-position":{"identifier":"deny-inner-position","description":"Denies the inner_position command without any pre-configured scope.","commands":{"allow":[],"deny":["inner_position"]}},"deny-inner-size":{"identifier":"deny-inner-size","description":"Denies the inner_size command without any pre-configured scope.","commands":{"allow":[],"deny":["inner_size"]}},"deny-internal-toggle-maximize":{"identifier":"deny-internal-toggle-maximize","description":"Denies the internal_toggle_maximize command without any pre-configured scope.","commands":{"allow":[],"deny":["internal_toggle_maximize"]}},"deny-is-always-on-top":{"identifier":"deny-is-always-on-top","description":"Denies the is_always_on_top command without any pre-configured scope.","commands":{"allow":[],"deny":["is_always_on_top"]}},"deny-is-closable":{"identifier":"deny-is-closable","description":"Denies the is_closable command without any pre-configured scope.","commands":{"allow":[],"deny":["is_closable"]}},"deny-is-decorated":{"identifier":"deny-is-decorated","description":"Denies the is_decorated command without any pre-configured scope.","commands":{"allow":[],"deny":["is_decorated"]}},"deny-is-enabled":{"identifier":"deny-is-enabled","description":"Denies the is_enabled command without any pre-configured scope.","commands":{"allow":[],"deny":["is_enabled"]}},"deny-is-focused":{"identifier":"deny-is-focused","description":"Denies the is_focused command without any pre-configured scope.","commands":{"allow":[],"deny":["is_focused"]}},"deny-is-fullscreen":{"identifier":"deny-is-fullscreen","description":"Denies the is_fullscreen command without any pre-configured scope.","commands":{"allow":[],"deny":["is_fullscreen"]}},"deny-is-maximizable":{"identifier":"deny-is-maximizable","description":"Denies the is_maximizable command without any pre-configured scope.","commands":{"allow":[],"deny":["is_maximizable"]}},"deny-is-maximized":{"identifier":"deny-is-maximized","description":"Denies the is_maximized command without any pre-configured scope.","commands":{"allow":[],"deny":["is_maximized"]}},"deny-is-minimizable":{"identifier":"deny-is-minimizable","description":"Denies the is_minimizable command without any pre-configured scope.","commands":{"allow":[],"deny":["is_minimizable"]}},"deny-is-minimized":{"identifier":"deny-is-minimized","description":"Denies the is_minimized command without any pre-configured scope.","commands":{"allow":[],"deny":["is_minimized"]}},"deny-is-resizable":{"identifier":"deny-is-resizable","description":"Denies the is_resizable command without any pre-configured scope.","commands":{"allow":[],"deny":["is_resizable"]}},"deny-is-visible":{"identifier":"deny-is-visible","description":"Denies the is_visible command without any pre-configured scope.","commands":{"allow":[],"deny":["is_visible"]}},"deny-maximize":{"identifier":"deny-maximize","description":"Denies the maximize command without any pre-configured scope.","commands":{"allow":[],"deny":["maximize"]}},"deny-minimize":{"identifier":"deny-minimize","description":"Denies the minimize command without any pre-configured scope.","commands":{"allow":[],"deny":["minimize"]}},"deny-monitor-from-point":{"identifier":"deny-monitor-from-point","description":"Denies the monitor_from_point command without any pre-configured scope.","commands":{"allow":[],"deny":["monitor_from_point"]}},"deny-outer-position":{"identifier":"deny-outer-position","description":"Denies the outer_position command without any pre-configured scope.","commands":{"allow":[],"deny":["outer_position"]}},"deny-outer-size":{"identifier":"deny-outer-size","description":"Denies the outer_size command without any pre-configured scope.","commands":{"allow":[],"deny":["outer_size"]}},"deny-primary-monitor":{"identifier":"deny-primary-monitor","description":"Denies the primary_monitor command without any pre-configured scope.","commands":{"allow":[],"deny":["primary_monitor"]}},"deny-request-user-attention":{"identifier":"deny-request-user-attention","description":"Denies the request_user_attention command without any pre-configured scope.","commands":{"allow":[],"deny":["request_user_attention"]}},"deny-scale-factor":{"identifier":"deny-scale-factor","description":"Denies the scale_factor command without any pre-configured scope.","commands":{"allow":[],"deny":["scale_factor"]}},"deny-set-always-on-bottom":{"identifier":"deny-set-always-on-bottom","description":"Denies the set_always_on_bottom command without any pre-configured scope.","commands":{"allow":[],"deny":["set_always_on_bottom"]}},"deny-set-always-on-top":{"identifier":"deny-set-always-on-top","description":"Denies the set_always_on_top command without any pre-configured scope.","commands":{"allow":[],"deny":["set_always_on_top"]}},"deny-set-background-color":{"identifier":"deny-set-background-color","description":"Denies the set_background_color command without any pre-configured scope.","commands":{"allow":[],"deny":["set_background_color"]}},"deny-set-badge-count":{"identifier":"deny-set-badge-count","description":"Denies the set_badge_count command without any pre-configured scope.","commands":{"allow":[],"deny":["set_badge_count"]}},"deny-set-badge-label":{"identifier":"deny-set-badge-label","description":"Denies the set_badge_label command without any pre-configured scope.","commands":{"allow":[],"deny":["set_badge_label"]}},"deny-set-closable":{"identifier":"deny-set-closable","description":"Denies the set_closable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_closable"]}},"deny-set-content-protected":{"identifier":"deny-set-content-protected","description":"Denies the set_content_protected command without any pre-configured scope.","commands":{"allow":[],"deny":["set_content_protected"]}},"deny-set-cursor-grab":{"identifier":"deny-set-cursor-grab","description":"Denies the set_cursor_grab command without any pre-configured scope.","commands":{"allow":[],"deny":["set_cursor_grab"]}},"deny-set-cursor-icon":{"identifier":"deny-set-cursor-icon","description":"Denies the set_cursor_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_cursor_icon"]}},"deny-set-cursor-position":{"identifier":"deny-set-cursor-position","description":"Denies the set_cursor_position command without any pre-configured scope.","commands":{"allow":[],"deny":["set_cursor_position"]}},"deny-set-cursor-visible":{"identifier":"deny-set-cursor-visible","description":"Denies the set_cursor_visible command without any pre-configured scope.","commands":{"allow":[],"deny":["set_cursor_visible"]}},"deny-set-decorations":{"identifier":"deny-set-decorations","description":"Denies the set_decorations command without any pre-configured scope.","commands":{"allow":[],"deny":["set_decorations"]}},"deny-set-effects":{"identifier":"deny-set-effects","description":"Denies the set_effects command without any pre-configured scope.","commands":{"allow":[],"deny":["set_effects"]}},"deny-set-enabled":{"identifier":"deny-set-enabled","description":"Denies the set_enabled command without any pre-configured scope.","commands":{"allow":[],"deny":["set_enabled"]}},"deny-set-focus":{"identifier":"deny-set-focus","description":"Denies the set_focus command without any pre-configured scope.","commands":{"allow":[],"deny":["set_focus"]}},"deny-set-focusable":{"identifier":"deny-set-focusable","description":"Denies the set_focusable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_focusable"]}},"deny-set-fullscreen":{"identifier":"deny-set-fullscreen","description":"Denies the set_fullscreen command without any pre-configured scope.","commands":{"allow":[],"deny":["set_fullscreen"]}},"deny-set-icon":{"identifier":"deny-set-icon","description":"Denies the set_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_icon"]}},"deny-set-ignore-cursor-events":{"identifier":"deny-set-ignore-cursor-events","description":"Denies the set_ignore_cursor_events command without any pre-configured scope.","commands":{"allow":[],"deny":["set_ignore_cursor_events"]}},"deny-set-max-size":{"identifier":"deny-set-max-size","description":"Denies the set_max_size command without any pre-configured scope.","commands":{"allow":[],"deny":["set_max_size"]}},"deny-set-maximizable":{"identifier":"deny-set-maximizable","description":"Denies the set_maximizable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_maximizable"]}},"deny-set-min-size":{"identifier":"deny-set-min-size","description":"Denies the set_min_size command without any pre-configured scope.","commands":{"allow":[],"deny":["set_min_size"]}},"deny-set-minimizable":{"identifier":"deny-set-minimizable","description":"Denies the set_minimizable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_minimizable"]}},"deny-set-overlay-icon":{"identifier":"deny-set-overlay-icon","description":"Denies the set_overlay_icon command without any pre-configured scope.","commands":{"allow":[],"deny":["set_overlay_icon"]}},"deny-set-position":{"identifier":"deny-set-position","description":"Denies the set_position command without any pre-configured scope.","commands":{"allow":[],"deny":["set_position"]}},"deny-set-progress-bar":{"identifier":"deny-set-progress-bar","description":"Denies the set_progress_bar command without any pre-configured scope.","commands":{"allow":[],"deny":["set_progress_bar"]}},"deny-set-resizable":{"identifier":"deny-set-resizable","description":"Denies the set_resizable command without any pre-configured scope.","commands":{"allow":[],"deny":["set_resizable"]}},"deny-set-shadow":{"identifier":"deny-set-shadow","description":"Denies the set_shadow command without any pre-configured scope.","commands":{"allow":[],"deny":["set_shadow"]}},"deny-set-simple-fullscreen":{"identifier":"deny-set-simple-fullscreen","description":"Denies the set_simple_fullscreen command without any pre-configured scope.","commands":{"allow":[],"deny":["set_simple_fullscreen"]}},"deny-set-size":{"identifier":"deny-set-size","description":"Denies the set_size command without any pre-configured scope.","commands":{"allow":[],"deny":["set_size"]}},"deny-set-size-constraints":{"identifier":"deny-set-size-constraints","description":"Denies the set_size_constraints command without any pre-configured scope.","commands":{"allow":[],"deny":["set_size_constraints"]}},"deny-set-skip-taskbar":{"identifier":"deny-set-skip-taskbar","description":"Denies the set_skip_taskbar command without any pre-configured scope.","commands":{"allow":[],"deny":["set_skip_taskbar"]}},"deny-set-theme":{"identifier":"deny-set-theme","description":"Denies the set_theme command without any pre-configured scope.","commands":{"allow":[],"deny":["set_theme"]}},"deny-set-title":{"identifier":"deny-set-title","description":"Denies the set_title command without any pre-configured scope.","commands":{"allow":[],"deny":["set_title"]}},"deny-set-title-bar-style":{"identifier":"deny-set-title-bar-style","description":"Denies the set_title_bar_style command without any pre-configured scope.","commands":{"allow":[],"deny":["set_title_bar_style"]}},"deny-set-visible-on-all-workspaces":{"identifier":"deny-set-visible-on-all-workspaces","description":"Denies the set_visible_on_all_workspaces command without any pre-configured scope.","commands":{"allow":[],"deny":["set_visible_on_all_workspaces"]}},"deny-show":{"identifier":"deny-show","description":"Denies the show command without any pre-configured scope.","commands":{"allow":[],"deny":["show"]}},"deny-start-dragging":{"identifier":"deny-start-dragging","description":"Denies the start_dragging command without any pre-configured scope.","commands":{"allow":[],"deny":["start_dragging"]}},"deny-start-resize-dragging":{"identifier":"deny-start-resize-dragging","description":"Denies the start_resize_dragging command without any pre-configured scope.","commands":{"allow":[],"deny":["start_resize_dragging"]}},"deny-theme":{"identifier":"deny-theme","description":"Denies the theme command without any pre-configured scope.","commands":{"allow":[],"deny":["theme"]}},"deny-title":{"identifier":"deny-title","description":"Denies the title command without any pre-configured scope.","commands":{"allow":[],"deny":["title"]}},"deny-toggle-maximize":{"identifier":"deny-toggle-maximize","description":"Denies the toggle_maximize command without any pre-configured scope.","commands":{"allow":[],"deny":["toggle_maximize"]}},"deny-unmaximize":{"identifier":"deny-unmaximize","description":"Denies the unmaximize command without any pre-configured scope.","commands":{"allow":[],"deny":["unmaximize"]}},"deny-unminimize":{"identifier":"deny-unminimize","description":"Denies the unminimize command without any pre-configured scope.","commands":{"allow":[],"deny":["unminimize"]}}},"permission_sets":{},"global_scope_schema":null},"fs":{"default_permission":{"identifier":"default","description":"This set of permissions describes the what kind of\nfile system access the `fs` plugin has enabled or denied by default.\n\n#### Granted Permissions\n\nThis default permission set enables read access to the\napplication specific directories (AppConfig, AppData, AppLocalData, AppCache,\nAppLog) and all files and sub directories created in it.\nThe location of these directories depends on the operating system,\nwhere the application is run.\n\nIn general these directories need to be manually created\nby the application at runtime, before accessing files or folders\nin it is possible.\n\nTherefore, it is also allowed to create all of these folders via\nthe `mkdir` command.\n\n#### Denied Permissions\n\nThis default permission set prevents access to critical components\nof the Tauri application by default.\nOn Windows the webview data folder access is denied.\n","permissions":["create-app-specific-dirs","read-app-specific-dirs-recursive","deny-default"]},"permissions":{"allow-copy-file":{"identifier":"allow-copy-file","description":"Enables the copy_file command without any pre-configured scope.","commands":{"allow":["copy_file"],"deny":[]}},"allow-create":{"identifier":"allow-create","description":"Enables the create command without any pre-configured scope.","commands":{"allow":["create"],"deny":[]}},"allow-exists":{"identifier":"allow-exists","description":"Enables the exists command without any pre-configured scope.","commands":{"allow":["exists"],"deny":[]}},"allow-fstat":{"identifier":"allow-fstat","description":"Enables the fstat command without any pre-configured scope.","commands":{"allow":["fstat"],"deny":[]}},"allow-ftruncate":{"identifier":"allow-ftruncate","description":"Enables the ftruncate command without any pre-configured scope.","commands":{"allow":["ftruncate"],"deny":[]}},"allow-lstat":{"identifier":"allow-lstat","description":"Enables the lstat command without any pre-configured scope.","commands":{"allow":["lstat"],"deny":[]}},"allow-mkdir":{"identifier":"allow-mkdir","description":"Enables the mkdir command without any pre-configured scope.","commands":{"allow":["mkdir"],"deny":[]}},"allow-open":{"identifier":"allow-open","description":"Enables the open command without any pre-configured scope.","commands":{"allow":["open"],"deny":[]}},"allow-read":{"identifier":"allow-read","description":"Enables the read command without any pre-configured scope.","commands":{"allow":["read"],"deny":[]}},"allow-read-dir":{"identifier":"allow-read-dir","description":"Enables the read_dir command without any pre-configured scope.","commands":{"allow":["read_dir"],"deny":[]}},"allow-read-file":{"identifier":"allow-read-file","description":"Enables the read_file command without any pre-configured scope.","commands":{"allow":["read_file"],"deny":[]}},"allow-read-text-file":{"identifier":"allow-read-text-file","description":"Enables the read_text_file command without any pre-configured scope.","commands":{"allow":["read_text_file"],"deny":[]}},"allow-read-text-file-lines":{"identifier":"allow-read-text-file-lines","description":"Enables the read_text_file_lines command without any pre-configured scope.","commands":{"allow":["read_text_file_lines","read_text_file_lines_next"],"deny":[]}},"allow-read-text-file-lines-next":{"identifier":"allow-read-text-file-lines-next","description":"Enables the read_text_file_lines_next command without any pre-configured scope.","commands":{"allow":["read_text_file_lines_next"],"deny":[]}},"allow-remove":{"identifier":"allow-remove","description":"Enables the remove command without any pre-configured scope.","commands":{"allow":["remove"],"deny":[]}},"allow-rename":{"identifier":"allow-rename","description":"Enables the rename command without any pre-configured scope.","commands":{"allow":["rename"],"deny":[]}},"allow-seek":{"identifier":"allow-seek","description":"Enables the seek command without any pre-configured scope.","commands":{"allow":["seek"],"deny":[]}},"allow-size":{"identifier":"allow-size","description":"Enables the size command without any pre-configured scope.","commands":{"allow":["size"],"deny":[]}},"allow-stat":{"identifier":"allow-stat","description":"Enables the stat command without any pre-configured scope.","commands":{"allow":["stat"],"deny":[]}},"allow-truncate":{"identifier":"allow-truncate","description":"Enables the truncate command without any pre-configured scope.","commands":{"allow":["truncate"],"deny":[]}},"allow-unwatch":{"identifier":"allow-unwatch","description":"Enables the unwatch command without any pre-configured scope.","commands":{"allow":["unwatch"],"deny":[]}},"allow-watch":{"identifier":"allow-watch","description":"Enables the watch command without any pre-configured scope.","commands":{"allow":["watch"],"deny":[]}},"allow-write":{"identifier":"allow-write","description":"Enables the write command without any pre-configured scope.","commands":{"allow":["write"],"deny":[]}},"allow-write-file":{"identifier":"allow-write-file","description":"Enables the write_file command without any pre-configured scope.","commands":{"allow":["write_file","open","write"],"deny":[]}},"allow-write-text-file":{"identifier":"allow-write-text-file","description":"Enables the write_text_file command without any pre-configured scope.","commands":{"allow":["write_text_file"],"deny":[]}},"create-app-specific-dirs":{"identifier":"create-app-specific-dirs","description":"This permissions allows to create the application specific directories.\n","commands":{"allow":["mkdir","scope-app-index"],"deny":[]}},"deny-copy-file":{"identifier":"deny-copy-file","description":"Denies the copy_file command without any pre-configured scope.","commands":{"allow":[],"deny":["copy_file"]}},"deny-create":{"identifier":"deny-create","description":"Denies the create command without any pre-configured scope.","commands":{"allow":[],"deny":["create"]}},"deny-exists":{"identifier":"deny-exists","description":"Denies the exists command without any pre-configured scope.","commands":{"allow":[],"deny":["exists"]}},"deny-fstat":{"identifier":"deny-fstat","description":"Denies the fstat command without any pre-configured scope.","commands":{"allow":[],"deny":["fstat"]}},"deny-ftruncate":{"identifier":"deny-ftruncate","description":"Denies the ftruncate command without any pre-configured scope.","commands":{"allow":[],"deny":["ftruncate"]}},"deny-lstat":{"identifier":"deny-lstat","description":"Denies the lstat command without any pre-configured scope.","commands":{"allow":[],"deny":["lstat"]}},"deny-mkdir":{"identifier":"deny-mkdir","description":"Denies the mkdir command without any pre-configured scope.","commands":{"allow":[],"deny":["mkdir"]}},"deny-open":{"identifier":"deny-open","description":"Denies the open command without any pre-configured scope.","commands":{"allow":[],"deny":["open"]}},"deny-read":{"identifier":"deny-read","description":"Denies the read command without any pre-configured scope.","commands":{"allow":[],"deny":["read"]}},"deny-read-dir":{"identifier":"deny-read-dir","description":"Denies the read_dir command without any pre-configured scope.","commands":{"allow":[],"deny":["read_dir"]}},"deny-read-file":{"identifier":"deny-read-file","description":"Denies the read_file command without any pre-configured scope.","commands":{"allow":[],"deny":["read_file"]}},"deny-read-text-file":{"identifier":"deny-read-text-file","description":"Denies the read_text_file command without any pre-configured scope.","commands":{"allow":[],"deny":["read_text_file"]}},"deny-read-text-file-lines":{"identifier":"deny-read-text-file-lines","description":"Denies the read_text_file_lines command without any pre-configured scope.","commands":{"allow":[],"deny":["read_text_file_lines"]}},"deny-read-text-file-lines-next":{"identifier":"deny-read-text-file-lines-next","description":"Denies the read_text_file_lines_next command without any pre-configured scope.","commands":{"allow":[],"deny":["read_text_file_lines_next"]}},"deny-remove":{"identifier":"deny-remove","description":"Denies the remove command without any pre-configured scope.","commands":{"allow":[],"deny":["remove"]}},"deny-rename":{"identifier":"deny-rename","description":"Denies the rename command without any pre-configured scope.","commands":{"allow":[],"deny":["rename"]}},"deny-seek":{"identifier":"deny-seek","description":"Denies the seek command without any pre-configured scope.","commands":{"allow":[],"deny":["seek"]}},"deny-size":{"identifier":"deny-size","description":"Denies the size command without any pre-configured scope.","commands":{"allow":[],"deny":["size"]}},"deny-stat":{"identifier":"deny-stat","description":"Denies the stat command without any pre-configured scope.","commands":{"allow":[],"deny":["stat"]}},"deny-truncate":{"identifier":"deny-truncate","description":"Denies the truncate command without any pre-configured scope.","commands":{"allow":[],"deny":["truncate"]}},"deny-unwatch":{"identifier":"deny-unwatch","description":"Denies the unwatch command without any pre-configured scope.","commands":{"allow":[],"deny":["unwatch"]}},"deny-watch":{"identifier":"deny-watch","description":"Denies the watch command without any pre-configured scope.","commands":{"allow":[],"deny":["watch"]}},"deny-webview-data-linux":{"identifier":"deny-webview-data-linux","description":"This denies read access to the\n`$APPLOCALDATA` folder on linux as the webview data and configuration values are stored here.\nAllowing access can lead to sensitive information disclosure and should be well considered.","commands":{"allow":[],"deny":[]}},"deny-webview-data-windows":{"identifier":"deny-webview-data-windows","description":"This denies read access to the\n`$APPLOCALDATA/EBWebView` folder on windows as the webview data and configuration values are stored here.\nAllowing access can lead to sensitive information disclosure and should be well considered.","commands":{"allow":[],"deny":[]}},"deny-write":{"identifier":"deny-write","description":"Denies the write command without any pre-configured scope.","commands":{"allow":[],"deny":["write"]}},"deny-write-file":{"identifier":"deny-write-file","description":"Denies the write_file command without any pre-configured scope.","commands":{"allow":[],"deny":["write_file"]}},"deny-write-text-file":{"identifier":"deny-write-text-file","description":"Denies the write_text_file command without any pre-configured scope.","commands":{"allow":[],"deny":["write_text_file"]}},"read-all":{"identifier":"read-all","description":"This enables all read related commands without any pre-configured accessible paths.","commands":{"allow":["read_dir","read_file","read","open","read_text_file","read_text_file_lines","read_text_file_lines_next","seek","stat","lstat","fstat","exists","watch","unwatch"],"deny":[]}},"read-app-specific-dirs-recursive":{"identifier":"read-app-specific-dirs-recursive","description":"This permission allows recursive read functionality on the application\nspecific base directories. \n","commands":{"allow":["read_dir","read_file","read_text_file","read_text_file_lines","read_text_file_lines_next","exists","scope-app-recursive"],"deny":[]}},"read-dirs":{"identifier":"read-dirs","description":"This enables directory read and file metadata related commands without any pre-configured accessible paths.","commands":{"allow":["read_dir","stat","lstat","fstat","exists"],"deny":[]}},"read-files":{"identifier":"read-files","description":"This enables file read related commands without any pre-configured accessible paths.","commands":{"allow":["read_file","read","open","read_text_file","read_text_file_lines","read_text_file_lines_next","seek","stat","lstat","fstat","exists"],"deny":[]}},"read-meta":{"identifier":"read-meta","description":"This enables all index or metadata related commands without any pre-configured accessible paths.","commands":{"allow":["read_dir","stat","lstat","fstat","exists","size"],"deny":[]}},"scope":{"identifier":"scope","description":"An empty permission you can use to modify the global scope.\n\n## Example\n\n```json\n{\n  \"identifier\": \"read-documents\",\n  \"windows\": [\"main\"],\n  \"permissions\": [\n    \"fs:allow-read\",\n    {\n      \"identifier\": \"fs:scope\",\n      \"allow\": [\n        \"$APPDATA/documents/**/*\"\n      ],\n      \"deny\": [\n        \"$APPDATA/documents/secret.txt\"\n      ]\n    }\n  ]\n}\n```\n","commands":{"allow":[],"deny":[]}},"scope-app":{"identifier":"scope-app","description":"This scope permits access to all files and list content of top level directories in the application folders.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPCONFIG/*"},{"path":"$APPDATA"},{"path":"$APPDATA/*"},{"path":"$APPLOCALDATA"},{"path":"$APPLOCALDATA/*"},{"path":"$APPCACHE"},{"path":"$APPCACHE/*"},{"path":"$APPLOG"},{"path":"$APPLOG/*"}]}},"scope-app-index":{"identifier":"scope-app-index","description":"This scope permits to list all files and folders in the application directories.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPDATA"},{"path":"$APPLOCALDATA"},{"path":"$APPCACHE"},{"path":"$APPLOG"}]}},"scope-app-recursive":{"identifier":"scope-app-recursive","description":"This scope permits recursive access to the complete application folders, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPCONFIG/**"},{"path":"$APPDATA"},{"path":"$APPDATA/**"},{"path":"$APPLOCALDATA"},{"path":"$APPLOCALDATA/**"},{"path":"$APPCACHE"},{"path":"$APPCACHE/**"},{"path":"$APPLOG"},{"path":"$APPLOG/**"}]}},"scope-appcache":{"identifier":"scope-appcache","description":"This scope permits access to all files and list content of top level directories in the `$APPCACHE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCACHE"},{"path":"$APPCACHE/*"}]}},"scope-appcache-index":{"identifier":"scope-appcache-index","description":"This scope permits to list all files and folders in the `$APPCACHE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCACHE"}]}},"scope-appcache-recursive":{"identifier":"scope-appcache-recursive","description":"This scope permits recursive access to the complete `$APPCACHE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCACHE"},{"path":"$APPCACHE/**"}]}},"scope-appconfig":{"identifier":"scope-appconfig","description":"This scope permits access to all files and list content of top level directories in the `$APPCONFIG` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPCONFIG/*"}]}},"scope-appconfig-index":{"identifier":"scope-appconfig-index","description":"This scope permits to list all files and folders in the `$APPCONFIG`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"}]}},"scope-appconfig-recursive":{"identifier":"scope-appconfig-recursive","description":"This scope permits recursive access to the complete `$APPCONFIG` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPCONFIG"},{"path":"$APPCONFIG/**"}]}},"scope-appdata":{"identifier":"scope-appdata","description":"This scope permits access to all files and list content of top level directories in the `$APPDATA` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPDATA"},{"path":"$APPDATA/*"}]}},"scope-appdata-index":{"identifier":"scope-appdata-index","description":"This scope permits to list all files and folders in the `$APPDATA`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPDATA"}]}},"scope-appdata-recursive":{"identifier":"scope-appdata-recursive","description":"This scope permits recursive access to the complete `$APPDATA` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPDATA"},{"path":"$APPDATA/**"}]}},"scope-applocaldata":{"identifier":"scope-applocaldata","description":"This scope permits access to all files and list content of top level directories in the `$APPLOCALDATA` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOCALDATA"},{"path":"$APPLOCALDATA/*"}]}},"scope-applocaldata-index":{"identifier":"scope-applocaldata-index","description":"This scope permits to list all files and folders in the `$APPLOCALDATA`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOCALDATA"}]}},"scope-applocaldata-recursive":{"identifier":"scope-applocaldata-recursive","description":"This scope permits recursive access to the complete `$APPLOCALDATA` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOCALDATA"},{"path":"$APPLOCALDATA/**"}]}},"scope-applog":{"identifier":"scope-applog","description":"This scope permits access to all files and list content of top level directories in the `$APPLOG` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOG"},{"path":"$APPLOG/*"}]}},"scope-applog-index":{"identifier":"scope-applog-index","description":"This scope permits to list all files and folders in the `$APPLOG`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOG"}]}},"scope-applog-recursive":{"identifier":"scope-applog-recursive","description":"This scope permits recursive access to the complete `$APPLOG` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$APPLOG"},{"path":"$APPLOG/**"}]}},"scope-audio":{"identifier":"scope-audio","description":"This scope permits access to all files and list content of top level directories in the `$AUDIO` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$AUDIO"},{"path":"$AUDIO/*"}]}},"scope-audio-index":{"identifier":"scope-audio-index","description":"This scope permits to list all files and folders in the `$AUDIO`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$AUDIO"}]}},"scope-audio-recursive":{"identifier":"scope-audio-recursive","description":"This scope permits recursive access to the complete `$AUDIO` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$AUDIO"},{"path":"$AUDIO/**"}]}},"scope-cache":{"identifier":"scope-cache","description":"This scope permits access to all files and list content of top level directories in the `$CACHE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CACHE"},{"path":"$CACHE/*"}]}},"scope-cache-index":{"identifier":"scope-cache-index","description":"This scope permits to list all files and folders in the `$CACHE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CACHE"}]}},"scope-cache-recursive":{"identifier":"scope-cache-recursive","description":"This scope permits recursive access to the complete `$CACHE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CACHE"},{"path":"$CACHE/**"}]}},"scope-config":{"identifier":"scope-config","description":"This scope permits access to all files and list content of top level directories in the `$CONFIG` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CONFIG"},{"path":"$CONFIG/*"}]}},"scope-config-index":{"identifier":"scope-config-index","description":"This scope permits to list all files and folders in the `$CONFIG`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CONFIG"}]}},"scope-config-recursive":{"identifier":"scope-config-recursive","description":"This scope permits recursive access to the complete `$CONFIG` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$CONFIG"},{"path":"$CONFIG/**"}]}},"scope-data":{"identifier":"scope-data","description":"This scope permits access to all files and list content of top level directories in the `$DATA` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DATA"},{"path":"$DATA/*"}]}},"scope-data-index":{"identifier":"scope-data-index","description":"This scope permits to list all files and folders in the `$DATA`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DATA"}]}},"scope-data-recursive":{"identifier":"scope-data-recursive","description":"This scope permits recursive access to the complete `$DATA` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DATA"},{"path":"$DATA/**"}]}},"scope-desktop":{"identifier":"scope-desktop","description":"This scope permits access to all files and list content of top level directories in the `$DESKTOP` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DESKTOP"},{"path":"$DESKTOP/*"}]}},"scope-desktop-index":{"identifier":"scope-desktop-index","description":"This scope permits to list all files and folders in the `$DESKTOP`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DESKTOP"}]}},"scope-desktop-recursive":{"identifier":"scope-desktop-recursive","description":"This scope permits recursive access to the complete `$DESKTOP` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DESKTOP"},{"path":"$DESKTOP/**"}]}},"scope-document":{"identifier":"scope-document","description":"This scope permits access to all files and list content of top level directories in the `$DOCUMENT` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOCUMENT"},{"path":"$DOCUMENT/*"}]}},"scope-document-index":{"identifier":"scope-document-index","description":"This scope permits to list all files and folders in the `$DOCUMENT`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOCUMENT"}]}},"scope-document-recursive":{"identifier":"scope-document-recursive","description":"This scope permits recursive access to the complete `$DOCUMENT` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOCUMENT"},{"path":"$DOCUMENT/**"}]}},"scope-download":{"identifier":"scope-download","description":"This scope permits access to all files and list content of top level directories in the `$DOWNLOAD` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOWNLOAD"},{"path":"$DOWNLOAD/*"}]}},"scope-download-index":{"identifier":"scope-download-index","description":"This scope permits to list all files and folders in the `$DOWNLOAD`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOWNLOAD"}]}},"scope-download-recursive":{"identifier":"scope-download-recursive","description":"This scope permits recursive access to the complete `$DOWNLOAD` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$DOWNLOAD"},{"path":"$DOWNLOAD/**"}]}},"scope-exe":{"identifier":"scope-exe","description":"This scope permits access to all files and list content of top level directories in the `$EXE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$EXE"},{"path":"$EXE/*"}]}},"scope-exe-index":{"identifier":"scope-exe-index","description":"This scope permits to list all files and folders in the `$EXE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$EXE"}]}},"scope-exe-recursive":{"identifier":"scope-exe-recursive","description":"This scope permits recursive access to the complete `$EXE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$EXE"},{"path":"$EXE/**"}]}},"scope-font":{"identifier":"scope-font","description":"This scope permits access to all files and list content of top level directories in the `$FONT` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$FONT"},{"path":"$FONT/*"}]}},"scope-font-index":{"identifier":"scope-font-index","description":"This scope permits to list all files and folders in the `$FONT`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$FONT"}]}},"scope-font-recursive":{"identifier":"scope-font-recursive","description":"This scope permits recursive access to the complete `$FONT` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$FONT"},{"path":"$FONT/**"}]}},"scope-home":{"identifier":"scope-home","description":"This scope permits access to all files and list content of top level directories in the `$HOME` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$HOME"},{"path":"$HOME/*"}]}},"scope-home-index":{"identifier":"scope-home-index","description":"This scope permits to list all files and folders in the `$HOME`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$HOME"}]}},"scope-home-recursive":{"identifier":"scope-home-recursive","description":"This scope permits recursive access to the complete `$HOME` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$HOME"},{"path":"$HOME/**"}]}},"scope-localdata":{"identifier":"scope-localdata","description":"This scope permits access to all files and list content of top level directories in the `$LOCALDATA` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOCALDATA"},{"path":"$LOCALDATA/*"}]}},"scope-localdata-index":{"identifier":"scope-localdata-index","description":"This scope permits to list all files and folders in the `$LOCALDATA`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOCALDATA"}]}},"scope-localdata-recursive":{"identifier":"scope-localdata-recursive","description":"This scope permits recursive access to the complete `$LOCALDATA` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOCALDATA"},{"path":"$LOCALDATA/**"}]}},"scope-log":{"identifier":"scope-log","description":"This scope permits access to all files and list content of top level directories in the `$LOG` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOG"},{"path":"$LOG/*"}]}},"scope-log-index":{"identifier":"scope-log-index","description":"This scope permits to list all files and folders in the `$LOG`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOG"}]}},"scope-log-recursive":{"identifier":"scope-log-recursive","description":"This scope permits recursive access to the complete `$LOG` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$LOG"},{"path":"$LOG/**"}]}},"scope-picture":{"identifier":"scope-picture","description":"This scope permits access to all files and list content of top level directories in the `$PICTURE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PICTURE"},{"path":"$PICTURE/*"}]}},"scope-picture-index":{"identifier":"scope-picture-index","description":"This scope permits to list all files and folders in the `$PICTURE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PICTURE"}]}},"scope-picture-recursive":{"identifier":"scope-picture-recursive","description":"This scope permits recursive access to the complete `$PICTURE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PICTURE"},{"path":"$PICTURE/**"}]}},"scope-public":{"identifier":"scope-public","description":"This scope permits access to all files and list content of top level directories in the `$PUBLIC` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PUBLIC"},{"path":"$PUBLIC/*"}]}},"scope-public-index":{"identifier":"scope-public-index","description":"This scope permits to list all files and folders in the `$PUBLIC`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PUBLIC"}]}},"scope-public-recursive":{"identifier":"scope-public-recursive","description":"This scope permits recursive access to the complete `$PUBLIC` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$PUBLIC"},{"path":"$PUBLIC/**"}]}},"scope-resource":{"identifier":"scope-resource","description":"This scope permits access to all files and list content of top level directories in the `$RESOURCE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RESOURCE"},{"path":"$RESOURCE/*"}]}},"scope-resource-index":{"identifier":"scope-resource-index","description":"This scope permits to list all files and folders in the `$RESOURCE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RESOURCE"}]}},"scope-resource-recursive":{"identifier":"scope-resource-recursive","description":"This scope permits recursive access to the complete `$RESOURCE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RESOURCE"},{"path":"$RESOURCE/**"}]}},"scope-runtime":{"identifier":"scope-runtime","description":"This scope permits access to all files and list content of top level directories in the `$RUNTIME` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RUNTIME"},{"path":"$RUNTIME/*"}]}},"scope-runtime-index":{"identifier":"scope-runtime-index","description":"This scope permits to list all files and folders in the `$RUNTIME`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RUNTIME"}]}},"scope-runtime-recursive":{"identifier":"scope-runtime-recursive","description":"This scope permits recursive access to the complete `$RUNTIME` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$RUNTIME"},{"path":"$RUNTIME/**"}]}},"scope-temp":{"identifier":"scope-temp","description":"This scope permits access to all files and list content of top level directories in the `$TEMP` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMP"},{"path":"$TEMP/*"}]}},"scope-temp-index":{"identifier":"scope-temp-index","description":"This scope permits to list all files and folders in the `$TEMP`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMP"}]}},"scope-temp-recursive":{"identifier":"scope-temp-recursive","description":"This scope permits recursive access to the complete `$TEMP` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMP"},{"path":"$TEMP/**"}]}},"scope-template":{"identifier":"scope-template","description":"This scope permits access to all files and list content of top level directories in the `$TEMPLATE` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMPLATE"},{"path":"$TEMPLATE/*"}]}},"scope-template-index":{"identifier":"scope-template-index","description":"This scope permits to list all files and folders in the `$TEMPLATE`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMPLATE"}]}},"scope-template-recursive":{"identifier":"scope-template-recursive","description":"This scope permits recursive access to the complete `$TEMPLATE` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$TEMPLATE"},{"path":"$TEMPLATE/**"}]}},"scope-video":{"identifier":"scope-video","description":"This scope permits access to all files and list content of top level directories in the `$VIDEO` folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$VIDEO"},{"path":"$VIDEO/*"}]}},"scope-video-index":{"identifier":"scope-video-index","description":"This scope permits to list all files and folders in the `$VIDEO`folder.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$VIDEO"}]}},"scope-video-recursive":{"identifier":"scope-video-recursive","description":"This scope permits recursive access to the complete `$VIDEO` folder, including sub directories and files.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"path":"$VIDEO"},{"path":"$VIDEO/**"}]}},"write-all":{"identifier":"write-all","description":"This enables all write related commands without any pre-configured accessible paths.","commands":{"allow":["mkdir","create","copy_file","remove","rename","truncate","ftruncate","write","write_file","write_text_file"],"deny":[]}},"write-files":{"identifier":"write-files","description":"This enables all file write related commands without any pre-configured accessible paths.","commands":{"allow":["create","copy_file","remove","rename","truncate","ftruncate","write","write_file","write_text_file"],"deny":[]}}},"permission_sets":{"allow-app-meta":{"identifier":"allow-app-meta","description":"This allows non-recursive read access to metadata of the application folders, including file listing and statistics.","permissions":["read-meta","scope-app-index"]},"allow-app-meta-recursive":{"identifier":"allow-app-meta-recursive","description":"This allows full recursive read access to metadata of the application folders, including file listing and statistics.","permissions":["read-meta","scope-app-recursive"]},"allow-app-read":{"identifier":"allow-app-read","description":"This allows non-recursive read access to the application folders.","permissions":["read-all","scope-app"]},"allow-app-read-recursive":{"identifier":"allow-app-read-recursive","description":"This allows full recursive read access to the complete application folders, files and subdirectories.","permissions":["read-all","scope-app-recursive"]},"allow-app-write":{"identifier":"allow-app-write","description":"This allows non-recursive write access to the application folders.","permissions":["write-all","scope-app"]},"allow-app-write-recursive":{"identifier":"allow-app-write-recursive","description":"This allows full recursive write access to the complete application folders, files and subdirectories.","permissions":["write-all","scope-app-recursive"]},"allow-appcache-meta":{"identifier":"allow-appcache-meta","description":"This allows non-recursive read access to metadata of the `$APPCACHE` folder, including file listing and statistics.","permissions":["read-meta","scope-appcache-index"]},"allow-appcache-meta-recursive":{"identifier":"allow-appcache-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPCACHE` folder, including file listing and statistics.","permissions":["read-meta","scope-appcache-recursive"]},"allow-appcache-read":{"identifier":"allow-appcache-read","description":"This allows non-recursive read access to the `$APPCACHE` folder.","permissions":["read-all","scope-appcache"]},"allow-appcache-read-recursive":{"identifier":"allow-appcache-read-recursive","description":"This allows full recursive read access to the complete `$APPCACHE` folder, files and subdirectories.","permissions":["read-all","scope-appcache-recursive"]},"allow-appcache-write":{"identifier":"allow-appcache-write","description":"This allows non-recursive write access to the `$APPCACHE` folder.","permissions":["write-all","scope-appcache"]},"allow-appcache-write-recursive":{"identifier":"allow-appcache-write-recursive","description":"This allows full recursive write access to the complete `$APPCACHE` folder, files and subdirectories.","permissions":["write-all","scope-appcache-recursive"]},"allow-appconfig-meta":{"identifier":"allow-appconfig-meta","description":"This allows non-recursive read access to metadata of the `$APPCONFIG` folder, including file listing and statistics.","permissions":["read-meta","scope-appconfig-index"]},"allow-appconfig-meta-recursive":{"identifier":"allow-appconfig-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPCONFIG` folder, including file listing and statistics.","permissions":["read-meta","scope-appconfig-recursive"]},"allow-appconfig-read":{"identifier":"allow-appconfig-read","description":"This allows non-recursive read access to the `$APPCONFIG` folder.","permissions":["read-all","scope-appconfig"]},"allow-appconfig-read-recursive":{"identifier":"allow-appconfig-read-recursive","description":"This allows full recursive read access to the complete `$APPCONFIG` folder, files and subdirectories.","permissions":["read-all","scope-appconfig-recursive"]},"allow-appconfig-write":{"identifier":"allow-appconfig-write","description":"This allows non-recursive write access to the `$APPCONFIG` folder.","permissions":["write-all","scope-appconfig"]},"allow-appconfig-write-recursive":{"identifier":"allow-appconfig-write-recursive","description":"This allows full recursive write access to the complete `$APPCONFIG` folder, files and subdirectories.","permissions":["write-all","scope-appconfig-recursive"]},"allow-appdata-meta":{"identifier":"allow-appdata-meta","description":"This allows non-recursive read access to metadata of the `$APPDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-appdata-index"]},"allow-appdata-meta-recursive":{"identifier":"allow-appdata-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-appdata-recursive"]},"allow-appdata-read":{"identifier":"allow-appdata-read","description":"This allows non-recursive read access to the `$APPDATA` folder.","permissions":["read-all","scope-appdata"]},"allow-appdata-read-recursive":{"identifier":"allow-appdata-read-recursive","description":"This allows full recursive read access to the complete `$APPDATA` folder, files and subdirectories.","permissions":["read-all","scope-appdata-recursive"]},"allow-appdata-write":{"identifier":"allow-appdata-write","description":"This allows non-recursive write access to the `$APPDATA` folder.","permissions":["write-all","scope-appdata"]},"allow-appdata-write-recursive":{"identifier":"allow-appdata-write-recursive","description":"This allows full recursive write access to the complete `$APPDATA` folder, files and subdirectories.","permissions":["write-all","scope-appdata-recursive"]},"allow-applocaldata-meta":{"identifier":"allow-applocaldata-meta","description":"This allows non-recursive read access to metadata of the `$APPLOCALDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-applocaldata-index"]},"allow-applocaldata-meta-recursive":{"identifier":"allow-applocaldata-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPLOCALDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-applocaldata-recursive"]},"allow-applocaldata-read":{"identifier":"allow-applocaldata-read","description":"This allows non-recursive read access to the `$APPLOCALDATA` folder.","permissions":["read-all","scope-applocaldata"]},"allow-applocaldata-read-recursive":{"identifier":"allow-applocaldata-read-recursive","description":"This allows full recursive read access to the complete `$APPLOCALDATA` folder, files and subdirectories.","permissions":["read-all","scope-applocaldata-recursive"]},"allow-applocaldata-write":{"identifier":"allow-applocaldata-write","description":"This allows non-recursive write access to the `$APPLOCALDATA` folder.","permissions":["write-all","scope-applocaldata"]},"allow-applocaldata-write-recursive":{"identifier":"allow-applocaldata-write-recursive","description":"This allows full recursive write access to the complete `$APPLOCALDATA` folder, files and subdirectories.","permissions":["write-all","scope-applocaldata-recursive"]},"allow-applog-meta":{"identifier":"allow-applog-meta","description":"This allows non-recursive read access to metadata of the `$APPLOG` folder, including file listing and statistics.","permissions":["read-meta","scope-applog-index"]},"allow-applog-meta-recursive":{"identifier":"allow-applog-meta-recursive","description":"This allows full recursive read access to metadata of the `$APPLOG` folder, including file listing and statistics.","permissions":["read-meta","scope-applog-recursive"]},"allow-applog-read":{"identifier":"allow-applog-read","description":"This allows non-recursive read access to the `$APPLOG` folder.","permissions":["read-all","scope-applog"]},"allow-applog-read-recursive":{"identifier":"allow-applog-read-recursive","description":"This allows full recursive read access to the complete `$APPLOG` folder, files and subdirectories.","permissions":["read-all","scope-applog-recursive"]},"allow-applog-write":{"identifier":"allow-applog-write","description":"This allows non-recursive write access to the `$APPLOG` folder.","permissions":["write-all","scope-applog"]},"allow-applog-write-recursive":{"identifier":"allow-applog-write-recursive","description":"This allows full recursive write access to the complete `$APPLOG` folder, files and subdirectories.","permissions":["write-all","scope-applog-recursive"]},"allow-audio-meta":{"identifier":"allow-audio-meta","description":"This allows non-recursive read access to metadata of the `$AUDIO` folder, including file listing and statistics.","permissions":["read-meta","scope-audio-index"]},"allow-audio-meta-recursive":{"identifier":"allow-audio-meta-recursive","description":"This allows full recursive read access to metadata of the `$AUDIO` folder, including file listing and statistics.","permissions":["read-meta","scope-audio-recursive"]},"allow-audio-read":{"identifier":"allow-audio-read","description":"This allows non-recursive read access to the `$AUDIO` folder.","permissions":["read-all","scope-audio"]},"allow-audio-read-recursive":{"identifier":"allow-audio-read-recursive","description":"This allows full recursive read access to the complete `$AUDIO` folder, files and subdirectories.","permissions":["read-all","scope-audio-recursive"]},"allow-audio-write":{"identifier":"allow-audio-write","description":"This allows non-recursive write access to the `$AUDIO` folder.","permissions":["write-all","scope-audio"]},"allow-audio-write-recursive":{"identifier":"allow-audio-write-recursive","description":"This allows full recursive write access to the complete `$AUDIO` folder, files and subdirectories.","permissions":["write-all","scope-audio-recursive"]},"allow-cache-meta":{"identifier":"allow-cache-meta","description":"This allows non-recursive read access to metadata of the `$CACHE` folder, including file listing and statistics.","permissions":["read-meta","scope-cache-index"]},"allow-cache-meta-recursive":{"identifier":"allow-cache-meta-recursive","description":"This allows full recursive read access to metadata of the `$CACHE` folder, including file listing and statistics.","permissions":["read-meta","scope-cache-recursive"]},"allow-cache-read":{"identifier":"allow-cache-read","description":"This allows non-recursive read access to the `$CACHE` folder.","permissions":["read-all","scope-cache"]},"allow-cache-read-recursive":{"identifier":"allow-cache-read-recursive","description":"This allows full recursive read access to the complete `$CACHE` folder, files and subdirectories.","permissions":["read-all","scope-cache-recursive"]},"allow-cache-write":{"identifier":"allow-cache-write","description":"This allows non-recursive write access to the `$CACHE` folder.","permissions":["write-all","scope-cache"]},"allow-cache-write-recursive":{"identifier":"allow-cache-write-recursive","description":"This allows full recursive write access to the complete `$CACHE` folder, files and subdirectories.","permissions":["write-all","scope-cache-recursive"]},"allow-config-meta":{"identifier":"allow-config-meta","description":"This allows non-recursive read access to metadata of the `$CONFIG` folder, including file listing and statistics.","permissions":["read-meta","scope-config-index"]},"allow-config-meta-recursive":{"identifier":"allow-config-meta-recursive","description":"This allows full recursive read access to metadata of the `$CONFIG` folder, including file listing and statistics.","permissions":["read-meta","scope-config-recursive"]},"allow-config-read":{"identifier":"allow-config-read","description":"This allows non-recursive read access to the `$CONFIG` folder.","permissions":["read-all","scope-config"]},"allow-config-read-recursive":{"identifier":"allow-config-read-recursive","description":"This allows full recursive read access to the complete `$CONFIG` folder, files and subdirectories.","permissions":["read-all","scope-config-recursive"]},"allow-config-write":{"identifier":"allow-config-write","description":"This allows non-recursive write access to the `$CONFIG` folder.","permissions":["write-all","scope-config"]},"allow-config-write-recursive":{"identifier":"allow-config-write-recursive","description":"This allows full recursive write access to the complete `$CONFIG` folder, files and subdirectories.","permissions":["write-all","scope-config-recursive"]},"allow-data-meta":{"identifier":"allow-data-meta","description":"This allows non-recursive read access to metadata of the `$DATA` folder, including file listing and statistics.","permissions":["read-meta","scope-data-index"]},"allow-data-meta-recursive":{"identifier":"allow-data-meta-recursive","description":"This allows full recursive read access to metadata of the `$DATA` folder, including file listing and statistics.","permissions":["read-meta","scope-data-recursive"]},"allow-data-read":{"identifier":"allow-data-read","description":"This allows non-recursive read access to the `$DATA` folder.","permissions":["read-all","scope-data"]},"allow-data-read-recursive":{"identifier":"allow-data-read-recursive","description":"This allows full recursive read access to the complete `$DATA` folder, files and subdirectories.","permissions":["read-all","scope-data-recursive"]},"allow-data-write":{"identifier":"allow-data-write","description":"This allows non-recursive write access to the `$DATA` folder.","permissions":["write-all","scope-data"]},"allow-data-write-recursive":{"identifier":"allow-data-write-recursive","description":"This allows full recursive write access to the complete `$DATA` folder, files and subdirectories.","permissions":["write-all","scope-data-recursive"]},"allow-desktop-meta":{"identifier":"allow-desktop-meta","description":"This allows non-recursive read access to metadata of the `$DESKTOP` folder, including file listing and statistics.","permissions":["read-meta","scope-desktop-index"]},"allow-desktop-meta-recursive":{"identifier":"allow-desktop-meta-recursive","description":"This allows full recursive read access to metadata of the `$DESKTOP` folder, including file listing and statistics.","permissions":["read-meta","scope-desktop-recursive"]},"allow-desktop-read":{"identifier":"allow-desktop-read","description":"This allows non-recursive read access to the `$DESKTOP` folder.","permissions":["read-all","scope-desktop"]},"allow-desktop-read-recursive":{"identifier":"allow-desktop-read-recursive","description":"This allows full recursive read access to the complete `$DESKTOP` folder, files and subdirectories.","permissions":["read-all","scope-desktop-recursive"]},"allow-desktop-write":{"identifier":"allow-desktop-write","description":"This allows non-recursive write access to the `$DESKTOP` folder.","permissions":["write-all","scope-desktop"]},"allow-desktop-write-recursive":{"identifier":"allow-desktop-write-recursive","description":"This allows full recursive write access to the complete `$DESKTOP` folder, files and subdirectories.","permissions":["write-all","scope-desktop-recursive"]},"allow-document-meta":{"identifier":"allow-document-meta","description":"This allows non-recursive read access to metadata of the `$DOCUMENT` folder, including file listing and statistics.","permissions":["read-meta","scope-document-index"]},"allow-document-meta-recursive":{"identifier":"allow-document-meta-recursive","description":"This allows full recursive read access to metadata of the `$DOCUMENT` folder, including file listing and statistics.","permissions":["read-meta","scope-document-recursive"]},"allow-document-read":{"identifier":"allow-document-read","description":"This allows non-recursive read access to the `$DOCUMENT` folder.","permissions":["read-all","scope-document"]},"allow-document-read-recursive":{"identifier":"allow-document-read-recursive","description":"This allows full recursive read access to the complete `$DOCUMENT` folder, files and subdirectories.","permissions":["read-all","scope-document-recursive"]},"allow-document-write":{"identifier":"allow-document-write","description":"This allows non-recursive write access to the `$DOCUMENT` folder.","permissions":["write-all","scope-document"]},"allow-document-write-recursive":{"identifier":"allow-document-write-recursive","description":"This allows full recursive write access to the complete `$DOCUMENT` folder, files and subdirectories.","permissions":["write-all","scope-document-recursive"]},"allow-download-meta":{"identifier":"allow-download-meta","description":"This allows non-recursive read access to metadata of the `$DOWNLOAD` folder, including file listing and statistics.","permissions":["read-meta","scope-download-index"]},"allow-download-meta-recursive":{"identifier":"allow-download-meta-recursive","description":"This allows full recursive read access to metadata of the `$DOWNLOAD` folder, including file listing and statistics.","permissions":["read-meta","scope-download-recursive"]},"allow-download-read":{"identifier":"allow-download-read","description":"This allows non-recursive read access to the `$DOWNLOAD` folder.","permissions":["read-all","scope-download"]},"allow-download-read-recursive":{"identifier":"allow-download-read-recursive","description":"This allows full recursive read access to the complete `$DOWNLOAD` folder, files and subdirectories.","permissions":["read-all","scope-download-recursive"]},"allow-download-write":{"identifier":"allow-download-write","description":"This allows non-recursive write access to the `$DOWNLOAD` folder.","permissions":["write-all","scope-download"]},"allow-download-write-recursive":{"identifier":"allow-download-write-recursive","description":"This allows full recursive write access to the complete `$DOWNLOAD` folder, files and subdirectories.","permissions":["write-all","scope-download-recursive"]},"allow-exe-meta":{"identifier":"allow-exe-meta","description":"This allows non-recursive read access to metadata of the `$EXE` folder, including file listing and statistics.","permissions":["read-meta","scope-exe-index"]},"allow-exe-meta-recursive":{"identifier":"allow-exe-meta-recursive","description":"This allows full recursive read access to metadata of the `$EXE` folder, including file listing and statistics.","permissions":["read-meta","scope-exe-recursive"]},"allow-exe-read":{"identifier":"allow-exe-read","description":"This allows non-recursive read access to the `$EXE` folder.","permissions":["read-all","scope-exe"]},"allow-exe-read-recursive":{"identifier":"allow-exe-read-recursive","description":"This allows full recursive read access to the complete `$EXE` folder, files and subdirectories.","permissions":["read-all","scope-exe-recursive"]},"allow-exe-write":{"identifier":"allow-exe-write","description":"This allows non-recursive write access to the `$EXE` folder.","permissions":["write-all","scope-exe"]},"allow-exe-write-recursive":{"identifier":"allow-exe-write-recursive","description":"This allows full recursive write access to the complete `$EXE` folder, files and subdirectories.","permissions":["write-all","scope-exe-recursive"]},"allow-font-meta":{"identifier":"allow-font-meta","description":"This allows non-recursive read access to metadata of the `$FONT` folder, including file listing and statistics.","permissions":["read-meta","scope-font-index"]},"allow-font-meta-recursive":{"identifier":"allow-font-meta-recursive","description":"This allows full recursive read access to metadata of the `$FONT` folder, including file listing and statistics.","permissions":["read-meta","scope-font-recursive"]},"allow-font-read":{"identifier":"allow-font-read","description":"This allows non-recursive read access to the `$FONT` folder.","permissions":["read-all","scope-font"]},"allow-font-read-recursive":{"identifier":"allow-font-read-recursive","description":"This allows full recursive read access to the complete `$FONT` folder, files and subdirectories.","permissions":["read-all","scope-font-recursive"]},"allow-font-write":{"identifier":"allow-font-write","description":"This allows non-recursive write access to the `$FONT` folder.","permissions":["write-all","scope-font"]},"allow-font-write-recursive":{"identifier":"allow-font-write-recursive","description":"This allows full recursive write access to the complete `$FONT` folder, files and subdirectories.","permissions":["write-all","scope-font-recursive"]},"allow-home-meta":{"identifier":"allow-home-meta","description":"This allows non-recursive read access to metadata of the `$HOME` folder, including file listing and statistics.","permissions":["read-meta","scope-home-index"]},"allow-home-meta-recursive":{"identifier":"allow-home-meta-recursive","description":"This allows full recursive read access to metadata of the `$HOME` folder, including file listing and statistics.","permissions":["read-meta","scope-home-recursive"]},"allow-home-read":{"identifier":"allow-home-read","description":"This allows non-recursive read access to the `$HOME` folder.","permissions":["read-all","scope-home"]},"allow-home-read-recursive":{"identifier":"allow-home-read-recursive","description":"This allows full recursive read access to the complete `$HOME` folder, files and subdirectories.","permissions":["read-all","scope-home-recursive"]},"allow-home-write":{"identifier":"allow-home-write","description":"This allows non-recursive write access to the `$HOME` folder.","permissions":["write-all","scope-home"]},"allow-home-write-recursive":{"identifier":"allow-home-write-recursive","description":"This allows full recursive write access to the complete `$HOME` folder, files and subdirectories.","permissions":["write-all","scope-home-recursive"]},"allow-localdata-meta":{"identifier":"allow-localdata-meta","description":"This allows non-recursive read access to metadata of the `$LOCALDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-localdata-index"]},"allow-localdata-meta-recursive":{"identifier":"allow-localdata-meta-recursive","description":"This allows full recursive read access to metadata of the `$LOCALDATA` folder, including file listing and statistics.","permissions":["read-meta","scope-localdata-recursive"]},"allow-localdata-read":{"identifier":"allow-localdata-read","description":"This allows non-recursive read access to the `$LOCALDATA` folder.","permissions":["read-all","scope-localdata"]},"allow-localdata-read-recursive":{"identifier":"allow-localdata-read-recursive","description":"This allows full recursive read access to the complete `$LOCALDATA` folder, files and subdirectories.","permissions":["read-all","scope-localdata-recursive"]},"allow-localdata-write":{"identifier":"allow-localdata-write","description":"This allows non-recursive write access to the `$LOCALDATA` folder.","permissions":["write-all","scope-localdata"]},"allow-localdata-write-recursive":{"identifier":"allow-localdata-write-recursive","description":"This allows full recursive write access to the complete `$LOCALDATA` folder, files and subdirectories.","permissions":["write-all","scope-localdata-recursive"]},"allow-log-meta":{"identifier":"allow-log-meta","description":"This allows non-recursive read access to metadata of the `$LOG` folder, including file listing and statistics.","permissions":["read-meta","scope-log-index"]},"allow-log-meta-recursive":{"identifier":"allow-log-meta-recursive","description":"This allows full recursive read access to metadata of the `$LOG` folder, including file listing and statistics.","permissions":["read-meta","scope-log-recursive"]},"allow-log-read":{"identifier":"allow-log-read","description":"This allows non-recursive read access to the `$LOG` folder.","permissions":["read-all","scope-log"]},"allow-log-read-recursive":{"identifier":"allow-log-read-recursive","description":"This allows full recursive read access to the complete `$LOG` folder, files and subdirectories.","permissions":["read-all","scope-log-recursive"]},"allow-log-write":{"identifier":"allow-log-write","description":"This allows non-recursive write access to the `$LOG` folder.","permissions":["write-all","scope-log"]},"allow-log-write-recursive":{"identifier":"allow-log-write-recursive","description":"This allows full recursive write access to the complete `$LOG` folder, files and subdirectories.","permissions":["write-all","scope-log-recursive"]},"allow-picture-meta":{"identifier":"allow-picture-meta","description":"This allows non-recursive read access to metadata of the `$PICTURE` folder, including file listing and statistics.","permissions":["read-meta","scope-picture-index"]},"allow-picture-meta-recursive":{"identifier":"allow-picture-meta-recursive","description":"This allows full recursive read access to metadata of the `$PICTURE` folder, including file listing and statistics.","permissions":["read-meta","scope-picture-recursive"]},"allow-picture-read":{"identifier":"allow-picture-read","description":"This allows non-recursive read access to the `$PICTURE` folder.","permissions":["read-all","scope-picture"]},"allow-picture-read-recursive":{"identifier":"allow-picture-read-recursive","description":"This allows full recursive read access to the complete `$PICTURE` folder, files and subdirectories.","permissions":["read-all","scope-picture-recursive"]},"allow-picture-write":{"identifier":"allow-picture-write","description":"This allows non-recursive write access to the `$PICTURE` folder.","permissions":["write-all","scope-picture"]},"allow-picture-write-recursive":{"identifier":"allow-picture-write-recursive","description":"This allows full recursive write access to the complete `$PICTURE` folder, files and subdirectories.","permissions":["write-all","scope-picture-recursive"]},"allow-public-meta":{"identifier":"allow-public-meta","description":"This allows non-recursive read access to metadata of the `$PUBLIC` folder, including file listing and statistics.","permissions":["read-meta","scope-public-index"]},"allow-public-meta-recursive":{"identifier":"allow-public-meta-recursive","description":"This allows full recursive read access to metadata of the `$PUBLIC` folder, including file listing and statistics.","permissions":["read-meta","scope-public-recursive"]},"allow-public-read":{"identifier":"allow-public-read","description":"This allows non-recursive read access to the `$PUBLIC` folder.","permissions":["read-all","scope-public"]},"allow-public-read-recursive":{"identifier":"allow-public-read-recursive","description":"This allows full recursive read access to the complete `$PUBLIC` folder, files and subdirectories.","permissions":["read-all","scope-public-recursive"]},"allow-public-write":{"identifier":"allow-public-write","description":"This allows non-recursive write access to the `$PUBLIC` folder.","permissions":["write-all","scope-public"]},"allow-public-write-recursive":{"identifier":"allow-public-write-recursive","description":"This allows full recursive write access to the complete `$PUBLIC` folder, files and subdirectories.","permissions":["write-all","scope-public-recursive"]},"allow-resource-meta":{"identifier":"allow-resource-meta","description":"This allows non-recursive read access to metadata of the `$RESOURCE` folder, including file listing and statistics.","permissions":["read-meta","scope-resource-index"]},"allow-resource-meta-recursive":{"identifier":"allow-resource-meta-recursive","description":"This allows full recursive read access to metadata of the `$RESOURCE` folder, including file listing and statistics.","permissions":["read-meta","scope-resource-recursive"]},"allow-resource-read":{"identifier":"allow-resource-read","description":"This allows non-recursive read access to the `$RESOURCE` folder.","permissions":["read-all","scope-resource"]},"allow-resource-read-recursive":{"identifier":"allow-resource-read-recursive","description":"This allows full recursive read access to the complete `$RESOURCE` folder, files and subdirectories.","permissions":["read-all","scope-resource-recursive"]},"allow-resource-write":{"identifier":"allow-resource-write","description":"This allows non-recursive write access to the `$RESOURCE` folder.","permissions":["write-all","scope-resource"]},"allow-resource-write-recursive":{"identifier":"allow-resource-write-recursive","description":"This allows full recursive write access to the complete `$RESOURCE` folder, files and subdirectories.","permissions":["write-all","scope-resource-recursive"]},"allow-runtime-meta":{"identifier":"allow-runtime-meta","description":"This allows non-recursive read access to metadata of the `$RUNTIME` folder, including file listing and statistics.","permissions":["read-meta","scope-runtime-index"]},"allow-runtime-meta-recursive":{"identifier":"allow-runtime-meta-recursive","description":"This allows full recursive read access to metadata of the `$RUNTIME` folder, including file listing and statistics.","permissions":["read-meta","scope-runtime-recursive"]},"allow-runtime-read":{"identifier":"allow-runtime-read","description":"This allows non-recursive read access to the `$RUNTIME` folder.","permissions":["read-all","scope-runtime"]},"allow-runtime-read-recursive":{"identifier":"allow-runtime-read-recursive","description":"This allows full recursive read access to the complete `$RUNTIME` folder, files and subdirectories.","permissions":["read-all","scope-runtime-recursive"]},"allow-runtime-write":{"identifier":"allow-runtime-write","description":"This allows non-recursive write access to the `$RUNTIME` folder.","permissions":["write-all","scope-runtime"]},"allow-runtime-write-recursive":{"identifier":"allow-runtime-write-recursive","description":"This allows full recursive write access to the complete `$RUNTIME` folder, files and subdirectories.","permissions":["write-all","scope-runtime-recursive"]},"allow-temp-meta":{"identifier":"allow-temp-meta","description":"This allows non-recursive read access to metadata of the `$TEMP` folder, including file listing and statistics.","permissions":["read-meta","scope-temp-index"]},"allow-temp-meta-recursive":{"identifier":"allow-temp-meta-recursive","description":"This allows full recursive read access to metadata of the `$TEMP` folder, including file listing and statistics.","permissions":["read-meta","scope-temp-recursive"]},"allow-temp-read":{"identifier":"allow-temp-read","description":"This allows non-recursive read access to the `$TEMP` folder.","permissions":["read-all","scope-temp"]},"allow-temp-read-recursive":{"identifier":"allow-temp-read-recursive","description":"This allows full recursive read access to the complete `$TEMP` folder, files and subdirectories.","permissions":["read-all","scope-temp-recursive"]},"allow-temp-write":{"identifier":"allow-temp-write","description":"This allows non-recursive write access to the `$TEMP` folder.","permissions":["write-all","scope-temp"]},"allow-temp-write-recursive":{"identifier":"allow-temp-write-recursive","description":"This allows full recursive write access to the complete `$TEMP` folder, files and subdirectories.","permissions":["write-all","scope-temp-recursive"]},"allow-template-meta":{"identifier":"allow-template-meta","description":"This allows non-recursive read access to metadata of the `$TEMPLATE` folder, including file listing and statistics.","permissions":["read-meta","scope-template-index"]},"allow-template-meta-recursive":{"identifier":"allow-template-meta-recursive","description":"This allows full recursive read access to metadata of the `$TEMPLATE` folder, including file listing and statistics.","permissions":["read-meta","scope-template-recursive"]},"allow-template-read":{"identifier":"allow-template-read","description":"This allows non-recursive read access to the `$TEMPLATE` folder.","permissions":["read-all","scope-template"]},"allow-template-read-recursive":{"identifier":"allow-template-read-recursive","description":"This allows full recursive read access to the complete `$TEMPLATE` folder, files and subdirectories.","permissions":["read-all","scope-template-recursive"]},"allow-template-write":{"identifier":"allow-template-write","description":"This allows non-recursive write access to the `$TEMPLATE` folder.","permissions":["write-all","scope-template"]},"allow-template-write-recursive":{"identifier":"allow-template-write-recursive","description":"This allows full recursive write access to the complete `$TEMPLATE` folder, files and subdirectories.","permissions":["write-all","scope-template-recursive"]},"allow-video-meta":{"identifier":"allow-video-meta","description":"This allows non-recursive read access to metadata of the `$VIDEO` folder, including file listing and statistics.","permissions":["read-meta","scope-video-index"]},"allow-video-meta-recursive":{"identifier":"allow-video-meta-recursive","description":"This allows full recursive read access to metadata of the `$VIDEO` folder, including file listing and statistics.","permissions":["read-meta","scope-video-recursive"]},"allow-video-read":{"identifier":"allow-video-read","description":"This allows non-recursive read access to the `$VIDEO` folder.","permissions":["read-all","scope-video"]},"allow-video-read-recursive":{"identifier":"allow-video-read-recursive","description":"This allows full recursive read access to the complete `$VIDEO` folder, files and subdirectories.","permissions":["read-all","scope-video-recursive"]},"allow-video-write":{"identifier":"allow-video-write","description":"This allows non-recursive write access to the `$VIDEO` folder.","permissions":["write-all","scope-video"]},"allow-video-write-recursive":{"identifier":"allow-video-write-recursive","description":"This allows full recursive write access to the complete `$VIDEO` folder, files and subdirectories.","permissions":["write-all","scope-video-recursive"]},"deny-default":{"identifier":"deny-default","description":"This denies access to dangerous Tauri relevant files and folders by default.","permissions":["deny-webview-data-linux","deny-webview-data-windows"]}},"global_scope_schema":{"$schema":"http://json-schema.org/draft-07/schema#","anyOf":[{"description":"A path that can be accessed by the webview when using the fs APIs. FS scope path pattern.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.","type":"string"},{"properties":{"path":{"description":"A path that can be accessed by the webview when using the fs APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.","type":"string"}},"required":["path"],"type":"object"}],"description":"FS scope entry.","title":"FsScopeEntry"}},"opener":{"default_permission":{"identifier":"default","description":"This permission set allows opening `mailto:`, `tel:`, `https://` and `http://` urls using their default application\nas well as reveal file in directories using default file explorer","permissions":["allow-open-url","allow-reveal-item-in-dir","allow-default-urls"]},"permissions":{"allow-default-urls":{"identifier":"allow-default-urls","description":"This enables opening `mailto:`, `tel:`, `https://` and `http://` urls using their default application.","commands":{"allow":[],"deny":[]},"scope":{"allow":[{"url":"mailto:*"},{"url":"tel:*"},{"url":"http://*"},{"url":"https://*"}]}},"allow-open-path":{"identifier":"allow-open-path","description":"Enables the open_path command without any pre-configured scope.","commands":{"allow":["open_path"],"deny":[]}},"allow-open-url":{"identifier":"allow-open-url","description":"Enables the open_url command without any pre-configured scope.","commands":{"allow":["open_url"],"deny":[]}},"allow-reveal-item-in-dir":{"identifier":"allow-reveal-item-in-dir","description":"Enables the reveal_item_in_dir command without any pre-configured scope.","commands":{"allow":["reveal_item_in_dir"],"deny":[]}},"deny-open-path":{"identifier":"deny-open-path","description":"Denies the open_path command without any pre-configured scope.","commands":{"allow":[],"deny":["open_path"]}},"deny-open-url":{"identifier":"deny-open-url","description":"Denies the open_url command without any pre-configured scope.","commands":{"allow":[],"deny":["open_url"]}},"deny-reveal-item-in-dir":{"identifier":"deny-reveal-item-in-dir","description":"Denies the reveal_item_in_dir command without any pre-configured scope.","commands":{"allow":[],"deny":["reveal_item_in_dir"]}}},"permission_sets":{},"global_scope_schema":{"$schema":"http://json-schema.org/draft-07/schema#","anyOf":[{"properties":{"app":{"allOf":[{"$ref":"#/definitions/Application"}],"description":"An application to open this url with, for example: firefox."},"url":{"description":"A URL that can be opened by the webview when using the Opener APIs.\n\nWildcards can be used following the UNIX glob pattern.\n\nExamples:\n\n- \"https://*\" : allows all HTTPS origin\n\n- \"https://*.github.com/tauri-apps/tauri\": allows any subdomain of \"github.com\" with the \"tauri-apps/api\" path\n\n- \"https://myapi.service.com/users/*\": allows access to any URLs that begins with \"https://myapi.service.com/users/\"","type":"string"}},"required":["url"],"type":"object"},{"properties":{"app":{"allOf":[{"$ref":"#/definitions/Application"}],"description":"An application to open this path with, for example: xdg-open."},"path":{"description":"A path that can be opened by the webview when using the Opener APIs.\n\nThe pattern can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.","type":"string"}},"required":["path"],"type":"object"}],"definitions":{"Application":{"anyOf":[{"description":"Open in default application.","type":"null"},{"description":"If true, allow open with any application.","type":"boolean"},{"description":"Allow specific application to open with.","type":"string"}],"description":"Opener scope application."}},"description":"Opener scope entry.","title":"OpenerScopeEntry"}},"shell":{"default_permission":{"identifier":"default","description":"This permission set configures which\nshell functionality is exposed by default.\n\n#### Granted Permissions\n\nIt allows to use the `open` functionality with a reasonable\nscope pre-configured. It will allow opening `http(s)://`,\n`tel:` and `mailto:` links.\n","permissions":["allow-open"]},"permissions":{"allow-execute":{"identifier":"allow-execute","description":"Enables the execute command without any pre-configured scope.","commands":{"allow":["execute"],"deny":[]}},"allow-kill":{"identifier":"allow-kill","description":"Enables the kill command without any pre-configured scope.","commands":{"allow":["kill"],"deny":[]}},"allow-open":{"identifier":"allow-open","description":"Enables the open command without any pre-configured scope.","commands":{"allow":["open"],"deny":[]}},"allow-spawn":{"identifier":"allow-spawn","description":"Enables the spawn command without any pre-configured scope.","commands":{"allow":["spawn"],"deny":[]}},"allow-stdin-write":{"identifier":"allow-stdin-write","description":"Enables the stdin_write command without any pre-configured scope.","commands":{"allow":["stdin_write"],"deny":[]}},"deny-execute":{"identifier":"deny-execute","description":"Denies the execute command without any pre-configured scope.","commands":{"allow":[],"deny":["execute"]}},"deny-kill":{"identifier":"deny-kill","description":"Denies the kill command without any pre-configured scope.","commands":{"allow":[],"deny":["kill"]}},"deny-open":{"identifier":"deny-open","description":"Denies the open command without any pre-configured scope.","commands":{"allow":[],"deny":["open"]}},"deny-spawn":{"identifier":"deny-spawn","description":"Denies the spawn command without any pre-configured scope.","commands":{"allow":[],"deny":["spawn"]}},"deny-stdin-write":{"identifier":"deny-stdin-write","description":"Denies the stdin_write command without any pre-configured scope.","commands":{"allow":[],"deny":["stdin_write"]}}},"permission_sets":{},"global_scope_schema":{"$schema":"http://json-schema.org/draft-07/schema#","anyOf":[{"additionalProperties":false,"properties":{"args":{"allOf":[{"$ref":"#/definitions/ShellScopeEntryAllowedArgs"}],"description":"The allowed arguments for the command execution."},"cmd":{"description":"The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.","type":"string"},"name":{"description":"The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.","type":"string"}},"required":["cmd","name"],"type":"object"},{"additionalProperties":false,"properties":{"args":{"allOf":[{"$ref":"#/definitions/ShellScopeEntryAllowedArgs"}],"description":"The allowed arguments for the command execution."},"name":{"description":"The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.","type":"string"},"sidecar":{"description":"If this command is a sidecar command.","type":"boolean"}},"required":["name","sidecar"],"type":"object"}],"definitions":{"ShellScopeEntryAllowedArg":{"anyOf":[{"description":"A non-configurable argument that is passed to the command in the order it was specified.","type":"string"},{"additionalProperties":false,"description":"A variable that is set while calling the command from the webview API.","properties":{"raw":{"default":false,"description":"Marks the validator as a raw regex, meaning the plugin should not make any modification at runtime.\n\nThis means the regex will not match on the entire string by default, which might be exploited if your regex allow unexpected input to be considered valid. When using this option, make sure your regex is correct.","type":"boolean"},"validator":{"description":"[regex] validator to require passed values to conform to an expected input.\n\nThis will require the argument value passed to this variable to match the `validator` regex before it will be executed.\n\nThe regex string is by default surrounded by `^...$` to match the full string. For example the `https?://\\w+` regex would be registered as `^https?://\\w+$`.\n\n[regex]: <https://docs.rs/regex/latest/regex/#syntax>","type":"string"}},"required":["validator"],"type":"object"}],"description":"A command argument allowed to be executed by the webview API."},"ShellScopeEntryAllowedArgs":{"anyOf":[{"description":"Use a simple boolean to allow all or disable all arguments to this command configuration.","type":"boolean"},{"description":"A specific set of [`ShellScopeEntryAllowedArg`] that are valid to call for the command configuration.","items":{"$ref":"#/definitions/ShellScopeEntryAllowedArg"},"type":"array"}],"description":"A set of command arguments allowed to be executed by the webview API.\n\nA value of `true` will allow any arguments to be passed to the command. `false` will disable all arguments. A list of [`ShellScopeEntryAllowedArg`] will set those arguments as the only valid arguments to be passed to the attached command configuration."}},"description":"Shell scope entry.","title":"ShellScopeEntry"}}}
@@ -11706,7 +11667,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/gen/schemas/capabilities.json`
+### 📄 文件: `src-tauri\gen\schemas\capabilities.json`
 
 ```json
 {"default":{"identifier":"default","description":"Capability for the main window","local":true,"windows":["main"],"permissions":["core:default","shell:allow-open","shell:default","opener:default",{"identifier":"fs:scope","allow":["$HOME/**"]}]}}
@@ -11714,7 +11675,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/gen/schemas/desktop-schema.json`
+### 📄 文件: `src-tauri\gen\schemas\desktop-schema.json`
 
 ```json
 {
@@ -18046,7 +18007,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/gen/schemas/linux-schema.json`
+### 📄 文件: `src-tauri\gen\schemas\windows-schema.json`
 
 ```json
 {
@@ -24378,7 +24339,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/128x128.png`
+### 📄 文件: `src-tauri\icons\128x128.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24386,7 +24347,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/128x128@2x.png`
+### 📄 文件: `src-tauri\icons\128x128@2x.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24394,7 +24355,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/32x32.png`
+### 📄 文件: `src-tauri\icons\32x32.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24402,7 +24363,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square107x107Logo.png`
+### 📄 文件: `src-tauri\icons\Square107x107Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24410,7 +24371,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square142x142Logo.png`
+### 📄 文件: `src-tauri\icons\Square142x142Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24418,7 +24379,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square150x150Logo.png`
+### 📄 文件: `src-tauri\icons\Square150x150Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24426,7 +24387,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square284x284Logo.png`
+### 📄 文件: `src-tauri\icons\Square284x284Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24434,7 +24395,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square30x30Logo.png`
+### 📄 文件: `src-tauri\icons\Square30x30Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24442,7 +24403,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square310x310Logo.png`
+### 📄 文件: `src-tauri\icons\Square310x310Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24450,7 +24411,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square44x44Logo.png`
+### 📄 文件: `src-tauri\icons\Square44x44Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24458,7 +24419,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square71x71Logo.png`
+### 📄 文件: `src-tauri\icons\Square71x71Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24466,7 +24427,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/Square89x89Logo.png`
+### 📄 文件: `src-tauri\icons\Square89x89Logo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24474,7 +24435,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/StoreLogo.png`
+### 📄 文件: `src-tauri\icons\StoreLogo.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24482,7 +24443,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/icon.icns`
+### 📄 文件: `src-tauri\icons\icon.icns`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24490,7 +24451,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/icon.ico`
+### 📄 文件: `src-tauri\icons\icon.ico`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24498,7 +24459,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/icons/icon.png`
+### 📄 文件: `src-tauri\icons\icon.png`
 
 ```
 [无法读取：可能是二进制文件或编码不支持]
@@ -24506,19 +24467,24 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/src/lib.rs`
+### 📄 文件: `src-tauri\src\lib.rs`
 
 ```rust
 use serde::{Deserialize, Serialize};
-use tauri::State; // 👈 引入 State
-use base64::prelude::*;
-use std::path::Path;
-use std::fs;
+use tauri::State;
 use std::sync::Arc;
-use tokio::sync::Mutex; // 👈 使用 tokio 的 Mutex 支持 async
+use tokio::sync::Mutex;
 
-// 🐧 Linux 平台依赖
-use lwg_core::{ConfigManager, WallpaperManager, controller::WallpaperController};
+
+// ================= 平台特定导入 =================
+
+#[cfg(target_os = "linux")]
+use lwg_core::{
+    ConfigManager as LwgConfigManager, 
+    controller::WallpaperController, 
+    config::AppConfig as LwgAppConfig,
+    wallpaper::WallpaperManager,
+};
 
 // ================= 数据结构 =================
 
@@ -24533,154 +24499,533 @@ pub struct Wallpaper {
     size: String,      
 }
 
-// 定义一个应用状态结构体，用来存放“长生不老”的对象
+/// 跨平台配置结构体
+/// Linux: 与 lwg_core::AppConfig 完全一致
+/// Windows: Mock 版本，用于 UI 开发
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppConfig {
+    pub fps: u32,
+    pub volume: u32,
+    pub scaling: String,
+    #[serde(rename = "muteAudio")]
+    pub silence: bool,
+    pub no_fullscreen_pause: bool,
+    pub disable_mouse: bool,
+    #[serde(rename = "noAutomute")]
+    pub no_auto_mute: bool,
+    pub no_audio_processing: bool,
+    pub disable_parallax: bool,
+    pub disable_particles: bool,
+    pub clamping: String,
+    pub last_wallpaper: Option<String>,
+    pub last_screen: Option<String>,
+    pub wallpaper_properties: std::collections::HashMap<String, serde_json::Value>,
+    pub screenshot_delay: u32,
+    pub screenshot_res: String,
+    pub prefer_xvfb: bool,
+    pub active_monitors: std::collections::HashMap<String, String>,
+    pub cycle_enabled: bool,
+    pub cycle_interval: u32,
+    pub cycle_order: String,
+    pub assets_path: Option<String>,
+    pub workshop_path: Option<String>,
+    pub wayland_only_active: bool,
+    pub wayland_ignore_appids: String,
+    pub compact_mode: bool,
+    pub wallpaper_nicknames: std::collections::HashMap<String, String>,
+}
+
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self {
+            fps: 30,
+            volume: 0,
+            scaling: "default".to_string(),
+            silence: true,
+            no_fullscreen_pause: false,
+            disable_mouse: false,
+            no_auto_mute: false,
+            no_audio_processing: false,
+            disable_parallax: false,
+            disable_particles: false,
+            clamping: "clamp".to_string(),
+            last_wallpaper: None,
+            last_screen: None,
+            wallpaper_properties: std::collections::HashMap::new(),
+            screenshot_delay: 20,
+            screenshot_res: "3840x2160".to_string(),
+            prefer_xvfb: true,
+            active_monitors: std::collections::HashMap::new(),
+            cycle_enabled: false,
+            cycle_interval: 15,
+            cycle_order: "random".to_string(),
+            assets_path: None,
+            workshop_path: None,
+            wayland_only_active: false,
+            wayland_ignore_appids: String::new(),
+            compact_mode: false,
+            wallpaper_nicknames: std::collections::HashMap::new(),
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+impl From<LwgAppConfig> for AppConfig {
+    fn from(config: LwgAppConfig) -> Self {
+        Self {
+            fps: config.fps,
+            volume: config.volume,
+            scaling: config.scaling,
+            silence: config.silence,
+            no_fullscreen_pause: config.no_fullscreen_pause,
+            disable_mouse: config.disable_mouse,
+            no_auto_mute: config.no_auto_mute,
+            no_audio_processing: config.no_audio_processing,
+            disable_parallax: config.disable_parallax,
+            disable_particles: config.disable_particles,
+            clamping: config.clamping,
+            last_wallpaper: config.last_wallpaper,
+            last_screen: config.last_screen,
+            wallpaper_properties: config.wallpaper_properties,
+            screenshot_delay: config.screenshot_delay,
+            screenshot_res: config.screenshot_res,
+            prefer_xvfb: config.prefer_xvfb,
+            active_monitors: config.active_monitors,
+            cycle_enabled: config.cycle_enabled,
+            cycle_interval: config.cycle_interval,
+            cycle_order: config.cycle_order,
+            assets_path: config.assets_path,
+            workshop_path: config.workshop_path,
+            wayland_only_active: config.wayland_only_active,
+            wayland_ignore_appids: config.wayland_ignore_appids,
+            compact_mode: config.compact_mode,
+            wallpaper_nicknames: config.wallpaper_nicknames,
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+impl From<AppConfig> for LwgAppConfig {
+    fn from(config: AppConfig) -> Self {
+        Self {
+            fps: config.fps,
+            volume: config.volume,
+            scaling: config.scaling,
+            silence: config.silence,
+            no_fullscreen_pause: config.no_fullscreen_pause,
+            disable_mouse: config.disable_mouse,
+            no_auto_mute: config.no_auto_mute,
+            no_audio_processing: config.no_audio_processing,
+            disable_parallax: config.disable_parallax,
+            disable_particles: config.disable_particles,
+            clamping: config.clamping,
+            last_wallpaper: config.last_wallpaper,
+            last_screen: config.last_screen,
+            wallpaper_properties: config.wallpaper_properties,
+            screenshot_delay: config.screenshot_delay,
+            screenshot_res: config.screenshot_res,
+            prefer_xvfb: config.prefer_xvfb,
+            active_monitors: config.active_monitors,
+            cycle_enabled: config.cycle_enabled,
+            cycle_interval: config.cycle_interval,
+            cycle_order: config.cycle_order,
+            assets_path: config.assets_path,
+            workshop_path: config.workshop_path,
+            wayland_only_active: config.wayland_only_active,
+            wayland_ignore_appids: config.wayland_ignore_appids,
+            compact_mode: config.compact_mode,
+            wallpaper_nicknames: config.wallpaper_nicknames,
+        }
+    }
+}
+
+// ================= AppState =================
+
 struct AppState {
-    // Controller 需要被互斥锁保护，因为 Tauri 命令是并发的
     #[cfg(target_os = "linux")]
     controller: Mutex<WallpaperController>,
+    
+    #[cfg(target_os = "linux")]
+    config_manager: Mutex<LwgConfigManager>,
+    
+    #[cfg(not(target_os = "linux"))]
+    _dummy: bool,
 }
 
 // ================= 辅助函数 =================
 
-fn file_to_base64(path_str: &str) -> String {
-    let path = Path::new(path_str);
-    if !path.exists() { return "".to_string(); }
-    match fs::read(path) {
-        Ok(bytes) => {
-            let mime = mime_guess::from_path(path).first_or_octet_stream().to_string();
-            let b64 = BASE64_STANDARD.encode(bytes);
-            format!("data:{};base64,{}", mime, b64)
-        },
-        Err(_) => "".to_string()
-    }
+/// 检查配置变更是否需要重启壁纸
+/// 只影响壁纸属性的配置项才需要重启
+#[cfg(target_os = "linux")]
+fn needs_wallpaper_restart(old: &LwgAppConfig, new: &LwgAppConfig) -> bool {
+    // 壁纸渲染相关配置
+    old.fps != new.fps ||
+    old.scaling != new.scaling ||
+    old.clamping != new.clamping ||
+    old.volume != new.volume ||
+    old.silence != new.silence ||
+    old.disable_parallax != new.disable_parallax ||
+    old.disable_particles != new.disable_particles ||
+    old.no_fullscreen_pause != new.no_fullscreen_pause ||
+    old.disable_mouse != new.disable_mouse ||
+    old.no_auto_mute != new.no_auto_mute ||
+    old.no_audio_processing != new.no_audio_processing ||
+    old.assets_path != new.assets_path ||
+    old.wayland_only_active != new.wayland_only_active ||
+    old.wayland_ignore_appids != new.wayland_ignore_appids ||
+    old.active_monitors != new.active_monitors
 }
 
+/// 格式化文件大小
 fn format_size(bytes: u64) -> String {
     if bytes == 0 { return "0 MB".to_string(); }
     format!("{:.1} MB", bytes as f64 / 1024.0 / 1024.0)
 }
 
+/// 默认壁纸库路径
+fn get_default_workshop_path() -> String {
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/home".to_string());
+    format!("{}/.local/share/Steam/steamapps/workshop/content/431960", home)
+}
+
+// ================= Mock 数据生成 =================
+
+#[cfg(not(target_os = "linux"))]
+fn generate_mock_wallpapers() -> Vec<Wallpaper> {
+    vec![
+        Wallpaper {
+            id: "mock_001".to_string(),
+            title: "Mock Cyberpunk City".to_string(),
+            preview: "https://picsum.photos/seed/cyber/400/225".to_string(),
+            wtype: "web".to_string(),
+            path: "/mock/path/cyberpunk".to_string(),
+            tags: vec!["cyberpunk".to_string(), "city".to_string(), "neon".to_string()],
+            size: "45.2 MB".to_string(),
+        },
+        Wallpaper {
+            id: "mock_002".to_string(),
+            title: "Mock Mountain Sunset".to_string(),
+            preview: "https://picsum.photos/seed/mountain/400/225".to_string(),
+            wtype: "video".to_string(),
+            path: "/mock/path/mountain".to_string(),
+            tags: vec!["nature".to_string(), "sunset".to_string(), "mountain".to_string()],
+            size: "128.5 MB".to_string(),
+        },
+        Wallpaper {
+            id: "mock_003".to_string(),
+            title: "Mock Space Station".to_string(),
+            preview: "https://picsum.photos/seed/space/400/225".to_string(),
+            wtype: "scene".to_string(),
+            path: "/mock/path/space".to_string(),
+            tags: vec!["space".to_string(), "scifi".to_string(), "station".to_string()],
+            size: "256.8 MB".to_string(),
+        },
+        Wallpaper {
+            id: "mock_004".to_string(),
+            title: "Mock Rainy Tokyo".to_string(),
+            preview: "https://picsum.photos/seed/tokyo/400/225".to_string(),
+            wtype: "web".to_string(),
+            path: "/mock/path/tokyo".to_string(),
+            tags: vec!["japan".to_string(), "rain".to_string(), "city".to_string()],
+            size: "67.3 MB".to_string(),
+        },
+        Wallpaper {
+            id: "mock_005".to_string(),
+            title: "Mock Ocean Waves".to_string(),
+            preview: "https://picsum.photos/seed/ocean/400/225".to_string(),
+            wtype: "video".to_string(),
+            path: "/mock/path/ocean".to_string(),
+            tags: vec!["ocean".to_string(), "waves".to_string(), "nature".to_string()],
+            size: "189.1 MB".to_string(),
+        },
+        Wallpaper {
+            id: "mock_006".to_string(),
+            title: "Mock Fireplace".to_string(),
+            preview: "https://picsum.photos/seed/fire/400/225".to_string(),
+            wtype: "video".to_string(),
+            path: "/mock/path/fireplace".to_string(),
+            tags: vec!["cozy".to_string(), "fire".to_string(), "warm".to_string()],
+            size: "52.4 MB".to_string(),
+        },
+    ]
+}
+
 // ================= Tauri 命令 =================
 
 #[tauri::command]
-async fn get_wallpapers() -> Result<Vec<Wallpaper>, String> {
+async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, String> {
     #[cfg(target_os = "linux")]
     {
-        println!("🐧 [Rust] 正在扫描壁纸...");
-        // 临时初始化一个 ConfigManager 只为了读路径
-        // (注：更好的做法是把 Config 也放到 State 里，但为了简单先这样)
-        let workshop_path = match ConfigManager::new() {
-            Ok(cm) => cm.config.assets_path.clone(),
-            Err(_) => None,
-        };
+        println!("🐧 [Linux] 扫描壁纸库...");
         
-        let target_path = workshop_path.unwrap_or_else(|| {
-            let home = std::env::var("HOME").unwrap_or_default();
-            format!("{}/.local/share/Steam/steamapps/workshop/content/431960", home)
-        });
-
-        if !std::path::Path::new(&target_path).exists() {
-            return Err(format!("找不到目录: {}", target_path));
-        }
-
-        let mut wm = WallpaperManager::new(target_path);
-        wm.scan().map_err(|e| format!("扫描失败: {}", e))?;
-
-        let core_list = wm.list();
-        let frontend_wallpapers: Vec<Wallpaper> = core_list
-            .into_iter()
-            .map(|wp| {
-                let preview_path = wp.preview.to_string_lossy().to_string();
-                let preview_base64 = file_to_base64(&preview_path);
-
-                Wallpaper {
-                    id: wp.id.clone(),
-                    title: wp.title.clone(),
-                    preview: preview_base64,
-                    wtype: wp.wp_type.clone(),
-                    path: wp.id.clone(),
-                    tags: wp.tags.clone(),
-                    size: format_size(wp.size),
-                }
-            })
-            .collect();
-
-        return Ok(frontend_wallpapers);
+        // 从配置获取 workshop_path，否则使用默认路径
+        let config_manager = _state.config_manager.lock().await;
+        let workshop_path = config_manager.config().workshop_path
+            .clone()
+            .unwrap_or_else(|| get_default_workshop_path());
+        drop(config_manager);
+        
+        println!("📁 [Linux] Workshop 路径: {}", workshop_path);
+        
+        // 使用 WallpaperManager 扫描
+        let mut manager = WallpaperManager::new(&workshop_path);
+        let wallpapers = manager.scan()
+            .map_err(|e| format!("扫描失败: {:?}", e))?;
+        
+        // 转换为前端需要的格式
+        let result: Vec<Wallpaper> = wallpapers.values().map(|w| {
+            Wallpaper {
+                id: w.id.clone(),
+                title: w.title.clone(),
+                preview: w.preview.to_string_lossy().to_string(),
+                wtype: w.wp_type.clone(),
+                path: workshop_path.clone(),
+                tags: w.tags.clone(),
+                size: format_size(w.size),
+            }
+        }).collect();
+        
+        println!("✅ [Linux] 扫描到 {} 张壁纸", result.len());
+        Ok(result)
     }
 
     #[cfg(not(target_os = "linux"))]
     {
-        Ok(vec![])
+        println!("🪟 [Windows Mock] 返回模拟壁纸数据");
+        Ok(generate_mock_wallpapers())
     }
 }
 
-// 🔥 新增：应用壁纸命令
 #[tauri::command]
 async fn apply_wallpaper(
     id: String, 
-    state: State<'_, AppState> // 👈 注入全局状态
+    _state: State<'_, AppState> 
 ) -> Result<(), String> {
     
     #[cfg(target_os = "linux")]
     {
         println!("▶️ [Rust] 正在应用壁纸: {}", id);
-        
-        // 1. 获取锁 (锁住 Controller 防止并发冲突)
-        let mut controller = state.controller.lock().await;
-        
-        // 2. 调用 lwg-core 的 apply 方法
-        // 参数2是 screen，传 None 表示应用到默认/上次的屏幕
+        let mut controller = _state.controller.lock().await;
         controller.apply(&id, None).await.map_err(|e| format!("应用失败: {:?}", e))?;
-        
         println!("✅ [Rust] 壁纸应用成功！");
+        return Ok(()); // 注意这里要显式返回
+    }
+
+    // ✅ 修复方案 2：为非 Linux 平台提供一个显式的默认返回
+    #[cfg(not(target_os = "linux"))]
+    {
+        println!("🪟 [Windows] 模拟应用成功: {}", id);
+        Ok(()) 
+    }
+}
+
+#[tauri::command]
+async fn stop_wallpaper(_state: State<'_, AppState>) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut controller = _state.controller.lock().await;
+        controller.stop().await;
         Ok(())
     }
 
     #[cfg(not(target_os = "linux"))]
     {
-        println!("🪟 Windows 模拟应用: {}", id);
+        println!("🪟 [Windows] 模拟停止");
+        Ok(()) // 👈 修复 E0308
+    }
+}
+
+// ================= Settings Commands =================
+
+#[tauri::command]
+async fn get_settings(_state: State<'_, AppState>) -> Result<AppConfig, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let config_manager = _state.config_manager.lock().await;
+        Ok(config_manager.config().clone().into()) // 转换为本地 AppConfig
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        println!("🪟 [Windows Mock] 返回默认配置");
+        Ok(AppConfig::default())
+    }
+}
+
+#[tauri::command]
+async fn save_settings(
+    config: AppConfig,
+    _state: State<'_, AppState>
+) -> Result<bool, String> {
+    #[cfg(target_os = "linux")]
+    {
+        println!("💾 [Linux] 正在保存配置...");
+        
+        let mut config_manager = _state.config_manager.lock().await;
+        let old_config = config_manager.config().clone();
+        
+        // 转换并更新配置
+        let lwg_config: LwgAppConfig = config.into();
+        *config_manager.config_mut() = lwg_config.clone();
+        
+        // 保存到文件
+        config_manager.save().map_err(|e| format!("保存失败: {:?}", e))?;
+        
+        // 检查是否需要重启壁纸
+        let needs_restart = needs_wallpaper_restart(&old_config, &lwg_config);
+        
+        if needs_restart {
+            println!("🔄 [Linux] 检测到壁纸相关配置变更，准备重启壁纸...");
+            drop(config_manager); // 释放锁
+            
+            let mut controller = _state.controller.lock().await;
+            controller.restart_wallpapers().await.map_err(|e| format!("重启失败: {:?}", e))?;
+            println!("✅ [Linux] 壁纸已重启");
+        } else {
+            println!("ℹ️ [Linux] 配置已保存（无需重启壁纸）");
+        }
+        
+        Ok(needs_restart)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        println!("🪟 [Windows Mock] 模拟保存配置: fps={}, volume={}", config.fps, config.volume);
+        Ok(false)
+    }
+}
+
+#[tauri::command]
+async fn restart_wallpapers(_state: State<'_, AppState>) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        println!("🔄 [Rust] 手动重启壁纸...");
+        let mut controller = _state.controller.lock().await;
+        controller.restart_wallpapers().await.map_err(|e| format!("重启失败: {:?}", e))?;
+        println!("✅ [Rust] 壁纸已重启");
         Ok(())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        println!("🪟 [Windows] 模拟重启壁纸");
+        Ok(())
+    }
+}
+
+// ================= System Integration Commands =================
+
+#[tauri::command]
+async fn set_autostart(enabled: bool, hidden: bool) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::io::Write;
+        
+        let autostart_dir = dirs::config_dir()
+            .ok_or_else(|| "无法获取配置目录".to_string())?
+            .join("autostart");
+        
+        std::fs::create_dir_all(&autostart_dir)
+            .map_err(|e| format!("创建 autostart 目录失败: {}", e))?;
+        
+        let desktop_path = autostart_dir.join("linux-wallpaperengine-gui.desktop");
+        
+        if enabled {
+            let current_exe = std::env::current_exe()
+                .map_err(|e| format!("获取程序路径失败: {}", e))?;
+            let exe_path = current_exe.to_string_lossy();
+            
+            let hidden_arg = if hidden { " --hidden" } else { "" };
+            
+            let desktop_content = format!(
+                r#"[Desktop Entry]
+Type=Application
+Name=Linux Wallpaper Engine GUI
+Comment=Linux Wallpaper Engine GUI
+Exec="{}"{}
+Icon=linux-wallpaperengine-gui
+Terminal=false
+Categories=Utility;
+"#,
+                exe_path, hidden_arg
+            );
+            
+            let mut file = std::fs::File::create(&desktop_path)
+                .map_err(|e| format!("创建 desktop 文件失败: {}", e))?;
+            file.write_all(desktop_content.as_bytes())
+                .map_err(|e| format!("写入 desktop 文件失败: {}", e))?;
+            
+            println!("✅ [Rust] Autostart 已启用: {:?}", desktop_path);
+        } else {
+            if desktop_path.exists() {
+                std::fs::remove_file(&desktop_path)
+                    .map_err(|e| format!("删除 desktop 文件失败: {}", e))?;
+            }
+            println!("✅ [Rust] Autostart 已禁用");
+        }
+        
+        Ok(())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        println!("🪟 [Windows] Autostart 未实现");
+        Ok(())
+    }
+}
+
+#[tauri::command]
+async fn get_autostart_status() -> Result<bool, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let autostart_dir = dirs::config_dir()
+            .ok_or_else(|| "无法获取配置目录".to_string())?;
+        let desktop_path = autostart_dir.join("autostart/linux-wallpaperengine-gui.desktop");
+        Ok(desktop_path.exists())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(false)
     }
 }
 
 // ================= 主入口 =================
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // --- 1. 初始化核心状态 ---
+    // 跨平台初始化状态
     #[cfg(target_os = "linux")]
     let app_state = {
-        println!("⚙️ [Init] 初始化核心组件...");
-        
-        // 初始化配置
-        let config_manager = ConfigManager::new().expect("配置加载失败");
-        // lwg-core 的 Controller 需要 Arc<Mutex<AppConfig>>
-        let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config));
-        
-        // 初始化控制器
+        println!("🐧 [Linux] 初始化应用状态...");
+        let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
+        let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
         let controller = WallpaperController::new(shared_config);
-        
-        AppState {
+        AppState { 
             controller: Mutex::new(controller),
+            config_manager: Mutex::new(config_manager),
         }
     };
 
-    // Windows 下放个空的 State 占位，防止编译报错
     #[cfg(not(target_os = "linux"))]
-    let app_state = AppState {};
+    let app_state = {
+        println!("🪟 [Windows Mock] 初始化 Mock 应用状态...");
+        AppState { _dummy: true }
+    };
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_fs::init())
-        
-        // --- 2. 注册状态 ---
         .manage(app_state) 
-        
-        // --- 3. 注册命令 ---
         .invoke_handler(tauri::generate_handler![
             get_wallpapers, 
-            apply_wallpaper // 👈 别忘了注册这个新命令
+            apply_wallpaper,
+            stop_wallpaper,
+            // Settings commands
+            get_settings,
+            save_settings,
+            restart_wallpapers,
+            // System integration commands
+            set_autostart,
+            get_autostart_status
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -24689,7 +25034,7 @@ pub fn run() {
 
 ---
 
-### 📄 文件: `src-tauri/src/main.rs`
+### 📄 文件: `src-tauri\src\main.rs`
 
 ```rust
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
@@ -24703,7 +25048,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src-tauri/tauri.conf.json`
+### 📄 文件: `src-tauri\tauri.conf.json`
 
 ```json
 {
@@ -24735,6 +25080,7 @@ fn main() {
       "csp": "default-src 'self'; img-src * asset: http://asset.localhost blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval';",
       
       "assetProtocol": {
+        "enable": true,
         "scope": [
           "**", 
           "/home/**",
@@ -24760,7 +25106,7 @@ fn main() {
 
 ---
 
-### 📄 文件: `src/App.css`
+### 📄 文件: `src\App.css`
 
 ```css
 .logo.vite:hover {
@@ -24884,32 +25230,26 @@ button {
 
 ---
 
-### 📄 文件: `src/App.tsx`
+### 📄 文件: `src\App.tsx`
 
 ```
 import { useState, useEffect } from "react";
-import { 
-  Monitor, Search, Image as ImageIcon, Video, 
-  Settings as SettingsIcon, Activity, Square, 
-  Shuffle, Camera
-} from "lucide-react";
-
-// 1. 动画与特效库
 import { motion, AnimatePresence } from "framer-motion";
-import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 
-// 2. Shadcn UI 组件
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+// Shadcn UI 组件
+import { Tabs } from "@/components/ui/tabs";
+import { Toaster } from "@/components/ui/sonner"; // 确保 Toast 正常工作
 
-// 3. 项目自定义组件
+// 项目自定义组件
 import { Layout } from "./components/Layout";
+import { AppNavbar } from "./components/AppnavBar";
+import { WallpaperSidebar } from "./components/WallpaperSidebar";
+
+// 页面组件
+import { Library } from "./pages/Library";
 import { Settings } from "./pages/Settings";
 import { Performance } from "./pages/Performance";
-import { AppSidebar } from "./components/app-sidebar";
-import { Wallpaper } from "./types";
+
 import { useAppStore } from "./store/appStore";
 
 // 页面切换动画配置
@@ -24926,204 +25266,125 @@ const pageTransition = {
 } as const;
 
 export function App() {
-  // Local UI state (not in store)
+  // Local UI state
   const [isLoading, setIsLoading] = useState(false);
   
   // Zustand store state and actions
-  const selectedId = useAppStore((state) => state.selectedId);
-  const searchQuery = useAppStore((state) => state.searchQuery);
   const activeTab = useAppStore((state) => state.activeTab);
-  
-  const loadWallpapers = useAppStore((state) => state.loadWallpapers);
-  const setSelectedId = useAppStore((state) => state.setSelectedId);
-  const setSearchQuery = useAppStore((state) => state.setSearchQuery);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
-  const getFilteredWallpapers = useAppStore((state) => state.getFilteredWallpapers);
-  const getSelectedWallpaper = useAppStore((state) => state.getSelectedWallpaper);
-
+  const loadWallpapers = useAppStore((state) => state.loadWallpapers);
+  
   useEffect(() => {
     setIsLoading(true);
     loadWallpapers().finally(() => setIsLoading(false));
-  }, []);
-
-  const selectedWallpaper = getSelectedWallpaper();
-  const filteredWallpapers = getFilteredWallpapers();
-
-  // --- Navbar (包含切换按钮) ---
-  const Navbar = (
-    <div className="flex w-full items-center gap-4 py-2">
-      <div className="flex items-center gap-2 mr-2 select-none">
-        <Monitor className="text-primary w-6 h-6" />
-        <span className="font-bold hidden md:block tracking-tight text-lg">Wallpaper Engine</span>
-      </div>
-
-      <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border">
-        <Button 
-          variant={activeTab === "wallpapers" ? "secondary" : "ghost"} 
-          size="sm" 
-          onClick={() => setActiveTab("wallpapers")}
-          className="gap-2 h-8"
-        >
-          <ImageIcon className="w-4 h-4" /> Library
-        </Button>
-        <Button 
-          variant={activeTab === "settings" ? "secondary" : "ghost"} 
-          size="sm" 
-          onClick={() => setActiveTab("settings")}
-          className="gap-2 h-8"
-        >
-          <SettingsIcon className="w-4 h-4" /> Settings
-        </Button>
-        <Button 
-          variant={activeTab === "performance" ? "secondary" : "ghost"} 
-          size="sm" 
-          onClick={() => setActiveTab("performance")}
-          className="gap-2 h-8"
-        >
-          <Activity className="w-4 h-4" /> Monitor
-        </Button>
-      </div>
-
-      <Separator orientation="vertical" className="h-6 mx-2" />
-      
-      <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input 
-          placeholder="Search..." 
-          className="pl-10 bg-muted/20 border-none h-9"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-
-      <div className="flex-1" />
-      
-      {/* 右侧快速操作区 */}
-      <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border">
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500"><Square className="w-4 h-4" /></Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8"><Shuffle className="w-4 h-4" /></Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8"><Camera className="w-4 h-4" /></Button>
-      </div>
-    </div>
-  );
-
+  }, []); 
 
   return (
-    <Layout navbar={Navbar} sidebar={activeTab === "wallpapers" ? <AppSidebar /> : null}>
-      <AnimatePresence mode="wait"> {/* 关键：处理切换动画 */}
-        {activeTab === "wallpapers" && (
-          <motion.div 
-            key="wallpapers" 
-            initial="initial" animate="in" exit="out" 
-            variants={pageVariants} transition={pageTransition} 
-            className="h-full flex flex-col p-6 space-y-6"
-          >
-            {/* 状态工具栏 */}
-            <div className="flex items-center justify-between bg-muted/20 px-4 py-2 rounded-xl border border-border/50">
-              <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest">
-                <span className="text-pink-500 uppercase">Currently Using</span>
-                <span className="text-foreground truncate max-w-[300px]">{selectedWallpaper?.title}</span>
-              </div>
-              <span className="text-xs font-mono text-muted-foreground/50">{filteredWallpapers.length} wallpapers</span>
-            </div>
+    <>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Layout 
+          navbar={<AppNavbar />} 
+          // 只有在 Library (wallpapers) 标签页时才显示侧边栏
+          sidebar={activeTab === "wallpapers" ? <WallpaperSidebar /> : null}
+        >
+          <AnimatePresence mode="wait">
+            {activeTab === "wallpapers" && (
+              <motion.div 
+                key="wallpapers" 
+                initial="initial" animate="in" exit="out" 
+                variants={pageVariants} transition={pageTransition} 
+                className="h-full"
+              >
+                <Library />
+              </motion.div>
+            )}
 
-            <ScrollArea className="flex-1">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 pb-10">
-                {filteredWallpapers.map((wp) => (
-                   <WallpaperCard 
-                     key={wp.id} 
-                     wp={wp} 
-                     isSelected={selectedId === wp.id} 
-                     onSelect={() => setSelectedId(wp.id)} 
-                   />
-                ))}
-              </div>
-            </ScrollArea>
-          </motion.div>
-        )}
+            {activeTab === "settings" && (
+              <motion.div 
+                key="settings" 
+                initial="initial" animate="in" exit="out" 
+                variants={pageVariants} transition={pageTransition} 
+                className="h-full"
+              >
+                <Settings />
+              </motion.div>
+            )}
 
-        {activeTab === "settings" && (
-          <motion.div 
-            key="settings" 
-            initial="initial" animate="in" exit="out" 
-            variants={pageVariants} transition={pageTransition} 
-            className="h-full"
-          >
-            <Settings />
-          </motion.div>
-        )}
-
-        {activeTab === "performance" && (
-          <motion.div 
-            key="performance" 
-            initial="initial" animate="in" exit="out" 
-            variants={pageVariants} transition={pageTransition} 
-            className="h-full"
-          >
-            <Performance />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Layout>
-  );
-}
-
-function WallpaperCard({ wp, isSelected, onSelect }: { wp: Wallpaper; isSelected: boolean; onSelect: () => void }) {
-  return (
-    <div onClick={onSelect} className="cursor-pointer">
-      <CardContainer className="inter-var w-full">
-        <CardBody className={`
-          relative group/card bg-card border-border/50 w-full rounded-2xl p-2 border transition-all
-          ${isSelected ? 'ring-2 ring-pink-500 ring-offset-4 ring-offset-background bg-muted/50' : 'hover:border-pink-500/50'}
-        `}>
-          <CardItem translateZ="50" className="w-full aspect-square rounded-xl overflow-hidden relative">
-            <img src={wp.preview} className="h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-110" />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-3 pt-8">
-              <p className="text-[11px] font-bold text-white truncate">{wp.title}</p>
-            </div>
-            <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md p-1.5 rounded-lg border border-white/10">
-              {wp.type === 'Video' ? <Video className="w-3 h-3 text-pink-400" /> : <ImageIcon className="w-3 h-3 text-emerald-400" />}
-            </div>
-          </CardItem>
-        </CardBody>
-      </CardContainer>
-    </div>
+            {activeTab === "performance" && (
+              <motion.div 
+                key="performance" 
+                initial="initial" animate="in" exit="out" 
+                variants={pageVariants} transition={pageTransition} 
+                className="h-full"
+              >
+                <Performance />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Layout>
+      </Tabs>
+      {/* 确保 Sonner Toaster 位于最顶层，否则 Settings 页面的 toast 无法显示 */}
+      <Toaster />
+    </>
   );
 }
 ```
 
 ---
 
-### 📄 文件: `src/api/wallpaper.ts`
+### 📄 文件: `src\api\wallpaper.ts`
 
 ```typescript
 ﻿import { invoke } from "@tauri-apps/api/core";
 import { Wallpaper } from "../types";
+import { MOCK_WALLPAPERS } from "../mock/wallpapers";
+
+// ================= 🛠️ 调试配置区域 =================
+
+// 🔴 开关 1：是否模拟“空空如也”的状态？
+// 设为 true -> 哪怕有数据也返回空数组，用于测试“无壁纸”时的 UI
+const FORCE_EMPTY = false; 
+
+// 🔵 开关 2：是否强制使用 Mock 数据？
+// 默认为自动检测 (Windows 下自动为 true)，你也可以手动改为 true 强制在 Linux 下调试 UI
+const USE_MOCK = navigator.userAgent.includes("Windows") || false;
+
+// ===================================================
 
 export async function scanWallpapers(): Promise<Wallpaper[]> {
+  // 1. 优先处理“强制为空”的情况
+  if (FORCE_EMPTY) {
+    console.log("🈳 [Debug] 模拟空壁纸库...");
+    await new Promise((resolve) => setTimeout(resolve, 300)); // 模拟加载延迟
+    return [];
+  }
+
+  // 2. 处理 Windows 环境或强制 Mock 的情况
+  if (USE_MOCK) {
+    console.log("🧪 [Debug] 使用 Mock 数据模式");
+    await new Promise((resolve) => setTimeout(resolve, 500)); // 模拟网络延迟
+    return MOCK_WALLPAPERS;
+  }
+
+  // 3. 生产环境：调用真实 Rust 后端
   try {
-    console.log("🚀 [API] 请求壁纸数据...");
-    
-    // 1. 获取后端数据
+    console.log("🚀 [Prod] 请求真实壁纸数据...");
     const data = await invoke<any[]>("get_wallpapers");
     
-    console.log("✅ [API] 收到数据:", data.length, "条");
-    // 打印第一条看看字段全不全
-    if (data.length > 0) console.log("🔍 首条数据样本:", data[0]);
-
-    // 2. 映射数据
+    // 调试：打印第一个壁纸的 preview 路径
+    if (data.length > 0) {
+      console.log("📷 [Debug] 第一张壁纸 preview 路径:", data[0].preview);
+    }
+    
     return data.map((item) => ({
       id: item.id,
       title: item.title,
-      preview: item.preview, // 已经是 Base64 了，直接用
+      preview: item.preview,
       path: item.path || "",
       type: (item.wtype || "Scene") as "Video" | "Scene" | "Web",
-      
-      // 👇 关键：接收新补全的字段，给个默认值防止报错
       tags: item.tags || [],
       size: item.size || "0 MB",
     }));
-
   } catch (error) {
     console.error("❌ API Error:", error);
     return [];
@@ -25131,20 +25392,27 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
 }
 
 export async function applyWallpaper(id: string): Promise<void> {
-  try {
-    console.log(`🚀 [API] 请求应用壁纸: ${id}`);
-    await invoke("apply_wallpaper", { id });
-    console.log("✅ [API] 应用成功");
-  } catch (error) {
-    console.error("❌ [API] 应用失败:", error);
-    throw error; // 抛出错误让 UI 知道
+  if (USE_MOCK || FORCE_EMPTY) {
+    console.log(`🧪 [Debug] 模拟应用壁纸 ID: ${id}`);
+    const wp = MOCK_WALLPAPERS.find(w => w.id === id);
+    if (wp) console.log(`   选中: ${wp.title}`);
+    return;
   }
+  await invoke("apply_wallpaper", { id });
+}
+
+export async function stopWallpaper(): Promise<void> {
+  if (USE_MOCK || FORCE_EMPTY) {
+    console.log(`🧪 [Debug] 模拟停止壁纸`);
+    return;
+  }
+  await invoke("stop_wallpaper");
 }
 ```
 
 ---
 
-### 📄 文件: `src/assets/react.svg`
+### 📄 文件: `src\assets\react.svg`
 
 ```
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
@@ -25152,7 +25420,7 @@ export async function applyWallpaper(id: string): Promise<void> {
 
 ---
 
-### 📄 文件: `src/components/3d-card-demo.tsx`
+### 📄 文件: `src\components\3d-card-demo.tsx`
 
 ```
 "use client";
@@ -25213,7 +25481,131 @@ export default function ThreeDCardDemo() {
 
 ---
 
-### 📄 文件: `src/components/Layout.tsx`
+### 📄 文件: `src\components\AppnavBar.tsx`
+
+```
+import { 
+  Search, Settings as SettingsIcon, Activity, Square, 
+  Shuffle, Camera, ImageIcon 
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAppStore } from "@/store/appStore";
+import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
+import { toast } from "sonner";
+
+export function AppNavbar() {
+  const searchQuery = useAppStore((state) => state.searchQuery);
+  const setSearchQuery = useAppStore((state) => state.setSearchQuery);
+  // 修正：保持与原版一致的状态获取方式，确保响应式更新
+  const getFilteredWallpapers = useAppStore((state) => state.getFilteredWallpapers);
+  const setSelectedId = useAppStore((state) => state.setSelectedId);
+  
+  const filteredWallpapers = getFilteredWallpapers();
+
+  // --- Stop Wallpaper Handler ---
+  const handleStop = async () => {
+    try {
+      await stopWallpaper();
+      toast.success("壁纸已停止");
+    } catch (error) {
+      console.error(error);
+      toast.error("停止失败");
+    }
+  };
+
+  // --- Shuffle Wallpaper Handler ---
+  const handleShuffle = async () => {
+    if (filteredWallpapers.length === 0) {
+      toast.error("没有可用的壁纸");
+      return;
+    }
+    const randomIndex = Math.floor(Math.random() * filteredWallpapers.length);
+    const randomWallpaper = filteredWallpapers[randomIndex];
+    try {
+      await applyWallpaper(randomWallpaper.id);
+      setSelectedId(randomWallpaper.id);
+      toast.success(`随机应用: ${randomWallpaper.title}`);
+    } catch (error) {
+      console.error(error);
+      toast.error("随机应用失败");
+    }
+  };
+
+  return (
+    <div className="flex w-full items-center gap-4 py-2">
+      <TabsList className="bg-muted/40 border border-border h-auto p-1">
+        <TabsTrigger value="wallpapers" className="gap-2 h-8 data-[state=active]:bg-secondary">
+          <ImageIcon className="w-4 h-4" /> Library
+        </TabsTrigger>
+        <TabsTrigger value="settings" className="gap-2 h-8 data-[state=active]:bg-secondary">
+          <SettingsIcon className="w-4 h-4" /> Settings
+        </TabsTrigger>
+        <TabsTrigger value="performance" className="gap-2 h-8 data-[state=active]:bg-secondary">
+          <Activity className="w-4 h-4" /> Monitor
+        </TabsTrigger>
+      </TabsList>
+
+      <Separator orientation="vertical" className="h-6 mx-2" />
+      
+      <InputGroup className="relative flex-1 max-w-md">
+        <InputGroupAddon align="inline-start">
+          <Search className="w-4 h-4" />
+        </InputGroupAddon>
+        <InputGroupInput 
+          placeholder="Search..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <InputGroupAddon align="inline-end">
+            <span className="text-xs">{filteredWallpapers.length} Results</span>
+          </InputGroupAddon>
+        )}
+      </InputGroup>
+
+      <div className="flex-1" />
+      
+      {/* 右侧快速操作区 */}
+      <TooltipProvider>
+        <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={handleStop}>
+                <Square className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Stop Wallpaper</p></TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShuffle}>
+                <Shuffle className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Random Wallpaper</p></TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Camera className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Screenshot</p></TooltipContent>
+          </Tooltip>
+        </div>
+      </TooltipProvider>
+    </div>
+  );
+}
+```
+
+---
+
+### 📄 文件: `src\components\Layout.tsx`
 
 ```
 import { ReactNode } from "react";
@@ -25256,7 +25648,7 @@ export function Layout({ navbar, sidebar, children }: LayoutProps) {
 
 ---
 
-### 📄 文件: `src/components/WallpaperContextMenu.tsx`
+### 📄 文件: `src\components\WallpaperContextMenu.tsx`
 
 ```
 import * as ContextMenu from '@radix-ui/react-context-menu';
@@ -25315,7 +25707,101 @@ function Item({ icon, label, onClick, destructive }: any) {
 
 ---
 
-### 📄 文件: `src/components/app-sidebar.tsx`
+### 📄 文件: `src\components\WallpaperSidebar.tsx`
+
+```
+import { Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAppStore } from "@/store/appStore";
+import { applyWallpaper } from "@/api/wallpaper";
+import { toast } from "sonner";
+import { convertFileSrc } from "@tauri-apps/api/core";
+
+/**
+ * 将本地文件路径转换为浏览器可加载的 URL
+ */
+function getPreviewUrl(preview: string): string {
+  if (preview.startsWith('http://') || preview.startsWith('https://')) {
+    return preview;
+  }
+  return convertFileSrc(preview);
+}
+export function WallpaperSidebar() {
+  const selectedWallpaper = useAppStore((state) => state.getSelectedWallpaper());
+
+  const handleApply = async () => {
+    if (!selectedWallpaper) return;
+    try {
+      console.log("Applying:", selectedWallpaper.title);
+      await applyWallpaper(selectedWallpaper.id);
+      toast.success(`已应用: ${selectedWallpaper.title}`);
+    } catch (error) {
+      console.error(error);
+      toast.error("应用失败，请检查后台日志");
+    }
+  };
+
+  // 修正：不要返回 null，否则 Layout 右侧会塌陷。
+  // 保持原版结构，如果 selectedWallpaper 为空，内容区域会显示为空白或占位符，但容器还在。
+  
+  return (
+    <div className="h-full flex flex-col bg-card/30">
+      <ScrollArea className="flex-1 p-6">
+        {selectedWallpaper ? (
+          <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+            {/* 图片容器 - 正方形，短边裁剪 */}
+            <div className="aspect-square relative overflow-hidden border border-border shadow-2xl rounded-2xl bg-muted">
+              <img 
+                src={getPreviewUrl(selectedWallpaper.preview)} 
+                className="absolute inset-0 w-full h-full object-cover" 
+                alt={selectedWallpaper.title}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
+                }}
+              />
+            </div>
+            <div className="space-y-3">
+              <h1 className="text-xl font-bold leading-tight">{selectedWallpaper.title}</h1>
+              <div className="flex flex-wrap gap-2">
+                <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20">{selectedWallpaper.id}</Badge>
+                <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/20">{selectedWallpaper.size || "0 MB"}</Badge>
+              </div>
+            </div>
+            <div className="space-y-2 border-t pt-4">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Description</h3>
+              <p className="text-sm text-muted-foreground/80 leading-relaxed italic">
+                A high-quality live wallpaper for your desktop.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-muted-foreground/50 space-y-4">
+             <div className="w-16 h-16 rounded-xl bg-muted/50 border-2 border-dashed border-muted-foreground/20" />
+             <p className="text-sm">Select a wallpaper to view details</p>
+          </div>
+        )}
+      </ScrollArea>
+      
+      <div className="p-6 border-t bg-background/50">
+        <Button 
+          onClick={handleApply}
+          disabled={!selectedWallpaper}
+          className="w-full h-12 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg shadow-pink-500/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Play className="w-5 h-5 fill-current" /> Apply Wallpaper
+        </Button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### 📄 文件: `src\components\app-sidebar.tsx`
 
 ```
 import {
@@ -25432,7 +25918,7 @@ export function AppSidebar() {
 
 ---
 
-### 📄 文件: `src/components/button.tsx`
+### 📄 文件: `src\components\button.tsx`
 
 ```
 import * as React from "react";
@@ -25482,7 +25968,1504 @@ export { Button };
 
 ---
 
-### 📄 文件: `src/components/theme-provider.tsx`
+### 📄 文件: `src\components\library\WallpaperCard.tsx`
+
+```
+import { memo, useMemo } from "react";
+import { Image as ImageIcon, Video } from "lucide-react";
+import { Wallpaper } from "@/types";
+import { convertFileSrc } from "@tauri-apps/api/core";
+
+interface WallpaperCardProps {
+  wp: Wallpaper;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+/**
+ * 将本地文件路径转换为浏览器可加载的 URL
+ */
+function getPreviewUrl(preview: string): string {
+  if (preview.startsWith('http://') || preview.startsWith('https://')) {
+    return preview;
+  }
+  return convertFileSrc(preview);
+}
+
+/**
+ * 壁纸卡片组件 - 使用 memo 优化避免不必要的重渲染
+ */
+export const WallpaperCard = memo(function WallpaperCard({ wp, isSelected, onSelect }: WallpaperCardProps) {
+  // 使用 useMemo 缓存 URL，避免每次渲染重新计算
+  const previewUrl = useMemo(() => getPreviewUrl(wp.preview), [wp.preview]);
+  
+  return (
+    <div 
+      onClick={onSelect} 
+      className="cursor-pointer group"
+    >
+      <div className={`
+        relative overflow-hidden rounded-2xl border-2 transition-all duration-300
+        ${isSelected 
+          ? 'ring-2 ring-pink-500 ring-offset-4 ring-offset-background border-pink-500' 
+          : 'border-border/50 hover:border-pink-500/50 hover:shadow-xl hover:shadow-pink-500/10'
+        }
+      `}>
+        {/* 图片容器 - 正方形，短边裁剪 */}
+        <div className="aspect-square relative overflow-hidden bg-muted">
+          <img 
+            src={previewUrl} 
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+            alt={wp.title}
+            loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
+            }}
+          />
+          
+          {/* 底部渐变标题 */}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-8">
+            <p className="text-[11px] font-bold text-white truncate">{wp.title}</p>
+          </div>
+          
+          {/* 右上角类型图标 */}
+          <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md p-1.5 rounded-lg border border-white/10">
+              {wp.type === 'Video' ? <Video className="w-3 h-3 text-pink-400" /> : <ImageIcon className="w-3 h-3 text-emerald-400" />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+```
+
+---
+
+### 📄 文件: `src\components\performance\Chart.tsx`
+
+```
+// src/components/performance/Chart.tsx
+import React, { memo } from "react";
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+} from 'recharts';
+import { ChartDataPoint } from "@/types/performance";
+
+interface PerformanceChartProps {
+  data: ChartDataPoint[];
+  color: string;
+  unit: string;
+  title?: string;
+  height?: number;
+}
+
+const PerformanceChart: React.FC<PerformanceChartProps> = memo(({ 
+  data, color, unit, title, height = 120 
+}) => {
+  return (
+    <div style={{ height }} className="w-full">
+      {title && <div className="text-[10px] uppercase text-muted-foreground font-semibold mb-1">{title}</div>}
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data}>
+          <defs>
+            <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={color} stopOpacity={0.2}/>
+              <stop offset="95%" stopColor={color} stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
+          <XAxis 
+            dataKey="time" 
+            hide 
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis 
+            hide={false} 
+            width={30} 
+            axisLine={false}
+            tickLine={false}
+            tick={{fontSize: 10, fill: "hsl(var(--muted-foreground))"}}
+            tickFormatter={(value) => `${value}`}
+          />
+          <Tooltip 
+            contentStyle={{ 
+              backgroundColor: "hsl(var(--card))", 
+              borderColor: "hsl(var(--border))", 
+              borderRadius: "6px",
+              fontSize: "12px",
+              padding: "4px 8px"
+            }}
+            itemStyle={{ color: "hsl(var(--foreground))" }}
+            formatter={(value: number) => [`${value.toFixed(1)}${unit}`, "Usage"]}
+            labelStyle={{ display: 'none' }}
+          />
+          <Area 
+            type="monotone" 
+            dataKey="value" 
+            stroke={color} 
+            strokeWidth={2} 
+            fill={`url(#grad-${color})`} 
+            isAnimationActive={false}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+});
+
+PerformanceChart.displayName = "PerformanceChart";
+export default PerformanceChart;
+
+```
+
+---
+
+### 📄 文件: `src\components\performance\OverviewCard.tsx`
+
+```
+// src/components/performance/OverviewCard.tsx
+import React, { memo } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Activity } from "lucide-react";
+import PerformanceChart from "./Chart";
+import { ChartDataPoint } from "@/types/performance";
+
+interface OverviewCardProps {
+  title: string;
+  value: string;
+  sub: string;
+  icon: React.ReactNode;
+  data: ChartDataPoint[];
+  color: string;
+  unit: string;
+}
+
+export const OverviewCard: React.FC<OverviewCardProps> = memo(({ title, value, sub, icon, data, color, unit }) => {
+  return (
+    <Card className="overflow-hidden">
+      <CardContent className="p-0">
+        <div className="p-6 pb-2">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-sm font-medium text-muted-foreground">{title}</span>
+            <div className="p-2 bg-muted/50 rounded-lg">{icon}</div>
+          </div>
+          <div className="text-2xl font-bold">{value}</div>
+          <div className="text-xs text-muted-foreground">{sub}</div>
+        </div>
+        <div className="h-[100px] w-full mt-2 pr-4">
+           <PerformanceChart data={data} color={color} unit={unit} height={100} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+OverviewCard.displayName = "OverviewCard";
+
+export const ThreadsCard = memo(({ count }: { count: number }) => {
+  return (
+    <Card>
+      <CardContent className="p-6 flex flex-col justify-between h-full">
+         <div className="flex justify-between items-start">
+            <span className="text-sm font-medium text-muted-foreground">Active Threads</span>
+            <div className="p-2 bg-muted/50 rounded-lg"><Activity className="w-4 h-4 text-green-500" /></div>
+         </div>
+         <div>
+            <div className="text-3xl font-bold">{count}</div>
+            <div className="text-xs text-muted-foreground mt-1">Across 3 processes</div>
+         </div>
+         <div className="h-[100px] flex items-end gap-1 mt-2 opacity-30">
+            {[40, 60, 30, 80, 50, 90, 20, 60].map((h, i) => (
+              <div key={i} className="flex-1 bg-green-500 rounded-t-sm" style={{ height: `${h}%` }}></div>
+            ))}
+         </div>
+      </CardContent>
+    </Card>
+  );
+});
+ThreadsCard.displayName = "ThreadsCard";
+
+```
+
+---
+
+### 📄 文件: `src\components\performance\ProcessList.tsx`
+
+```
+// src/components/performance/ProcessList.tsx
+import React, { useState, memo } from "react";
+import { 
+  Activity, Cpu, Layout, ArrowDownToLine, Monitor, Layers, Image as ImageIcon, Server
+} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { ProcessStats, SystemStats } from "@/types/performance";
+import PerformanceChart from "./Chart";
+
+// ProcessRow 组件
+interface ProcessRowProps {
+  type: string;
+  data: ProcessStats;
+  icon: React.ReactNode;
+}
+
+const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const cpuColor = data.cpu < 20 ? "#22c55e" : data.cpu < 40 ? "#f97316" : "#ef4444";
+
+  return (
+    <Card className="overflow-hidden transition-all hover:border-primary/50">
+      <div className="p-4 flex flex-col gap-4">
+        {/* Header Row */}
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center shrink-0">
+            {icon}
+          </div>
+          
+          <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+            <div className="col-span-3">
+               <div className="font-bold text-base flex items-center gap-2">
+                 {data.name} 
+                 <Badge variant="outline" className="text-[10px] h-5 px-1 font-mono text-muted-foreground">
+                   PID: {data.pid}
+                 </Badge>
+               </div>
+               <div className="text-xs text-muted-foreground truncate" title={data.cmd}>{data.cmd}</div>
+            </div>
+
+            <div className="col-span-3 flex gap-6">
+               <div>
+                  <div className={`font-mono font-bold ${data.cpu > 20 ? 'text-orange-500' : 'text-green-500'}`}>
+                    {data.cpu.toFixed(1)}%
+                  </div>
+                  <div className="text-[10px] text-muted-foreground uppercase">CPU</div>
+               </div>
+               <div>
+                  <div className="font-mono font-bold text-blue-500">
+                    {data.mem.toFixed(0)} MB
+                  </div>
+                  <div className="text-[10px] text-muted-foreground uppercase">Mem</div>
+               </div>
+               <div>
+                  <div className="font-mono text-muted-foreground">{data.status}</div>
+                  <div className="text-[10px] text-muted-foreground uppercase">Status</div>
+               </div>
+            </div>
+
+            <div className="col-span-4 hidden md:flex gap-4 items-center">
+               <div className="flex-1">
+                  <PerformanceChart data={data.cpuHistory} color={cpuColor} unit="%" height={60} title="CPU Trend" />
+               </div>
+               <div className="flex-1">
+                  <PerformanceChart data={data.memHistory} color="#3b82f6" unit=" MB" height={60} title="Mem Trend" />
+               </div>
+            </div>
+
+            <div className="col-span-2 flex justify-end">
+               <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)}>
+                  {isOpen ? "Hide" : "Details"}
+                  {isOpen ? <ChevronDown className="ml-2 w-4 h-4"/> : <ChevronRight className="ml-2 w-4 h-4"/>}
+               </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Expandable Content */}
+        <Collapsible open={isOpen} className="space-y-2">
+          <CollapsibleContent>
+             <div className="pt-2 pl-[64px] pr-4 space-y-4">
+                
+                {/* Backend Specific Info */}
+                {type === 'backend' && (
+                  <div className="rounded-lg bg-secondary/30 border p-4 flex gap-4">
+                     <div className="w-32 h-20 bg-black/40 rounded-md overflow-hidden border border-white/10 shrink-0 relative group">
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
+                            <ImageIcon className="w-6 h-6 text-muted-foreground" />
+                        </div>
+                        <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-white p-1 text-center truncate">
+                            Preview
+                        </div>
+                     </div>
+                     <div className="flex flex-col justify-center space-y-1">
+                        <div className="flex items-center gap-2">
+                            <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20 hover:bg-blue-500/30">Video</Badge>
+                            <span className="text-sm font-bold">Cyberpunk City 2077</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-4">
+                            <span className="flex items-center gap-1"><Monitor className="w-3 h-3"/> Display 1 (2560x1440)</span>
+                            <span className="flex items-center gap-1"><Layers className="w-3 h-3"/> ID: 2849204</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground pt-1">
+                            Rendering at 60 FPS • Hardware Acceleration: On
+                        </div>
+                     </div>
+                  </div>
+                )}
+
+                {/* Thread Details */}
+                <div className="rounded-lg bg-muted/30 border p-4">
+                   <h4 className="text-xs font-bold uppercase text-muted-foreground mb-3 flex items-center gap-2">
+                     <Activity className="w-3 h-3" /> Active Threads ({data.threads.length})
+                   </h4>
+                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      {data.threads.map((t, i) => (
+                        <div key={i} className="text-xs font-mono text-muted-foreground flex items-center gap-2 hover:text-foreground transition-colors cursor-default">
+                           <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                           {t}
+                        </div>
+                      ))}
+                   </div>
+                </div>
+             </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+    </Card>
+  );
+});
+
+ProcessRow.displayName = "ProcessRow";
+
+// ProcessList 容器
+export default function ProcessList({ processes }: { processes: SystemStats['processes'] }) {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold flex items-center gap-2">
+        <Server className="w-5 h-5" /> Process Details
+      </h2>
+      
+      <ProcessRow 
+        type="backend" 
+        data={processes.backend} 
+        icon={<Cpu className="text-orange-500" />}
+      />
+      <ProcessRow 
+        type="frontend" 
+        data={processes.frontend} 
+        icon={<Layout className="text-blue-500" />}
+      />
+      <ProcessRow 
+        type="tray" 
+        data={processes.tray} 
+        icon={<ArrowDownToLine className="text-purple-500" />}
+      />
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\performance\ScreenshotHistory.tsx`
+
+```
+// src/components/performance/ScreenshotHistory.tsx
+import React, { memo } from "react";
+import { Camera, FolderOpen, Image as ImageIcon, Clock, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ScreenshotRecord } from "@/types/performance";
+import { toast } from "sonner";
+
+interface ScreenshotRowProps {
+  record: ScreenshotRecord;
+}
+
+const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
+  return (
+    <div className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors group">
+       <div className="flex items-center gap-4">
+          <div className="w-16 h-10 bg-muted rounded overflow-hidden border group-hover:border-primary/50 transition-colors flex items-center justify-center relative">
+             <Camera className="w-4 h-4 text-muted-foreground absolute" />
+          </div>
+          <div>
+             <div className="text-sm font-medium">{record.name}</div>
+             <div className="text-xs text-muted-foreground flex items-center gap-2">
+                <Clock className="w-3 h-3" /> {record.timestamp}
+             </div>
+          </div>
+       </div>
+
+       <div className="flex items-center gap-8">
+          <div className="text-right w-20">
+             <div className="text-xs font-bold">{record.duration}s</div>
+             <div className="text-[10px] text-muted-foreground uppercase">Duration</div>
+          </div>
+          <div className="text-right w-20">
+             <div className="text-xs font-bold text-orange-500">{record.maxCpu}%</div>
+             <div className="text-[10px] text-muted-foreground uppercase">Max CPU</div>
+          </div>
+          <div className="text-right w-20">
+             <div className="text-xs font-bold text-blue-500">{record.maxMem} MB</div>
+             <div className="text-[10px] text-muted-foreground uppercase">Max Mem</div>
+          </div>
+       </div>
+
+       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toast.success(`Opening ${record.path}...`)}>
+             <FolderOpen className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toast.success(`Viewing image...`)}>
+             <ImageIcon className="w-4 h-4" />
+          </Button>
+       </div>
+    </div>
+  );
+});
+
+ScreenshotRow.displayName = "ScreenshotRow";
+
+interface ScreenshotHistoryProps {
+  items: ScreenshotRecord[];
+  onClear: () => void;
+}
+
+export default function ScreenshotHistory({ items, onClear }: ScreenshotHistoryProps) {
+  return (
+    <div className="space-y-4">
+       <div className="flex items-center justify-between">
+          <div>
+             <h2 className="text-lg font-semibold flex items-center gap-2">
+               <Camera className="w-5 h-5" /> Screenshot History
+             </h2>
+             <p className="text-xs text-muted-foreground">Recent performance snapshots.</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={onClear} disabled={items.length === 0}>
+             <Trash2 className="w-4 h-4 mr-2" /> Clear
+          </Button>
+       </div>
+
+       <div className="rounded-xl border bg-card/50 overflow-hidden">
+          {items.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground text-sm">No screenshots taken yet.</div>
+          ) : (
+            <div className="divide-y">
+               {items.map((record) => (
+                  <ScreenshotRow key={record.id} record={record} />
+               ))}
+            </div>
+          )}
+       </div>
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\resizable-navbar-demo.tsx`
+
+```
+"use client";
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  NavbarLogo,
+  NavbarButton,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+} from "@/components/ui/resizable-navbar";
+import { useState } from "react";
+
+export default function NavbarDemo() {
+  const navItems = [
+    {
+      name: "Features",
+      link: "#features",
+    },
+    {
+      name: "Pricing",
+      link: "#pricing",
+    },
+    {
+      name: "Contact",
+      link: "#contact",
+    },
+  ];
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  return (
+    <div className="relative w-full">
+      <Navbar>
+        {/* Desktop Navigation */}
+        <NavBody>
+          <NavbarLogo />
+          <NavItems items={navItems} />
+          <div className="flex items-center gap-4">
+            <NavbarButton variant="secondary">Login</NavbarButton>
+            <NavbarButton variant="primary">Book a call</NavbarButton>
+          </div>
+        </NavBody>
+
+        {/* Mobile Navigation */}
+        <MobileNav>
+          <MobileNavHeader>
+            <NavbarLogo />
+            <MobileNavToggle
+              isOpen={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            />
+          </MobileNavHeader>
+
+          <MobileNavMenu
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+          >
+            {navItems.map((item, idx) => (
+              <a
+                key={`mobile-link-${idx}`}
+                href={item.link}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="relative text-neutral-600 dark:text-neutral-300"
+              >
+                <span className="block">{item.name}</span>
+              </a>
+            ))}
+            <div className="flex w-full flex-col gap-4">
+              <NavbarButton
+                onClick={() => setIsMobileMenuOpen(false)}
+                variant="primary"
+                className="w-full"
+              >
+                Login
+              </NavbarButton>
+              <NavbarButton
+                onClick={() => setIsMobileMenuOpen(false)}
+                variant="primary"
+                className="w-full"
+              >
+                Book a call
+              </NavbarButton>
+            </div>
+          </MobileNavMenu>
+        </MobileNav>
+      </Navbar>
+      <DummyContent />
+
+      {/* Navbar */}
+    </div>
+  );
+}
+
+const DummyContent = () => {
+  return (
+    <div className="container mx-auto p-8 pt-24">
+      <h1 className="mb-4 text-center text-3xl font-bold">
+        Check the navbar at the top of the container
+      </h1>
+      <p className="mb-10 text-center text-sm text-zinc-500">
+        For demo purpose we have kept the position as{" "}
+        <span className="font-medium">Sticky</span>. Keep in mind that this
+        component is <span className="font-medium">fixed</span> and will not
+        move when scrolling.
+      </p>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        {[
+          {
+            id: 1,
+            title: "The",
+            width: "md:col-span-1",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 2,
+            title: "First",
+            width: "md:col-span-2",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 3,
+            title: "Rule",
+            width: "md:col-span-1",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 4,
+            title: "Of",
+            width: "md:col-span-3",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 5,
+            title: "F",
+            width: "md:col-span-1",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 6,
+            title: "Club",
+            width: "md:col-span-2",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 7,
+            title: "Is",
+            width: "md:col-span-2",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 8,
+            title: "You",
+            width: "md:col-span-1",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 9,
+            title: "Do NOT TALK about",
+            width: "md:col-span-2",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+          {
+            id: 10,
+            title: "F Club",
+            width: "md:col-span-1",
+            height: "h-60",
+            bg: "bg-neutral-100 dark:bg-neutral-800",
+          },
+        ].map((box) => (
+          <div
+            key={box.id}
+            className={`${box.width} ${box.height} ${box.bg} flex items-center justify-center rounded-lg p-4 shadow-sm`}
+          >
+            <h2 className="text-xl font-medium">{box.title}</h2>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+```
+
+---
+
+### 📄 文件: `src\components\settings\Display.tsx`
+
+```
+import { Monitor, Volume2, Moon, Sun, Speaker } from "lucide-react";
+import { useAppStore } from "@/store/appStore";
+import { useTheme } from "@/components/theme-provider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SelectItem } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import {
+  Header,
+  SliderRow,
+  SwitchRow,
+  SwitchCard,
+  SelectField,
+  MONITOR_OPTIONS,
+  THEME_OPTIONS,
+} from "./Shared";
+
+
+export function DisplaySettings() {
+  const { theme, setTheme } = useTheme();
+  const { settings, updateSetting } = useAppStore();
+
+  if (!settings) return <div>Loading...</div>;
+
+  return (
+    <div className="space-y-6">
+      <Header title="Audio & Display" desc="Manage multi-monitor setup and audio processing." />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Monitor className="w-4 h-4 text-blue-500" /> Display Output
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <SelectField
+            label="Target Monitor"
+            value={settings.lastScreen || "all"}
+            onValueChange={(v) => updateSetting("lastScreen", v === "all" ? null : v)}
+            options={MONITOR_OPTIONS}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Volume2 className="w-4 h-4 text-green-500" /> Audio Control
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <SliderRow
+            label="Master Volume"
+            value={settings.volume}
+            onValueChange={(v) => updateSetting("volume", v)}
+            max={100}
+            step={1}
+            suffix="%"
+          />
+          <Separator />
+          <SwitchRow
+            label="Mute Audio"
+            description="Mute all audio"
+            checked={settings.muteAudio}
+            onCheckedChange={(v) => updateSetting("muteAudio", v)}
+            icon={<Speaker className="w-4 h-4 text-muted-foreground" />}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <SwitchCard
+              label="Disable Auto Mute"
+              description="Prevent muting when other apps play sound"
+              checked={settings.noAutomute}
+              onCheckedChange={(v) => updateSetting("noAutomute", v)}
+            />
+            <SwitchCard
+              label="No Audio Processing"
+              description="Disable spectrum analysis"
+              checked={settings.noAudioProcessing}
+              onCheckedChange={(v) => updateSetting("noAudioProcessing", v)}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />} Interface Theme
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">App Appearance</label>
+              <p className="text-xs text-muted-foreground">Light or Dark mode</p>
+            </div>
+            {/* 为了保持原 UI 样式（w-[180px]），这里稍微变通使用 SelectField 或直接内联 */}
+             <SelectField
+              label=""
+              value={theme}
+              onValueChange={(v) => setTheme(v as "light" | "dark" | "system")}
+              options={THEME_OPTIONS}
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\settings\Logs.tsx`
+
+```
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Filter, Copy, Check } from "lucide-react";
+import { LogEntry } from "@/types";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Header,
+  LOG_FILTER_OPTIONS,
+  getLevelColor,
+  formatLogEntry,
+} from "./Shared";
+
+export function LogViewer() {
+  const [filter, setFilter] = useState<string>("All");
+  const [isCopied, setIsCopied] = useState(false);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+
+  useEffect(() => {
+    setLogs([
+      { id: 1, timestamp: "10:00:01", level: "info", source: "GUI", message: "Application initialized" },
+      { id: 2, timestamp: "10:00:02", level: "info", source: "Core", message: "Connected to Wallpaper Engine Core" },
+      { id: 3, timestamp: "10:00:02", level: "warn", source: "Controller", message: "Steam API not detected" },
+    ]);
+  }, []);
+
+  const filteredLogs = useMemo(
+    () => logs.filter((log) => filter === "All" || log.source === filter),
+    [logs, filter]
+  );
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(filteredLogs.map(formatLogEntry).join("\n"));
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  }, [filteredLogs]);
+
+  return (
+    <div className="space-y-6 h-full flex flex-col">
+      <div className="flex items-center justify-between">
+        <Header title="Log Monitor" desc="Real-time debug information." />
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LOG_FILTER_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="flex-1 rounded-lg border bg-[#0f0f12] font-mono text-xs overflow-hidden flex flex-col">
+        <ScrollArea className="flex-1 p-4">
+          {filteredLogs.map((log) => (
+            <div key={log.id} className="flex gap-4 py-0.5">
+              <span className="text-gray-500 w-16">{log.timestamp}</span>
+              <span className={`w-10 font-bold ${getLevelColor(log.level)}`}>
+                {log.level.toUpperCase()}
+              </span>
+              <span className="text-purple-500 w-20">[{log.source}]</span>
+              <span className="text-gray-200 flex-1">{log.message}</span>
+            </div>
+          ))}
+        </ScrollArea>
+      </div>
+
+      <div className="flex justify-between items-center pt-2">
+        <span className="text-[10px] text-muted-foreground">{filteredLogs.length} entries</span>
+        <Button variant="outline" size="sm" onClick={handleCopy} className="h-8 gap-2 text-xs">
+          {isCopied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+          {isCopied ? "Copied!" : "Copy"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\settings\Playback.tsx`
+
+```
+import { Zap, MousePointer2, Clock } from "lucide-react";
+import { useAppStore } from "@/store/appStore";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+// 引入公共组件
+import {
+  Header,
+  SliderRow,
+  SwitchRow,
+  SelectField,
+  InputField,
+  SCALING_OPTIONS,
+  CLAMPING_OPTIONS,
+  CYCLE_ORDER_OPTIONS,
+} from "./Shared";
+
+export function PlaybackSettings() {
+  const { settings, updateSetting } = useAppStore();
+
+  if (!settings) return <div>Loading...</div>;
+
+  return (
+    <div className="space-y-6">
+      <Header
+        title="Playback & Performance"
+        desc="Fine-tune rendering quality, automation, and system integration."
+      />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-orange-500" /> Rendering Quality
+          </CardTitle>
+          <CardDescription>Optimize for battery life or visual fidelity.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <SliderRow
+            label="Target FPS Limit"
+            value={settings.fps}
+            onValueChange={(v) => updateSetting("fps", v)}
+            max={144}
+            min={10}
+            step={1}
+            suffix=" FPS"
+          />
+          <Separator />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SwitchRow
+              label="Disable Parallax"
+              description="Stop mouse movement effects"
+              checked={settings.disableParallax}
+              onCheckedChange={(v) => updateSetting("disableParallax", v)}
+            />
+            <SwitchRow
+              label="Disable Particles"
+              description="Turn off rain/fire effects"
+              checked={settings.disableParticles}
+              onCheckedChange={(v) => updateSetting("disableParticles", v)}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Display Behavior</CardTitle></CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SelectField
+              label="Scaling Mode"
+              value={settings.scaling}
+              onValueChange={(v) => updateSetting("scaling", v)}
+              options={SCALING_OPTIONS}
+            />
+            <SelectField
+              label="Texture Clamping"
+              value={settings.clamping}
+              onValueChange={(v) => updateSetting("clamping", v)}
+              options={CLAMPING_OPTIONS}
+            />
+          </div>
+          <Separator />
+          <SwitchRow
+            label="No Fullscreen Pause"
+            description="Keep playing when games open"
+            checked={settings.noFullscreenPause}
+            onCheckedChange={(v) => updateSetting("noFullscreenPause", v)}
+          />
+          <SwitchRow
+            label="Disable Mouse Interaction"
+            description="Ignore mouse clicks"
+            checked={settings.disableMouse}
+            onCheckedChange={(v) => updateSetting("disableMouse", v)}
+            icon={<MousePointer2 className="w-4 h-4 text-muted-foreground" />}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-blue-500" /> Playlist Automation
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <SwitchRow
+            label="Enable Auto-Cycle"
+            description="Automatically switch wallpapers"
+            checked={settings.cycleEnabled}
+            onCheckedChange={(v) => updateSetting("cycleEnabled", v)}
+          />
+          {settings.cycleEnabled && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <InputField
+                label="Cycle Interval (minutes)"
+                value={settings.cycleInterval}
+                onChange={(v) => updateSetting("cycleInterval", parseInt(v) || 15)}
+                type="number"
+                min={1}
+              />
+              <SelectField
+                label="Cycle Order"
+                value={settings.cycleOrder}
+                onValueChange={(v) => updateSetting("cycleOrder", v)}
+                options={CYCLE_ORDER_OPTIONS}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-blue-500/20 bg-blue-500/5">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Wayland Tweaks</span>
+            <Badge variant="outline" className="text-xs font-normal border-blue-500/30 text-blue-500">
+              Wayland
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <SwitchRow
+            label="Pause Only When Active"
+            description="Only pause if app is focused"
+            checked={settings.waylandOnlyActive}
+            onCheckedChange={(v) => updateSetting("waylandOnlyActive", v)}
+          />
+          <InputField
+            label="Ignore Application IDs"
+            value={settings.waylandIgnoreAppids}
+            onChange={(v) => updateSetting("waylandIgnoreAppids", v)}
+            placeholder="dock, bar, launcher..."
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\settings\Shared.tsx`
+
+```
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { FolderOpen } from "lucide-react";
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface SwitchRowProps {
+  label: string;
+  description?: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  icon?: React.ReactNode;
+}
+
+interface SliderRowProps {
+  label: string;
+  value: number;
+  onValueChange: (value: number) => void;
+  max: number;
+  min?: number;
+  step?: number;
+  suffix?: string;
+}
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+export const SCALING_OPTIONS = [
+  { value: "default", label: "Default" },
+  { value: "stretch", label: "Stretch" },
+  { value: "fit", label: "Fit" },
+  { value: "fill", label: "Fill" },
+] as const;
+
+export const CLAMPING_OPTIONS = [
+  { value: "clamp", label: "Clamp" },
+  { value: "border", label: "Border" },
+  { value: "repeat", label: "Repeat" },
+] as const;
+
+export const CYCLE_ORDER_OPTIONS = [
+  { value: "random", label: "Random" },
+  { value: "title", label: "Title" },
+  { value: "size", label: "Size" },
+] as const;
+
+export const MONITOR_OPTIONS = [
+  { value: "all", label: "All Monitors" },
+  { value: "eDP-1", label: "eDP-1" },
+  { value: "HDMI-1", label: "HDMI-1" },
+] as const;
+
+export const THEME_OPTIONS = [
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+  { value: "system", label: "System" },
+] as const;
+
+export const LOG_FILTER_OPTIONS = [
+  { value: "All", label: "All Sources" },
+  { value: "GUI", label: "GUI Only" },
+  { value: "Core", label: "Core Only" },
+] as const;
+
+export const LOG_LEVEL_COLORS: Record<string, string> = {
+  info: "text-blue-500",
+  warn: "text-amber-500",
+  error: "text-red-500",
+};
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+export const getLevelColor = (level: string): string => {
+  return LOG_LEVEL_COLORS[level] || "text-gray-500";
+};
+
+export const formatLogEntry = (log: { timestamp: string; level: string; source: string; message: string }): string => {
+  return `[${log.timestamp}] [${log.level.toUpperCase()}] [${log.source}] ${log.message}`;
+};
+
+// ============================================================================
+// Reusable Components
+// ============================================================================
+
+export function Header({ title, desc }: { title: string; desc: string }) {
+  return (
+    <div>
+      <h3 className="text-lg font-medium">{title}</h3>
+      <p className="text-sm text-muted-foreground">{desc}</p>
+      <Separator className="mt-4" />
+    </div>
+  );
+}
+
+export function SwitchRow({ label, description, checked, onCheckedChange, icon }: SwitchRowProps) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        {icon}
+        <div className="space-y-0.5">
+          <Label>{label}</Label>
+          {description && <p className="text-xs text-muted-foreground">{description}</p>}
+        </div>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+  );
+}
+
+export function SliderRow({ label, value, onValueChange, max, min = 0, step = 1, suffix = "" }: SliderRowProps) {
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <Label>{label}</Label>
+        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+          {value}{suffix}
+        </span>
+      </div>
+      <Slider
+        value={[value]}
+        onValueChange={(v) => onValueChange(v[0])}
+        max={max}
+        min={min}
+        step={step}
+        className="py-2"
+      />
+    </div>
+  );
+}
+
+export function SelectField({ 
+  label, 
+  value, 
+  onValueChange, 
+  options 
+}: { 
+  label: string; 
+  value: string; 
+  onValueChange: (value: string) => void; 
+  options: readonly { value: string; label: string }[];
+}) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <Select value={value} onValueChange={onValueChange}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+export function InputField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  min,
+}: {
+  label: string;
+  value: string | number;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+  min?: number;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <Input
+        type={type}
+        min={min}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  );
+}
+
+export function PathInputField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string | null) => void;
+  placeholder?: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div className="flex space-x-2">
+        <Input
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value || null)}
+        />
+        <Button variant="secondary">
+          <FolderOpen className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export function SwitchCard({
+  label,
+  description,
+  checked,
+  onCheckedChange,
+}: {
+  label: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}) {
+  return (
+    <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm">{label}</Label>
+        <Switch checked={checked} onCheckedChange={onCheckedChange} />
+      </div>
+      <p className="text-[10px] text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\settings\System.tsx`
+
+```
+// src/components/settings/System.tsx
+import { useState, useEffect, useCallback } from "react";
+import { Power, EyeOff, FileImage, FolderOpen } from "lucide-react"; // 修正：FolderOpen 必须在此导入
+import { invoke } from "@tauri-apps/api/core";
+import { useAppStore } from "@/store/appStore";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
+// 引入公共组件
+import {
+  Header,
+  SwitchRow,
+  InputField,
+  PathInputField,
+} from "./Shared";
+
+export function SystemSettings() {
+  const { settings, updateSetting } = useAppStore();
+  const [autostart, setAutostart] = useState(false);
+  const [startHidden, setStartHidden] = useState(false);
+
+  useEffect(() => {
+    // 获取自启动状态
+    invoke<boolean>("get_autostart_status").then(setAutostart).catch(() => {});
+  }, []);
+
+  const handleAutostartChange = useCallback(
+    async (enabled: boolean) => {
+      try {
+        await invoke("set_autostart", { enabled, hidden: startHidden });
+        setAutostart(enabled);
+        toast.success(enabled ? "Autostart enabled" : "Autostart disabled");
+      } catch {
+        toast.error("Failed to change autostart");
+      }
+    },
+    [startHidden]
+  );
+
+  if (!settings) return <div>Loading...</div>;
+
+  return (
+    <div className="space-y-6">
+      <Header
+        title="System & Tools"
+        desc="Manage directories and screenshot utilities."
+      />
+
+      {/* Directories Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FolderOpen className="w-4 h-4 text-yellow-500" /> Directories
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <PathInputField
+            label="Steam Workshop Path"
+            value={settings.workshopPath || ""}
+            onChange={(v) => updateSetting("workshopPath", v)}
+            placeholder="/home/user/.local/share/Steam/..."
+          />
+          <PathInputField
+            label="Assets Directory (Optional)"
+            value={settings.assetsPath || ""}
+            onChange={(v) => updateSetting("assetsPath", v)}
+            placeholder="Leave empty to auto-detect"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Startup & Integration Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Power className="w-4 h-4 text-purple-500" /> Startup & Integration
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <SwitchRow
+            label="Run on Startup"
+            description="Launch automatically on login"
+            checked={autostart}
+            onCheckedChange={handleAutostartChange}
+          />
+
+          <SwitchRow
+            label="Start Hidden"
+            description="Minimize to tray on launch"
+            checked={startHidden}
+            onCheckedChange={setStartHidden}
+            icon={<EyeOff className="w-4 h-4 text-muted-foreground" />}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Screenshot Tools Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileImage className="w-4 h-4 text-pink-500" /> Screenshot Tools
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Screenshot Slider - 保持原版特定布局 */}
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label>Capture Delay</Label>
+                <span className="text-xs text-muted-foreground">
+                  {settings.screenshotDelay} frames
+                </span>
+              </div>
+              <Slider
+                value={[settings.screenshotDelay]}
+                onValueChange={(v) => updateSetting("screenshotDelay", v[0])}
+                max={600}
+                min={1}
+                step={1}
+              />
+            </div>
+            <InputField
+              label="Target Resolution"
+              value={settings.screenshotRes}
+              onChange={(v) => updateSetting("screenshotRes", v)}
+              placeholder="1920x1080"
+            />
+          </div>
+
+          <Separator />
+
+          <SwitchRow
+            label="Prefer Silent Capture (Xvfb)"
+            description="Capture in background"
+            checked={settings.preferXvfb}
+            onCheckedChange={(v) => updateSetting("preferXvfb", v)}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\stateful-button-demo.tsx`
+
+```
+"use client";
+
+import React from "react";
+import { Button } from "@/components/ui/stateful-button";
+
+export default function StatefulButtonDemo() {
+  // dummy API call
+  const handleClick = () => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, 4000);
+    });
+  };
+  return (
+    <div className="flex h-40 w-full items-center justify-center">
+      <Button onClick={handleClick}>Send message</Button>
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\theme-provider.tsx`
 
 ```
 import { createContext, useContext, useEffect, useState } from "react"
@@ -25562,7 +27545,7 @@ export const useTheme = () => {
 
 ---
 
-### 📄 文件: `src/components/ui/3d-card.tsx`
+### 📄 文件: `src\components\ui\3d-card.tsx`
 
 ```
 "use client";
@@ -25725,7 +27708,7 @@ export const useMouseEnter = () => {
 
 ---
 
-### 📄 文件: `src/components/ui/alert-dialog.tsx`
+### 📄 文件: `src\components\ui\alert-dialog.tsx`
 
 ```
 import * as React from "react"
@@ -25872,7 +27855,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/alert.tsx`
+### 📄 文件: `src\components\ui\alert.tsx`
 
 ```
 import * as React from "react"
@@ -25939,7 +27922,7 @@ export { Alert, AlertTitle, AlertDescription }
 
 ---
 
-### 📄 文件: `src/components/ui/badge.tsx`
+### 📄 文件: `src\components\ui\badge.tsx`
 
 ```
 import * as React from "react"
@@ -25983,7 +27966,7 @@ export { Badge, badgeVariants }
 
 ---
 
-### 📄 文件: `src/components/ui/breadcrumb.tsx`
+### 📄 文件: `src\components\ui\breadcrumb.tsx`
 
 ```
 import * as React from "react"
@@ -26106,7 +28089,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/button-group.tsx`
+### 📄 文件: `src\components\ui\button-group.tsx`
 
 ```
 import { Slot } from "@radix-ui/react-slot"
@@ -26197,7 +28180,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/button.tsx`
+### 📄 文件: `src\components\ui\button.tsx`
 
 ```
 import * as React from "react"
@@ -26262,7 +28245,7 @@ export { Button, buttonVariants }
 
 ---
 
-### 📄 文件: `src/components/ui/card.tsx`
+### 📄 文件: `src\components\ui\card.tsx`
 
 ```
 import * as React from "react"
@@ -26346,7 +28329,7 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 
 ---
 
-### 📄 文件: `src/components/ui/carousel.tsx`
+### 📄 文件: `src\components\ui\carousel.tsx`
 
 ```
 import * as React from "react"
@@ -26614,7 +28597,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/chart.tsx`
+### 📄 文件: `src\components\ui\chart.tsx`
 
 ```
 import * as React from "react"
@@ -26989,7 +28972,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/checkbox.tsx`
+### 📄 文件: `src\components\ui\checkbox.tsx`
 
 ```
 import * as React from "react"
@@ -27025,7 +29008,7 @@ export { Checkbox }
 
 ---
 
-### 📄 文件: `src/components/ui/collapsible.tsx`
+### 📄 文件: `src\components\ui\collapsible.tsx`
 
 ```
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
@@ -27042,7 +29025,7 @@ export { Collapsible, CollapsibleTrigger, CollapsibleContent }
 
 ---
 
-### 📄 文件: `src/components/ui/combobox.tsx`
+### 📄 文件: `src\components\ui\combobox.tsx`
 
 ```
 import * as React from "react"
@@ -27139,7 +29122,7 @@ export function Combobox({
 
 ---
 
-### 📄 文件: `src/components/ui/command.tsx`
+### 📄 文件: `src\components\ui\command.tsx`
 
 ```
 "use client"
@@ -27300,7 +29283,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/context-menu.tsx`
+### 📄 文件: `src\components\ui\context-menu.tsx`
 
 ```
 import * as React from "react"
@@ -27506,7 +29489,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/dialog.tsx`
+### 📄 文件: `src\components\ui\dialog.tsx`
 
 ```
 import * as React from "react"
@@ -27634,7 +29617,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/drawer.tsx`
+### 📄 文件: `src\components\ui\drawer.tsx`
 
 ```
 import * as React from "react"
@@ -27758,7 +29741,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/dropdown-menu.tsx`
+### 📄 文件: `src\components\ui\dropdown-menu.tsx`
 
 ```
 import * as React from "react"
@@ -27965,10 +29948,11 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/empty.tsx`
+### 📄 文件: `src\components\ui\empty.tsx`
 
 ```
 import { cva, type VariantProps } from "class-variance-authority"
+import { Ghost } from "lucide-react";
 
 import { cn } from "@/lib/utils"
 
@@ -28073,11 +30057,26 @@ export {
   EmptyMedia,
 }
 
+export function EmptyState() {
+  return (
+    <Empty>
+      <EmptyMedia>
+        <Ghost className="size-12 text-muted-foreground/50" />
+      </EmptyMedia>
+      <EmptyHeader>
+        <EmptyTitle>No Wallpapers Found</EmptyTitle>
+        <EmptyDescription>
+          Try a correct library path or add some new wallpapers.
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  )
+}
 ```
 
 ---
 
-### 📄 文件: `src/components/ui/hover-card.tsx`
+### 📄 文件: `src\components\ui\hover-card.tsx`
 
 ```
 import * as React from "react"
@@ -28112,7 +30111,7 @@ export { HoverCard, HoverCardTrigger, HoverCardContent }
 
 ---
 
-### 📄 文件: `src/components/ui/input-group.tsx`
+### 📄 文件: `src\components\ui\input-group.tsx`
 
 ```
 import * as React from "react"
@@ -28288,7 +30287,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/input.tsx`
+### 📄 文件: `src\components\ui\input.tsx`
 
 ```
 import * as React from "react"
@@ -28318,7 +30317,7 @@ export { Input }
 
 ---
 
-### 📄 文件: `src/components/ui/label.tsx`
+### 📄 文件: `src\components\ui\label.tsx`
 
 ```
 import * as React from "react"
@@ -28350,7 +30349,7 @@ export { Label }
 
 ---
 
-### 📄 文件: `src/components/ui/menubar.tsx`
+### 📄 文件: `src\components\ui\menubar.tsx`
 
 ```
 import * as React from "react"
@@ -28612,7 +30611,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/navigation-menu.tsx`
+### 📄 文件: `src\components\ui\navigation-menu.tsx`
 
 ```
 import * as React from "react"
@@ -28748,7 +30747,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/pagination.tsx`
+### 📄 文件: `src\components\ui\pagination.tsx`
 
 ```
 import * as React from "react"
@@ -28873,7 +30872,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/popover.tsx`
+### 📄 文件: `src\components\ui\popover.tsx`
 
 ```
 import * as React from "react"
@@ -28912,7 +30911,303 @@ export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
 
 ---
 
-### 📄 文件: `src/components/ui/resizable.tsx`
+### 📄 文件: `src\components\ui\resizable-navbar.tsx`
+
+```
+"use client";
+import { cn } from "@/lib/utils";
+import { IconMenu2, IconX } from "@tabler/icons-react";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+} from "motion/react";
+
+import React, { useRef, useState } from "react";
+
+
+interface NavbarProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface NavBodyProps {
+  children: React.ReactNode;
+  className?: string;
+  visible?: boolean;
+}
+
+interface NavItemsProps {
+  items: {
+    name: string;
+    link: string;
+  }[];
+  className?: string;
+  onItemClick?: () => void;
+}
+
+interface MobileNavProps {
+  children: React.ReactNode;
+  className?: string;
+  visible?: boolean;
+}
+
+interface MobileNavHeaderProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface MobileNavMenuProps {
+  children: React.ReactNode;
+  className?: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const Navbar = ({ children, className }: NavbarProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+  const [visible, setVisible] = useState<boolean>(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 100) {
+      setVisible(true);
+    } else {
+      setVisible(false);
+    }
+  });
+
+  return (
+    <motion.div
+      ref={ref}
+      // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
+      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+    >
+      {React.Children.map(children, (child) =>
+        React.isValidElement(child)
+          ? React.cloneElement(
+              child as React.ReactElement<{ visible?: boolean }>,
+              { visible },
+            )
+          : child,
+      )}
+    </motion.div>
+  );
+};
+
+export const NavBody = ({ children, className, visible }: NavBodyProps) => {
+  return (
+    <motion.div
+      animate={{
+        backdropFilter: visible ? "blur(10px)" : "none",
+        boxShadow: visible
+          ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
+          : "none",
+        width: visible ? "40%" : "100%",
+        y: visible ? 20 : 0,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 200,
+        damping: 50,
+      }}
+      style={{
+        minWidth: "800px",
+      }}
+      className={cn(
+        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex dark:bg-transparent",
+        visible && "bg-white/80 dark:bg-neutral-950/80",
+        className,
+      )}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  return (
+    <motion.div
+      onMouseLeave={() => setHovered(null)}
+      className={cn(
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        className,
+      )}
+    >
+      {items.map((item, idx) => (
+        <a
+          onMouseEnter={() => setHovered(idx)}
+          onClick={onItemClick}
+          className="relative px-4 py-2 text-neutral-600 dark:text-neutral-300"
+          key={`link-${idx}`}
+          href={item.link}
+        >
+          {hovered === idx && (
+            <motion.div
+              layoutId="hovered"
+              className="absolute inset-0 h-full w-full rounded-full bg-gray-100 dark:bg-neutral-800"
+            />
+          )}
+          <span className="relative z-20">{item.name}</span>
+        </a>
+      ))}
+    </motion.div>
+  );
+};
+
+export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
+  return (
+    <motion.div
+      animate={{
+        backdropFilter: visible ? "blur(10px)" : "none",
+        boxShadow: visible
+          ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
+          : "none",
+        width: visible ? "90%" : "100%",
+        paddingRight: visible ? "12px" : "0px",
+        paddingLeft: visible ? "12px" : "0px",
+        borderRadius: visible ? "4px" : "2rem",
+        y: visible ? 20 : 0,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 200,
+        damping: 50,
+      }}
+      className={cn(
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
+        visible && "bg-white/80 dark:bg-neutral-950/80",
+        className,
+      )}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+export const MobileNavHeader = ({
+  children,
+  className,
+}: MobileNavHeaderProps) => {
+  return (
+    <div
+      className={cn(
+        "flex w-full flex-row items-center justify-between",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+
+export const MobileNavMenu = ({
+  children,
+  className,
+  isOpen,
+  onClose,
+}: MobileNavMenuProps) => {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className={cn(
+            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-white px-4 py-8 shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] dark:bg-neutral-950",
+            className,
+          )}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export const MobileNavToggle = ({
+  isOpen,
+  onClick,
+}: {
+  isOpen: boolean;
+  onClick: () => void;
+}) => {
+  return isOpen ? (
+    <IconX className="text-black dark:text-white" onClick={onClick} />
+  ) : (
+    <IconMenu2 className="text-black dark:text-white" onClick={onClick} />
+  );
+};
+
+export const NavbarLogo = () => {
+  return (
+    <a
+      href="#"
+      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
+    >
+      <img
+        src="https://assets.aceternity.com/logo-dark.png"
+        alt="logo"
+        width={30}
+        height={30}
+      />
+      <span className="font-medium text-black dark:text-white">Startup</span>
+    </a>
+  );
+};
+
+export const NavbarButton = ({
+  href,
+  as: Tag = "a",
+  children,
+  className,
+  variant = "primary",
+  ...props
+}: {
+  href?: string;
+  as?: React.ElementType;
+  children: React.ReactNode;
+  className?: string;
+  variant?: "primary" | "secondary" | "dark" | "gradient";
+} & (
+  | React.ComponentPropsWithoutRef<"a">
+  | React.ComponentPropsWithoutRef<"button">
+)) => {
+  const baseStyles =
+    "px-4 py-2 rounded-md bg-white button bg-white text-black text-sm font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
+
+  const variantStyles = {
+    primary:
+      "shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
+    secondary: "bg-transparent shadow-none dark:text-white",
+    dark: "bg-black text-white shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
+    gradient:
+      "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
+  };
+
+  return (
+    <Tag
+      href={href || undefined}
+      className={cn(baseStyles, variantStyles[variant], className)}
+      {...props}
+    >
+      {children}
+    </Tag>
+  );
+};
+
+```
+
+---
+
+### 📄 文件: `src\components\ui\resizable.tsx`
 
 ```
 import { GripVertical } from "lucide-react"
@@ -28963,7 +31258,7 @@ export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
 
 ---
 
-### 📄 文件: `src/components/ui/scroll-area.tsx`
+### 📄 文件: `src\components\ui\scroll-area.tsx`
 
 ```
 import * as React from "react"
@@ -29017,7 +31312,7 @@ export { ScrollArea, ScrollBar }
 
 ---
 
-### 📄 文件: `src/components/ui/select.tsx`
+### 📄 文件: `src\components\ui\select.tsx`
 
 ```
 import * as React from "react"
@@ -29182,7 +31477,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/separator.tsx`
+### 📄 文件: `src\components\ui\separator.tsx`
 
 ```
 import * as React from "react"
@@ -29219,7 +31514,7 @@ export { Separator }
 
 ---
 
-### 📄 文件: `src/components/ui/sheet.tsx`
+### 📄 文件: `src\components\ui\sheet.tsx`
 
 ```
 import * as React from "react"
@@ -29365,7 +31660,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/sidebar.tsx`
+### 📄 文件: `src\components\ui\sidebar.tsx`
 
 ```
 import * as React from "react"
@@ -30144,7 +32439,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/skeleton.tsx`
+### 📄 文件: `src\components\ui\skeleton.tsx`
 
 ```
 import { cn } from "@/lib/utils"
@@ -30167,7 +32462,7 @@ export { Skeleton }
 
 ---
 
-### 📄 文件: `src/components/ui/slider.tsx`
+### 📄 文件: `src\components\ui\slider.tsx`
 
 ```
 import * as React from "react"
@@ -30201,7 +32496,7 @@ export { Slider }
 
 ---
 
-### 📄 文件: `src/components/ui/sonner.tsx`
+### 📄 文件: `src\components\ui\sonner.tsx`
 
 ```
 import { useTheme } from "next-themes"
@@ -30215,6 +32510,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
+      position="bottom-center"
       className="toaster group"
       toastOptions={{
         classNames: {
@@ -30238,7 +32534,7 @@ export { Toaster }
 
 ---
 
-### 📄 文件: `src/components/ui/spinner.tsx`
+### 📄 文件: `src\components\ui\spinner.tsx`
 
 ```
 import { Loader2Icon } from "lucide-react"
@@ -30262,7 +32558,183 @@ export { Spinner }
 
 ---
 
-### 📄 文件: `src/components/ui/switch.tsx`
+### 📄 文件: `src\components\ui\stateful-button.tsx`
+
+```
+"use client";
+import { cn } from "@/lib/utils";
+import React from "react";
+import { motion, AnimatePresence, useAnimate } from "motion/react";
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export const Button = ({ className, children, ...props }: ButtonProps) => {
+  const [scope, animate] = useAnimate();
+
+  const animateLoading = async () => {
+    await animate(
+      ".loader",
+      {
+        width: "20px",
+        scale: 1,
+        display: "block",
+      },
+      {
+        duration: 0.2,
+      },
+    );
+  };
+
+  const animateSuccess = async () => {
+    await animate(
+      ".loader",
+      {
+        width: "0px",
+        scale: 0,
+        display: "none",
+      },
+      {
+        duration: 0.2,
+      },
+    );
+    await animate(
+      ".check",
+      {
+        width: "20px",
+        scale: 1,
+        display: "block",
+      },
+      {
+        duration: 0.2,
+      },
+    );
+
+    await animate(
+      ".check",
+      {
+        width: "0px",
+        scale: 0,
+        display: "none",
+      },
+      {
+        delay: 2,
+        duration: 0.2,
+      },
+    );
+  };
+
+  const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    await animateLoading();
+    await props.onClick?.(event);
+    await animateSuccess();
+  };
+
+  const {
+    onClick,
+    onDrag,
+    onDragStart,
+    onDragEnd,
+    onAnimationStart,
+    onAnimationEnd,
+    ...buttonProps
+  } = props;
+
+  return (
+    <motion.button
+      layout
+      layoutId="button"
+      ref={scope}
+      className={cn(
+        "flex min-w-[120px] cursor-pointer items-center justify-center gap-2 rounded-full bg-green-500 px-4 py-2 font-medium text-white ring-offset-2 transition duration-200 hover:ring-2 hover:ring-green-500 dark:ring-offset-black",
+        className,
+      )}
+      {...buttonProps}
+      onClick={handleClick}
+    >
+      <motion.div layout className="flex items-center gap-2">
+        <Loader />
+        <CheckIcon />
+        <motion.span layout>{children}</motion.span>
+      </motion.div>
+    </motion.button>
+  );
+};
+
+const Loader = () => {
+  return (
+    <motion.svg
+      animate={{
+        rotate: [0, 360],
+      }}
+      initial={{
+        scale: 0,
+        width: 0,
+        display: "none",
+      }}
+      style={{
+        scale: 0.5,
+        display: "none",
+      }}
+      transition={{
+        duration: 0.3,
+        repeat: Infinity,
+        ease: "linear",
+      }}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="loader text-white"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3a9 9 0 1 0 9 9" />
+    </motion.svg>
+  );
+};
+
+const CheckIcon = () => {
+  return (
+    <motion.svg
+      initial={{
+        scale: 0,
+        width: 0,
+        display: "none",
+      }}
+      style={{
+        scale: 0.5,
+        display: "none",
+      }}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="check text-white"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+      <path d="M9 12l2 2l4 -4" />
+    </motion.svg>
+  );
+};
+
+```
+
+---
+
+### 📄 文件: `src\components\ui\switch.tsx`
 
 ```
 import * as React from "react"
@@ -30297,7 +32769,7 @@ export { Switch }
 
 ---
 
-### 📄 文件: `src/components/ui/table.tsx`
+### 📄 文件: `src\components\ui\table.tsx`
 
 ```
 import * as React from "react"
@@ -30425,7 +32897,7 @@ export {
 
 ---
 
-### 📄 文件: `src/components/ui/tabs.tsx`
+### 📄 文件: `src\components\ui\tabs.tsx`
 
 ```
 import * as React from "react"
@@ -30486,7 +32958,7 @@ export { Tabs, TabsList, TabsTrigger, TabsContent }
 
 ---
 
-### 📄 文件: `src/components/ui/textarea.tsx`
+### 📄 文件: `src\components\ui\textarea.tsx`
 
 ```
 import * as React from "react"
@@ -30516,7 +32988,7 @@ export { Textarea }
 
 ---
 
-### 📄 文件: `src/components/ui/toggle.tsx`
+### 📄 文件: `src\components\ui\toggle.tsx`
 
 ```
 import * as React from "react"
@@ -30567,7 +33039,7 @@ export { Toggle, toggleVariants }
 
 ---
 
-### 📄 文件: `src/components/ui/tooltip.tsx`
+### 📄 文件: `src\components\ui\tooltip.tsx`
 
 ```
 import * as React from "react"
@@ -30605,7 +33077,7 @@ export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
 
 ---
 
-### 📄 文件: `src/hooks/use-mobile.tsx`
+### 📄 文件: `src\hooks\use-mobile.tsx`
 
 ```
 import * as React from "react"
@@ -30632,7 +33104,91 @@ export function useIsMobile() {
 
 ---
 
-### 📄 文件: `src/index.css`
+### 📄 文件: `src\hooks\useSystemStats.ts`
+
+```typescript
+// src/hooks/useSystemStats.ts
+import { useState, useEffect } from "react";
+import { SystemStats, ScreenshotRecord, ChartDataPoint } from "@/types/performance";
+
+export function useSystemStats() {
+  const [stats, setStats] = useState<SystemStats | null>(null);
+  const [history, setHistory] = useState<ScreenshotRecord[]>([]);
+
+  useEffect(() => {
+    // 初始数据生成器
+    const initData = (len: number): ChartDataPoint[] => 
+      Array.from({ length: len }, (_, i) => ({ 
+        time: `${len - i}s`, 
+        value: 0 
+      }));
+    
+    // 初始化截图历史
+    setHistory([
+      { id: 1, name: "Cyberpunk City", timestamp: "15:45:20", duration: 1.2, maxCpu: 45.2, maxMem: 600.5, path: "/tmp/s1.png" },
+      { id: 2, name: "Ocean Waves", timestamp: "14:20:10", duration: 0.8, maxCpu: 20.1, maxMem: 450.2, path: "/tmp/s2.png" },
+    ]);
+
+    const timer = setInterval(() => {
+      setStats(prev => {
+        const nowStr = "Now";
+        
+        const updateArr = (arr: ChartDataPoint[] | undefined, val: number, maxLen = 30) => {
+          const current = arr || initData(maxLen);
+          // 移动时间轴标签 (简单模拟)
+          const shifted = current.slice(1).map((p, i) => ({ ...p, time: `${maxLen - i}s` }));
+          return [...shifted, { time: nowStr, value: val }];
+        };
+
+        const newCpu = Math.random() * 30 + 5;
+        const newMem = Math.random() * 100 + 400;
+
+        return {
+          totalCpu: newCpu,
+          totalMem: newMem,
+          activeThreads: 31,
+          cpuHistory: updateArr(prev?.cpuHistory, newCpu),
+          memHistory: updateArr(prev?.memHistory, newMem),
+          processes: {
+            backend: {
+              pid: 2722, name: "Backend", cmd: "wallpaper-engine-backend", status: "Running",
+              cpu: Math.random() * 15, mem: 370 + Math.random() * 20,
+              cpuHistory: updateArr(prev?.processes.backend.cpuHistory, Math.random() * 15),
+              memHistory: updateArr(prev?.processes.backend.memHistory, 370 + Math.random() * 20),
+              threads: ["render-loop", "video-decoder", "audio-processor", "ipc-worker", "steam-callback"]
+            },
+            frontend: {
+              pid: 5459, name: "Frontend", cmd: "wallpaper-engine-gui", status: "Sleeping",
+              cpu: Math.random() * 2, mem: 360 + Math.random() * 10,
+              cpuHistory: updateArr(prev?.processes.frontend.cpuHistory, Math.random() * 2),
+              memHistory: updateArr(prev?.processes.frontend.memHistory, 360 + Math.random() * 10),
+              threads: ["gui-main", "event-loop", "dbus-worker"]
+            },
+            tray: {
+              pid: 1233, name: "Tray", cmd: "wallpaper-tray", status: "Running",
+              cpu: 0.1, mem: 65,
+              cpuHistory: updateArr(prev?.processes.tray.cpuHistory, 0.1),
+              memHistory: updateArr(prev?.processes.tray.memHistory, 65),
+              threads: ["gtk-main"]
+            }
+          }
+        };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const clearHistory = () => setHistory([]);
+
+  return { stats, history, clearHistory };
+}
+
+```
+
+---
+
+### 📄 文件: `src\index.css`
 
 ```css
 @tailwind base;
@@ -30721,7 +33277,7 @@ body {
 
 ---
 
-### 📄 文件: `src/lib/utils.ts`
+### 📄 文件: `src\lib\utils.ts`
 
 ```typescript
 import { clsx, type ClassValue } from "clsx"
@@ -30735,7 +33291,7 @@ export function cn(...inputs: ClassValue[]) {
 
 ---
 
-### 📄 文件: `src/main.tsx`
+### 📄 文件: `src\main.tsx`
 
 ```
 import React from "react";
@@ -30744,14 +33300,14 @@ import { App } from "./App";
 import "./index.css";
 // 1. 引入 Provider
 import { ThemeProvider } from "./components/theme-provider";
-import { SidebarProvider } from "./components/ui/sidebar";
+import { Toaster } from "./components/ui/sonner";
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     {/* 2. 包裹 App，默认设为 dark (这样第一次打开就是好看的深色) */}
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <SidebarProvider>
-        <App />
-      </SidebarProvider>
+      <App />
+      <Toaster />
     </ThemeProvider>
   </React.StrictMode>
 );
@@ -30759,7 +33315,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
 ---
 
-### 📄 文件: `src/mock/wallpapers.ts`
+### 📄 文件: `src\mock\wallpapers.ts`
 
 ```typescript
 ﻿// src/mock/wallpapers.ts
@@ -30785,134 +33341,70 @@ export const MOCK_WALLPAPERS = Array.from({ length: 20 }).map((_, i) => {
 
 ---
 
-### 📄 文件: `src/pages/Performance.tsx`
+### 📄 文件: `src\pages\Library.tsx`
 
 ```
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Cpu, HardDrive, Activity, Smartphone } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { EmptyState } from "@/components/ui/empty";
+import { WallpaperCard } from "@/components/library/WallpaperCard";
+import { useAppStore } from "@/store/appStore";
+import { useMemo, useCallback } from "react";
 
-// Mock Data generation
-const generateData = () => Array.from({ length: 30 }, (_, i) => ({
-  time: i,
-  cpu: Math.floor(Math.random() * 30) + 5,
-  mem: 200 + Math.floor(Math.random() * 50),
-}));
-
-export function Performance() {
-  const data = generateData();
+export function Library() {
+  const wallpapers = useAppStore((state) => state.wallpapers);
+  const searchQuery = useAppStore((state) => state.searchQuery);
+  const selectedId = useAppStore((state) => state.selectedId);
+  const setSelectedId = useAppStore((state) => state.setSelectedId);
+  
+  const filteredWallpapers = useMemo(() => {
+    if (!searchQuery) return wallpapers;
+    const lowerQ = searchQuery.toLowerCase();
+    return wallpapers.filter(w => 
+      w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
+    );
+  }, [wallpapers, searchQuery]);
+  
+  const selectedWallpaper = useMemo(() => {
+    return wallpapers.find(w => w.id === selectedId) || null;
+  }, [wallpapers, selectedId]);
+  
+  const handleSelect = useCallback((id: string) => {
+    setSelectedId(id);
+  }, [setSelectedId]);
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-        <h1 className="text-3xl font-bold">System Monitor</h1>
-
-        {/* 1. 顶部数据卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard title="Total CPU" value="12.5%" sub="4 Cores Active" icon={<Cpu className="text-primary" />} />
-          <StatCard title="Memory Usage" value="807.1 MB" sub="of 32 GB" icon={<HardDrive className="text-blue-400" />} />
-          <StatCard title="Active Threads" value="31" sub="Across 3 processes" icon={<Activity className="text-green-400" />} />
+    <div className="h-full flex flex-col p-6 space-y-6">
+      {/* 状态工具栏 */}
+      <div className="flex items-center justify-between bg-muted/20 px-4 py-2 rounded-xl border border-border/50">
+        <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest">
+          <span className="text-pink-500 uppercase">Currently Using</span>
+          <span className="text-foreground truncate max-w-[300px]">
+            {selectedWallpaper?.title || "None"}
+          </span>
         </div>
+        <span className="text-xs font-mono text-muted-foreground/50">
+          {filteredWallpapers.length} wallpapers
+        </span>
+      </div>
 
-        {/* 2. 主图表 (Recharts) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartCard title="Total CPU History" data={data} dataKey="cpu" color="#f87171" unit="%" />
-          <ChartCard title="Total Memory History" data={data} dataKey="mem" color="#3b82f6" unit=" MB" />
-        </div>
-
-        {/* 3. 详细进程列表 (复刻原版 Process Details) */}
-        <div>
-          <h2 className="text-xl font-bold mb-4">Process Details</h2>
-          <div className="space-y-4">
-            <ProcessRow name="Frontend (GUI)" pid={5459} cpu="0.7%" mem="368.9 MB" status="Sleeping" />
-            <ProcessRow name="Backend (Engine)" pid={2722} cpu="0.3%" mem="372.7 MB" status="Running" />
-            <ProcessRow name="Tray Icon" pid={1233} cpu="0.1%" mem="65.4 MB" status="Sleeping" />
+      <ScrollArea className="flex-1">
+        {filteredWallpapers.length === 0 ? (
+          <div className="flex h-full min-h-[50vh] items-center justify-center">
+            <EmptyState />
           </div>
-        </div>
-
-      </div>
-  );
-}
-
-// --- 组件 ---
-
-function StatCard({ title, value, sub, icon }: any) {
-  return (
-    <div className="bg-surface p-6 rounded-xl border border-white/5 flex flex-col justify-between hover:border-white/10 transition-colors">
-      <div className="flex justify-between items-start mb-4">
-        <span className="text-gray-400 text-sm font-medium">{title}</span>
-        <div className="p-2 bg-white/5 rounded-lg">{icon}</div>
-      </div>
-      <div>
-        <div className="text-3xl font-bold text-white mb-1">{value}</div>
-        <div className="text-xs text-gray-500">{sub}</div>
-      </div>
-    </div>
-  );
-}
-
-function ChartCard({ title, data, dataKey, color, unit }: any) {
-  return (
-    <div className="bg-surface p-6 rounded-xl border border-white/5 shadow-lg">
-      <h3 className="text-sm font-medium text-gray-400 mb-4">{title}</h3>
-      <div className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
-            <defs>
-              <linearGradient id={`color${dataKey}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={color} stopOpacity={0.3}/>
-                <stop offset="95%" stopColor={color} stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-            <XAxis dataKey="time" hide />
-            <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}`} />
-            <Tooltip 
-              contentStyle={{ backgroundColor: '#1e1e2e', borderColor: '#313244', borderRadius: '8px', fontSize: '12px' }}
-              itemStyle={{ color: '#cdd6f4' }}
-              formatter={(val: any) => [`${val}${unit}`, title]}
-            />
-            <Area 
-              type="monotone" 
-              dataKey={dataKey} 
-              stroke={color} 
-              strokeWidth={2}
-              fillOpacity={1} 
-              fill={`url(#color${dataKey})`} 
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
-
-function ProcessRow({ name, pid, cpu, mem, status }: any) {
-  return (
-    <div className="bg-surface p-4 rounded-xl border border-white/5 flex items-center justify-between group hover:border-primary/50 transition-all">
-      <div className="flex items-center gap-4">
-        <div className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center">
-          <Smartphone size={20} className="text-gray-400 group-hover:text-primary transition-colors" />
-        </div>
-        <div>
-          <div className="font-bold text-white">{name}</div>
-          <div className="text-xs text-gray-500 font-mono">PID: {pid}</div>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-3 gap-12 text-right">
-        <div>
-          <div className="text-xs text-gray-500">CPU</div>
-          <div className="font-mono text-green-400">{cpu}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-500">Memory</div>
-          <div className="font-mono text-blue-400">{mem}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-500">Status</div>
-          <div className="text-gray-300">{status}</div>
-        </div>
-      </div>
+        ) : (
+          <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
+            {filteredWallpapers.map((wp) => (
+              <WallpaperCard 
+                key={wp.id} 
+                wp={wp} 
+                isSelected={selectedId === wp.id} 
+                onSelect={() => handleSelect(wp.id)} 
+              />
+            ))}
+          </div>
+        )}
+      </ScrollArea>
     </div>
   );
 }
@@ -30920,87 +33412,212 @@ function ProcessRow({ name, pid, cpu, mem, status }: any) {
 
 ---
 
-### 📄 文件: `src/pages/Settings.tsx`
+### 📄 文件: `src\pages\Performance.tsx`
 
 ```
-import { useState } from "react";
-import { 
-  Monitor, Volume2, Cpu, FileText, 
-  MousePointer2, Shield, FolderOpen 
-} from "lucide-react";
-
-// 引入 Shadcn UI 组件
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+// src/pages/Performance.tsx
+import React from "react";
+import { Cpu, MemoryStick } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Combobox } from "@/components/ui/combobox";
-import { useTheme } from "@/components/theme-provider";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
-type SettingsTab = "general" | "audio" | "advanced" | "logs";
+// Hooks
+import { useSystemStats } from "@/hooks/useSystemStats";
+
+// Components
+import { OverviewCard, ThreadsCard } from "@/components/performance/OverviewCard";
+import ProcessList from "@/components/performance/ProcessList";
+import ScreenshotHistory from "@/components/performance/ScreenshotHistory";
+
+export function Performance() {
+  const { stats, history, clearHistory } = useSystemStats();
+
+  if (!stats) return <div className="p-8 text-muted-foreground">Initializing Performance Monitor...</div>;
+
+  return (
+    <div className="flex flex-col h-full space-y-6 overflow-hidden">
+      
+      <div className="flex flex-col space-y-1">
+        <h1 className="text-2xl font-bold tracking-tight">System Monitor</h1>
+        <p className="text-sm text-muted-foreground">Real-time resource usage of Wallpaper Engine components.</p>
+      </div>
+
+      <ScrollArea className="flex-1 -mx-6 px-6">
+        <div className="space-y-8 pb-20">
+          
+          {/* 1. 总览卡片 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <OverviewCard 
+              title="Total CPU" 
+              value={`${stats.totalCpu.toFixed(1)}%`} 
+              sub="4 Cores Active"
+              icon={<Cpu className="text-primary" />} 
+              data={stats.cpuHistory} 
+              color="#ef4444"
+              unit="%"
+            />
+            <OverviewCard 
+              title="Total Memory" 
+              value={`${stats.totalMem.toFixed(0)} MB`} 
+              sub="of 16 GB"
+              icon={<MemoryStick className="text-blue-500" />} 
+              data={stats.memHistory} 
+              color="#3b82f6"
+              unit=" MB"
+            />
+            <ThreadsCard count={stats.activeThreads} />
+          </div>
+
+          <Separator />
+
+          {/* 2. 进程详情 */}
+          <ProcessList processes={stats.processes} />
+
+          <Separator />
+
+          {/* 3. 截图历史 */}
+          <ScreenshotHistory items={history} onClear={clearHistory} />
+          
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\pages\Settings.tsx`
+
+```
+import { useState, useEffect, useCallback } from "react";
+import {
+  PlayCircle, Monitor, Settings2, FileText, Zap, RotateCw, Save, Square
+} from "lucide-react";
+
+import { useAppStore } from "@/store/appStore";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
+import { stopWallpaper } from "@/api/wallpaper";
+
+// 引入拆分后的子组件
+import { PlaybackSettings } from "@/components/settings/Playback";
+import { DisplaySettings } from "@/components/settings/Display";
+import { SystemSettings } from "@/components/settings/System";
+import { LogViewer } from "@/components/settings/Logs";
+
+type SettingsTab = "playback" | "display" | "system" | "logs";
 
 export function Settings() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>("general");
+  const [activeTab, setActiveTab] = useState<SettingsTab>("playback");
+  const { settings, fetchSettings, saveSettings, restartWallpapers, settingsLoading } =
+    useAppStore();
+
+  useEffect(() => {
+    if (!settings) {
+      fetchSettings().catch(() => toast.error("Failed to load settings"));
+    }
+  }, [settings, fetchSettings]);
+
+  const handleSave = useCallback(async () => {
+    try {
+      await saveSettings();
+      toast.success("Settings saved successfully");
+    } catch {
+      toast.error("Failed to save settings");
+    }
+  }, [saveSettings]);
+
+  const handleReload = useCallback(async () => {
+    try {
+      await restartWallpapers();
+      toast.success("Wallpapers reloaded");
+    } catch {
+      toast.error("Failed to reload wallpapers");
+    }
+  }, [restartWallpapers]);
+
+  const handleStop = useCallback(async () => {
+    try {
+      await stopWallpaper();
+      toast.success("Wallpaper stopped");
+    } catch {
+      toast.error("Failed to stop wallpaper");
+    }
+  }, []);
 
   return (
     <div className="flex h-full w-full bg-background text-foreground rounded-xl overflow-hidden border">
-      
-      {/* 左侧导航 */}
+      {/* Sidebar Navigation */}
       <aside className="w-64 border-r bg-muted/30 flex flex-col">
         <div className="p-6">
-          <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
+          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <Settings2 className="w-6 h-6" /> Settings
+          </h2>
         </div>
-        <div className="px-3 space-y-1">
-          <NavButton 
-            active={activeTab === "general"} 
-            onClick={() => setActiveTab("general")}
+
+        <div className="px-3 space-y-1 flex-1">
+          <NavButton
+            active={activeTab === "playback"}
+            onClick={() => setActiveTab("playback")}
+            icon={<PlayCircle className="w-4 h-4" />}
+            label="Playback & Perf"
+            desc="FPS, Cycling, Interaction"
+          />
+          <NavButton
+            active={activeTab === "display"}
+            onClick={() => setActiveTab("display")}
             icon={<Monitor className="w-4 h-4" />}
-            label="General"
+            label="Audio & Display"
+            desc="Monitor, Theme, Volume"
           />
-          <NavButton 
-            active={activeTab === "audio"} 
-            onClick={() => setActiveTab("audio")}
-            icon={<Volume2 className="w-4 h-4" />}
-            label="Audio"
+          <NavButton
+            active={activeTab === "system"}
+            onClick={() => setActiveTab("system")}
+            icon={<Zap className="w-4 h-4" />}
+            label="System & Tools"
+            desc="Paths, Root, Autostart"
           />
-          <NavButton 
-            active={activeTab === "advanced"} 
-            onClick={() => setActiveTab("advanced")}
-            icon={<Cpu className="w-4 h-4" />}
-            label="Advanced"
-          />
-          <NavButton 
-            active={activeTab === "logs"} 
+          <NavButton
+            active={activeTab === "logs"}
             onClick={() => setActiveTab("logs")}
             icon={<FileText className="w-4 h-4" />}
-            label="Logs"
+            label="Log Monitor"
+            desc="Debug & Filters"
           />
+        </div>
+
+        <div className="p-4 border-t bg-background/50 space-y-3 backdrop-blur-sm">
+          <Button
+            className="w-full gap-2 font-bold shadow-lg shadow-primary/20"
+            onClick={handleSave}
+            disabled={settingsLoading}
+          >
+            <Save className="w-4 h-4" /> Save Changes
+          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleReload}>
+              <RotateCw className="w-3 h-3" /> Reload
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+              onClick={handleStop}
+            >
+              <Square className="w-3 h-3 fill-current" /> Stop
+            </Button>
+          </div>
         </div>
       </aside>
 
-      {/* 右侧内容区 (使用 ScrollArea) */}
-      <ScrollArea className="flex-1">
-        <div className="p-8 max-w-4xl space-y-8">
-          {activeTab === "general" && <GeneralSettings />}
-          {activeTab === "audio" && <AudioSettings />}
-          {activeTab === "advanced" && <AdvancedSettings />}
+      <ScrollArea className="flex-1 bg-card/10">
+        <div className="p-8 max-w-4xl space-y-8 pb-20">
+          {activeTab === "playback" && <PlaybackSettings />}
+          {activeTab === "display" && <DisplaySettings />}
+          {activeTab === "system" && <SystemSettings />}
           {activeTab === "logs" && <LogViewer />}
         </div>
       </ScrollArea>
@@ -31008,199 +33625,34 @@ export function Settings() {
   );
 }
 
-// --- 子页面组件 ---
-
-function GeneralSettings() {
-  // 模拟状态
-  const [scaling, setScaling] = useState("cover");
-  const { theme, setTheme } = useTheme();
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">General</h3>
-        <p className="text-sm text-muted-foreground">Configure system behavior.</p>
-      </div>
-      <Separator />
-      
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Appearance</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          
-          {/* Theme Selector */}
-          <div className="flex items-center justify-between space-x-4">
-            <div className="flex flex-col space-y-1">
-              <Label className="text-base">Theme</Label>
-              <p className="text-sm text-muted-foreground">Select interface color scheme</p>
-            </div>
-            
-            <Select value={theme} onValueChange={setTheme}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select theme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
-              </SelectContent>
-            </Select>
-            
-          </div>
-
-          <Separator />
-          
-          {/* ... 其他设置 (Start with System 等) ... */}
-          
-        </CardContent>
-      </Card>
-
-
-      <Card>
-        <CardHeader>
-          <CardTitle>System</CardTitle>
-          <CardDescription>Manage how the application starts and behaves.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label className="text-base">Start with System</Label>
-              <p className="text-sm text-muted-foreground">Launch automatically on login</p>
-            </div>
-            <Switch defaultChecked />
-          </div>
-
-          <Separator />
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label className="text-base">Scaling Mode</Label>
-              <p className="text-sm text-muted-foreground">How wallpapers fit your screen</p>
-            </div>
-            {/* 使用我们刚写的 Combobox */}
-            <Combobox 
-              value={scaling}
-              onChange={setScaling}
-              options={[
-                { value: "cover", label: "Cover (Fill)" },
-                { value: "contain", label: "Contain (Fit)" },
-                { value: "stretch", label: "Stretch" },
-              ]}
-            />
-          </div>
-
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader><CardTitle>Interaction</CardTitle></CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <MousePointer2 className="w-5 h-5 text-muted-foreground" />
-              <div className="space-y-0.5">
-                <Label className="text-base">Disable Mouse</Label>
-                <p className="text-sm text-muted-foreground">Ignore interactions</p>
-              </div>
-            </div>
-            <Switch />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function AudioSettings() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Audio</h3>
-        <p className="text-sm text-muted-foreground">Sound output controls.</p>
-      </div>
-      <Separator />
-      <Card>
-        <CardContent className="pt-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <Label className="text-base">Mute All</Label>
-            <Switch />
-          </div>
-          <Separator />
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <Label>Master Volume</Label>
-              <span className="text-sm text-muted-foreground">50%</span>
-            </div>
-            <Slider defaultValue={[50]} max={100} step={1} />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function AdvancedSettings() {
-  return (
-    <div className="space-y-6">
-      <div><h3 className="text-lg font-medium">Advanced</h3></div>
-      <Separator />
-      <Card>
-        <CardContent className="pt-6 space-y-4">
-          <div className="space-y-2">
-            <Label>Workshop Directory</Label>
-            <div className="flex space-x-2">
-              <Input placeholder="/path/to/steam/workshop" readOnly />
-              <Button variant="outline"><FolderOpen className="w-4 h-4 mr-2"/> Browse</Button>
-            </div>
-          </div>
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-orange-500" />
-              <Label>Run as Root</Label>
-            </div>
-            <Switch />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function LogViewer() {
-  return (
-    <div className="space-y-6">
-      <div><h3 className="text-lg font-medium">Logs</h3></div>
-      <div className="rounded-md border bg-muted p-4 h-[400px] font-mono text-xs overflow-auto">
-        <p className="text-green-600">[INFO] Application initialized.</p>
-        <p className="text-blue-600">[INFO] Components loaded successfully.</p>
-      </div>
-      <div className="flex justify-end gap-2">
-        <Button variant="outline">Clear</Button>
-        <Button>Export</Button>
-      </div>
-    </div>
-  );
-}
-
-function NavButton({ active, onClick, icon, label }: any) {
+// NavButton 是布局专用组件，保留在主文件中
+function NavButton({ active, onClick, icon, label, desc }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; desc: string }) {
   return (
     <Button
       variant={active ? "secondary" : "ghost"}
-      className="w-full justify-start gap-3"
+      className={`w-full justify-start h-auto py-3 px-4 mb-1 ${active ? "bg-secondary shadow-sm" : ""}`}
       onClick={onClick}
     >
-      {icon}
-      {label}
+      <div
+        className={`mr-3 p-2 rounded-md ${active ? "bg-background text-primary" : "bg-muted text-muted-foreground"}`}
+      >
+        {icon}
+      </div>
+      <div className="text-left flex-1 min-w-0">
+        <div className={`font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}>
+          {label}
+        </div>
+        <div className="text-xs text-muted-foreground truncate opacity-70">{desc}</div>
+      </div>
     </Button>
   );
 }
+
 ```
 
 ---
 
-### 📄 文件: `src/pages/Wallpapers.tsx`
+### 📄 文件: `src\pages\Wallpapers.tsx`
 
 ```
 // 在你的 Wallpapers 页面组件里
@@ -31229,7 +33681,7 @@ useEffect(() => {
 
 ---
 
-### 📄 文件: `src/store/appStore.test.ts`
+### 📄 文件: `src\store\appStore.test.ts`
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -31340,37 +33792,52 @@ describe('appStore - getSelectedWallpaper', () => {
 
 ---
 
-### 📄 文件: `src/store/appStore.ts`
+### 📄 文件: `src\store\appStore.ts`
 
 ```typescript
 import { create } from 'zustand';
-import { Wallpaper } from '../types';
+import { invoke } from '@tauri-apps/api/core';
+import { Wallpaper, AppConfig } from '../types';
 import { scanWallpapers } from '../api/wallpaper';
 
 interface AppState {
-  // 数据
+  // Wallpaper data
   wallpapers: Wallpaper[];
   selectedId: string | null;
   searchQuery: string;
   activeTab: "wallpapers" | "settings" | "performance";
   
-  // 动作
+  // Settings data
+  settings: AppConfig | null;
+  settingsLoading: boolean;
+  
+  // Wallpaper actions
   loadWallpapers: () => Promise<void>;
   setSelectedId: (id: string | null) => void;
   setSearchQuery: (query: string) => void;
-  setActiveTab: (tab: any) => void;
+  setActiveTab: (tab: "wallpapers" | "settings" | "performance") => void;
   
-  // 计算属性 (Getter)
+  // Settings actions
+  fetchSettings: () => Promise<void>;
+  updateSetting: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => void;
+  saveSettings: () => Promise<void>;
+  restartWallpapers: () => Promise<void>;
+  
+  // Computed properties (Getter)
   getFilteredWallpapers: () => Wallpaper[];
   getSelectedWallpaper: () => Wallpaper | null;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
+  // Initial state
   wallpapers: [],
   selectedId: null,
   searchQuery: "",
   activeTab: "wallpapers",
+  settings: null,
+  settingsLoading: false,
 
+  // Wallpaper actions
   loadWallpapers: async () => {
     const data = await scanWallpapers();
     set({ wallpapers: data });
@@ -31382,6 +33849,48 @@ export const useAppStore = create<AppState>((set, get) => ({
   setSelectedId: (id) => set({ selectedId: id }),
   setSearchQuery: (q) => set({ searchQuery: q }),
   setActiveTab: (tab) => set({ activeTab: tab }),
+
+  // Settings actions
+  fetchSettings: async () => {
+    set({ settingsLoading: true });
+    try {
+      const settings = await invoke<AppConfig>('get_settings');
+      set({ settings, settingsLoading: false });
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+      set({ settingsLoading: false });
+      throw error;
+    }
+  },
+
+  updateSetting: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
+    const currentSettings = get().settings;
+    if (currentSettings) {
+      set({ settings: { ...currentSettings, [key]: value } });
+    }
+  },
+
+  saveSettings: async () => {
+    const settings = get().settings;
+    if (!settings) {
+      throw new Error('No settings to save');
+    }
+    try {
+      await invoke('save_settings', { config: settings });
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      throw error;
+    }
+  },
+
+  restartWallpapers: async () => {
+    try {
+      await invoke('restart_wallpapers');
+    } catch (error) {
+      console.error('Failed to restart wallpapers:', error);
+      throw error;
+    }
+  },
 
   getFilteredWallpapers: () => {
     const { wallpapers, searchQuery } = get();
@@ -31401,7 +33910,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
 ---
 
-### 📄 文件: `src/types.ts`
+### 📄 文件: `src\types.ts`
 
 ```typescript
 // src/types.ts
@@ -31414,11 +33923,122 @@ export interface Wallpaper {
   tags?: string[];
   size?: string;
 }
+
+export interface AppConfig {
+  // --- 1. Playback & Performance ---
+  fps: number;
+  scaling: string;
+  clamping: string;
+
+  
+  noFullscreenPause: boolean;
+  disableMouse: boolean;
+  disableParallax: boolean;
+  disableParticles: boolean;
+  
+  // --- 2. Audio & Display ---
+  volume: number;
+  muteAudio: boolean;           // silence -> muteAudio
+  noAutomute: boolean;          // no_auto_mute -> noAutomute
+  noAudioProcessing: boolean;
+  
+  // --- 3. Monitor & Display ---
+  lastScreen?: string | null;
+  lastWallpaper?: string;
+  activeMonitors: Record<string, string>;
+  
+  // --- 4. Automation (Cycling) ---
+  cycleEnabled: boolean;
+  cycleInterval: number;
+  cycleOrder: string;
+
+  // --- 5. Wayland Tweaks ---
+  waylandOnlyActive: boolean;
+  waylandIgnoreAppids: string;
+
+  // --- 6. System & Storage ---
+  assetsPath: string | null;
+  workshopPath: string | null;
+  
+  // --- 7. Screenshot Tools ---
+  screenshotDelay: number;
+  screenshotRes: string;
+  preferXvfb: boolean;
+  
+  // --- 8. Wallpaper Properties ---
+  wallpaperProperties: Record<string, any>;
+  wallpaperNicknames: Record<string, string>;
+  compactMode: boolean;
+}
+
+// System integration settings (not stored in AppConfig)
+export interface SystemIntegration {
+  autostart: boolean;
+  startHidden: boolean;
+}
+
+export interface LogEntry {
+  id: number;           // 唯一标识，用于 React key
+  timestamp: string;    // "10:00:01"
+  level: "info" | "warn" | "error" | "debug";
+  source: "GUI" | "Core" | "Engine" | "Controller";
+  message: string;
+}
 ```
 
 ---
 
-### 📄 文件: `src/vite-env.d.ts`
+### 📄 文件: `src\types\performance.ts`
+
+```typescript
+// src/types/performance.ts
+
+export interface ChartDataPoint {
+  time: string;
+  value: number;
+}
+
+export interface ProcessStats {
+  pid: number;
+  name: string;
+  cmd: string;
+  status: "Running" | "Sleeping" | "Idle";
+  cpu: number;
+  mem: number;
+  cpuHistory: ChartDataPoint[];
+  memHistory: ChartDataPoint[];
+  threads: string[];
+}
+
+export interface SystemStats {
+  totalCpu: number;
+  totalMem: number;
+  activeThreads: number;
+  cpuHistory: ChartDataPoint[];
+  memHistory: ChartDataPoint[];
+  processes: {
+    backend: ProcessStats;
+    frontend: ProcessStats;
+    tray: ProcessStats;
+  };
+}
+
+export interface ScreenshotRecord {
+  id: number;
+  name: string;
+  timestamp: string;
+  preview?: string;
+  duration: number;
+  maxCpu: number;
+  maxMem: number;
+  path: string;
+}
+
+```
+
+---
+
+### 📄 文件: `src\vite-env.d.ts`
 
 ```typescript
 /// <reference types="vite/client" />
@@ -31589,7 +34209,7 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
-    host: host || false,
+    host: true,
     hmr: host
       ? {
           protocol: "ws",
@@ -31600,6 +34220,7 @@ export default defineConfig(async () => ({
     watch: {
       // 3. tell Vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
+      usePolling: true,
     },
   },
 }));
