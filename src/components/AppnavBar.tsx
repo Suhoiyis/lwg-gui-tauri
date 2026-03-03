@@ -27,6 +27,8 @@ import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
 import { toast } from "sonner";
 import { AppMenu } from "@/components/AppMenu";
 
+import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
+
 export function AppNavbar() {
   const searchQuery = useAppStore((state) => state.searchQuery);
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
@@ -38,7 +40,31 @@ export function AppNavbar() {
   const setSelectedId = useAppStore((state) => state.setSelectedId);
   const filteredWallpapers = getFilteredWallpapers();
 
-  // --- Actions ---
+  // --- ✨ 核心修复：安全的切换函数 ---
+  const handleSwitchToCompact = async () => {
+    // 1. 环境检测
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+
+    if (!isTauri) {
+      console.warn("[Browser Mode] Skipping window resize, toggling UI only.");
+      toggleCompactMode(true);
+      return;
+    }
+
+    // 2. Tauri 逻辑
+    try {
+      const appWindow = getCurrentWindow();
+      if (appWindow) {
+        await appWindow.setSize(new LogicalSize(360, 600));
+      }
+      toggleCompactMode(true);
+    } catch (err) {
+      console.error("Resize failed:", err);
+      toggleCompactMode(true); // 报错也要切换 UI
+    }
+  };
+
+  // --- 原有 Actions ---
   const handleStop = async () => {
     try {
       await stopWallpaper();
@@ -68,9 +94,7 @@ export function AppNavbar() {
 
   return (
     <div className="flex w-full items-center gap-4 py-2 px-4 drag-region select-none">
-      {/* 1. Left: Compact Toggle & Tabs */}
       <div className="no-drag flex items-center gap-2">
-        {/* ✨ Compact Mode */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -78,7 +102,7 @@ export function AppNavbar() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-primary hover:bg-primary/10"
-                onClick={() => toggleCompactMode(true)}
+                onClick={handleSwitchToCompact} // 👈 使用新函数
               >
                 <Minimize2 className="w-4 h-4" />
               </Button>
@@ -113,7 +137,6 @@ export function AppNavbar() {
 
       <Separator orientation="vertical" className="h-6 mx-2" />
 
-      {/* 2. Middle: Search */}
       <div className="no-drag flex-1 max-w-md">
         <InputGroup className="relative w-full">
           <InputGroupAddon align="inline-start">
@@ -124,22 +147,13 @@ export function AppNavbar() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          {searchQuery && (
-            <InputGroupAddon align="inline-end">
-              <span className="text-[10px] font-mono opacity-60">
-                {filteredWallpapers.length} Results
-              </span>
-            </InputGroupAddon>
-          )}
         </InputGroup>
       </div>
 
       <div className="flex-1" />
 
-      {/* 3. Right: Quick Actions */}
       <TooltipProvider>
         <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border no-drag">
-          {/* STOP Button */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -152,11 +166,10 @@ export function AppNavbar() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Stop Wallpaper</p>
+              <p>Stop</p>
             </TooltipContent>
           </Tooltip>
 
-          {/* SHUFFLE Button */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -169,11 +182,10 @@ export function AppNavbar() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Random Wallpaper</p>
+              <p>Shuffle</p>
             </TooltipContent>
           </Tooltip>
 
-          {/* SCREENSHOT Button */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -185,10 +197,7 @@ export function AppNavbar() {
             </TooltipContent>
           </Tooltip>
 
-          {/* Separator (Compact Mode 移走后保留分隔符) */}
           <Separator orientation="vertical" className="h-4 mx-1" />
-
-          {/* Hamburger Menu */}
           <AppMenu />
         </div>
       </TooltipProvider>
