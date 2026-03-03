@@ -17,6 +17,7 @@ import { CompactMode } from "./pages/Compact";
 
 import { useAppStore } from "./store/appStore";
 
+// 页面切换动画配置
 const pageVariants = {
   initial: { opacity: 0, y: 10, scale: 0.99 },
   in: { opacity: 1, y: 0, scale: 1 },
@@ -30,32 +31,65 @@ const pageTransition = {
 } as const;
 
 export function App() {
+  // Local UI state
   const [isLoading, setIsLoading] = useState(false);
+
+  // Zustand store state and actions
   const activeTab = useAppStore((state) => state.activeTab);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
-  const isCompactMode = useAppStore((s) => s.isCompactMode);
 
+  const isCompactMode = useAppStore((s) => s.isCompactMode);
+  const toggleCompactMode = useAppStore((s) => s.toggleCompactMode);
+
+  // ✨ 核心新增：自动响应窗口大小
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const THRESHOLD = 500; // 阈值：小于 500px 自动变小窗
+
+      if (width < THRESHOLD && !isCompactMode) {
+        // 只有当不是 Compact Mode 时才切换，避免死循环
+        toggleCompactMode(true);
+      } else if (width >= THRESHOLD && isCompactMode) {
+        // 只有当是 Compact Mode 时才切换回大窗
+        toggleCompactMode(false);
+      }
+    };
+
+    // 初始化时先检查一次
+    handleResize();
+
+    // 监听窗口变化
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isCompactMode, toggleCompactMode]); // 依赖项
+
+  // 初始化加载壁纸
   useEffect(() => {
     setIsLoading(true);
     loadWallpapers().finally(() => setIsLoading(false));
-  }, [loadWallpapers]);
+  }, []);
 
+  // --- 渲染逻辑 ---
+
+  // 1. 如果是 Compact Mode (无论是手动切的还是自动切的)
   if (isCompactMode) {
     return (
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          className="h-screen w-screen overflow-hidden"
-        >
-          <CompactMode />
-        </motion.div>
-      </AnimatePresence>
+      <motion.div
+        key="compact"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="h-screen w-screen bg-background"
+      >
+        <CompactMode />
+        <Toaster />
+      </motion.div>
     );
   }
 
+  // 2. 正常大窗口模式
   return (
     <>
       <Tabs
