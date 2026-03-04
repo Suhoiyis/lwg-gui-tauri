@@ -48,10 +48,11 @@ function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
     threads: [],
   });
 
-  const toChartData = (values: number[] | undefined): ChartDataPoint[] => {
+    const toChartData = (values: number[] | undefined): ChartDataPoint[] => {
     if (!values) return [];
+    // Reverse so newest data is on the right (index 0 = oldest, index n-1 = newest)
     return values.map((value, i) => ({
-      time: `${i + 1}s`,
+      time: `${values.length - i}s`,  // Oldest (left) shows larger number, newest (right) shows smaller
       value,
     }));
   };
