@@ -26,7 +26,12 @@ import {
 } from "@/components/ui/tooltip";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/store/appStore";
-import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
+import {
+  applyWallpaper,
+  stopWallpaper,
+  takeScreenshot,
+  getScreenshotHistory,
+} from "@/api/wallpaper";
 import { toast } from "sonner";
 import { AppMenu } from "@/components/AppMenu";
 
@@ -94,18 +99,28 @@ export function AppNavbar() {
     }
   };
 
-  // ✨ 2. 新增：模拟截图处理函数
-  const handleScreenshot = () => {
-    // 返回一个 Promise，让 StatefulButton 自动进入 loading 状态
-    return new Promise<void>((resolve) => {
-      // 模拟 1.5 秒的后端处理时间
-      setTimeout(() => {
-        toast.success("Screenshot saved", {
-          description: "Saved to Pictures/LWG_Screenshots (Mock)",
-        });
-        resolve(); // 任务完成，按钮恢复原状
-      }, 1500);
-    });
+  // ✨ 2. 真实截图处理函数
+  const handleScreenshot = async (): Promise<void> => {
+    const selectedId = useAppStore.getState().selectedId;
+
+    if (!selectedId) {
+      toast.error("Screenshot failed", {
+        description: "Please select a wallpaper first",
+      });
+      throw new Error("No wallpaper selected");
+    }
+
+    try {
+      const result = await takeScreenshot(selectedId);
+      toast.success("Screenshot saved", {
+        description: `Saved to ${result.outputPath}\nDuration: ${result.duration.toFixed(1)}s | Max CPU: ${result.maxCpu.toFixed(1)}% | Max Mem: ${result.maxMem.toFixed(1)}MB`,
+      });
+    } catch (error) {
+      toast.error("Screenshot failed", {
+        description: String(error),
+      });
+      throw error; // 让 StatefulButton 知道失败
+    }
   };
 
   return (

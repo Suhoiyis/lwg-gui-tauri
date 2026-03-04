@@ -11,6 +11,24 @@ export interface Wallpaper {
   size?: number;
 }
 
+export interface ScreenshotRecord {
+  timestamp: number;
+  wpId: string;
+  outputPath: string;
+  duration: number;
+  maxCpu: number;
+  maxMem: number;
+}
+export interface Wallpaper {
+  id: string;
+  title: string;
+  preview: string;
+  path: string;
+  type: "video" | "image" | "web";
+  tags: string[];
+  size?: number;
+}
+
 // ================= 🧬 基础 Mock 模板 (5张) =================
 const BASE_MOCK_TEMPLATES: Wallpaper[] = [
   {
@@ -139,4 +157,15 @@ export async function stopWallpaper(): Promise<void> {
   } catch (e) {
     console.log(`[Mock] 假装停止了壁纸`);
   }
+}
+
+export async function takeScreenshot(
+  wallpaperId: string,
+  outputPath?: string,
+): Promise<ScreenshotRecord> {
+  return await invoke("take_screenshot", { wallpaperId, outputPath });
+}
+
+export async function getScreenshotHistory(): Promise<ScreenshotRecord[]> {
+  return await invoke("get_screenshot_history");
 }

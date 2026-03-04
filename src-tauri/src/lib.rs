@@ -4,6 +4,8 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::collections::HashMap;
 use tokio::sync::Mutex;
+use std::time::{SystemTime, UNIX_EPOCH};
+
 
 // ================= 平台特定导入 =================
 
@@ -628,6 +630,90 @@ async fn clear_screenshot_history(
     Ok(())
 }
 
+#[tauri::command]
+async fn take_screenshot(
+    wallpaper_id: String,
+    output_path: Option<String>,
+    state: State<'_, AppState>,
+) -> Result<ScreenshotRecord, String> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::time::{SystemTime, UNIX_EPOCH};
+        use lwg_core::controller::ScreenshotManager;
+        
+        // 获取或生成输出路径
+        let path = output_path.unwrap_or_else(|| {
+            get_default_screenshot_path(&wallpaper_id)
+        });
+        
+        // 创建 ScreenshotManager
+        let config = state.config_manager.lock().await.config().clone();
+        let shared_config = Arc::new(tokio::sync::Mutex::new(config));
+        let screenshot_manager = ScreenshotManager::new(shared_config);
+        
+        // 启动截图并监控
+        let (mut child, tracker) = screenshot_manager
+            .take_screenshot_with_monitor(
+                &wallpaper_id,
+                &path,
+                state.performance_monitor.clone(),
+            )
+            .await
+            .map_err(|e| format!("Failed to start screenshot: {}", e))?;
+        
+        // 等待截图完成（timeout = delay + 60 秒）
+        let config = state.config_manager.lock().await.config().clone();
+        let timeout_secs = (config.screenshot_delay + 60) as u64;
+        drop(config);
+        
+        ScreenshotManager::wait_for_screenshot(&mut child, timeout_secs)
+            .await
+            .map_err(|e| format!("Screenshot failed: {}", e))?;
+        
+        // 完成截图并保存历史
+        let record = ScreenshotManager::finalize_screenshot(
+            tracker,
+            wallpaper_id,
+            path.clone(),
+            state.performance_monitor.clone(),
+        )
+        .map_err(|e| format!("Failed to finalize screenshot: {}", e))?;
+        
+        // 添加到历史记录
+        {
+            let mut monitor = state.performance_monitor.lock()
+                .map_err(|e| format!("Lock error: {}", e))?;
+            monitor.add_screenshot_history(record.clone());
+        }
+        
+        println!("✅ Screenshot saved: {}", path);
+        Ok(record)
+    }
+    
+    #[cfg(not(target_os = "linux"))]
+    {
+        Err("Screenshot is only available on Linux".to_string())
+    }
+}
+
+/// 生成默认截图路径
+fn get_default_screenshot_path(wallpaper_id: &str) -> String {
+    use std::fs;
+    
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/home".to_string());
+    let dir = format!("{}/Pictures/LWG_Screenshots", home);
+    
+    // 创建目录
+    let _ = fs::create_dir_all(&dir);
+    
+    // 生成文件名
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    
+    format!("{}/{}_{}.jpg", dir, wallpaper_id, timestamp)
+}
 #[tauri::command]
 async fn get_active_wallpapers(
     state: State<'_, AppState>,
