@@ -1,32 +1,12 @@
+// src/pages/Library.tsx
 import { useMemo, useCallback, useState, useRef, useEffect } from "react";
-import { Play, Square, FolderOpen, Trash2, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
-// Components
-import { Input } from "@/components/ui/input";
+// Layout & UI Components
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { WallpaperCard } from "@/components/library/WallpaperCard";
-import { LibraryHeader } from "@/components/library/LibraryHeader";
-import { WallpaperSidebar } from "@/components/library/WallpaperSidebar";
-
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,40 +17,42 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
 import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-  ContextMenuShortcut,
-} from "@/components/ui/context-menu";
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+
+// Custom Components
+import { LibraryHeader } from "@/components/library/LibraryHeader";
+import { WallpaperSidebar } from "@/components/library/WallpaperSidebar";
+import { WallpaperGrid } from "@/components/library/WallpaperGrid";
+import { LibraryPagination } from "@/components/library/LibraryPagination";
 
 // State & API
 import { useAppStore } from "@/store/appStore";
 import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
 
-const ITEMS_PER_PAGE = 24; // 每页显示 24 张 (可被 2,3,4 整除，适配网格)
+const ITEMS_PER_PAGE = 24;
 
 export function Library() {
+  // Store State
   const wallpapers = useAppStore((state) => state.wallpapers);
   const searchQuery = useAppStore((state) => state.searchQuery);
   const selectedId = useAppStore((state) => state.selectedId);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
 
-  // 删除确认状态
+  // Local State
   const [wallpaperToDelete, setWallpaperToDelete] = useState<{
     id: string;
     title: string;
   } | null>(null);
-
-  // ✨ 分页状态
   const [currentPage, setCurrentPage] = useState(1);
-  // 用于切换分页后滚动回顶部
   const scrollTopRef = useRef<HTMLDivElement>(null);
 
-  // 1. 搜索过滤逻辑
+  // --- Logic Layers ---
+
+  // 1. Filtering
   const filteredWallpapers = useMemo(() => {
     if (!searchQuery) return wallpapers;
     const lowerQ = searchQuery.toLowerCase();
@@ -79,12 +61,11 @@ export function Library() {
     );
   }, [wallpapers, searchQuery]);
 
-  // ✨ 当搜索条件改变时，重置回第一页
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // ✨ 计算分页数据
+  // 2. Pagination
   const totalItems = filteredWallpapers.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
@@ -93,62 +74,32 @@ export function Library() {
     return filteredWallpapers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [filteredWallpapers, currentPage]);
 
-  // ✨ 切换页码处理
-  const handlePageChange = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-    // 稍微延迟一点滚动，等待渲染完成
-    setTimeout(() => {
-      scrollTopRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 10);
-  };
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page < 1 || page > totalPages) return;
+      setCurrentPage(page);
+      setTimeout(() => {
+        scrollTopRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 10);
+    },
+    [totalPages],
+  );
 
-  // ✨ 智能页码生成逻辑 (1 ... 4 5 6 ... 20)
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-
-    if (totalPages <= 7) {
-      // 页数很少，直接全显示
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      // 页数很多，需要省略号
-      if (currentPage <= 4) {
-        // 靠近开头: 1 2 3 4 5 ... 20
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push("...");
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 3) {
-        // 靠近结尾: 1 ... 16 17 18 19 20
-        pages.push(1);
-        pages.push("...");
-        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-      } else {
-        // 在中间: 1 ... 4 5 6 ... 20
-        pages.push(1);
-        pages.push("...");
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-        pages.push("...");
-        pages.push(totalPages);
-      }
-    }
-    return pages;
-  };
-
+  // 3. Selection & Metadata
   const selectedWallpaper = useMemo(() => {
     return wallpapers.find((w) => w.id === selectedId) || null;
   }, [wallpapers, selectedId]);
 
   const currentIndex = useMemo(() => {
     if (!selectedId) return 0;
-    // 在过滤后的列表中查找位置，这样序号才符合当前视图
     const index = filteredWallpapers.findIndex((w) => w.id === selectedId);
     return index !== -1 ? index + 1 : 0;
   }, [filteredWallpapers, selectedId]);
 
+  // --- Event Handlers ---
+
   const handleSelect = useCallback(
-    (id: string) => {
-      setSelectedId(id);
-    },
+    (id: string) => setSelectedId(id),
     [setSelectedId],
   );
 
@@ -167,7 +118,6 @@ export function Library() {
   };
 
   const handleOpenFolder = (path: string) => {
-    console.log("Open folder request:", path);
     toast.info("Open Folder", {
       description: path ? `Path: ${path}` : "Path unknown (Mock)",
     });
@@ -185,31 +135,16 @@ export function Library() {
     setWallpaperToDelete(null);
   };
 
-  const handleJumpToPage = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const target = parseInt(e.currentTarget.value);
-      if (!isNaN(target) && target >= 1 && target <= totalPages) {
-        handlePageChange(target);
-        e.currentTarget.value = ""; // 清空输入框
-      } else {
-        toast.error("Invalid Page", {
-          description: `Please enter a number between 1 and ${totalPages}`,
-        });
-      }
-    }
-  };
-
   return (
     <div className="h-full w-full overflow-hidden">
       <ResizablePanelGroup
         orientation="horizontal"
         className="h-full w-full rounded-lg"
       >
-        {/* 左侧：主内容区 */}
+        {/* Left Panel: Main Content */}
         <ResizablePanel defaultSize="75%" minSize="30%">
-          {/* ✨ 优化 1：去掉了外层的 padding 和 space-y，只保留 flex 布局结构 */}
           <div className="flex flex-col h-full overflow-hidden">
-            {/* Header 区域：自己控制 Padding */}
+            {/* Header */}
             <div className="px-6 pt-6 pb-4 shrink-0">
               <LibraryHeader
                 currentTitle={selectedWallpaper?.title || ""}
@@ -221,7 +156,7 @@ export function Library() {
               />
             </div>
 
-            {/* ScrollArea 区域：撑满剩余空间 */}
+            {/* Content Area */}
             <TooltipProvider>
               <ScrollArea className="flex-1 w-full h-full">
                 {filteredWallpapers.length === 0 ? (
@@ -229,140 +164,26 @@ export function Library() {
                     <EmptyState />
                   </div>
                 ) : (
-                  // ✨ 优化 2：内容区域控制内边距，确保滚动条在最右侧，内容不贴边
                   <div className="px-6 pb-10">
-                    {/* 用于回顶的锚点 */}
                     <div ref={scrollTopRef} />
 
-                    {/* 壁纸网格 */}
-                    <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
-                      {paginatedWallpapers.map((wp) => (
-                        <ContextMenu key={wp.id}>
-                          <ContextMenuTrigger asChild>
-                            <div
-                              className="w-full h-full relative cursor-context-menu select-none"
-                              onDoubleClick={() => handleApply(wp.id, wp.title)}
-                            >
-                              <WallpaperCard
-                                wp={wp}
-                                isSelected={selectedId === wp.id}
-                              onSelect={() => handleSelect(wp.id)}
-                              />
-                            </div>
-                          </ContextMenuTrigger>
+                    {/* Grid Component */}
+                    <WallpaperGrid
+                      wallpapers={paginatedWallpapers}
+                      selectedId={selectedId}
+                      onSelect={handleSelect}
+                      onApply={handleApply}
+                      onStop={handleStop}
+                      onOpenFolder={handleOpenFolder}
+                      onDelete={handleDeleteRequest}
+                    />
 
-                          <ContextMenuContent className="w-56">
-                            <ContextMenuItem
-                              onClick={() => handleApply(wp.id, wp.title)}
-                            >
-                              <Play className="mr-2 h-4 w-4" />
-                              Apply Wallpaper
-                            </ContextMenuItem>
-                            <ContextMenuItem onClick={handleStop}>
-                              <Square className="mr-2 h-4 w-4" />
-                              Stop Wallpaper
-                            </ContextMenuItem>
-                            <ContextMenuSeparator />
-                            <ContextMenuItem
-                              onClick={() => handleOpenFolder(wp.path)}
-                            >
-                              <FolderOpen className="mr-2 h-4 w-4" />
-                              Open Folder...
-                            </ContextMenuItem>
-                            <ContextMenuSeparator />
-                            <ContextMenuItem
-                              className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
-                              onClick={() =>
-                                handleDeleteRequest(wp.id, wp.title)
-                              }
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                              <ContextMenuShortcut>Del</ContextMenuShortcut>
-                            </ContextMenuItem>
-                          </ContextMenuContent>
-                        </ContextMenu>
-                      ))}
-                    </div>
-
-                    {/* 分页器 */}
-                    {totalPages > 1 && (
-                      <div className="mt-8 pb-4 flex items-center justify-center gap-4">
-                        {/* 1. 分页条本身 (去掉 mx-auto，改由父容器控制居中) */}
-                        <Pagination className="mx-0 w-auto">
-                          <PaginationContent>
-                            <PaginationItem>
-                              <PaginationPrevious
-                                href="#"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  handlePageChange(currentPage - 1);
-                                }}
-                                className={
-                                  currentPage === 1
-                                    ? "pointer-events-none opacity-50"
-                                    : "cursor-pointer"
-                                }
-                              />
-                            </PaginationItem>
-
-                            {getPageNumbers().map((page, index) => (
-                              <PaginationItem key={index}>
-                                {page === "..." ? (
-                                  <PaginationEllipsis />
-                                ) : (
-                                  <PaginationLink
-                                    href="#"
-                                    isActive={page === currentPage}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      handlePageChange(page as number);
-                                    }}
-                                    className="cursor-pointer"
-                                  >
-                                    {page}
-                                  </PaginationLink>
-                                )}
-                              </PaginationItem>
-                            ))}
-
-                            <PaginationItem>
-                              <PaginationNext
-                                href="#"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  handlePageChange(currentPage + 1);
-                                }}
-                                className={
-                                  currentPage === totalPages
-                                    ? "pointer-events-none opacity-50"
-                                    : "cursor-pointer"
-                                }
-                              />
-                            </PaginationItem>
-                          </PaginationContent>
-                        </Pagination>
-
-                        {/* 2. 放在 Next 右侧的跳转框 */}
-                        {totalPages > 7 && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground ml-2 border-l pl-4 h-5">
-                            <span>Go to</span>
-                            <div className="relative">
-                              <Input
-                                type="number"
-                                min={1}
-                                max={totalPages}
-                                // ✨ 样式优化：极简风格，h-8 高度与按钮对齐
-                                className="h-8 w-14 text-center px-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-1"
-                                onKeyDown={handleJumpToPage}
-                                placeholder={currentPage.toString()}
-                              />
-                            </div>
-                            <span>of {totalPages}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    {/* Pagination Component */}
+                    <LibraryPagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
                   </div>
                 )}
               </ScrollArea>
@@ -370,24 +191,16 @@ export function Library() {
           </div>
         </ResizablePanel>
 
-        {/* 拖拽手柄 */}
+        {/* Handle */}
         <ResizableHandle
           withHandle={false}
           className="relative w-2 bg-transparent z-10 -ml-1 cursor-col-resize group outline-none"
         >
           <div className="h-full w-[1px] bg-border/40 mx-auto group-hover:bg-border transition-colors duration-300" />
-
-          {/* 2. 中间的小胶囊：平时隐藏，鼠标放上去浮现 */}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                  w-1 h-8 rounded-full bg-border
-                  opacity-0 group-hover:opacity-100
-                  group-hover:bg-primary group-active:bg-primary/80
-                  transition-all duration-300 ease-in-out shadow-sm"
-          />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-border opacity-0 group-hover:opacity-100 group-hover:bg-primary group-active:bg-primary/80 transition-all duration-300 ease-in-out shadow-sm" />
         </ResizableHandle>
 
-        {/* 右侧：侧边栏 */}
+        {/* Right Panel: Sidebar */}
         <ResizablePanel
           defaultSize="25%"
           minSize={300}
@@ -398,7 +211,7 @@ export function Library() {
         </ResizablePanel>
       </ResizablePanelGroup>
 
-      {/* 删除弹窗 */}
+      {/* Delete Dialog */}
       <AlertDialog
         open={!!wallpaperToDelete}
         onOpenChange={(open) => !open && setWallpaperToDelete(null)}
