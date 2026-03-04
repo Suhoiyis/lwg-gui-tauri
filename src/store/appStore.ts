@@ -10,6 +10,10 @@ interface AppState {
   searchQuery: string;
   activeTab: "wallpapers" | "settings" | "performance";
 
+  // Favorites & nicknames
+  favoriteIds: Set<string>;
+  nicknames: Record<string, string>;
+
   // Settings data
   settings: AppConfig | null;
   settingsLoading: boolean;
@@ -19,6 +23,12 @@ interface AppState {
   setSelectedId: (id: string | null) => void;
   setSearchQuery: (query: string) => void;
   setActiveTab: (tab: "wallpapers" | "settings" | "performance") => void;
+
+  // Favorites & nicknames actions
+  toggleFavorite: (id: string) => void;
+  isFavorite: (id: string) => boolean;
+  setNickname: (id: string, nickname: string) => void;
+  getNickname: (id: string) => string | undefined;
 
   // Settings actions
   fetchSettings: () => Promise<void>;
@@ -43,6 +53,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedId: null,
   searchQuery: "",
   activeTab: "wallpapers",
+  favoriteIds: new Set<string>(),
+  nicknames: {},
   settings: null,
   settingsLoading: false,
 
@@ -58,6 +70,23 @@ export const useAppStore = create<AppState>((set, get) => ({
   setSelectedId: (id) => set({ selectedId: id }),
   setSearchQuery: (q) => set({ searchQuery: q }),
   setActiveTab: (tab) => set({ activeTab: tab }),
+
+  // Favorites & nicknames actions
+  toggleFavorite: (id: string) => {
+    const current = get().favoriteIds;
+    const next = new Set(current);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    set({ favoriteIds: next });
+  },
+  isFavorite: (id: string) => get().favoriteIds.has(id),
+  setNickname: (id: string, nickname: string) => {
+    set({ nicknames: { ...get().nicknames, [id]: nickname } });
+  },
+  getNickname: (id: string) => get().nicknames[id],
 
   // Settings actions
   fetchSettings: async () => {

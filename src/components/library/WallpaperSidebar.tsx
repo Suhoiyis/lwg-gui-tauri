@@ -1,5 +1,18 @@
-import { Play } from "lucide-react";
+import React from "react";
+import { Play, Star, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAppStore } from "@/store/appStore";
@@ -43,6 +56,41 @@ export function WallpaperSidebar() {
   const selectedWallpaper = useAppStore((state) =>
     state.getSelectedWallpaper(),
   );
+  const isFavorite = useAppStore((state) =>
+    selectedWallpaper ? state.isFavorite(selectedWallpaper.id) : false
+  );
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+  const nickname = useAppStore((state) =>
+    selectedWallpaper ? state.getNickname(selectedWallpaper.id) : undefined
+  );
+  const setNickname = useAppStore((state) => state.setNickname);
+
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [nicknameInput, setNicknameInput] = React.useState("");
+
+  React.useEffect(() => {
+    if (selectedWallpaper && isDialogOpen) {
+      setNicknameInput(nickname || "");
+    }
+  }, [selectedWallpaper, nickname, isDialogOpen]);
+
+  const handleSaveNickname = () => {
+    if (selectedWallpaper) {
+      setNickname(selectedWallpaper.id, nicknameInput);
+      toast.success("Nickname updated", { description: nicknameInput || "(Cleared)" });
+      setIsDialogOpen(false);
+    }
+  };
+
+  const handleToggleFavorite = () => {
+    if (selectedWallpaper) {
+      toggleFavorite(selectedWallpaper.id);
+      toast.success(
+        isFavorite ? "Removed from favorites" : "Added to favorites",
+        { description: selectedWallpaper.title }
+      );
+    }
+  };
 
   const handleApply = async () => {
     if (!selectedWallpaper) return;
@@ -89,6 +137,67 @@ export function WallpaperSidebar() {
                   {selectedWallpaper.size || "0 MB"}
                 </Badge>
               </div>
+            </div>
+
+            {/* ✨ 新增：Nickname 编辑 + 收藏切换 */}
+            <div className="flex gap-2 pt-2 border-t">
+              {/* Nickname 编辑按钮 */}
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="flex-1 gap-2 h-10"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                    {nickname ? "Edit Nickname" : "Set Nickname"}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Set Wallpaper Nickname</DialogTitle>
+                    <DialogDescription>
+                      Give this wallpaper a custom nickname for easier identification.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="nickname">Nickname</Label>
+                      <Input
+                        id="nickname"
+                        value={nicknameInput}
+                        onChange={(e) => setNicknameInput(e.target.value)}
+                        placeholder="Enter a nickname..."
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleSaveNickname();
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleSaveNickname}>Save</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              {/* 收藏切换按钮 */}
+              <Toggle
+                pressed={isFavorite}
+                onPressedChange={handleToggleFavorite}
+                variant="outline"
+                className="flex-1 gap-2 h-10 data-[state=on]:bg-yellow-500/20 data-[state=on]:text-yellow-600 data-[state=on]:border-yellow-500/50"
+              >
+                <Star
+                  className={`w-4 h-4 transition-colors ${
+                    isFavorite
+                      ? "fill-yellow-500 text-yellow-500"
+                      : "fill-transparent"
+                  }`}
+                />
+                {isFavorite ? "Unfavorite" : "Favorite"}
+              </Toggle>
             </div>
 
             {/* ✨ 3. 并排布局：Tags (左) + Type (右) */}

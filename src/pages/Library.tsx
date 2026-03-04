@@ -65,9 +65,6 @@ export function Library() {
     title: string;
   } | null>(null);
 
-  // 收藏状态（本地页面级）
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
-
   // ✨ 分页状态
   const [currentPage, setCurrentPage] = useState(1);
   // 用于切换分页后滚动回顶部
@@ -109,7 +106,6 @@ export function Library() {
   // ✨ 智能页码生成逻辑 (1 ... 4 5 6 ... 20)
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
-    const maxVisiblePages = 5; // 最多显示的页码数（不含首尾）
 
     if (totalPages <= 7) {
       // 页数很少，直接全显示
@@ -154,30 +150,6 @@ export function Library() {
       setSelectedId(id);
     },
     [setSelectedId],
-  );
-
-  const handleToggleFavorite = useCallback(
-    (id: string, title: string) => {
-      const isCurrentlyFavorite = favoriteIds.has(id);
-
-      setFavoriteIds((prev) => {
-        const next = new Set(prev);
-        if (isCurrentlyFavorite) {
-          next.delete(id);
-        } else {
-          next.add(id);
-        }
-        return next;
-      });
-
-      toast.success(
-        isCurrentlyFavorite ? "Removed from favorites" : "Added to favorites",
-        {
-          description: title,
-        },
-      );
-    },
-    [favoriteIds],
   );
 
   const handleApply = async (id: string, title: string) => {
@@ -274,11 +246,7 @@ export function Library() {
                               <WallpaperCard
                                 wp={wp}
                                 isSelected={selectedId === wp.id}
-                                isFavorite={favoriteIds.has(wp.id)}
-                                onSelect={() => handleSelect(wp.id)}
-                                onToggleFavorite={() =>
-                                  handleToggleFavorite(wp.id, wp.title)
-                                }
+                              onSelect={() => handleSelect(wp.id)}
                               />
                             </div>
                           </ContextMenuTrigger>

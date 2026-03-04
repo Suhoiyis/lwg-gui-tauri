@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { Wallpaper } from "@/types";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import { useAppStore } from "@/store/appStore";
+import { toast } from "sonner";
 import { Toggle } from "@/components/ui/toggle";
 import {
   Tooltip,
@@ -18,9 +20,7 @@ import {
 interface WallpaperCardProps {
   wp: Wallpaper;
   isSelected: boolean;
-  isFavorite: boolean;
   onSelect: () => void;
-  onToggleFavorite: () => void;
 }
 
 function getPreviewUrl(preview: string): string {
@@ -33,10 +33,19 @@ function getPreviewUrl(preview: string): string {
 export const WallpaperCard = memo(function WallpaperCard({
   wp,
   isSelected,
-  isFavorite,
   onSelect,
-  onToggleFavorite,
 }: WallpaperCardProps) {
+  const isFavorite = useAppStore((state) => state.isFavorite(wp.id));
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+
+  const handleToggleFavorite = () => {
+    toggleFavorite(wp.id);
+    toast.success(
+      isFavorite ? "Removed from favorites" : "Added to favorites",
+      { description: wp.title }
+    );
+  };
+
   const previewUrl = useMemo(() => getPreviewUrl(wp.preview), [wp.preview]);
 
   // ✨ 定义图标渲染逻辑
@@ -75,7 +84,7 @@ export const WallpaperCard = memo(function WallpaperCard({
             <TooltipTrigger asChild>
               <Toggle
                 pressed={isFavorite}
-                onPressedChange={() => onToggleFavorite()}
+                onPressedChange={handleToggleFavorite}
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => e.stopPropagation()}
                 size="sm"
