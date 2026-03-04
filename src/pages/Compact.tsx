@@ -176,7 +176,7 @@ export function CompactMode() {
           >
             {/* ✨ 利用 children 插入 Shuffle 按钮 */}
             {/* 注意：因为父级有 pointer-events-none，这里按钮需要加 pointer-events-auto */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-auto">
+            {/* <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-auto">
               <Button
                 size="icon"
                 variant="secondary"
@@ -188,7 +188,7 @@ export function CompactMode() {
               >
                 <Shuffle className="h-4 w-4" />
               </Button>
-            </div>
+            </div> */}
           </WallpaperCard>
 
           {/* Title & ID */}

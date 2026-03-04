@@ -74,7 +74,7 @@ export const WallpaperCard = memo(function WallpaperCard({
       onClick={onSelect}
       className={cn(
         "group relative cursor-pointer select-none",
-        // 这里不要强制写 aspect-square，让外部 className 决定形状（比如 Compact 可能是固定 px）
+        "aspect-square",
         className,
       )}
     >
