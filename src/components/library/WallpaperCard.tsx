@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { Image as ImageIcon, Video } from "lucide-react";
+import { Video, Monitor, Globe, Image as ImageIcon } from "lucide-react";
 import { Wallpaper } from "@/types";
 import { convertFileSrc } from "@tauri-apps/api/core";
 
@@ -9,9 +9,6 @@ interface WallpaperCardProps {
   onSelect: () => void;
 }
 
-/**
- * 将本地文件路径转换为浏览器可加载的 URL
- */
 function getPreviewUrl(preview: string): string {
   if (preview.startsWith("http://") || preview.startsWith("https://")) {
     return preview;
@@ -19,16 +16,30 @@ function getPreviewUrl(preview: string): string {
   return convertFileSrc(preview);
 }
 
-/**
- * 壁纸卡片组件 - 使用 memo 优化避免不必要的重渲染
- */
 export const WallpaperCard = memo(function WallpaperCard({
   wp,
   isSelected,
   onSelect,
 }: WallpaperCardProps) {
-  // 使用 useMemo 缓存 URL，避免每次渲染重新计算
   const previewUrl = useMemo(() => getPreviewUrl(wp.preview), [wp.preview]);
+
+  // ✨ 定义图标渲染逻辑
+  const TypeIcon = useMemo(() => {
+    // 1. 统一转为小写，并处理空值情况，确保 switch 匹配总是安全的
+    const type = wp.type?.toLowerCase() ?? "";
+
+    switch (type) {
+      case "video":
+        return <Video className="w-3.5 h-3.5 text-pink-400" />;
+      case "web":
+        return <Globe className="w-3.5 h-3.5 text-blue-400" />;
+      case "scene":
+        return <Monitor className="w-3.5 h-3.5 text-emerald-400" />;
+      default:
+        // 如果是 image 类型或者其他未知类型，显示图片图标
+        return <ImageIcon className="w-3.5 h-3.5 text-slate-400" />;
+    }
+  }, [wp.type]);
 
   return (
     <div onClick={onSelect} className="cursor-pointer group">
@@ -37,12 +48,11 @@ export const WallpaperCard = memo(function WallpaperCard({
         relative overflow-hidden rounded-2xl border-2 transition-all duration-300
         ${
           isSelected
-            ? "ring-2 ring-pink-500 ring-offset-4 ring-offset-background border-pink-500"
+            ? "ring-2 ring-pink-500 ring-offset-4 ring-offset-background border-pink-500 shadow-lg shadow-pink-500/20"
             : "border-border/50 hover:border-pink-500/50 hover:shadow-xl hover:shadow-pink-500/10"
         }
       `}
       >
-        {/* 图片容器 - 正方形，短边裁剪 */}
         <div className="aspect-square relative overflow-hidden bg-muted">
           <img
             src={previewUrl}
@@ -64,12 +74,8 @@ export const WallpaperCard = memo(function WallpaperCard({
           </div>
 
           {/* 右上角类型图标 */}
-          <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md p-1.5 rounded-lg border border-white/10">
-            {wp.type === "Video" ? (
-              <Video className="w-3 h-3 text-pink-400" />
-            ) : (
-              <ImageIcon className="w-3 h-3 text-emerald-400" />
-            )}
+          <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-md p-1.5 rounded-lg border border-white/5 shadow-2xl flex items-center justify-center">
+            {TypeIcon}
           </div>
         </div>
       </div>
