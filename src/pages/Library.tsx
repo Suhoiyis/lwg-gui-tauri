@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { Play, Square, FolderOpen, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -8,6 +8,17 @@ import { EmptyState } from "@/components/ui/empty";
 import { WallpaperCard } from "@/components/library/WallpaperCard";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { WallpaperSidebar } from "@/components/library/WallpaperSidebar";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import {
   ContextMenu,
@@ -28,7 +39,14 @@ export function Library() {
   const selectedId = useAppStore((state) => state.selectedId);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
 
-  // 1. 搜索过滤逻辑 (保留)
+  // ✨ 新增：用于控制删除确认弹窗的状态
+  // 存储当前要删除的壁纸对象，为 null 时表示弹窗关闭
+  const [wallpaperToDelete, setWallpaperToDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+
+  // 1. 搜索过滤逻辑
   const filteredWallpapers = useMemo(() => {
     if (!searchQuery) return wallpapers;
     const lowerQ = searchQuery.toLowerCase();
@@ -37,12 +55,12 @@ export function Library() {
     );
   }, [wallpapers, searchQuery]);
 
-  // 2. 当前选中的壁纸 (保留)
+  // 2. 当前选中的壁纸
   const selectedWallpaper = useMemo(() => {
     return wallpapers.find((w) => w.id === selectedId) || null;
   }, [wallpapers, selectedId]);
 
-  // 3. 点击选中处理 (保留)
+  // 3. 点击选中处理
   const handleSelect = useCallback(
     (id: string) => {
       setSelectedId(id);
@@ -50,14 +68,14 @@ export function Library() {
     [setSelectedId],
   );
 
-  // --- ✨ 新增：右键菜单的处理函数 ---
+  // --- 动作处理 ---
   const handleApply = async (id: string, title: string) => {
     toast.promise(applyWallpaper(id), {
       loading: `Applying ${title}...`,
       success: `Applied: ${title}`,
       error: "Failed to apply wallpaper",
     });
-    setSelectedId(id); // 右键应用时，同时也选中它，符合直觉
+    setSelectedId(id);
   };
 
   const handleStop = async () => {
@@ -66,30 +84,42 @@ export function Library() {
   };
 
   const handleOpenFolder = (path: string) => {
-    // 这是一个 Mock 提示，直到后端实现了 show_in_folder
     console.log("Open folder request:", path);
     toast.info("Open Folder", {
       description: path ? `Path: ${path}` : "Path unknown (Mock)",
     });
   };
 
-  const handleDelete = (id: string) => {
-    // 这是一个 Mock 提示，直到后端实现了 delete_wallpaper
+  // ✨ 第一步：请求删除（只打开弹窗）
+  const handleDeleteRequest = (id: string, title: string) => {
+    setWallpaperToDelete({ id, title });
+  };
+
+  // ✨ 第二步：确认删除（执行逻辑）
+  const handleDeleteConfirm = () => {
+    if (!wallpaperToDelete) return;
+
+    // TODO: 调用后端删除 API
+    // await deleteWallpaper(wallpaperToDelete.id);
+
+    // 模拟删除成功
     toast.error("Delete Wallpaper", {
-      description: `Feature coming soon. (ID: ${id})`,
+      description: `Feature coming soon. (ID: ${wallpaperToDelete.id})`,
     });
+
+    // 关闭弹窗
+    setWallpaperToDelete(null);
   };
 
   return (
     <div className="h-full flex w-full">
+      {/* 右侧主内容区 */}
       <div className="flex-1 flex flex-col p-6 space-y-6 h-full overflow-hidden min-w-0">
-        {/* 顶部状态栏 (保留) */}
         <LibraryHeader
           currentTitle={selectedWallpaper?.title || ""}
           totalCount={filteredWallpapers.length}
         />
 
-        {/* 滚动列表 */}
         <ScrollArea className="flex-1">
           {filteredWallpapers.length === 0 ? (
             <div className="flex h-full min-h-[50vh] items-center justify-center">
@@ -97,13 +127,9 @@ export function Library() {
             </div>
           ) : (
             <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
-              {/* 遍历壁纸 */}
               {filteredWallpapers.map((wp) => (
-                // ✨ 这里的 ContextMenu 包裹了每一个卡片
                 <ContextMenu key={wp.id}>
-                  {/* 触发区域：原来的卡片 */}
                   <ContextMenuTrigger asChild>
-                    {/* ✨ onDoubleClick ， select-none */}
                     <div
                       className="w-full h-full relative cursor-context-menu select-none"
                       onDoubleClick={() => handleApply(wp.id, wp.title)}
@@ -116,7 +142,6 @@ export function Library() {
                     </div>
                   </ContextMenuTrigger>
 
-                  {/* 菜单内容 */}
                   <ContextMenuContent className="w-56">
                     <ContextMenuItem
                       onClick={() => handleApply(wp.id, wp.title)}
@@ -141,7 +166,8 @@ export function Library() {
 
                     <ContextMenuItem
                       className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
-                      onClick={() => handleDelete(wp.id)}
+                      // ✨ 这里改为调用请求函数，传入 ID 和 标题
+                      onClick={() => handleDeleteRequest(wp.id, wp.title)}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
@@ -159,6 +185,37 @@ export function Library() {
       <aside className="w-64 border-l bg-muted/30 h-full hidden md:block flex-shrink-0">
         <WallpaperSidebar />
       </aside>
+
+      {/* ✨ 全局删除确认弹窗 */}
+      <AlertDialog
+        open={!!wallpaperToDelete}
+        onOpenChange={(open) => !open && setWallpaperToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              wallpaper
+              <span className="font-bold text-foreground">
+                {" "}
+                "{wallpaperToDelete?.title}"{" "}
+              </span>
+              from your library.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            {/* 确认按钮使用红色样式 */}
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
