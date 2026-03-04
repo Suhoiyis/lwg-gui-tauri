@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // Shadcn UI 组件
 import { Tabs } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 // 项目自定义组件
 import { Layout } from "./components/Layout";
@@ -31,10 +32,8 @@ const pageTransition = {
 } as const;
 
 export function App() {
-  // Local UI state
   const [isLoading, setIsLoading] = useState(false);
 
-  // Zustand store state and actions
   const activeTab = useAppStore((state) => state.activeTab);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
@@ -42,12 +41,10 @@ export function App() {
   const isCompactMode = useAppStore((s) => s.isCompactMode);
   const toggleCompactMode = useAppStore((s) => s.toggleCompactMode);
 
-  // ✨ 核心新增：自动响应窗口大小
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      const THRESHOLD = 500; // 阈值：小于 500px 自动变小窗
-
+      const THRESHOLD = 500;
       if (width < THRESHOLD && !isCompactMode) {
         // 只有当不是 Compact Mode 时才切换，避免死循环
         toggleCompactMode(true);
@@ -56,7 +53,6 @@ export function App() {
         toggleCompactMode(false);
       }
     };
-
     // 初始化时先检查一次
     handleResize();
 
@@ -69,29 +65,34 @@ export function App() {
   useEffect(() => {
     setIsLoading(true);
     loadWallpapers().finally(() => setIsLoading(false));
-  }, []);
+    loadWallpapers();
+  }, [loadWallpapers]); // 简化依赖
 
   // --- 渲染逻辑 ---
 
-  // 1. 如果是 Compact Mode (无论是手动切的还是自动切的)
+  // 1. 如果是 Compact Mode
   if (isCompactMode) {
     return (
-      <motion.div
-        key="compact"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="h-screen w-screen bg-background"
-      >
-        <CompactMode />
-        <Toaster />
-      </motion.div>
+      // ✨ 2. 包裹 TooltipProvider
+      <TooltipProvider delayDuration={300}>
+        <motion.div
+          key="compact"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="h-screen w-screen bg-background"
+        >
+          <CompactMode />
+          <Toaster />
+        </motion.div>
+      </TooltipProvider>
     );
   }
 
   // 2. 正常大窗口模式
   return (
-    <>
+    // ✨ 2. 包裹 TooltipProvider (这里的 <> 也可以删掉直接包 Provider)
+    <TooltipProvider delayDuration={300}>
       <Tabs
         value={activeTab}
         onValueChange={(value) =>
@@ -145,6 +146,6 @@ export function App() {
         </Layout>
       </Tabs>
       <Toaster />
-    </>
+    </TooltipProvider>
   );
 }

@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { WallpaperCard } from "@/components/WallpaperCard";
 import { useAppStore } from "@/store/appStore";
 import { applyWallpaper } from "@/api/wallpaper";
 import { toast } from "sonner";
@@ -57,11 +58,11 @@ export function WallpaperSidebar() {
     state.getSelectedWallpaper(),
   );
   const isFavorite = useAppStore((state) =>
-    selectedWallpaper ? state.isFavorite(selectedWallpaper.id) : false
+    selectedWallpaper ? state.isFavorite(selectedWallpaper.id) : false,
   );
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
   const nickname = useAppStore((state) =>
-    selectedWallpaper ? state.getNickname(selectedWallpaper.id) : undefined
+    selectedWallpaper ? state.getNickname(selectedWallpaper.id) : undefined,
   );
   const setNickname = useAppStore((state) => state.setNickname);
 
@@ -77,7 +78,9 @@ export function WallpaperSidebar() {
   const handleSaveNickname = () => {
     if (selectedWallpaper) {
       setNickname(selectedWallpaper.id, nicknameInput);
-      toast.success("Nickname updated", { description: nicknameInput || "(Cleared)" });
+      toast.success("Nickname updated", {
+        description: nicknameInput || "(Cleared)",
+      });
       setIsDialogOpen(false);
     }
   };
@@ -87,7 +90,7 @@ export function WallpaperSidebar() {
       toggleFavorite(selectedWallpaper.id);
       toast.success(
         isFavorite ? "Removed from favorites" : "Added to favorites",
-        { description: selectedWallpaper.title }
+        { description: selectedWallpaper.title },
       );
     }
   };
@@ -110,16 +113,14 @@ export function WallpaperSidebar() {
         {selectedWallpaper ? (
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
             {/* 1. 图片容器 */}
-            <div className="aspect-square relative overflow-hidden border border-border shadow-2xl rounded-2xl bg-muted">
-              <img
-                src={getPreviewUrl(selectedWallpaper.preview)}
-                className="absolute inset-0 w-full h-full object-cover"
-                alt={selectedWallpaper.title}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src =
-                    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
-                }}
+            <div className="w-full">
+              <WallpaperCard
+                wp={selectedWallpaper}
+                isSelected={false} // 侧边栏不需要选中框
+                onSelect={() => {}} // 也不需要点击事件
+                showTitle={false} // ❌ 隐藏底部标题
+                showIcons={false} // ❌ 隐藏右上角图标和收藏
+                className="w-full aspect-square shadow-2xl" // 强制正方形并加深阴影
               />
             </div>
 
@@ -144,10 +145,7 @@ export function WallpaperSidebar() {
               {/* Nickname 编辑按钮 */}
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex-1 gap-2 h-10"
-                  >
+                  <Button variant="outline" className="flex-1 gap-2 h-10">
                     <Edit3 className="w-4 h-4" />
                     {nickname ? "Edit Nickname" : "Set Nickname"}
                   </Button>
@@ -156,7 +154,8 @@ export function WallpaperSidebar() {
                   <DialogHeader>
                     <DialogTitle>Set Wallpaper Nickname</DialogTitle>
                     <DialogDescription>
-                      Give this wallpaper a custom nickname for easier identification.
+                      Give this wallpaper a custom nickname for easier
+                      identification.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
@@ -174,7 +173,10 @@ export function WallpaperSidebar() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
                       Cancel
                     </Button>
                     <Button onClick={handleSaveNickname}>Save</Button>

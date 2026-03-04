@@ -1,7 +1,7 @@
 // src/components/library/WallpaperGrid.tsx
 import { memo } from "react";
 import { Play, Square, FolderOpen, Trash2 } from "lucide-react";
-import { WallpaperCard } from "@/components/library/WallpaperCard";
+import { WallpaperCard } from "@/components/WallpaperCard";
 import {
   ContextMenu,
   ContextMenuContent,

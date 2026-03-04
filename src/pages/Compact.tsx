@@ -28,6 +28,7 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { WallpaperCard } from "@/components/WallpaperCard";
 import { useAppStore } from "@/store/appStore";
 import { cn } from "@/lib/utils"; // 引入 cn
 
@@ -165,28 +166,30 @@ export function CompactMode() {
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4 flex flex-col items-center">
           {/* Preview Image */}
-          <div className="w-[200px] h-[200px] bg-muted rounded-lg shadow-sm border overflow-hidden relative group">
-            {currentWallpaper?.preview ? (
-              <img
-                src={convertFileSrc(currentWallpaper.preview)}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                No Preview
-              </div>
-            )}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <WallpaperCard
+            wp={currentWallpaper || wallpapers[0]}
+            isSelected={false}
+            onSelect={() => {}}
+            showTitle={false} // ❌ 隐藏标题（下方已有）
+            showIcons={true} // ✅ 显示图标（方便点收藏）
+            className="w-[200px] h-[200px] shadow-sm" // 自定义尺寸
+          >
+            {/* ✨ 利用 children 插入 Shuffle 按钮 */}
+            {/* 注意：因为父级有 pointer-events-none，这里按钮需要加 pointer-events-auto */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-auto">
               <Button
                 size="icon"
                 variant="secondary"
                 className="rounded-full shadow-lg h-10 w-10"
-                onClick={handleLucky}
+                onClick={(e) => {
+                  e.stopPropagation(); // 防止冒泡
+                  handleLucky();
+                }}
               >
                 <Shuffle className="h-4 w-4" />
               </Button>
             </div>
-          </div>
+          </WallpaperCard>
 
           {/* Title & ID */}
           <div className="w-full text-center space-y-1">
