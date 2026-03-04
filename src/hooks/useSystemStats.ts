@@ -35,6 +35,8 @@ interface RawProcessStats {
   thread_names?: string[];
 }
 
+const HISTORY_SIZE = 60;
+
 function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
   const createDefaultProcess = (name: string): ProcessStats => ({
     pid: 0,
@@ -48,13 +50,30 @@ function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
     threads: [],
   });
 
-    const toChartData = (values: number[] | undefined): ChartDataPoint[] => {
+  // Transform flat number array to ChartDataPoint[] with right-aligned data
+  // When data is not full, pad with null on the left so data appears on the right
+  const toChartData = (values: number[] | undefined): ChartDataPoint[] => {
     if (!values) return [];
-    // Reverse so newest data is on the right (index 0 = oldest, index n-1 = newest)
-    return values.map((value, i) => ({
-      time: `${values.length - i}s`,  // Oldest (left) shows larger number, newest (right) shows smaller
-      value,
-    }));
+    
+    const result: ChartDataPoint[] = [];
+    const dataLen = values.length;
+    
+    // Pad left side with empty data so actual data appears on the right
+    for (let i = 0; i < HISTORY_SIZE - dataLen; i++) {
+      result.push({ time: "", value: 0 }); // Empty time label, zero value (won't show line)
+    }
+    
+    // Add actual data with time labels
+    // values[0] = oldest, values[dataLen-1] = newest
+    // We want: oldest on left (larger time number), newest on right (smaller time number)
+    for (let i = 0; i < dataLen; i++) {
+      result.push({
+        time: `${dataLen - i}s`, // Newest (right) shows "1s", oldest shows "60s"
+        value: values[i],
+      });
+    }
+    
+    return result;
   };
 
   const mapProcess = (raw: RawProcessStats | undefined, name: string): ProcessStats => {
@@ -75,26 +94,40 @@ function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
   const allProcesses = raw.processes || {};
   const processValues = Object.values(allProcesses);
   
-  const maxHistoryLen = Math.max(
-    ...processValues.map(p => p?.cpu_history?.length || 0),
-    60
-  );
-  
+  // System-level history aggregation with right alignment
   const cpuHistory: ChartDataPoint[] = [];
   const memHistory: ChartDataPoint[] = [];
-  for (let i = 0; i < maxHistoryLen; i++) {
+  
+  // Calculate max history length among all processes
+  let maxDataLen = 0;
+  for (const p of processValues) {
+    if (p?.cpu_history) {
+      maxDataLen = Math.max(maxDataLen, p.cpu_history.length);
+    }
+  }
+  maxDataLen = Math.min(maxDataLen, HISTORY_SIZE);
+  
+  // Pad left side
+  for (let i = 0; i < HISTORY_SIZE - maxDataLen; i++) {
+    cpuHistory.push({ time: "", value: 0 });
+    memHistory.push({ time: "", value: 0 });
+  }
+  
+  // Add actual aggregated data
+  for (let i = 0; i < maxDataLen; i++) {
     let totalCpu = 0;
     let totalMem = 0;
     for (const p of processValues) {
-      if (p?.cpu_history && i < p.cpu_history.length) {
-        totalCpu += p.cpu_history[i] || 0;
-      }
-      if (p?.mem_history && i < p.mem_history.length) {
-        totalMem += p.mem_history[i] || 0;
+      // Calculate offset: we want the newest data (highest index) to be at the end
+      const processLen = p?.cpu_history?.length || 0;
+      const idx = i - (maxDataLen - processLen);
+      if (idx >= 0 && idx < processLen) {
+        totalCpu += p.cpu_history?.[idx] || 0;
+        totalMem += p.mem_history?.[idx] || 0;
       }
     }
-    cpuHistory.push({ time: `${i + 1}s`, value: totalCpu });
-    memHistory.push({ time: `${i + 1}s`, value: totalMem });
+    cpuHistory.push({ time: `${maxDataLen - i}s`, value: totalCpu });
+    memHistory.push({ time: `${maxDataLen - i}s`, value: totalMem });
   }
 
   return {
