@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 use tauri::{Emitter, State};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::collections::HashMap;
 use tokio::sync::Mutex;
-
 
 // ================= 平台特定导入 =================
 
@@ -628,6 +628,22 @@ async fn clear_screenshot_history(
     Ok(())
 }
 
+#[tauri::command]
+async fn get_active_wallpapers(
+    state: State<'_, AppState>,
+) -> Result<HashMap<String, String>, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let controller = state.controller.lock().await;
+        Ok(controller.get_active_wallpapers().await)
+    }
+    
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(HashMap::new())
+    }
+}
+
 // ================= 主入口 =================
 
 pub fn run() {
@@ -674,7 +690,9 @@ pub fn run() {
             start_performance_monitor,
             stop_performance_monitor,
             get_screenshot_history,
-            clear_screenshot_history
+            clear_screenshot_history,
+            // Active wallpaper commands
+            get_active_wallpapers
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
