@@ -64,6 +64,8 @@ export function CompactMode() {
   const [isCopied, setIsCopied] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
 
+  const [inputValue, setInputValue] = useState("");
+
   const currentWallpaper = useMemo(
     () => wallpapers.find((w) => w.id === selectedId) || wallpapers[0],
     [wallpapers, selectedId],
@@ -73,6 +75,10 @@ export function CompactMode() {
     () => wallpapers.findIndex((w) => w.id === selectedId) + 1,
     [wallpapers, selectedId],
   );
+
+  useEffect(() => {
+    setInputValue(currentIndex.toString());
+  }, [currentIndex]);
 
   useEffect(() => {
     if (!api) return;
@@ -130,6 +136,29 @@ export function CompactMode() {
   const handleLucky = () => {
     const randomIdx = Math.floor(Math.random() * wallpapers.length);
     setSelectedId(wallpapers[randomIdx].id);
+  };
+
+  const handleJumpToPage = () => {
+    const targetPage = parseInt(inputValue);
+    // 验证输入是否合法：必须是数字，且在 1 到 总数 之间
+    if (
+      !isNaN(targetPage) &&
+      targetPage >= 1 &&
+      targetPage <= wallpapers.length
+    ) {
+      const targetIndex = targetPage - 1;
+      setSelectedId(wallpapers[targetIndex].id);
+    } else {
+      // 如果输入非法（比如乱填或者超出范围），重置回当前页码
+      setInputValue(currentIndex.toString());
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleJumpToPage();
+      e.currentTarget.blur(); // 按回车后让输入框失去焦点
+    }
   };
 
   return (
@@ -224,11 +253,15 @@ export function CompactMode() {
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
+            {/* ✨ 4. 可编辑的页码输入框 */}
             <div className="flex items-center gap-1 bg-muted rounded-md px-2 h-8 font-mono">
               <Input
-                className="h-6 w-10 p-0 text-center border-none bg-transparent focus-visible:ring-0 text-xs"
-                value={currentIndex || "-"}
-                readOnly
+                // 去掉了 spinner 样式，使其看起来更像纯文本
+                className="h-6 w-10 p-0 text-center border-none bg-transparent focus-visible:ring-0 text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onBlur={handleJumpToPage} // 失去焦点时（点别处）也尝试跳转
+                onKeyDown={handleKeyDown} // 回车跳转
               />
               <span className="text-xs text-muted-foreground">
                 / {wallpapers.length}
