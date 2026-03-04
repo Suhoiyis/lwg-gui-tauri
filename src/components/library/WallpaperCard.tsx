@@ -1,12 +1,26 @@
 import { memo, useMemo } from "react";
-import { Video, Monitor, Globe, Image as ImageIcon } from "lucide-react";
+import {
+  Star,
+  Video,
+  Monitor,
+  Globe,
+  Image as ImageIcon,
+} from "lucide-react";
 import { Wallpaper } from "@/types";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import { Toggle } from "@/components/ui/toggle";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface WallpaperCardProps {
   wp: Wallpaper;
   isSelected: boolean;
+  isFavorite: boolean;
   onSelect: () => void;
+  onToggleFavorite: () => void;
 }
 
 function getPreviewUrl(preview: string): string {
@@ -19,7 +33,9 @@ function getPreviewUrl(preview: string): string {
 export const WallpaperCard = memo(function WallpaperCard({
   wp,
   isSelected,
+  isFavorite,
   onSelect,
+  onToggleFavorite,
 }: WallpaperCardProps) {
   const previewUrl = useMemo(() => getPreviewUrl(wp.preview), [wp.preview]);
 
@@ -54,6 +70,39 @@ export const WallpaperCard = memo(function WallpaperCard({
       `}
       >
         <div className="aspect-square relative overflow-hidden bg-muted">
+          {/* 左上角收藏按钮 */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                pressed={isFavorite}
+                onPressedChange={() => onToggleFavorite()}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                size="sm"
+                variant="default"
+                aria-label={
+                  isFavorite ? "Remove from favorites" : "Add to favorites"
+                }
+                className={`absolute top-2 left-2 z-20 h-8 w-8 min-w-8 p-0 bg-transparent shadow-none transition-opacity hover:bg-accent/70 data-[state=on]:bg-accent/80 data-[state=on]:text-yellow-400 ${
+                  isFavorite
+                    ? "opacity-100 pointer-events-auto"
+                    : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
+                }`}
+              >
+                <Star
+                  className={`h-4 w-4 transition-colors ${
+                    isFavorite
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "fill-transparent text-yellow-400"
+                  }`}
+                />
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>{isFavorite ? "Remove from favorites" : "Add to favorites"}</p>
+            </TooltipContent>
+          </Tooltip>
+
           <img
             src={previewUrl}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

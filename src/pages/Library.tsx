@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { WallpaperCard } from "@/components/library/WallpaperCard";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { WallpaperSidebar } from "@/components/library/WallpaperSidebar";
@@ -63,6 +64,9 @@ export function Library() {
     id: string;
     title: string;
   } | null>(null);
+
+  // 收藏状态（本地页面级）
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 
   // ✨ 分页状态
   const [currentPage, setCurrentPage] = useState(1);
@@ -152,6 +156,30 @@ export function Library() {
     [setSelectedId],
   );
 
+  const handleToggleFavorite = useCallback(
+    (id: string, title: string) => {
+      const isCurrentlyFavorite = favoriteIds.has(id);
+
+      setFavoriteIds((prev) => {
+        const next = new Set(prev);
+        if (isCurrentlyFavorite) {
+          next.delete(id);
+        } else {
+          next.add(id);
+        }
+        return next;
+      });
+
+      toast.success(
+        isCurrentlyFavorite ? "Removed from favorites" : "Added to favorites",
+        {
+          description: title,
+        },
+      );
+    },
+    [favoriteIds],
+  );
+
   const handleApply = async (id: string, title: string) => {
     toast.promise(applyWallpaper(id), {
       loading: `Applying ${title}...`,
@@ -222,147 +250,155 @@ export function Library() {
             </div>
 
             {/* ScrollArea 区域：撑满剩余空间 */}
-            <ScrollArea className="flex-1 w-full h-full">
-              {filteredWallpapers.length === 0 ? (
-                <div className="flex h-full min-h-[50vh] items-center justify-center">
-                  <EmptyState />
-                </div>
-              ) : (
-                // ✨ 优化 2：内容区域控制内边距，确保滚动条在最右侧，内容不贴边
-                <div className="px-6 pb-10">
-                  {/* 用于回顶的锚点 */}
-                  <div ref={scrollTopRef} />
-
-                  {/* 壁纸网格 */}
-                  <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
-                    {paginatedWallpapers.map((wp) => (
-                      <ContextMenu key={wp.id}>
-                        <ContextMenuTrigger asChild>
-                          <div
-                            className="w-full h-full relative cursor-context-menu select-none"
-                            onDoubleClick={() => handleApply(wp.id, wp.title)}
-                          >
-                            <WallpaperCard
-                              wp={wp}
-                              isSelected={selectedId === wp.id}
-                              onSelect={() => handleSelect(wp.id)}
-                            />
-                          </div>
-                        </ContextMenuTrigger>
-
-                        <ContextMenuContent className="w-56">
-                          <ContextMenuItem
-                            onClick={() => handleApply(wp.id, wp.title)}
-                          >
-                            <Play className="mr-2 h-4 w-4" />
-                            Apply Wallpaper
-                          </ContextMenuItem>
-                          <ContextMenuItem onClick={handleStop}>
-                            <Square className="mr-2 h-4 w-4" />
-                            Stop Wallpaper
-                          </ContextMenuItem>
-                          <ContextMenuSeparator />
-                          <ContextMenuItem
-                            onClick={() => handleOpenFolder(wp.path)}
-                          >
-                            <FolderOpen className="mr-2 h-4 w-4" />
-                            Open Folder...
-                          </ContextMenuItem>
-                          <ContextMenuSeparator />
-                          <ContextMenuItem
-                            className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
-                            onClick={() => handleDeleteRequest(wp.id, wp.title)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                            <ContextMenuShortcut>Del</ContextMenuShortcut>
-                          </ContextMenuItem>
-                        </ContextMenuContent>
-                      </ContextMenu>
-                    ))}
+            <TooltipProvider>
+              <ScrollArea className="flex-1 w-full h-full">
+                {filteredWallpapers.length === 0 ? (
+                  <div className="flex h-full min-h-[50vh] items-center justify-center">
+                    <EmptyState />
                   </div>
+                ) : (
+                  // ✨ 优化 2：内容区域控制内边距，确保滚动条在最右侧，内容不贴边
+                  <div className="px-6 pb-10">
+                    {/* 用于回顶的锚点 */}
+                    <div ref={scrollTopRef} />
 
-                  {/* 分页器 */}
-                  {totalPages > 1 && (
-                    <div className="mt-8 pb-4 flex items-center justify-center gap-4">
-                      {/* 1. 分页条本身 (去掉 mx-auto，改由父容器控制居中) */}
-                      <Pagination className="mx-0 w-auto">
-                        <PaginationContent>
-                          <PaginationItem>
-                            <PaginationPrevious
-                              href="#"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handlePageChange(currentPage - 1);
-                              }}
-                              className={
-                                currentPage === 1
-                                  ? "pointer-events-none opacity-50"
-                                  : "cursor-pointer"
+                    {/* 壁纸网格 */}
+                    <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
+                      {paginatedWallpapers.map((wp) => (
+                        <ContextMenu key={wp.id}>
+                          <ContextMenuTrigger asChild>
+                            <div
+                              className="w-full h-full relative cursor-context-menu select-none"
+                              onDoubleClick={() => handleApply(wp.id, wp.title)}
+                            >
+                              <WallpaperCard
+                                wp={wp}
+                                isSelected={selectedId === wp.id}
+                                isFavorite={favoriteIds.has(wp.id)}
+                                onSelect={() => handleSelect(wp.id)}
+                                onToggleFavorite={() =>
+                                  handleToggleFavorite(wp.id, wp.title)
+                                }
+                              />
+                            </div>
+                          </ContextMenuTrigger>
+
+                          <ContextMenuContent className="w-56">
+                            <ContextMenuItem
+                              onClick={() => handleApply(wp.id, wp.title)}
+                            >
+                              <Play className="mr-2 h-4 w-4" />
+                              Apply Wallpaper
+                            </ContextMenuItem>
+                            <ContextMenuItem onClick={handleStop}>
+                              <Square className="mr-2 h-4 w-4" />
+                              Stop Wallpaper
+                            </ContextMenuItem>
+                            <ContextMenuSeparator />
+                            <ContextMenuItem
+                              onClick={() => handleOpenFolder(wp.path)}
+                            >
+                              <FolderOpen className="mr-2 h-4 w-4" />
+                              Open Folder...
+                            </ContextMenuItem>
+                            <ContextMenuSeparator />
+                            <ContextMenuItem
+                              className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
+                              onClick={() =>
+                                handleDeleteRequest(wp.id, wp.title)
                               }
-                            />
-                          </PaginationItem>
-
-                          {getPageNumbers().map((page, index) => (
-                            <PaginationItem key={index}>
-                              {page === "..." ? (
-                                <PaginationEllipsis />
-                              ) : (
-                                <PaginationLink
-                                  href="#"
-                                  isActive={page === currentPage}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handlePageChange(page as number);
-                                  }}
-                                  className="cursor-pointer"
-                                >
-                                  {page}
-                                </PaginationLink>
-                              )}
-                            </PaginationItem>
-                          ))}
-
-                          <PaginationItem>
-                            <PaginationNext
-                              href="#"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handlePageChange(currentPage + 1);
-                              }}
-                              className={
-                                currentPage === totalPages
-                                  ? "pointer-events-none opacity-50"
-                                  : "cursor-pointer"
-                              }
-                            />
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
-
-                      {/* 2. 放在 Next 右侧的跳转框 */}
-                      {totalPages > 7 && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground ml-2 border-l pl-4 h-5">
-                          <span>Go to</span>
-                          <div className="relative">
-                            <Input
-                              type="number"
-                              min={1}
-                              max={totalPages}
-                              // ✨ 样式优化：极简风格，h-8 高度与按钮对齐
-                              className="h-8 w-14 text-center px-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-1"
-                              onKeyDown={handleJumpToPage}
-                              placeholder={currentPage.toString()}
-                            />
-                          </div>
-                          <span>of {totalPages}</span>
-                        </div>
-                      )}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                              <ContextMenuShortcut>Del</ContextMenuShortcut>
+                            </ContextMenuItem>
+                          </ContextMenuContent>
+                        </ContextMenu>
+                      ))}
                     </div>
-                  )}
-                </div>
-              )}
-            </ScrollArea>
+
+                    {/* 分页器 */}
+                    {totalPages > 1 && (
+                      <div className="mt-8 pb-4 flex items-center justify-center gap-4">
+                        {/* 1. 分页条本身 (去掉 mx-auto，改由父容器控制居中) */}
+                        <Pagination className="mx-0 w-auto">
+                          <PaginationContent>
+                            <PaginationItem>
+                              <PaginationPrevious
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handlePageChange(currentPage - 1);
+                                }}
+                                className={
+                                  currentPage === 1
+                                    ? "pointer-events-none opacity-50"
+                                    : "cursor-pointer"
+                                }
+                              />
+                            </PaginationItem>
+
+                            {getPageNumbers().map((page, index) => (
+                              <PaginationItem key={index}>
+                                {page === "..." ? (
+                                  <PaginationEllipsis />
+                                ) : (
+                                  <PaginationLink
+                                    href="#"
+                                    isActive={page === currentPage}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handlePageChange(page as number);
+                                    }}
+                                    className="cursor-pointer"
+                                  >
+                                    {page}
+                                  </PaginationLink>
+                                )}
+                              </PaginationItem>
+                            ))}
+
+                            <PaginationItem>
+                              <PaginationNext
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handlePageChange(currentPage + 1);
+                                }}
+                                className={
+                                  currentPage === totalPages
+                                    ? "pointer-events-none opacity-50"
+                                    : "cursor-pointer"
+                                }
+                              />
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+
+                        {/* 2. 放在 Next 右侧的跳转框 */}
+                        {totalPages > 7 && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground ml-2 border-l pl-4 h-5">
+                            <span>Go to</span>
+                            <div className="relative">
+                              <Input
+                                type="number"
+                                min={1}
+                                max={totalPages}
+                                // ✨ 样式优化：极简风格，h-8 高度与按钮对齐
+                                className="h-8 w-14 text-center px-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-1"
+                                onKeyDown={handleJumpToPage}
+                                placeholder={currentPage.toString()}
+                              />
+                            </div>
+                            <span>of {totalPages}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </ScrollArea>
+            </TooltipProvider>
           </div>
         </ResizablePanel>
 
