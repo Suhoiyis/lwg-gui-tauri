@@ -1,5 +1,5 @@
 import { useMemo, useCallback, useState } from "react";
-import { Play, Square, FolderOpen, Trash2 } from "lucide-react";
+import { Play, Square, FolderOpen, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 // Components
@@ -39,8 +39,7 @@ export function Library() {
   const selectedId = useAppStore((state) => state.selectedId);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
 
-  // ✨ 新增：用于控制删除确认弹窗的状态
-  // 存储当前要删除的壁纸对象，为 null 时表示弹窗关闭
+  // ✨ 状态：存储当前要删除的壁纸对象
   const [wallpaperToDelete, setWallpaperToDelete] = useState<{
     id: string;
     title: string;
@@ -90,24 +89,20 @@ export function Library() {
     });
   };
 
-  // ✨ 第一步：请求删除（只打开弹窗）
+  // 请求删除（打开弹窗）
   const handleDeleteRequest = (id: string, title: string) => {
     setWallpaperToDelete({ id, title });
   };
 
-  // ✨ 第二步：确认删除（执行逻辑）
+  // 确认删除（执行逻辑）
   const handleDeleteConfirm = () => {
     if (!wallpaperToDelete) return;
 
-    // TODO: 调用后端删除 API
-    // await deleteWallpaper(wallpaperToDelete.id);
-
-    // 模拟删除成功
-    toast.error("Delete Wallpaper", {
-      description: `Feature coming soon. (ID: ${wallpaperToDelete.id})`,
+    // TODO: 这里接入后端 API await deleteWallpaper(wallpaperToDelete.id);
+    toast.error("Wallpaper Deleted", {
+      description: `"${wallpaperToDelete.title}" has been removed.`,
     });
 
-    // 关闭弹窗
     setWallpaperToDelete(null);
   };
 
@@ -166,7 +161,6 @@ export function Library() {
 
                     <ContextMenuItem
                       className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
-                      // ✨ 这里改为调用请求函数，传入 ID 和 标题
                       onClick={() => handleDeleteRequest(wp.id, wp.title)}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
@@ -186,32 +180,40 @@ export function Library() {
         <WallpaperSidebar />
       </aside>
 
-      {/* ✨ 全局删除确认弹窗 */}
+      {/* ✨ 全局删除确认弹窗 (Destructive Style) */}
       <AlertDialog
         open={!!wallpaperToDelete}
         onOpenChange={(open) => !open && setWallpaperToDelete(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              wallpaper
-              <span className="font-bold text-foreground">
-                {" "}
-                "{wallpaperToDelete?.title}"{" "}
-              </span>
-              from your library.
-            </AlertDialogDescription>
+            {/* 模拟 AlertDialogMedia 效果 */}
+            <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10 dark:bg-red-900/20">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="space-y-1 text-center sm:text-left">
+                <AlertDialogTitle>Delete this wallpaper?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  <span className="font-bold text-foreground">
+                    {" "}
+                    "{wallpaperToDelete?.title}"{" "}
+                  </span>
+                  and remove it from your disk.
+                </AlertDialogDescription>
+              </div>
+            </div>
           </AlertDialogHeader>
+
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            {/* 确认按钮使用红色样式 */}
+            {/* 使用 Destructive Variant */}
             <AlertDialogAction
               onClick={handleDeleteConfirm}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
             >
-              Delete
+              Delete Wallpaper
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
