@@ -9,6 +9,9 @@ import {
   Minimize2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+// ✨ 1. 引入 StatefulButton，重命名以避免冲突
+import { Button as StatefulButton } from "@/components/ui/stateful-button";
+
 import {
   InputGroup,
   InputGroupAddon,
@@ -27,6 +30,7 @@ import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
 import { toast } from "sonner";
 import { AppMenu } from "@/components/AppMenu";
 
+// 引入 Tauri API
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
 export function AppNavbar() {
@@ -40,9 +44,8 @@ export function AppNavbar() {
   const setSelectedId = useAppStore((state) => state.setSelectedId);
   const filteredWallpapers = getFilteredWallpapers();
 
-  // --- ✨ 核心修复：安全的切换函数 ---
+  // --- 核心修复：安全的切换函数 ---
   const handleSwitchToCompact = async () => {
-    // 1. 环境检测
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
 
     if (!isTauri) {
@@ -51,7 +54,6 @@ export function AppNavbar() {
       return;
     }
 
-    // 2. Tauri 逻辑
     try {
       const appWindow = getCurrentWindow();
       if (appWindow) {
@@ -60,11 +62,11 @@ export function AppNavbar() {
       toggleCompactMode(true);
     } catch (err) {
       console.error("Resize failed:", err);
-      toggleCompactMode(true); // 报错也要切换 UI
+      toggleCompactMode(true);
     }
   };
 
-  // --- 原有 Actions ---
+  // --- Actions ---
   const handleStop = async () => {
     try {
       await stopWallpaper();
@@ -92,6 +94,20 @@ export function AppNavbar() {
     }
   };
 
+  // ✨ 2. 新增：模拟截图处理函数
+  const handleScreenshot = () => {
+    // 返回一个 Promise，让 StatefulButton 自动进入 loading 状态
+    return new Promise<void>((resolve) => {
+      // 模拟 1.5 秒的后端处理时间
+      setTimeout(() => {
+        toast.success("Screenshot saved", {
+          description: "Saved to Pictures/LWG_Screenshots (Mock)",
+        });
+        resolve(); // 任务完成，按钮恢复原状
+      }, 1500);
+    });
+  };
+
   return (
     <div className="flex w-full items-center gap-4 py-2 px-4 drag-region select-none">
       <div className="no-drag flex items-center gap-2">
@@ -102,7 +118,7 @@ export function AppNavbar() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-primary hover:bg-primary/10"
-                onClick={handleSwitchToCompact} // 👈 使用新函数
+                onClick={handleSwitchToCompact}
               >
                 <Minimize2 className="w-4 h-4" />
               </Button>
@@ -186,11 +202,18 @@ export function AppNavbar() {
             </TooltipContent>
           </Tooltip>
 
+          {/* ✨ 3. 替换为 StatefulButton */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              {/* 注意：StatefulButton 内部会自动处理 loading 状态的图标显示 */}
+              <StatefulButton
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleScreenshot}
+              >
                 <Camera className="w-4 h-4" />
-              </Button>
+              </StatefulButton>
             </TooltipTrigger>
             <TooltipContent>
               <p>Screenshot</p>

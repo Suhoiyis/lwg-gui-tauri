@@ -1,168 +1,105 @@
 "use client";
-import { cn } from "@/lib/utils";
-import React from "react";
-import { motion, AnimatePresence, useAnimate } from "motion/react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  className?: string;
-  children: React.ReactNode;
+import * as React from "react";
+import { Button as ShadcnButton, ButtonProps } from "@/components/ui/button";
+import { AnimatePresence, motion } from "motion/react";
+import { Loader2, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface StatefulButtonProps extends Omit<ButtonProps, "onClick"> {
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => Promise<void> | void;
 }
 
-export const Button = ({ className, children, ...props }: ButtonProps) => {
-  const [scope, animate] = useAnimate();
+export function Button({
+  children,
+  onClick,
+  className,
+  variant = "ghost",
+  size = "icon",
+  ...props
+}: StatefulButtonProps) {
+  const [status, setStatus] = React.useState<"idle" | "loading" | "success">(
+    "idle",
+  );
 
-  const animateLoading = async () => {
-    await animate(
-      ".loader",
-      {
-        width: "20px",
-        scale: 1,
-        display: "block",
-      },
-      {
-        duration: 0.2,
-      },
-    );
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    // 如果没有传入 onClick，直接返回
+    if (!onClick) return;
+
+    // 如果正在处理中，阻止重复点击
+    if (status !== "idle") {
+      e.preventDefault();
+      return;
+    }
+
+    setStatus("loading");
+    try {
+      // ✨ 修复 3：调用 onClick 时把事件 e 传回去
+      await onClick(e);
+      setStatus("success");
+      setTimeout(() => {
+        setStatus("idle");
+      }, 1500);
+    } catch (error) {
+      console.error(error);
+      setStatus("idle");
+    }
   };
-
-  const animateSuccess = async () => {
-    await animate(
-      ".loader",
-      {
-        width: "0px",
-        scale: 0,
-        display: "none",
-      },
-      {
-        duration: 0.2,
-      },
-    );
-    await animate(
-      ".check",
-      {
-        width: "20px",
-        scale: 1,
-        display: "block",
-      },
-      {
-        duration: 0.2,
-      },
-    );
-
-    await animate(
-      ".check",
-      {
-        width: "0px",
-        scale: 0,
-        display: "none",
-      },
-      {
-        delay: 2,
-        duration: 0.2,
-      },
-    );
-  };
-
-  const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await animateLoading();
-    await props.onClick?.(event);
-    await animateSuccess();
-  };
-
-  const {
-    onClick,
-    onDrag,
-    onDragStart,
-    onDragEnd,
-    onAnimationStart,
-    onAnimationEnd,
-    ...buttonProps
-  } = props;
 
   return (
-    <motion.button
-      layout
-      layoutId="button"
-      ref={scope}
+    <ShadcnButton
+      variant={variant}
+      size={size}
       className={cn(
-        "flex min-w-[120px] cursor-pointer items-center justify-center gap-2 rounded-full bg-green-500 px-4 py-2 font-medium text-white ring-offset-2 transition duration-200 hover:ring-2 hover:ring-green-500 dark:ring-offset-black",
+        "relative transition-all",
+        status === "success" &&
+          "text-green-500 hover:text-green-600 hover:bg-green-500/10",
         className,
       )}
-      {...buttonProps}
       onClick={handleClick}
+      disabled={status === "loading"}
+      {...props}
     >
-      <motion.div layout className="flex items-center gap-2">
-        <Loader />
-        <CheckIcon />
-        <motion.span layout>{children}</motion.span>
-      </motion.div>
-    </motion.button>
-  );
-};
+      <AnimatePresence mode="popLayout" initial={false}>
+        {status === "idle" && (
+          <motion.span
+            key="idle"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center justify-center w-full h-full"
+          >
+            {children}
+          </motion.span>
+        )}
 
-const Loader = () => {
-  return (
-    <motion.svg
-      animate={{
-        rotate: [0, 360],
-      }}
-      initial={{
-        scale: 0,
-        width: 0,
-        display: "none",
-      }}
-      style={{
-        scale: 0.5,
-        display: "none",
-      }}
-      transition={{
-        duration: 0.3,
-        repeat: Infinity,
-        ease: "linear",
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="loader text-white"
-    >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 3a9 9 0 1 0 9 9" />
-    </motion.svg>
-  );
-};
+        {status === "loading" && (
+          <motion.span
+            key="loading"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </motion.span>
+        )}
 
-const CheckIcon = () => {
-  return (
-    <motion.svg
-      initial={{
-        scale: 0,
-        width: 0,
-        display: "none",
-      }}
-      style={{
-        scale: 0.5,
-        display: "none",
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="check text-white"
-    >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-      <path d="M9 12l2 2l4 -4" />
-    </motion.svg>
+        {status === "success" && (
+          <motion.span
+            key="success"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Check className="h-4 w-4" />
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </ShadcnButton>
   );
-};
+}
