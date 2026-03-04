@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button as ShadcnButton, ButtonProps } from "@/components/ui/button";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
