@@ -67,7 +67,7 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
 
 // ================= 🚀 自动生成扩充版 Mock 数据 (60张) =================
 // 这里的逻辑是：把上面5张模板，重复循环12次，生成60张，并修改ID防止重复
-const EXPANDED_MOCK_WALLPAPERS = Array.from({ length: 60 }).map((_, i) => {
+const EXPANDED_MOCK_WALLPAPERS = Array.from({ length: 150 }).map((_, i) => {
   const template = BASE_MOCK_TEMPLATES[i % BASE_MOCK_TEMPLATES.length];
   return {
     ...template,
