@@ -6,6 +6,7 @@ import { useAppStore } from "@/store/appStore";
 import { applyWallpaper } from "@/api/wallpaper";
 import { toast } from "sonner";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import { cn } from "@/lib/utils";
 
 /**
  * 将本地文件路径转换为浏览器可加载的 URL
@@ -16,6 +17,28 @@ function getPreviewUrl(preview: string): string {
   }
   return convertFileSrc(preview);
 }
+
+// 辅助函数：生成标签颜色
+const getColorForTag = (tag: string) => {
+  const colors = [
+    "bg-blue-100 text-blue-700 hover:bg-blue-100/80 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+    "bg-green-100 text-green-700 hover:bg-green-100/80 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
+    "bg-purple-100 text-purple-700 hover:bg-purple-100/80 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+    "bg-pink-100 text-pink-700 hover:bg-pink-100/80 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800",
+    "bg-yellow-100 text-yellow-700 hover:bg-yellow-100/80 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+    "bg-indigo-100 text-indigo-700 hover:bg-indigo-100/80 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800",
+    "bg-red-100 text-red-700 hover:bg-red-100/80 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
+    "bg-orange-100 text-orange-700 hover:bg-orange-100/80 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
+    "bg-teal-100 text-teal-700 hover:bg-teal-100/80 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
+  ];
+
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash += tag.charCodeAt(i);
+  }
+  return colors[hash % colors.length];
+};
+
 export function WallpaperSidebar() {
   const selectedWallpaper = useAppStore((state) =>
     state.getSelectedWallpaper(),
@@ -33,15 +56,12 @@ export function WallpaperSidebar() {
     }
   };
 
-  // 修正：不要返回 null，否则 Layout 右侧会塌陷。
-  // 保持原版结构，如果 selectedWallpaper 为空，内容区域会显示为空白或占位符，但容器还在。
-
   return (
     <div className="h-full flex flex-col bg-card/30">
       <ScrollArea className="flex-1 p-6">
         {selectedWallpaper ? (
           <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-            {/* 图片容器 - 正方形，短边裁剪 */}
+            {/* 1. 图片容器 */}
             <div className="aspect-square relative overflow-hidden border border-border shadow-2xl rounded-2xl bg-muted">
               <img
                 src={getPreviewUrl(selectedWallpaper.preview)}
@@ -54,19 +74,69 @@ export function WallpaperSidebar() {
                 }}
               />
             </div>
+
+            {/* 2. 标题与基础信息 */}
             <div className="space-y-3">
-              <h1 className="text-xl font-bold leading-tight">
+              <h1 className="text-xl font-bold leading-tight break-words">
                 {selectedWallpaper.title}
               </h1>
+              {/* ID 和 Size */}
               <div className="flex flex-wrap gap-2">
-                <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20">
+                <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20 hover:bg-pink-500/30">
                   {selectedWallpaper.id}
                 </Badge>
-                <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/20">
+                <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/30">
                   {selectedWallpaper.size || "0 MB"}
                 </Badge>
               </div>
             </div>
+
+            {/* ✨ 3. 并排布局：Tags (左) + Type (右) */}
+            <div className="grid grid-cols-2 gap-4 border-t pt-4">
+              {/* 左侧：Tags */}
+              <div className="space-y-2">
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  Tags
+                </div>
+                <div className="flex flex-wrap gap-1.5 content-start">
+                  {selectedWallpaper.tags?.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className={cn(
+                        "font-normal border shadow-sm",
+                        getColorForTag(tag),
+                      )}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                  {(!selectedWallpaper.tags ||
+                    selectedWallpaper.tags.length === 0) && (
+                    <span className="text-xs text-muted-foreground italic">
+                      No tags
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* 右侧：Type */}
+              <div className="space-y-2">
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  Type
+                </div>
+                <div className="flex flex-wrap content-start">
+                  <Badge
+                    variant="secondary"
+                    className="font-mono bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                  >
+                    {selectedWallpaper.type || "Unknown"}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. 描述 */}
             <div className="space-y-2 border-t pt-4">
               <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                 Description

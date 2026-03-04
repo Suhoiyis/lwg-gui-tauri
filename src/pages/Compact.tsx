@@ -29,9 +29,32 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { useAppStore } from "@/store/appStore";
+import { cn } from "@/lib/utils"; // 引入 cn
 
-// ✨ 引入 Tauri Window API
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
+
+// ✨ 辅助函数：根据标签内容生成固定的颜色类名
+const getColorForTag = (tag: string) => {
+  const colors = [
+    "bg-blue-100 text-blue-700 hover:bg-blue-100/80 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+    "bg-green-100 text-green-700 hover:bg-green-100/80 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
+    "bg-purple-100 text-purple-700 hover:bg-purple-100/80 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+    "bg-pink-100 text-pink-700 hover:bg-pink-100/80 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800",
+    "bg-yellow-100 text-yellow-700 hover:bg-yellow-100/80 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+    "bg-indigo-100 text-indigo-700 hover:bg-indigo-100/80 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800",
+    "bg-red-100 text-red-700 hover:bg-red-100/80 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
+    "bg-orange-100 text-orange-700 hover:bg-orange-100/80 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
+    "bg-teal-100 text-teal-700 hover:bg-teal-100/80 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
+  ];
+
+  // 简单的哈希算法：计算字符串 ASCII 码之和
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash += tag.charCodeAt(i);
+  }
+
+  return colors[hash % colors.length];
+};
 
 export function CompactMode() {
   const { wallpapers, selectedId, setSelectedId, toggleCompactMode } =
@@ -40,7 +63,6 @@ export function CompactMode() {
   const [isCopied, setIsCopied] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
 
-  // 1. 获取当前选中的壁纸对象
   const currentWallpaper = useMemo(
     () => wallpapers.find((w) => w.id === selectedId) || wallpapers[0],
     [wallpapers, selectedId],
@@ -51,11 +73,9 @@ export function CompactMode() {
     [wallpapers, selectedId],
   );
 
-  // --- 🔄 核心：Carousel 双向同步逻辑 ---
   useEffect(() => {
     if (!api) return;
 
-    // A. 监听 Carousel 滚动结束 (select) 事件，同步更新选中的 ID
     const onSelect = () => {
       const snapIndex = api.selectedScrollSnap();
       const targetWp = wallpapers[snapIndex];
@@ -67,10 +87,8 @@ export function CompactMode() {
 
     api.on("select", onSelect);
 
-    // B. 当外部（或大箭头）改变 ID 时，同步滚动 Carousel
     const index = wallpapers.findIndex((w) => w.id === selectedId);
     if (index !== -1 && api.selectedScrollSnap() !== index) {
-      // 微小延迟确保布局稳定后再滚动
       setTimeout(() => api.scrollTo(index), 20);
     }
 
@@ -79,11 +97,8 @@ export function CompactMode() {
     };
   }, [api, selectedId, wallpapers, setSelectedId]);
 
-  // --- 窗口切换逻辑 ---
   const handleSwitchToNormal = async () => {
-    // 检测是否在 Tauri 环境中
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
-
     if (!isTauri) {
       console.warn("Detected non-Tauri environment. Skipping window resize.");
       toggleCompactMode(false);
@@ -92,19 +107,16 @@ export function CompactMode() {
 
     try {
       const appWindow = getCurrentWindow();
-      // 只有环境正确时才执行
       if (appWindow) {
         await appWindow.setSize(new LogicalSize(1200, 800));
       }
       toggleCompactMode(false);
     } catch (err) {
       console.error("Failed to resize window:", err);
-      // 即使报错，也要确保模式切换成功
       toggleCompactMode(false);
     }
   };
 
-  // --- 导航与随机逻辑 ---
   const handleNavigate = (direction: -1 | 1) => {
     const currentIdx = wallpapers.findIndex((w) => w.id === selectedId);
     if (currentIdx === -1) return;
@@ -121,13 +133,13 @@ export function CompactMode() {
 
   return (
     <div className="flex flex-col h-full bg-background text-foreground select-none">
-      {/* 1. 顶部状态栏 (Navbar) */}
+      {/* Navbar */}
       <div className="flex items-center justify-between p-2 border-b bg-muted/20 drag-region">
         <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8 no-drag"
-          onClick={handleSwitchToNormal} // ✨ 绑定调整窗口大小的函数
+          onClick={handleSwitchToNormal}
         >
           <Maximize2 className="h-4 w-4" />
         </Button>
@@ -149,10 +161,10 @@ export function CompactMode() {
         </div>
       </div>
 
-      {/* 2. 主内容滚动区 */}
+      {/* Main Content */}
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4 flex flex-col items-center">
-          {/* 预览图区域 */}
+          {/* Preview Image */}
           <div className="w-[200px] h-[200px] bg-muted rounded-lg shadow-sm border overflow-hidden relative group">
             {currentWallpaper?.preview ? (
               <img
@@ -176,7 +188,7 @@ export function CompactMode() {
             </div>
           </div>
 
-          {/* 标题与 ID 复制 */}
+          {/* Title & ID */}
           <div className="w-full text-center space-y-1">
             <h3 className="font-bold text-lg leading-tight line-clamp-2 px-4">
               {currentWallpaper?.title || "Select Wallpaper"}
@@ -198,7 +210,7 @@ export function CompactMode() {
             </div>
           </div>
 
-          {/* 控制按钮（上一张/下一张/索引显示） */}
+          {/* Navigation */}
           <div className="flex items-center gap-2 w-full px-4 justify-center">
             <Button
               variant="outline"
@@ -239,33 +251,55 @@ export function CompactMode() {
 
           <Separator />
 
-          {/* Tags 标签 */}
-          <div className="w-full space-y-2">
-            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Tags
+          {/* Tags & Type Grid */}
+          <div className="w-full grid grid-cols-2 gap-4">
+            {/* Left: Tags with Colors */}
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Tags
+              </div>
+              <div className="flex flex-wrap gap-1.5 content-start">
+                {currentWallpaper?.tags?.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="outline" // 使用 outline 配合自定义颜色
+                    // ✨ 动态计算颜色
+                    className={cn(
+                      "text-[10px] px-1.5 h-5 font-normal border shadow-sm",
+                      getColorForTag(tag),
+                    )}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+                {!currentWallpaper?.tags?.length && (
+                  <span className="text-[10px] text-muted-foreground italic">
+                    No tags
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {currentWallpaper?.tags?.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="text-[10px] px-1.5 h-5 font-normal"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
 
-          {/* 详情信息 */}
-          <div className="w-full flex justify-between text-xs px-1">
-            <span className="text-muted-foreground">Type</span>
-            <span className="font-mono">{currentWallpaper?.type}</span>
+            {/* Right: Type */}
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Type
+              </div>
+              <div className="flex flex-wrap content-start">
+                {/* 这里修改了 className */}
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] h-5 px-1.5 font-mono font-normal bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                >
+                  {currentWallpaper?.type || "Unknown"}
+                </Badge>
+              </div>
+            </div>
           </div>
         </div>
       </ScrollArea>
 
-      {/* 3. 底部 Carousel 轮播导航 */}
+      {/* Carousel */}
       <div className="p-2 border-t bg-muted/10 relative group">
         <Carousel
           setApi={setApi}
@@ -280,7 +314,7 @@ export function CompactMode() {
                     aspect-square rounded-md overflow-hidden cursor-pointer transition-all border-2
                     ${selectedId === wp.id ? "border-primary shadow-md scale-95" : "border-transparent opacity-60 hover:opacity-100"}
                   `}
-                  onClick={() => api?.scrollTo(index)} // ✨ 点击缩略图自动滚动并选中
+                  onClick={() => api?.scrollTo(index)}
                 >
                   {wp.preview ? (
                     <img
@@ -296,8 +330,6 @@ export function CompactMode() {
               </CarouselItem>
             ))}
           </CarouselContent>
-
-          {/* 内部箭头控制 */}
           <CarouselPrevious className="left-1 h-6 w-6 opacity-0 group-hover:opacity-70 transition-opacity hover:!opacity-100" />
           <CarouselNext className="right-1 h-6 w-6 opacity-0 group-hover:opacity-70 transition-opacity hover:!opacity-100" />
         </Carousel>
@@ -306,5 +338,4 @@ export function CompactMode() {
   );
 }
 
-// 辅助函数
 const convertFileSrc = (path: string) => path;
