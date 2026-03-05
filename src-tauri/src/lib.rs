@@ -641,17 +641,23 @@ async fn take_screenshot(
         use std::time::{SystemTime, UNIX_EPOCH};
         use lwg_core::controller::ScreenshotManager;
         
+        println!("📸 Screenshot requested for wallpaper: {}", wallpaper_id);
+        
         // 获取或生成输出路径
         let path = output_path.unwrap_or_else(|| {
             get_default_screenshot_path(&wallpaper_id)
         });
+        println!("📁 Output path: {}", path);
         
         // 创建 ScreenshotManager
         let config = state.config_manager.lock().await.config().clone();
+        println!("⚙️ Config: delay={}, res={}, prefer_xvfb={}", 
+            config.screenshot_delay, config.screenshot_res, config.prefer_xvfb);
         let shared_config = Arc::new(tokio::sync::Mutex::new(config));
         let screenshot_manager = ScreenshotManager::new(shared_config);
         
         // 启动截图并监控
+        println!("🚀 Starting screenshot process...");
         let (mut child, tracker) = screenshot_manager
             .take_screenshot_with_monitor(
                 &wallpaper_id,
@@ -659,21 +665,49 @@ async fn take_screenshot(
                 state.performance_monitor.clone(),
             )
             .await
-            .map_err(|e| format!("Failed to start screenshot: {}", e))?;
+            .map_err(|e| {
+                println!("❌ Failed to start: {}", e);
+                format!("Failed to start screenshot: {}", e)
+            })?;
+        
+        println!("✅ Process started with PID: {}", child.id());
         
         // 等待截图完成（timeout = delay + 60 秒）
         let config = state.config_manager.lock().await.config().clone();
         let timeout_secs = (config.screenshot_delay + 60) as u64;
         drop(config);
         
-        ScreenshotManager::wait_for_screenshot(&mut child, timeout_secs)
+        println!("⏳ Waiting for screenshot (timeout: {}s)...", timeout_secs);
+        
+        // 获取并校验进程退出状态码
+        let status = ScreenshotManager::wait_for_screenshot(&mut child, &path, timeout_secs)
             .await
-            .map_err(|e| format!("Screenshot failed: {}", e))?;
+            .map_err(|e| {
+                println!("❌ Wait failed: {}", e);
+                format!("Screenshot failed: {}", e)
+            })?;
+        
+        if !status.success() {
+            let log_msg = std::fs::read_to_string("/tmp/wallpaper_screenshot_error.log").unwrap_or_default();
+            println!("❌ Process exited with error: {}\nLogs:\n{}", status, log_msg);
+            return Err(format!("截图进程崩溃 ({})。请检查 /tmp/wallpaper_screenshot_error.log", status));
+        }
+        
+        println!("✅ Screenshot process completed");
+        
+        // 如果文件没生成，必须 return Err，阻断成功弹窗
+        if !std::path::Path::new(&path).exists() {
+            println!("⚠️ Screenshot file NOT found: {}", path);
+            let log_msg = std::fs::read_to_string("/tmp/wallpaper_screenshot_error.log").unwrap_or_default();
+            return Err(format!("截图程序已运行完毕，但未能生成文件：{}\n日志：{}", path, log_msg));
+        }
+        
+        println!("✅ Screenshot file exists: {}", path);
         
         // 完成截图并保存历史
         let record = ScreenshotManager::finalize_screenshot(
             tracker,
-            wallpaper_id,
+            wallpaper_id.clone(),
             path.clone(),
             state.performance_monitor.clone(),
         )
@@ -777,6 +811,7 @@ pub fn run() {
             stop_performance_monitor,
             get_screenshot_history,
             clear_screenshot_history,
+            take_screenshot,
             // Active wallpaper commands
             get_active_wallpapers
         ])

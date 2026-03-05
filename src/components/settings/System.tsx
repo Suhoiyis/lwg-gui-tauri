@@ -108,13 +108,13 @@ export function SystemSettings() {
               <div className="flex justify-between">
                 <Label>Capture Delay</Label>
                 <span className="text-xs text-muted-foreground">
-                  {settings.screenshotDelay} frames
+                  {settings.screenshotDelay} seconds
                 </span>
               </div>
               <Slider
                 value={[settings.screenshotDelay]}
                 onValueChange={(v) => updateSetting("screenshotDelay", v[0])}
-                max={600}
+                max={20}
                 min={1}
                 step={1}
               />
