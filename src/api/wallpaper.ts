@@ -240,3 +240,7 @@ export async function takeScreenshot(
 export async function getScreenshotHistory(): Promise<ScreenshotRecord[]> {
   return await invoke("get_screenshot_history");
 }
+
+export async function openFolder(path: string): Promise<void> {
+  await invoke("open_folder", { path });
+}

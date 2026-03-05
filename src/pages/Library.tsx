@@ -31,7 +31,7 @@ import { LibraryPagination } from "@/components/library/LibraryPagination";
 
 // State & API
 import { useAppStore } from "@/store/appStore";
-import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
+import { applyWallpaper, stopWallpaper, openFolder } from "@/api/wallpaper";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -117,10 +117,21 @@ export function Library() {
     toast.success("Wallpaper stopped");
   };
 
-  const handleOpenFolder = (path: string) => {
-    toast.info("Open Folder", {
-      description: path ? `Path: ${path}` : "Path unknown (Mock)",
-    });
+  const handleOpenFolder = async (path: string) => {
+    if (!path) {
+      toast.error("Cannot open folder", {
+        description: "Path is unknown",
+      });
+      return;
+    }
+    
+    try {
+      await openFolder(path);
+    } catch (error) {
+      toast.error("Failed to open folder", {
+        description: String(error),
+      });
+    }
   };
 
   const handleDeleteRequest = (id: string, title: string) => {

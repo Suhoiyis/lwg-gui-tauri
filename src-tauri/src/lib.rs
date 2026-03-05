@@ -749,6 +749,38 @@ fn get_default_screenshot_path(wallpaper_id: &str) -> String {
     format!("{}/{}_{}.jpg", dir, wallpaper_id, timestamp)
 }
 #[tauri::command]
+async fn open_folder(path: String) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::process::Command;
+        
+        // 检查路径是否存在
+        let path = std::path::Path::new(&path);
+        let folder = if path.is_file() {
+            path.parent().unwrap_or(path)
+        } else {
+            path
+        };
+        
+        // 尝试真正的文件管理器（跳过 xdg-open，它可能被错误配置）
+        let file_managers = ["nautilus", "thunar", "dolphin", "xdg-open"];
+        for fm in &file_managers {
+            if Command::new(fm).arg(folder).spawn().is_ok() {
+                return Ok(());
+            }
+        }
+        
+        Err("No file manager found. Please install xdg-open, nautilus, thunar, or dolphin.".to_string())
+    }
+    
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = path;
+        Err("Open folder is only available on Linux".to_string())
+    }
+}
+
+#[tauri::command]
 async fn get_active_wallpapers(
     state: State<'_, AppState>,
 ) -> Result<HashMap<String, String>, String> {
@@ -813,7 +845,8 @@ pub fn run() {
             clear_screenshot_history,
             take_screenshot,
             // Active wallpaper commands
-            get_active_wallpapers
+            get_active_wallpapers,
+            open_folder,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
