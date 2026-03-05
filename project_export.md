@@ -1,6 +1,6 @@
 # 项目结构与文件内容导出 (Rust Project)
 
-**生成时间**: 2026-03-03 12:31:22
+**生成时间**: 2026-03-05 09:16:31
 **根目录**: `C:\Users\i26248\Documents\lwg-gui-tauri`
 
 ---
@@ -9,6 +9,7 @@
 
 ```text
 /
+├── .prettierignore
 ├── README.md
 ├── components.json
 ├── folder.py
@@ -28,14 +29,19 @@
 │   │   └── react.svg
 │   ├── components/
 │   │   ├── 3d-card-demo.tsx
+│   │   ├── AboutDialog.tsx
+│   │   ├── AppMenu.tsx
 │   │   ├── AppnavBar.tsx
 │   │   ├── Layout.tsx
+│   │   ├── WallpaperCard.tsx
 │   │   ├── WallpaperContextMenu.tsx
-│   │   ├── WallpaperSidebar.tsx
 │   │   ├── app-sidebar.tsx
 │   │   ├── button.tsx
 │   │   ├── library/
-│   │   │   └── WallpaperCard.tsx
+│   │   │   ├── LibraryHeader.tsx
+│   │   │   ├── LibraryPagination.tsx
+│   │   │   ├── WallpaperGrid.tsx
+│   │   │   └── WallpaperSidebar.tsx
 │   │   ├── performance/
 │   │   │   ├── Chart.tsx
 │   │   │   ├── OverviewCard.tsx
@@ -98,6 +104,7 @@
 │   │       └── tooltip.tsx
 │   ├── hooks/
 │   │   ├── use-mobile.tsx
+│   │   ├── useActiveWallpapers.ts
 │   │   └── useSystemStats.ts
 │   ├── index.css
 │   ├── lib/
@@ -106,6 +113,7 @@
 │   ├── mock/
 │   │   └── wallpapers.ts
 │   ├── pages/
+│   │   ├── Compact.tsx
 │   │   ├── Library.tsx
 │   │   ├── Performance.tsx
 │   │   ├── Settings.tsx
@@ -161,6 +169,46 @@
 ---
 
 ## 📄 文件详细内容
+
+### 📄 文件: `.prettierignore`
+
+```
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+src-tauri/target/
+
+node_modules
+dist
+build
+coverage
+*.min.js
+.lock
+```
+
+---
 
 ### 📄 文件: `README.md`
 
@@ -515,12 +563,13 @@ if __name__ == "__main__":
         "embla-carousel-react": "^8.6.0",
         "framer-motion": "^12.34.3",
         "lucide-react": "^0.575.0",
+        "motion": "^12.34.5",
         "next-themes": "^0.4.6",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "react-icons": "^5.5.0",
         "react-parallax-tilt": "^1.7.319",
-        "react-resizable-panels": "^4.6.5",
+        "react-resizable-panels": "^4.7.1",
         "recharts": "^2.15.4",
         "sonner": "^2.0.7",
         "tailwind-merge": "^3.5.0",
@@ -536,6 +585,7 @@ if __name__ == "__main__":
         "@vitejs/plugin-react": "^4.6.0",
         "autoprefixer": "^10.4.27",
         "postcss": "^8.5.6",
+        "prettier": "^3.8.1",
         "tailwindcss": "^3.4.17",
         "typescript": "~5.8.3",
         "vite": "^7.0.4",
@@ -4109,12 +4159,12 @@ if __name__ == "__main__":
       }
     },
     "node_modules/framer-motion": {
-      "version": "12.34.3",
-      "resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-12.34.3.tgz",
-      "integrity": "sha512-v81ecyZKYO/DfpTwHivqkxSUBzvceOpoI+wLfgCgoUIKxlFKEXdg0oR9imxwXumT4SFy8vRk9xzJ5l3/Du/55Q==",
+      "version": "12.34.5",
+      "resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-12.34.5.tgz",
+      "integrity": "sha512-Z2dQ+o7BsfpJI3+u0SQUNCrN+ajCKJen1blC4rCHx1Ta2EOHs+xKJegLT2aaD9iSMbU3OoX+WabQXkloUbZmJQ==",
       "license": "MIT",
       "dependencies": {
-        "motion-dom": "^12.34.3",
+        "motion-dom": "^12.34.5",
         "motion-utils": "^12.29.2",
         "tslib": "^2.4.0"
       },
@@ -4405,10 +4455,36 @@ if __name__ == "__main__":
         "url": "https://github.com/sponsors/jonschlinkert"
       }
     },
+    "node_modules/motion": {
+      "version": "12.34.5",
+      "resolved": "https://registry.npmjs.org/motion/-/motion-12.34.5.tgz",
+      "integrity": "sha512-N06NLJ9IeBHeielRqIvYvjPfXuRdyTxa+9++BgpGa+hY2D7TcMkI6QzV3jaRuv0aZRXgMa7cPy9YcBUBisPzAQ==",
+      "license": "MIT",
+      "dependencies": {
+        "framer-motion": "^12.34.5",
+        "tslib": "^2.4.0"
+      },
+      "peerDependencies": {
+        "@emotion/is-prop-valid": "*",
+        "react": "^18.0.0 || ^19.0.0",
+        "react-dom": "^18.0.0 || ^19.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@emotion/is-prop-valid": {
+          "optional": true
+        },
+        "react": {
+          "optional": true
+        },
+        "react-dom": {
+          "optional": true
+        }
+      }
+    },
     "node_modules/motion-dom": {
-      "version": "12.34.3",
-      "resolved": "https://registry.npmjs.org/motion-dom/-/motion-dom-12.34.3.tgz",
-      "integrity": "sha512-sYgFe+pR9aIM7o4fhs2aXtOI+oqlUd33N9Yoxcgo1Fv7M20sRkHtCmzE/VRNIcq7uNJ+qio+Xubt1FXH3pQ+eQ==",
+      "version": "12.34.5",
+      "resolved": "https://registry.npmjs.org/motion-dom/-/motion-dom-12.34.5.tgz",
+      "integrity": "sha512-k33CsnxO2K3gBRMUZT+vPmc4Utlb5menKdG0RyVNLtlqRaaJPRWlE9fXl8NTtfZ5z3G8TDvqSu0MENLqSTaHZA==",
       "license": "MIT",
       "dependencies": {
         "motion-utils": "^12.29.2"
@@ -4709,6 +4785,22 @@ if __name__ == "__main__":
       "integrity": "sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==",
       "license": "MIT"
     },
+    "node_modules/prettier": {
+      "version": "3.8.1",
+      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.8.1.tgz",
+      "integrity": "sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==",
+      "dev": true,
+      "license": "MIT",
+      "bin": {
+        "prettier": "bin/prettier.cjs"
+      },
+      "engines": {
+        "node": ">=14"
+      },
+      "funding": {
+        "url": "https://github.com/prettier/prettier?sponsor=1"
+      }
+    },
     "node_modules/prop-types": {
       "version": "15.8.1",
       "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz",
@@ -4850,9 +4942,9 @@ if __name__ == "__main__":
       }
     },
     "node_modules/react-resizable-panels": {
-      "version": "4.6.5",
-      "resolved": "https://registry.npmjs.org/react-resizable-panels/-/react-resizable-panels-4.6.5.tgz",
-      "integrity": "sha512-pmQP6qv9KmsesNMvWVNvVfVJAwYSOWWbAOAtrPR8Cre20+j1NWIlyft0btjtDQE+OepXmI6g3VPrCXQY0oD7+Q==",
+      "version": "4.7.1",
+      "resolved": "https://registry.npmjs.org/react-resizable-panels/-/react-resizable-panels-4.7.1.tgz",
+      "integrity": "sha512-RYBRgvdZhnUds5jJWYr1up0hYFofgN1dqSwhxfBl9Savoxms0gyGF0AfaXskhxTYkXrlwc+TlQPe5UkoV+1neg==",
       "license": "MIT",
       "peerDependencies": {
         "react": "^18.0.0 || ^19.0.0",
@@ -5722,12 +5814,13 @@ if __name__ == "__main__":
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.34.3",
     "lucide-react": "^0.575.0",
+    "motion": "^12.34.5",
     "next-themes": "^0.4.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
     "react-parallax-tilt": "^1.7.319",
-    "react-resizable-panels": "^4.6.5",
+    "react-resizable-panels": "^4.7.1",
     "recharts": "^2.15.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
@@ -5743,6 +5836,7 @@ if __name__ == "__main__":
     "@vitejs/plugin-react": "^4.6.0",
     "autoprefixer": "^10.4.27",
     "postcss": "^8.5.6",
+    "prettier": "^3.8.1",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3",
     "vite": "^7.0.4",
@@ -27883,9 +27977,12 @@ fn main() {
 
 ```rust
 use serde::{Deserialize, Serialize};
-use tauri::State;
+use tauri::{Emitter, State};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::collections::HashMap;
 use tokio::sync::Mutex;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 
 // ================= 平台特定导入 =================
@@ -27896,7 +27993,21 @@ use lwg_core::{
     controller::WallpaperController,
     config::AppConfig as LwgAppConfig,
     wallpaper::WallpaperManager,
+    PerformanceMonitor,
+    ScreenshotRecord,
 };
+
+// Non-Linux: provide local ScreenshotRecord definition
+#[cfg(not(target_os = "linux"))]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScreenshotRecord {
+    pub timestamp: u64,
+    pub wp_id: String,
+    pub output_path: String,
+    pub duration: f32,
+    pub max_cpu: f32,
+    pub max_mem: f32,
+}
 
 // ================= 数据结构 =================
 
@@ -28060,6 +28171,11 @@ struct AppState {
 
     #[cfg(target_os = "linux")]
     config_manager: Mutex<LwgConfigManager>,
+
+    #[cfg(target_os = "linux")]
+    performance_monitor: Arc<std::sync::Mutex<PerformanceMonitor>>,
+
+    monitor_running: Arc<AtomicBool>,
 
     #[cfg(not(target_os = "linux"))]
     _dummy: bool,
@@ -28403,6 +28519,195 @@ async fn get_autostart_status() -> Result<bool, String> {
     }
 }
 
+// ================= Performance Monitoring Commands =================
+
+#[tauri::command]
+async fn start_performance_monitor(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
+    // Check if already running
+    if state.monitor_running.load(Ordering::SeqCst) {
+        return Ok(());
+    }
+
+    state.monitor_running.store(true, Ordering::SeqCst);
+    let running = state.monitor_running.clone();
+
+    #[cfg(target_os = "linux")]
+    let monitor = state.performance_monitor.clone();
+
+    // Spawn background thread for periodic stats emission
+    std::thread::spawn(move || {
+        while running.load(Ordering::SeqCst) {
+            #[cfg(target_os = "linux")]
+            {
+                if let Ok(monitor) = monitor.lock() {
+                    let stats = monitor.get_stats();
+                    let _ = app.emit("performance-update", &stats);
+                }
+            }
+
+            #[cfg(not(target_os = "linux"))]
+            {
+                // Emit empty stats on non-Linux platforms
+                let _ = app.emit("performance-update", serde_json::json!({
+                    "total_cpu": 0.0,
+                    "total_memory_mb": 0.0,
+                    "total_threads": 0,
+                    "processes": {},
+                    "timestamp": 0
+                }));
+            }
+
+            std::thread::sleep(std::time::Duration::from_secs(1));
+        }
+    });
+
+    println!("✅ [Rust] Performance monitor started");
+    Ok(())
+}
+
+#[tauri::command]
+async fn stop_performance_monitor(
+    state: State<'_, AppState>,
+) -> Result<(), String> {
+    state.monitor_running.store(false, Ordering::SeqCst);
+    println!("✅ [Rust] Performance monitor stopped");
+    Ok(())
+}
+
+#[tauri::command]
+async fn get_screenshot_history(
+    _state: State<'_, AppState>,
+) -> Result<Vec<ScreenshotRecord>, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let monitor = _state.performance_monitor.lock()
+            .map_err(|e| format!("Lock error: {}", e))?;
+        Ok(monitor.get_screenshot_history())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(Vec::new())
+    }
+}
+
+#[tauri::command]
+async fn clear_screenshot_history(
+    _state: State<'_, AppState>,
+) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut monitor = _state.performance_monitor.lock()
+            .map_err(|e| format!("Lock error: {}", e))?;
+        monitor.clear_screenshot_history();
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
+async fn take_screenshot(
+    wallpaper_id: String,
+    output_path: Option<String>,
+    state: State<'_, AppState>,
+) -> Result<ScreenshotRecord, String> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::time::{SystemTime, UNIX_EPOCH};
+        use lwg_core::controller::ScreenshotManager;
+
+        // 获取或生成输出路径
+        let path = output_path.unwrap_or_else(|| {
+            get_default_screenshot_path(&wallpaper_id)
+        });
+
+        // 创建 ScreenshotManager
+        let config = state.config_manager.lock().await.config().clone();
+        let shared_config = Arc::new(tokio::sync::Mutex::new(config));
+        let screenshot_manager = ScreenshotManager::new(shared_config);
+
+        // 启动截图并监控
+        let (mut child, tracker) = screenshot_manager
+            .take_screenshot_with_monitor(
+                &wallpaper_id,
+                &path,
+                state.performance_monitor.clone(),
+            )
+            .await
+            .map_err(|e| format!("Failed to start screenshot: {}", e))?;
+
+        // 等待截图完成（timeout = delay + 60 秒）
+        let config = state.config_manager.lock().await.config().clone();
+        let timeout_secs = (config.screenshot_delay + 60) as u64;
+        drop(config);
+
+        ScreenshotManager::wait_for_screenshot(&mut child, timeout_secs)
+            .await
+            .map_err(|e| format!("Screenshot failed: {}", e))?;
+
+        // 完成截图并保存历史
+        let record = ScreenshotManager::finalize_screenshot(
+            tracker,
+            wallpaper_id,
+            path.clone(),
+            state.performance_monitor.clone(),
+        )
+        .map_err(|e| format!("Failed to finalize screenshot: {}", e))?;
+
+        // 添加到历史记录
+        {
+            let mut monitor = state.performance_monitor.lock()
+                .map_err(|e| format!("Lock error: {}", e))?;
+            monitor.add_screenshot_history(record.clone());
+        }
+
+        println!("✅ Screenshot saved: {}", path);
+        Ok(record)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Err("Screenshot is only available on Linux".to_string())
+    }
+}
+
+/// 生成默认截图路径
+fn get_default_screenshot_path(wallpaper_id: &str) -> String {
+    use std::fs;
+
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/home".to_string());
+    let dir = format!("{}/Pictures/LWG_Screenshots", home);
+
+    // 创建目录
+    let _ = fs::create_dir_all(&dir);
+
+    // 生成文件名
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+
+    format!("{}/{}_{}.jpg", dir, wallpaper_id, timestamp)
+}
+#[tauri::command]
+async fn get_active_wallpapers(
+    state: State<'_, AppState>,
+) -> Result<HashMap<String, String>, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let controller = state.controller.lock().await;
+        Ok(controller.get_active_wallpapers().await)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(HashMap::new())
+    }
+}
+
 // ================= 主入口 =================
 
 pub fn run() {
@@ -28412,17 +28717,24 @@ pub fn run() {
         println!("🐧 [Linux] 初始化应用状态...");
         let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
-        let controller = WallpaperController::new(shared_config);
+        let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
+        let mut controller = WallpaperController::new(shared_config);
+        controller.set_performance_monitor(performance_monitor.clone());
         AppState {
             controller: Mutex::new(controller),
             config_manager: Mutex::new(config_manager),
+            performance_monitor,
+            monitor_running: Arc::new(AtomicBool::new(false)),
         }
     };
 
     #[cfg(not(target_os = "linux"))]
     let app_state = {
         println!("🪟 [Windows Mock] 初始化 Mock 应用状态...");
-        AppState { _dummy: true }
+        AppState {
+            _dummy: true,
+            monitor_running: Arc::new(AtomicBool::new(false)),
+        }
     };
 
     tauri::Builder::default()
@@ -28437,7 +28749,14 @@ pub fn run() {
             restart_wallpapers,
             // System integration commands
             set_autostart,
-            get_autostart_status
+            get_autostart_status,
+            // Performance monitoring commands
+            start_performance_monitor,
+            stop_performance_monitor,
+            get_screenshot_history,
+            clear_screenshot_history,
+            // Active wallpaper commands
+            get_active_wallpapers
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -28644,17 +28963,18 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // Shadcn UI 组件
 import { Tabs } from "@/components/ui/tabs";
-import { Toaster } from "@/components/ui/sonner"; // 确保 Toast 正常工作
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 // 项目自定义组件
 import { Layout } from "./components/Layout";
 import { AppNavbar } from "./components/AppnavBar";
-import { WallpaperSidebar } from "./components/WallpaperSidebar";
 
 // 页面组件
 import { Library } from "./pages/Library";
 import { Settings } from "./pages/Settings";
 import { Performance } from "./pages/Performance";
+import { CompactMode } from "./pages/Compact";
 
 import { useAppStore } from "./store/appStore";
 
@@ -28662,43 +28982,93 @@ import { useAppStore } from "./store/appStore";
 const pageVariants = {
   initial: { opacity: 0, y: 10, scale: 0.99 },
   in: { opacity: 1, y: 0, scale: 1 },
-  out: { opacity: 0, y: -10, scale: 0.99 }
+  out: { opacity: 0, y: -10, scale: 0.99 },
 };
 
 const pageTransition = {
   type: "tween",
   ease: "circOut",
-  duration: 0.25
+  duration: 0.25,
 } as const;
 
 export function App() {
-  // Local UI state
   const [isLoading, setIsLoading] = useState(false);
 
-  // Zustand store state and actions
   const activeTab = useAppStore((state) => state.activeTab);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
 
+  const isCompactMode = useAppStore((s) => s.isCompactMode);
+  const toggleCompactMode = useAppStore((s) => s.toggleCompactMode);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const THRESHOLD = 500;
+      if (width < THRESHOLD && !isCompactMode) {
+        // 只有当不是 Compact Mode 时才切换，避免死循环
+        toggleCompactMode(true);
+      } else if (width >= THRESHOLD && isCompactMode) {
+        // 只有当是 Compact Mode 时才切换回大窗
+        toggleCompactMode(false);
+      }
+    };
+    // 初始化时先检查一次
+    handleResize();
+
+    // 监听窗口变化
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isCompactMode, toggleCompactMode]); // 依赖项
+
+  // 初始化加载壁纸
   useEffect(() => {
     setIsLoading(true);
     loadWallpapers().finally(() => setIsLoading(false));
-  }, []);
+    loadWallpapers();
+  }, [loadWallpapers]); // 简化依赖
 
-  return (
-    <>
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <Layout
-          navbar={<AppNavbar />}
-          // 只有在 Library (wallpapers) 标签页时才显示侧边栏
-          sidebar={activeTab === "wallpapers" ? <WallpaperSidebar /> : null}
+  // --- 渲染逻辑 ---
+
+  // 1. 如果是 Compact Mode
+  if (isCompactMode) {
+    return (
+      // ✨ 2. 包裹 TooltipProvider
+      <TooltipProvider delayDuration={300}>
+        <motion.div
+          key="compact"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="h-screen w-screen bg-background"
         >
+          <CompactMode />
+          <Toaster />
+        </motion.div>
+      </TooltipProvider>
+    );
+  }
+
+  // 2. 正常大窗口模式
+  return (
+    // ✨ 2. 包裹 TooltipProvider (这里的 <> 也可以删掉直接包 Provider)
+    <TooltipProvider delayDuration={300}>
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) =>
+          setActiveTab(value as "wallpapers" | "settings" | "performance")
+        }
+      >
+        <Layout navbar={<AppNavbar />} sidebar={null}>
           <AnimatePresence mode="wait">
             {activeTab === "wallpapers" && (
               <motion.div
                 key="wallpapers"
-                initial="initial" animate="in" exit="out"
-                variants={pageVariants} transition={pageTransition}
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
                 className="h-full"
               >
                 <Library />
@@ -28708,8 +29078,11 @@ export function App() {
             {activeTab === "settings" && (
               <motion.div
                 key="settings"
-                initial="initial" animate="in" exit="out"
-                variants={pageVariants} transition={pageTransition}
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
                 className="h-full"
               >
                 <Settings />
@@ -28719,8 +29092,11 @@ export function App() {
             {activeTab === "performance" && (
               <motion.div
                 key="performance"
-                initial="initial" animate="in" exit="out"
-                variants={pageVariants} transition={pageTransition}
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
                 className="h-full"
               >
                 <Performance />
@@ -28729,11 +29105,11 @@ export function App() {
           </AnimatePresence>
         </Layout>
       </Tabs>
-      {/* 确保 Sonner Toaster 位于最顶层，否则 Settings 页面的 toast 无法显示 */}
       <Toaster />
-    </>
+    </TooltipProvider>
   );
 }
+
 ```
 
 ---
@@ -28742,77 +29118,175 @@ export function App() {
 
 ```typescript
 import { invoke } from "@tauri-apps/api/core";
-import { Wallpaper } from "../types";
-import { MOCK_WALLPAPERS } from "../mock/wallpapers";
 
-// ================= 🛠️ 调试配置区域 =================
+// ================= 🛠️ 类型定义 =================
+export interface Wallpaper {
+  id: string;
+  title: string;
+  preview: string;
+  path: string;
+  type: "video" | "image" | "web";
+  tags: string[];
+  size?: number;
+}
 
-// 🔴 开关 1：是否模拟“空空如也”的状态？
-// 设为 true -> 哪怕有数据也返回空数组，用于测试“无壁纸”时的 UI
-const FORCE_EMPTY = false;
+export interface ScreenshotRecord {
+  timestamp: number;
+  wpId: string;
+  outputPath: string;
+  duration: number;
+  maxCpu: number;
+  maxMem: number;
+}
+export interface Wallpaper {
+  id: string;
+  title: string;
+  preview: string;
+  path: string;
+  type: "video" | "image" | "web";
+  tags: string[];
+  size?: number;
+}
 
-// 🔵 开关 2：是否强制使用 Mock 数据？
-// 默认为自动检测 (Windows 下自动为 true)，你也可以手动改为 true 强制在 Linux 下调试 UI
-const USE_MOCK = navigator.userAgent.includes("Windows") || false;
+// ================= 🧬 基础 Mock 模板 (5张) =================
+const BASE_MOCK_TEMPLATES: Wallpaper[] = [
+  {
+    id: "base_1",
+    title: "Cyberpunk City",
+    preview:
+      "https://images.unsplash.com/photo-1605218427306-635ba2439af2?w=500&q=80",
+    path: "mock/path/1.mp4",
+    type: "video",
+    tags: ["Cyberpunk", "Night", "City"],
+    size: 52428800,
+  },
+  {
+    id: "base_2",
+    title: "Anime Landscape",
+    preview:
+      "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
+    path: "mock/path/2.jpg",
+    type: "image",
+    tags: ["Anime", "Scenery"],
+    size: 5242880,
+  },
+  {
+    id: "base_3",
+    title: "Neon Car",
+    preview:
+      "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500&q=80",
+    path: "mock/path/3.jpg",
+    type: "image",
+    tags: ["Cars", "Neon"],
+    size: 8388608,
+  },
+  {
+    id: "base_4",
+    title: "Abstract Waves",
+    preview:
+      "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500&q=80",
+    path: "mock/path/4.mp4",
+    type: "video",
+    tags: ["Abstract", "4K"],
+    size: 125829120,
+  },
+  {
+    id: "base_5",
+    title: "Forest Rain",
+    preview:
+      "https://images.unsplash.com/photo-1448375240586-dfd8f3793371?w=500&q=80",
+    path: "mock/path/5.mp4",
+    type: "video",
+    tags: ["Nature", "Relaxing"],
+    size: 205829120,
+  },
+];
+
+// ================= 🚀 自动生成扩充版 Mock 数据 (60张) =================
+// 这里的逻辑是：把上面5张模板，重复循环12次，生成60张，并修改ID防止重复
+const EXPANDED_MOCK_WALLPAPERS = Array.from({ length: 150 }).map((_, i) => {
+  const template = BASE_MOCK_TEMPLATES[i % BASE_MOCK_TEMPLATES.length];
+  return {
+    ...template,
+    id: `mock_wp_${i}`, // 强制生成唯一 ID
+    title: `${template.title} #${i + 1}`, // 标题加个序号方便区分
+  };
+});
+
+// ================= 🛠️ 调试配置 =================
+const FORCE_EMPTY = false; // 是否强制返回空列表测试 UI
+const FORCE_MOCK = false; // 是否强制在 App 环境也使用 Mock
 
 // ===================================================
 
 export async function scanWallpapers(): Promise<Wallpaper[]> {
-  // 1. 优先处理“强制为空”的情况
+  // 1. 测试空状态
   if (FORCE_EMPTY) {
     console.log("🈳 [Debug] 模拟空壁纸库...");
-    await new Promise((resolve) => setTimeout(resolve, 300)); // 模拟加载延迟
+    await new Promise((resolve) => setTimeout(resolve, 300));
     return [];
   }
 
-  // 2. 处理 Windows 环境或强制 Mock 的情况
-  if (USE_MOCK) {
-    console.log("🧪 [Debug] 使用 Mock 数据模式");
-    await new Promise((resolve) => setTimeout(resolve, 500)); // 模拟网络延迟
-    return MOCK_WALLPAPERS;
+  // 2. 强制 Mock
+  if (FORCE_MOCK) {
+    console.log("🧪 [Debug] 强制使用 Mock 数据");
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return EXPANDED_MOCK_WALLPAPERS;
   }
 
-  // 3. 生产环境：调用真实 Rust 后端
+  // 3. 真实环境 (带自动降级)
   try {
-    console.log("🚀 [Prod] 请求真实壁纸数据...");
+    // 尝试调用 Rust
     const data = await invoke<any[]>("get_wallpapers");
 
-    // 调试：打印第一个壁纸的 preview 路径
-    if (data.length > 0) {
-      console.log("📷 [Debug] 第一张壁纸 preview 路径:", data[0].preview);
-    }
-
+    // 真实数据转换
     return data.map((item) => ({
       id: item.id,
       title: item.title,
       preview: item.preview,
       path: item.path || "",
-      type: (item.wtype || "Scene") as "Video" | "Scene" | "Web",
+      type: (item.wtype || "Scene") as "video" | "image" | "web",
       tags: item.tags || [],
-      size: item.size || "0 MB",
+      size: item.size || 0,
     }));
   } catch (error) {
-    console.error("❌ API Error:", error);
-    return [];
+    // ⚠️ 浏览器环境捕获错误 -> 返回扩充后的 Mock 数据
+    console.warn(
+      "⚠️ 环境检测：无法连接 Rust 后端，已切换至 [扩充版] Mock 数据模式。",
+    );
+    await new Promise((resolve) => setTimeout(resolve, 600)); // 假装加载一会儿
+
+    return EXPANDED_MOCK_WALLPAPERS;
   }
 }
 
 export async function applyWallpaper(id: string): Promise<void> {
-  if (USE_MOCK || FORCE_EMPTY) {
-    console.log(`🧪 [Debug] 模拟应用壁纸 ID: ${id}`);
-    const wp = MOCK_WALLPAPERS.find((w) => w.id === id);
+  try {
+    await invoke("apply_wallpaper", { id });
+  } catch (e) {
+    console.log(`[Mock] 假装应用了壁纸 ID: ${id}`);
+    const wp = EXPANDED_MOCK_WALLPAPERS.find((w) => w.id === id);
     if (wp) console.log(`   选中: ${wp.title}`);
-    return;
   }
-  await invoke("apply_wallpaper", { id });
 }
 
 export async function stopWallpaper(): Promise<void> {
-  if (USE_MOCK || FORCE_EMPTY) {
-    console.log(`🧪 [Debug] 模拟停止壁纸`);
-    return;
+  try {
+    await invoke("stop_wallpaper");
+  } catch (e) {
+    console.log(`[Mock] 假装停止了壁纸`);
   }
-  await invoke("stop_wallpaper");
+}
+
+export async function takeScreenshot(
+  wallpaperId: string,
+  outputPath?: string,
+): Promise<ScreenshotRecord> {
+  return await invoke("take_screenshot", { wallpaperId, outputPath });
+}
+
+export async function getScreenshotHistory(): Promise<ScreenshotRecord[]> {
+  return await invoke("get_screenshot_history");
 }
 ```
 
@@ -28887,46 +29361,289 @@ export default function ThreeDCardDemo() {
 
 ---
 
+### 📄 文件: `src\components\AboutDialog.tsx`
+
+```
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Github, Globe, Code2 } from "lucide-react";
+
+interface AboutDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px] flex flex-col items-center text-center">
+        {/* 1. Logo 区域 (致敬 Adw.AboutDialog 的大图标) */}
+        <div className="h-24 w-24 bg-primary/10 rounded-full flex items-center justify-center mb-2 text-primary">
+          <Code2 className="h-12 w-12" />
+          {/* 这里可以换成你的真实 <img src="/logo.png" /> */}
+        </div>
+
+        <DialogHeader className="flex flex-col items-center">
+          <DialogTitle className="text-2xl font-bold">LWG GUI</DialogTitle>
+          <DialogDescription className="text-sm">
+            v0.1.0-alpha
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* 2. 描述文本 */}
+        <div className="py-4 text-sm text-muted-foreground">
+          <p>
+            A modern, high-performance wallpaper manager built with Tauri,
+            React, and Rust.
+            <br />
+            Designed for simplicity and efficiency.
+          </p>
+        </div>
+
+        {/* 3. 链接按钮组 */}
+        <div className="flex gap-2 justify-center w-full">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => window.open("https://github.com", "_blank")}
+          >
+            <Github className="h-4 w-4" /> GitHub
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => window.open("https://tauri.app", "_blank")}
+          >
+            <Globe className="h-4 w-4" /> Website
+          </Button>
+        </div>
+
+        {/* 4. 底部版权信息 */}
+        <div className="mt-4 text-[10px] text-muted-foreground">
+          <p>© 2024 Your Name or Organization.</p>
+          <p>Licensed under MIT License.</p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+```
+
+---
+
+### 📄 文件: `src\components\AppMenu.tsx`
+
+```
+import { useState } from "react";
+import {
+  Menu,
+  RefreshCw,
+  Rocket,
+  Info,
+  RotateCcw,
+  LogOut,
+  History,
+  Download,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AboutDialog } from "./AboutDialog";
+import { useAppStore } from "@/store/appStore";
+import { toast } from "sonner";
+
+export function AppMenu() {
+  const loadWallpapers = useAppStore((state) => state.loadWallpapers);
+  const [showAbout, setShowAbout] = useState(false);
+
+  // Mock handlers
+  const handleRefresh = () => {
+    loadWallpapers();
+    toast.info("Refreshing library...");
+  };
+
+  const handleHistory = () => toast.info("History Panel (Coming soon)");
+  const handleGetStarted = () =>
+    toast.info("Show Welcome Screen (Coming soon)");
+
+  const handleCheckUpdate = () => {
+    toast.info("Checking for updates...", {
+      description: "You are on the latest version (v0.1.0)",
+    });
+  };
+
+  const handleAbout = () =>
+    toast.info("LWG GUI v0.1.0\nCreated with Tauri & React");
+  const handleRestart = () => toast.warning("Restarting app... (Mock)");
+  const handleQuit = () => toast.error("Quitting app... (Mock)");
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 hover:bg-muted-foreground/10"
+          >
+            <Menu className="w-4 h-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>Application</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem onClick={handleRefresh}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Refresh Library
+          </DropdownMenuItem>
+
+          <DropdownMenuItem onClick={handleHistory}>
+            <History className="mr-2 h-4 w-4" /> Play History
+          </DropdownMenuItem>
+
+          <DropdownMenuItem onClick={handleGetStarted}>
+            <Rocket className="mr-2 h-4 w-4" /> Get Started
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem onClick={handleCheckUpdate}>
+            <Download className="mr-2 h-4 w-4" /> Check for Update
+          </DropdownMenuItem>
+
+          <DropdownMenuItem onClick={() => setShowAbout(true)}>
+            <Info className="mr-2 h-4 w-4" /> About
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem onClick={handleRestart}>
+            <RotateCcw className="mr-2 h-4 w-4" /> Restart
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={handleQuit}
+            className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/30"
+          >
+            <LogOut className="mr-2 h-4 w-4" /> Quit
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* ✨ 挂载 Dialog */}
+      <AboutDialog open={showAbout} onOpenChange={setShowAbout} />
+    </>
+  );
+}
+
+```
+
+---
+
 ### 📄 文件: `src\components\AppnavBar.tsx`
 
 ```
 import {
-  Search, Settings as SettingsIcon, Activity, Square,
-  Shuffle, Camera, ImageIcon
+  Search,
+  Settings as SettingsIcon,
+  Activity,
+  Square,
+  Shuffle,
+  Camera,
+  ImageIcon,
+  Minimize2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+// ✨ 1. 引入 StatefulButton，重命名以避免冲突
+import { Button as StatefulButton } from "@/components/ui/stateful-button";
+
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/store/appStore";
-import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
+import {
+  applyWallpaper,
+  stopWallpaper,
+  takeScreenshot,
+  getScreenshotHistory,
+} from "@/api/wallpaper";
 import { toast } from "sonner";
+import { AppMenu } from "@/components/AppMenu";
+
+// 引入 Tauri API
+import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
 export function AppNavbar() {
   const searchQuery = useAppStore((state) => state.searchQuery);
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
-  // 修正：保持与原版一致的状态获取方式，确保响应式更新
-  const getFilteredWallpapers = useAppStore((state) => state.getFilteredWallpapers);
-  const setSelectedId = useAppStore((state) => state.setSelectedId);
+  const toggleCompactMode = useAppStore((state) => state.toggleCompactMode);
 
+  const getFilteredWallpapers = useAppStore(
+    (state) => state.getFilteredWallpapers,
+  );
+  const setSelectedId = useAppStore((state) => state.setSelectedId);
   const filteredWallpapers = getFilteredWallpapers();
 
-  // --- Stop Wallpaper Handler ---
-  const handleStop = async () => {
+  // --- 核心修复：安全的切换函数 ---
+  const handleSwitchToCompact = async () => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+
+    if (!isTauri) {
+      console.warn("[Browser Mode] Skipping window resize, toggling UI only.");
+      toggleCompactMode(true);
+      return;
+    }
+
     try {
-      await stopWallpaper();
-      toast.success("壁纸已停止");
-    } catch (error) {
-      console.error(error);
-      toast.error("停止失败");
+      const appWindow = getCurrentWindow();
+      if (appWindow) {
+        await appWindow.setSize(new LogicalSize(360, 600));
+      }
+      toggleCompactMode(true);
+    } catch (err) {
+      console.error("Resize failed:", err);
+      toggleCompactMode(true);
     }
   };
 
-  // --- Shuffle Wallpaper Handler ---
+  // --- Actions ---
+  const handleStop = async () => {
+    try {
+      await stopWallpaper();
+      toast.success("Wallpaper stopped");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to stop");
+    }
+  };
+
   const handleShuffle = async () => {
     if (filteredWallpapers.length === 0) {
-      toast.error("没有可用的壁纸");
+      toast.error("No wallpapers available");
       return;
     }
     const randomIndex = Math.floor(Math.random() * filteredWallpapers.length);
@@ -28934,79 +29651,157 @@ export function AppNavbar() {
     try {
       await applyWallpaper(randomWallpaper.id);
       setSelectedId(randomWallpaper.id);
-      toast.success(`随机应用: ${randomWallpaper.title}`);
+      toast.success(`Applied: ${randomWallpaper.title}`);
     } catch (error) {
       console.error(error);
-      toast.error("随机应用失败");
+      toast.error("Failed to apply");
+    }
+  };
+
+  // ✨ 2. 真实截图处理函数
+  const handleScreenshot = async (): Promise<void> => {
+    const selectedId = useAppStore.getState().selectedId;
+
+    if (!selectedId) {
+      toast.error("Screenshot failed", {
+        description: "Please select a wallpaper first",
+      });
+      throw new Error("No wallpaper selected");
+    }
+
+    try {
+      const result = await takeScreenshot(selectedId);
+      toast.success("Screenshot saved", {
+        description: `Saved to ${result.outputPath}\nDuration: ${result.duration.toFixed(1)}s | Max CPU: ${result.maxCpu.toFixed(1)}% | Max Mem: ${result.maxMem.toFixed(1)}MB`,
+      });
+    } catch (error) {
+      toast.error("Screenshot failed", {
+        description: String(error),
+      });
+      throw error; // 让 StatefulButton 知道失败
     }
   };
 
   return (
-    <div className="flex w-full items-center gap-4 py-2">
-      <TabsList className="bg-muted/40 border border-border h-auto p-1">
-        <TabsTrigger value="wallpapers" className="gap-2 h-8 data-[state=active]:bg-secondary">
-          <ImageIcon className="w-4 h-4" /> Library
-        </TabsTrigger>
-        <TabsTrigger value="settings" className="gap-2 h-8 data-[state=active]:bg-secondary">
-          <SettingsIcon className="w-4 h-4" /> Settings
-        </TabsTrigger>
-        <TabsTrigger value="performance" className="gap-2 h-8 data-[state=active]:bg-secondary">
-          <Activity className="w-4 h-4" /> Monitor
-        </TabsTrigger>
-      </TabsList>
+    <div className="flex w-full items-center gap-4 py-2 px-4 drag-region select-none">
+      <div className="no-drag flex items-center gap-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-primary hover:bg-primary/10"
+                onClick={handleSwitchToCompact}
+              >
+                <Minimize2 className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Compact Mode</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TabsList className="bg-muted/40 border border-border h-auto p-1">
+          <TabsTrigger
+            value="wallpapers"
+            className="gap-2 h-8 data-[state=active]:bg-secondary"
+          >
+            <ImageIcon className="w-4 h-4" /> Library
+          </TabsTrigger>
+          <TabsTrigger
+            value="performance"
+            className="gap-2 h-8 data-[state=active]:bg-secondary"
+          >
+            <Activity className="w-4 h-4" /> Monitor
+          </TabsTrigger>
+          <TabsTrigger
+            value="settings"
+            className="gap-2 h-8 data-[state=active]:bg-secondary"
+          >
+            <SettingsIcon className="w-4 h-4" /> Settings
+          </TabsTrigger>
+        </TabsList>
+      </div>
 
       <Separator orientation="vertical" className="h-6 mx-2" />
 
-      <InputGroup className="relative flex-1 max-w-md">
-        <InputGroupAddon align="inline-start">
-          <Search className="w-4 h-4" />
-        </InputGroupAddon>
-        <InputGroupInput
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        {searchQuery && (
-          <InputGroupAddon align="inline-end">
-            <span className="text-xs">{filteredWallpapers.length} Results</span>
+      <div className="no-drag flex-1 max-w-md">
+        <InputGroup className="relative w-full">
+          <InputGroupAddon align="inline-start">
+            <Search className="w-4 h-4" />
           </InputGroupAddon>
-        )}
-      </InputGroup>
+          <InputGroupInput
+            placeholder="Search wallpapers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </InputGroup>
+      </div>
 
       <div className="flex-1" />
 
-      {/* 右侧快速操作区 */}
       <TooltipProvider>
-        <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border">
+        <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border no-drag">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={handleStop}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-red-500 hover:bg-red-500/10"
+                onClick={handleStop}
+              >
                 <Square className="w-4 h-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent><p>Stop Wallpaper</p></TooltipContent>
+            <TooltipContent>
+              <p>Stop</p>
+            </TooltipContent>
           </Tooltip>
+
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShuffle}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleShuffle}
+              >
                 <Shuffle className="w-4 h-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent><p>Random Wallpaper</p></TooltipContent>
+            <TooltipContent>
+              <p>Shuffle</p>
+            </TooltipContent>
           </Tooltip>
+
+          {/* ✨ 3. 替换为 StatefulButton */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              {/* 注意：StatefulButton 内部会自动处理 loading 状态的图标显示 */}
+              <StatefulButton
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleScreenshot}
+              >
                 <Camera className="w-4 h-4" />
-              </Button>
+              </StatefulButton>
             </TooltipTrigger>
-            <TooltipContent><p>Screenshot</p></TooltipContent>
+            <TooltipContent>
+              <p>Screenshot</p>
+            </TooltipContent>
           </Tooltip>
+
+          <Separator orientation="vertical" className="h-4 mx-1" />
+          <AppMenu />
         </div>
       </TooltipProvider>
     </div>
   );
 }
+
 ```
 
 ---
@@ -29034,7 +29829,6 @@ export function Layout({ navbar, sidebar, children }: LayoutProps) {
 
       {/* 下方主体区域 */}
       <div className="flex flex-1 overflow-hidden min-w-0">
-
         {/* 左侧主内容：修复核心 - 移除了 flex flex-col 和 h-full */}
         <main className="flex-1 overflow-y-auto p-4 min-w-0 scrollbar-thin relative">
           {children}
@@ -29050,6 +29844,183 @@ export function Layout({ navbar, sidebar, children }: LayoutProps) {
     </div>
   );
 }
+
+```
+
+---
+
+### 📄 文件: `src\components\WallpaperCard.tsx`
+
+```
+// src/components/library/WallpaperCard.tsx
+import { memo, useMemo } from "react";
+import { Star, Video, Monitor, Globe, Image as ImageIcon } from "lucide-react";
+import { Wallpaper } from "@/types";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { useAppStore } from "@/store/appStore";
+import { toast } from "sonner";
+import { Toggle } from "@/components/ui/toggle";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+
+interface WallpaperCardProps {
+  wp: Wallpaper;
+  isSelected: boolean;
+  onSelect: () => void;
+
+  // ✨ 细粒度显示控制
+  showTitle?: boolean;
+  showIcons?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+function getPreviewUrl(preview: string): string {
+  if (preview.startsWith("http://") || preview.startsWith("https://")) {
+    return preview;
+  }
+  return convertFileSrc(preview);
+}
+
+export const WallpaperCard = memo(function WallpaperCard({
+  wp,
+  isSelected,
+  onSelect,
+  showTitle = true,
+  showIcons = true,
+  className,
+  children,
+}: WallpaperCardProps) {
+  const isFavorite = useAppStore((state) => state.isFavorite(wp.id));
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+
+  const handleToggleFavorite = () => {
+    toggleFavorite(wp.id);
+    toast.success(
+      isFavorite ? "Removed from favorites" : "Added to favorites",
+      { description: wp.title },
+    );
+  };
+
+  const previewUrl = useMemo(() => getPreviewUrl(wp.preview), [wp.preview]);
+
+  const TypeIcon = useMemo(() => {
+    const type = wp.type?.toLowerCase() ?? "";
+    switch (type) {
+      case "video":
+        return <Video className="w-3.5 h-3.5 text-pink-400" />;
+      case "web":
+        return <Globe className="w-3.5 h-3.5 text-blue-400" />;
+      case "scene":
+        return <Monitor className="w-3.5 h-3.5 text-emerald-400" />;
+      default:
+        return <ImageIcon className="w-3.5 h-3.5 text-slate-400" />;
+    }
+  }, [wp.type]);
+
+  return (
+    // 1. 最外层容器：负责响应点击、布局位置和传入的 className
+    <div
+      onClick={onSelect}
+      className={cn(
+        "group relative cursor-pointer select-none",
+        "aspect-square",
+        className,
+      )}
+    >
+      {/* 2. 视觉容器：负责圆角、边框、阴影和 hover 效果 */}
+      <div
+        className={cn(
+          "relative w-full h-full overflow-hidden rounded-2xl border-2 bg-muted transition-all duration-300",
+          isSelected
+            ? "border-pink-500 ring-2 ring-pink-500 ring-offset-4 ring-offset-background shadow-lg shadow-pink-500/20"
+            : "border-border/50 hover:border-pink-500/50 hover:shadow-xl hover:shadow-pink-500/10",
+        )}
+      >
+        {/* 3. 内容层：图片和叠加元素 */}
+
+        {/* 图片 */}
+        <img
+          src={previewUrl}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          alt={wp.title}
+          loading="lazy"
+          draggable={false}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src =
+              'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
+          }}
+        />
+
+        {/* 收藏按钮 (左上) */}
+        {showIcons && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                className="absolute top-2 left-2 z-20"
+                onClick={(e) => e.stopPropagation()} // 再次确保阻断点击
+              >
+                <Toggle
+                  pressed={isFavorite}
+                  onPressedChange={handleToggleFavorite}
+                  size="sm"
+                  className={cn(
+                    "h-7 w-7 p-0 rounded-full border border-white/10 backdrop-blur-sm transition-all",
+                    // 未选中时半透明黑底，选中时淡黄底
+                    isFavorite
+                      ? "bg-yellow-500/20 border-yellow-500/50 opacity-100"
+                      : "bg-black/40 hover:bg-black/60 opacity-0 group-hover:opacity-100",
+                  )}
+                >
+                  <Star
+                    className={cn(
+                      "h-3.5 w-3.5 transition-colors",
+                      isFavorite
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "fill-transparent text-white/90",
+                    )}
+                  />
+                </Toggle>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>{isFavorite ? "Remove from favorites" : "Add to favorites"}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+
+        {/* 类型图标 (右上) */}
+        {showIcons && (
+          <div className="absolute top-2 right-2 z-20 bg-black/50 backdrop-blur-md p-1.5 rounded-lg border border-white/5 shadow-sm flex items-center justify-center pointer-events-none">
+            {TypeIcon}
+          </div>
+        )}
+
+        {/* 底部标题 (渐变层) */}
+        {showTitle && (
+          <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-8 pointer-events-none">
+            <p className="text-[11px] font-bold text-white truncate">
+              {wp.title}
+            </p>
+          </div>
+        )}
+
+        {/* 子元素插槽 (覆盖在最上层) */}
+        {children && (
+          <div className="absolute inset-0 z-30 pointer-events-none">
+            {children}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
 ```
 
 ---
@@ -29057,9 +30028,9 @@ export function Layout({ navbar, sidebar, children }: LayoutProps) {
 ### 📄 文件: `src\components\WallpaperContextMenu.tsx`
 
 ```
-import * as ContextMenu from '@radix-ui/react-context-menu';
-import { ReactNode } from 'react';
-import { FolderOpen, Trash2, Info, Play } from 'lucide-react';
+import * as ContextMenu from "@radix-ui/react-context-menu";
+import { ReactNode } from "react";
+import { FolderOpen, Trash2, Info, Play } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -29068,25 +30039,43 @@ interface Props {
   onProperties?: () => void;
 }
 
-export function WallpaperContextMenu({ children, onOpenFolder, onDelete, onProperties }: Props) {
+export function WallpaperContextMenu({
+  children,
+  onOpenFolder,
+  onDelete,
+  onProperties,
+}: Props) {
   return (
     <ContextMenu.Root>
-      <ContextMenu.Trigger asChild>
-        {children}
-      </ContextMenu.Trigger>
+      <ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
 
       <ContextMenu.Portal>
         <ContextMenu.Content className="min-w-[180px] bg-[#1e1e2e] rounded-lg border border-white/10 p-1.5 shadow-xl animate-in fade-in duration-200 z-50">
-
-          <Item onClick={onOpenFolder} icon={<Play size={14} />} label="Apply Wallpaper" />
+          <Item
+            onClick={onOpenFolder}
+            icon={<Play size={14} />}
+            label="Apply Wallpaper"
+          />
           <ContextMenu.Separator className="h-px bg-white/10 my-1" />
 
-          <Item onClick={onOpenFolder} icon={<FolderOpen size={14} />} label="Open in Explorer" />
-          <Item onClick={onProperties} icon={<Info size={14} />} label="Properties" />
+          <Item
+            onClick={onOpenFolder}
+            icon={<FolderOpen size={14} />}
+            label="Open in Explorer"
+          />
+          <Item
+            onClick={onProperties}
+            icon={<Info size={14} />}
+            label="Properties"
+          />
 
           <ContextMenu.Separator className="h-px bg-white/10 my-1" />
-          <Item onClick={onDelete} icon={<Trash2 size={14} />} label="Delete" destructive />
-
+          <Item
+            onClick={onDelete}
+            icon={<Trash2 size={14} />}
+            label="Delete"
+            destructive
+          />
         </ContextMenu.Content>
       </ContextMenu.Portal>
     </ContextMenu.Root>
@@ -29100,7 +30089,7 @@ function Item({ icon, label, onClick, destructive }: any) {
       className={`
         flex items-center gap-2 px-2 py-1.5 rounded text-sm outline-none cursor-pointer select-none
         data-[highlighted]:bg-white/10
-        ${destructive ? 'text-red-400 data-[highlighted]:text-red-300' : 'text-gray-200'}
+        ${destructive ? "text-red-400 data-[highlighted]:text-red-300" : "text-gray-200"}
       `}
       onClick={onClick}
     >
@@ -29109,100 +30098,7 @@ function Item({ icon, label, onClick, destructive }: any) {
     </ContextMenu.Item>
   );
 }
-```
 
----
-
-### 📄 文件: `src\components\WallpaperSidebar.tsx`
-
-```
-import { Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAppStore } from "@/store/appStore";
-import { applyWallpaper } from "@/api/wallpaper";
-import { toast } from "sonner";
-import { convertFileSrc } from "@tauri-apps/api/core";
-
-/**
- * 将本地文件路径转换为浏览器可加载的 URL
- */
-function getPreviewUrl(preview: string): string {
-  if (preview.startsWith('http://') || preview.startsWith('https://')) {
-    return preview;
-  }
-  return convertFileSrc(preview);
-}
-export function WallpaperSidebar() {
-  const selectedWallpaper = useAppStore((state) => state.getSelectedWallpaper());
-
-  const handleApply = async () => {
-    if (!selectedWallpaper) return;
-    try {
-      console.log("Applying:", selectedWallpaper.title);
-      await applyWallpaper(selectedWallpaper.id);
-      toast.success(`已应用: ${selectedWallpaper.title}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("应用失败，请检查后台日志");
-    }
-  };
-
-  // 修正：不要返回 null，否则 Layout 右侧会塌陷。
-  // 保持原版结构，如果 selectedWallpaper 为空，内容区域会显示为空白或占位符，但容器还在。
-
-  return (
-    <div className="h-full flex flex-col bg-card/30">
-      <ScrollArea className="flex-1 p-6">
-        {selectedWallpaper ? (
-          <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-            {/* 图片容器 - 正方形，短边裁剪 */}
-            <div className="aspect-square relative overflow-hidden border border-border shadow-2xl rounded-2xl bg-muted">
-              <img
-                src={getPreviewUrl(selectedWallpaper.preview)}
-                className="absolute inset-0 w-full h-full object-cover"
-                alt={selectedWallpaper.title}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
-                }}
-              />
-            </div>
-            <div className="space-y-3">
-              <h1 className="text-xl font-bold leading-tight">{selectedWallpaper.title}</h1>
-              <div className="flex flex-wrap gap-2">
-                <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20">{selectedWallpaper.id}</Badge>
-                <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/20">{selectedWallpaper.size || "0 MB"}</Badge>
-              </div>
-            </div>
-            <div className="space-y-2 border-t pt-4">
-              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Description</h3>
-              <p className="text-sm text-muted-foreground/80 leading-relaxed italic">
-                A high-quality live wallpaper for your desktop.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="h-full flex flex-col items-center justify-center text-muted-foreground/50 space-y-4">
-             <div className="w-16 h-16 rounded-xl bg-muted/50 border-2 border-dashed border-muted-foreground/20" />
-             <p className="text-sm">Select a wallpaper to view details</p>
-          </div>
-        )}
-      </ScrollArea>
-
-      <div className="p-6 border-t bg-background/50">
-        <Button
-          onClick={handleApply}
-          disabled={!selectedWallpaper}
-          className="w-full h-12 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg shadow-pink-500/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Play className="w-5 h-5 fill-current" /> Apply Wallpaper
-        </Button>
-      </div>
-    </div>
-  );
-}
 ```
 
 ---
@@ -29221,41 +30117,49 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { Home, Settings, Activity, Play, Image as ImageIcon } from "lucide-react"
-import { useAppStore } from "@/store/appStore"
-import { applyWallpaper } from "@/api/wallpaper"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
+} from "@/components/ui/sidebar";
+import {
+  Home,
+  Settings,
+  Activity,
+  Play,
+  Image as ImageIcon,
+} from "lucide-react";
+import { useAppStore } from "@/store/appStore";
+import { applyWallpaper } from "@/api/wallpaper";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 // 菜单项配置
 const items = [
   { title: "Library", tab: "wallpapers", icon: Home },
   { title: "Performance", tab: "performance", icon: Activity },
   { title: "Settings", tab: "settings", icon: Settings },
-] as const
+] as const;
 
 export function AppSidebar() {
   // 1. 获取当前选中的壁纸
-  const selectedWallpaper = useAppStore((state) => state.getSelectedWallpaper())
+  const selectedWallpaper = useAppStore((state) =>
+    state.getSelectedWallpaper(),
+  );
 
   // 2. 处理应用壁纸逻辑
   const handleApply = async () => {
-    if (!selectedWallpaper) return
+    if (!selectedWallpaper) return;
 
     try {
-      console.log("Applying:", selectedWallpaper.title)
-      await applyWallpaper(selectedWallpaper.id)
-      toast.success(`已应用: ${selectedWallpaper.title}`)
+      console.log("Applying:", selectedWallpaper.title);
+      await applyWallpaper(selectedWallpaper.id);
+      toast.success(`已应用: ${selectedWallpaper.title}`);
     } catch (error) {
-      console.error(error)
-      toast.error("应用失败，请检查后台日志")
+      console.error(error);
+      toast.error("应用失败，请检查后台日志");
     }
-  }
+  };
 
   // 3. 获取 setActiveTab
-  const setActiveTab = useAppStore((state) => state.setActiveTab)
-  const activeTab = useAppStore((state) => state.activeTab)
+  const setActiveTab = useAppStore((state) => state.setActiveTab);
+  const activeTab = useAppStore((state) => state.activeTab);
 
   return (
     <Sidebar>
@@ -29297,8 +30201,8 @@ export function AppSidebar() {
                 {selectedWallpaper.title}
               </div>
               <div className="text-xs text-muted-foreground flex justify-between">
-                 <span>{selectedWallpaper.type}</span>
-                 <span>{selectedWallpaper.size}</span>
+                <span>{selectedWallpaper.type}</span>
+                <span>{selectedWallpaper.size}</span>
               </div>
             </div>
 
@@ -29318,8 +30222,9 @@ export function AppSidebar() {
         )}
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
+
 ```
 
 ---
@@ -29337,16 +30242,18 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => {
-
     // 基础样式：圆角、居中、过渡动画
-    const baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95";
+    const baseStyles =
+      "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95";
 
     // 变体样式 (Variants)
     const variants = {
-      default: "bg-primary text-black hover:bg-blue-400 shadow-lg shadow-blue-900/20",
+      default:
+        "bg-primary text-black hover:bg-blue-400 shadow-lg shadow-blue-900/20",
       secondary: "bg-white/10 text-white hover:bg-white/20",
       ghost: "text-gray-400 hover:text-white hover:bg-white/5", // 用于导航栏按钮
-      outline: "border border-white/10 bg-transparent hover:bg-white/5 text-white",
+      outline:
+        "border border-white/10 bg-transparent hover:bg-white/5 text-white",
       destructive: "bg-red-500 text-white hover:bg-red-600",
     };
 
@@ -29365,85 +30272,667 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 Button.displayName = "Button";
 
 export { Button };
+
 ```
 
 ---
 
-### 📄 文件: `src\components\library\WallpaperCard.tsx`
+### 📄 文件: `src\components\library\LibraryHeader.tsx`
 
 ```
-import { memo, useMemo } from "react";
-import { Image as ImageIcon, Video } from "lucide-react";
-import { Wallpaper } from "@/types";
-import { convertFileSrc } from "@tauri-apps/api/core";
+// src/components/library/LibraryHeader.tsx
+import { memo, useState, useEffect, useRef } from "react";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
-interface WallpaperCardProps {
-  wp: Wallpaper;
-  isSelected: boolean;
-  onSelect: () => void;
+interface LibraryHeaderProps {
+  currentTitle: string;
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  currentIndex: number;
+  onPageChange: (page: number) => void;
 }
+
+export const LibraryHeader = memo(
+  ({
+    currentTitle,
+    totalCount,
+    currentPage,
+    totalPages,
+    currentIndex,
+    onPageChange,
+  }: LibraryHeaderProps) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [inputValue, setInputValue] = useState(currentPage.toString());
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+      setInputValue(currentPage.toString());
+    }, [currentPage]);
+
+    useEffect(() => {
+      if (isEditing && inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }, [isEditing]);
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        const page = parseInt(inputValue);
+        if (!isNaN(page) && page >= 1 && page <= totalPages) {
+          onPageChange(page);
+          setIsEditing(false);
+        } else {
+          toast.error("Invalid Page");
+          setInputValue(currentPage.toString());
+        }
+      } else if (e.key === "Escape") {
+        setIsEditing(false);
+        setInputValue(currentPage.toString());
+      }
+    };
+
+    const handleBlur = () => {
+      setIsEditing(false);
+      setInputValue(currentPage.toString());
+    };
+
+    return (
+      // ✨ 改动 1: 固定高度 h-12 (48px)，并垂直居中。
+      // 这样内部元素无论怎么变，只要不超过 48px，Header 就不会抖动。
+      <div className="h-12 flex items-center justify-between bg-muted/20 px-4 rounded-xl border border-border/50 shrink-0">
+        <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest">
+          <span className="text-pink-500 uppercase">Currently Using</span>
+          <span className="text-foreground truncate max-w-[300px]">
+            {currentTitle || "None"}
+          </span>
+        </div>
+
+        <span className="flex items-center gap-1 text-xs font-mono text-muted-foreground/50 select-none">
+          <span>
+            {currentIndex > 0 ? currentIndex : "-"}/{totalCount} wallpapers
+          </span>
+
+          {totalPages > 0 && (
+            <span className="flex items-center ml-2 text-muted-foreground/40">
+              (
+              {isEditing ? (
+                // ✨ 改动 2: 给 Input 一个明确的固定高度 h-5 (20px)
+                // 配合外层的 h-12，空间非常富裕，绝对不会撑大容器
+                <Input
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onBlur={handleBlur}
+                  className="inline-block h-5 w-8 min-h-0 py-0 px-0 text-center text-xs font-mono border-0 border-b border-primary rounded-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 leading-none mx-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              ) : (
+                // 样式代码
+                // 样式代码
+                // 修改 LibraryHeader.tsx 中的数字 3 样式
+                <span
+                  onClick={() => setIsEditing(true)}
+                  className="
+    text-primary/90        /* 使用主题色，比纯白柔和，但比灰色显眼 */
+    hover:text-primary     /* 悬停时加亮 */
+    cursor-pointer
+    transition-colors
+    px-0.5
+    border-b border-dashed border-primary/30 /* 淡淡的虚线下划线，暗示可编辑 */
+    hover:border-solid     /* 悬停时虚线变实线 */
+  "
+                >
+                  {currentPage}
+                </span>
+              )}
+              /{totalPages} Pages)
+            </span>
+          )}
+        </span>
+      </div>
+    );
+  },
+);
+
+```
+
+---
+
+### 📄 文件: `src\components\library\LibraryPagination.tsx`
+
+```
+// src/components/library/LibraryPagination.tsx
+import { memo, useCallback } from "react";
+import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { toast } from "sonner";
+
+interface LibraryPaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+export const LibraryPagination = memo(
+  ({ currentPage, totalPages, onPageChange }: LibraryPaginationProps) => {
+    // 智能页码生成逻辑 (1 ... 4 5 6 ... 20)
+    const getPageNumbers = useCallback(() => {
+      const pages: (number | string)[] = [];
+
+      if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+      } else {
+        if (currentPage <= 4) {
+          for (let i = 1; i <= 5; i++) pages.push(i);
+          pages.push("...");
+          pages.push(totalPages);
+        } else if (currentPage >= totalPages - 3) {
+          pages.push(1);
+          pages.push("...");
+          for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+        } else {
+          pages.push(1);
+          pages.push("...");
+          for (let i = currentPage - 1; i <= currentPage + 1; i++)
+            pages.push(i);
+          pages.push("...");
+          pages.push(totalPages);
+        }
+      }
+      return pages;
+    }, [currentPage, totalPages]);
+
+    const handleJumpToPage = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        const target = parseInt(e.currentTarget.value);
+        if (!isNaN(target) && target >= 1 && target <= totalPages) {
+          onPageChange(target);
+          e.currentTarget.value = "";
+        } else {
+          toast.error("Invalid Page", {
+            description: `Please enter a number between 1 and ${totalPages}`,
+          });
+        }
+      }
+    };
+
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="mt-8 pb-4 flex items-center justify-center gap-4">
+        <Pagination className="mx-0 w-auto">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPageChange(currentPage - 1);
+                }}
+                className={
+                  currentPage === 1
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
+              />
+            </PaginationItem>
+
+            {getPageNumbers().map((page, index) => (
+              <PaginationItem key={index}>
+                {page === "..." ? (
+                  <PaginationEllipsis />
+                ) : (
+                  <PaginationLink
+                    href="#"
+                    isActive={page === currentPage}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onPageChange(page as number);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                )}
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPageChange(currentPage + 1);
+                }}
+                className={
+                  currentPage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+
+        {totalPages > 7 && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground ml-2 border-l pl-4 h-5">
+            <span>Go to</span>
+            <div className="relative">
+              <Input
+                type="number"
+                min={1}
+                max={totalPages}
+                className="h-8 w-14 text-center px-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-1"
+                onKeyDown={handleJumpToPage}
+                placeholder={currentPage.toString()}
+              />
+            </div>
+            <span>of {totalPages}</span>
+          </div>
+        )}
+      </div>
+    );
+  },
+);
+
+LibraryPagination.displayName = "LibraryPagination";
+
+```
+
+---
+
+### 📄 文件: `src\components\library\WallpaperGrid.tsx`
+
+```
+// src/components/library/WallpaperGrid.tsx
+import { memo } from "react";
+import { Play, Square, FolderOpen, Trash2 } from "lucide-react";
+import { WallpaperCard } from "@/components/WallpaperCard";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+  ContextMenuShortcut,
+} from "@/components/ui/context-menu";
+
+// 假设 Wallpaper 类型定义在 @/types，如果没有则需在此定义
+import { Wallpaper } from "@/types";
+
+interface WallpaperGridProps {
+  wallpapers: Wallpaper[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  onApply: (id: string, title: string) => void;
+  onStop: () => void;
+  onOpenFolder: (path: string) => void;
+  onDelete: (id: string, title: string) => void;
+}
+
+export const WallpaperGrid = memo(
+  ({
+    wallpapers,
+    selectedId,
+    onSelect,
+    onApply,
+    onStop,
+    onOpenFolder,
+    onDelete,
+  }: WallpaperGridProps) => {
+    return (
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
+        {wallpapers.map((wp) => (
+          <ContextMenu key={wp.id}>
+            <ContextMenuTrigger asChild>
+              <div
+                className="w-full h-full relative cursor-context-menu select-none"
+                onDoubleClick={() => onApply(wp.id, wp.title)}
+              >
+                <WallpaperCard
+                  wp={wp}
+                  isSelected={selectedId === wp.id}
+                  onSelect={() => onSelect(wp.id)}
+                />
+              </div>
+            </ContextMenuTrigger>
+
+            <ContextMenuContent className="w-56">
+              <ContextMenuItem onClick={() => onApply(wp.id, wp.title)}>
+                <Play className="mr-2 h-4 w-4" />
+                Apply Wallpaper
+              </ContextMenuItem>
+              <ContextMenuItem onClick={onStop}>
+                <Square className="mr-2 h-4 w-4" />
+                Stop Wallpaper
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+              <ContextMenuItem onClick={() => onOpenFolder(wp.path)}>
+                <FolderOpen className="mr-2 h-4 w-4" />
+                Open Folder...
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+              <ContextMenuItem
+                className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
+                onClick={() => onDelete(wp.id, wp.title)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+                <ContextMenuShortcut>Del</ContextMenuShortcut>
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
+        ))}
+      </div>
+    );
+  },
+);
+
+WallpaperGrid.displayName = "WallpaperGrid";
+
+```
+
+---
+
+### 📄 文件: `src\components\library\WallpaperSidebar.tsx`
+
+```
+import React from "react";
+import { Play, Star, Edit3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { WallpaperCard } from "@/components/WallpaperCard";
+import { useAppStore } from "@/store/appStore";
+import { applyWallpaper } from "@/api/wallpaper";
+import { toast } from "sonner";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { cn } from "@/lib/utils";
 
 /**
  * 将本地文件路径转换为浏览器可加载的 URL
  */
 function getPreviewUrl(preview: string): string {
-  if (preview.startsWith('http://') || preview.startsWith('https://')) {
+  if (preview.startsWith("http://") || preview.startsWith("https://")) {
     return preview;
   }
   return convertFileSrc(preview);
 }
 
-/**
- * 壁纸卡片组件 - 使用 memo 优化避免不必要的重渲染
- */
-export const WallpaperCard = memo(function WallpaperCard({ wp, isSelected, onSelect }: WallpaperCardProps) {
-  // 使用 useMemo 缓存 URL，避免每次渲染重新计算
-  const previewUrl = useMemo(() => getPreviewUrl(wp.preview), [wp.preview]);
+// 辅助函数：生成标签颜色
+const getColorForTag = (tag: string) => {
+  const colors = [
+    "bg-blue-100 text-blue-700 hover:bg-blue-100/80 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+    "bg-green-100 text-green-700 hover:bg-green-100/80 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
+    "bg-purple-100 text-purple-700 hover:bg-purple-100/80 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+    "bg-pink-100 text-pink-700 hover:bg-pink-100/80 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800",
+    "bg-yellow-100 text-yellow-700 hover:bg-yellow-100/80 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+    "bg-indigo-100 text-indigo-700 hover:bg-indigo-100/80 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800",
+    "bg-red-100 text-red-700 hover:bg-red-100/80 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
+    "bg-orange-100 text-orange-700 hover:bg-orange-100/80 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
+    "bg-teal-100 text-teal-700 hover:bg-teal-100/80 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
+  ];
+
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash += tag.charCodeAt(i);
+  }
+  return colors[hash % colors.length];
+};
+
+export function WallpaperSidebar() {
+  const selectedWallpaper = useAppStore((state) =>
+    state.getSelectedWallpaper(),
+  );
+  const isFavorite = useAppStore((state) =>
+    selectedWallpaper ? state.isFavorite(selectedWallpaper.id) : false,
+  );
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+  const nickname = useAppStore((state) =>
+    selectedWallpaper ? state.getNickname(selectedWallpaper.id) : undefined,
+  );
+  const setNickname = useAppStore((state) => state.setNickname);
+
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [nicknameInput, setNicknameInput] = React.useState("");
+
+  React.useEffect(() => {
+    if (selectedWallpaper && isDialogOpen) {
+      setNicknameInput(nickname || "");
+    }
+  }, [selectedWallpaper, nickname, isDialogOpen]);
+
+  const handleSaveNickname = () => {
+    if (selectedWallpaper) {
+      setNickname(selectedWallpaper.id, nicknameInput);
+      toast.success("Nickname updated", {
+        description: nicknameInput || "(Cleared)",
+      });
+      setIsDialogOpen(false);
+    }
+  };
+
+  const handleToggleFavorite = () => {
+    if (selectedWallpaper) {
+      toggleFavorite(selectedWallpaper.id);
+      toast.success(
+        isFavorite ? "Removed from favorites" : "Added to favorites",
+        { description: selectedWallpaper.title },
+      );
+    }
+  };
+
+  const handleApply = async () => {
+    if (!selectedWallpaper) return;
+    try {
+      console.log("Applying:", selectedWallpaper.title);
+      await applyWallpaper(selectedWallpaper.id);
+      toast.success(`已应用: ${selectedWallpaper.title}`);
+    } catch (error) {
+      console.error(error);
+      toast.error("应用失败，请检查后台日志");
+    }
+  };
 
   return (
-    <div
-      onClick={onSelect}
-      className="cursor-pointer group"
-    >
-      <div className={`
-        relative overflow-hidden rounded-2xl border-2 transition-all duration-300
-        ${isSelected
-          ? 'ring-2 ring-pink-500 ring-offset-4 ring-offset-background border-pink-500'
-          : 'border-border/50 hover:border-pink-500/50 hover:shadow-xl hover:shadow-pink-500/10'
-        }
-      `}>
-        {/* 图片容器 - 正方形，短边裁剪 */}
-        <div className="aspect-square relative overflow-hidden bg-muted">
-          <img
-            src={previewUrl}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            alt={wp.title}
-            loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
-            }}
-          />
+    <div className="h-full flex flex-col bg-card/30">
+      <ScrollArea className="flex-1 p-6">
+        {selectedWallpaper ? (
+          <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+            {/* 1. 图片容器 */}
+            <div className="w-full">
+              <WallpaperCard
+                wp={selectedWallpaper}
+                isSelected={false} // 侧边栏不需要选中框
+                onSelect={() => {}} // 也不需要点击事件
+                showTitle={false} // ❌ 隐藏底部标题
+                showIcons={false} // ❌ 隐藏右上角图标和收藏
+                className="w-full aspect-square shadow-2xl" // 强制正方形并加深阴影
+              />
+            </div>
 
-          {/* 底部渐变标题 */}
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-8">
-            <p className="text-[11px] font-bold text-white truncate">{wp.title}</p>
-          </div>
+            {/* 2. 标题与基础信息 */}
+            <div className="space-y-3">
+              <h1 className="text-xl font-bold leading-tight break-words">
+                {selectedWallpaper.title}
+              </h1>
+              {/* ID 和 Size */}
+              <div className="flex flex-wrap gap-2">
+                <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20 hover:bg-pink-500/30">
+                  {selectedWallpaper.id}
+                </Badge>
+                <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/30">
+                  {selectedWallpaper.size || "0 MB"}
+                </Badge>
+              </div>
+            </div>
 
-          {/* 右上角类型图标 */}
-          <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md p-1.5 rounded-lg border border-white/10">
-              {wp.type === 'Video' ? <Video className="w-3 h-3 text-pink-400" /> : <ImageIcon className="w-3 h-3 text-emerald-400" />}
+            {/* ✨ 新增：Nickname 编辑 + 收藏切换 */}
+            <div className="flex gap-2 pt-2 border-t">
+              {/* Nickname 编辑按钮 */}
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex-1 gap-2 h-10">
+                    <Edit3 className="w-4 h-4" />
+                    {nickname ? "Edit Nickname" : "Set Nickname"}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Set Wallpaper Nickname</DialogTitle>
+                    <DialogDescription>
+                      Give this wallpaper a custom nickname for easier
+                      identification.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="nickname">Nickname</Label>
+                      <Input
+                        id="nickname"
+                        value={nicknameInput}
+                        onChange={(e) => setNicknameInput(e.target.value)}
+                        placeholder="Enter a nickname..."
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleSaveNickname();
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={handleSaveNickname}>Save</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              {/* 收藏切换按钮 */}
+              <Toggle
+                pressed={isFavorite}
+                onPressedChange={handleToggleFavorite}
+                variant="outline"
+                className="flex-1 gap-2 h-10 data-[state=on]:bg-yellow-500/20 data-[state=on]:text-yellow-600 data-[state=on]:border-yellow-500/50"
+              >
+                <Star
+                  className={`w-4 h-4 transition-colors ${
+                    isFavorite
+                      ? "fill-yellow-500 text-yellow-500"
+                      : "fill-transparent"
+                  }`}
+                />
+                {isFavorite ? "Unfavorite" : "Favorite"}
+              </Toggle>
+            </div>
+
+            {/* ✨ 3. 并排布局：Tags (左) + Type (右) */}
+            <div className="grid grid-cols-2 gap-4 border-t pt-4">
+              {/* 左侧：Tags */}
+              <div className="space-y-2">
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  Tags
+                </div>
+                <div className="flex flex-wrap gap-1.5 content-start">
+                  {selectedWallpaper.tags?.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className={cn(
+                        "font-normal border shadow-sm",
+                        getColorForTag(tag),
+                      )}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                  {(!selectedWallpaper.tags ||
+                    selectedWallpaper.tags.length === 0) && (
+                    <span className="text-xs text-muted-foreground italic">
+                      No tags
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* 右侧：Type */}
+              <div className="space-y-2">
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  Type
+                </div>
+                <div className="flex flex-wrap content-start">
+                  <Badge
+                    variant="secondary"
+                    className="font-mono bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                  >
+                    {selectedWallpaper.type || "Unknown"}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. 描述 */}
+            <div className="space-y-2 border-t pt-4">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                Description
+              </h3>
+              <p className="text-sm text-muted-foreground/80 leading-relaxed italic">
+                A high-quality live wallpaper for your desktop.
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-muted-foreground/50 space-y-4">
+            <div className="w-16 h-16 rounded-xl bg-muted/50 border-2 border-dashed border-muted-foreground/20" />
+            <p className="text-sm">Select a wallpaper to view details</p>
+          </div>
+        )}
+      </ScrollArea>
+
+      <div className="p-6 border-t bg-background/50">
+        <Button
+          onClick={handleApply}
+          disabled={!selectedWallpaper}
+          className="w-full h-12 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg shadow-pink-500/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Play className="w-5 h-5 fill-current" /> Apply Wallpaper
+        </Button>
       </div>
     </div>
   );
-});
+}
+
 ```
 
 ---
@@ -29454,8 +30943,14 @@ export const WallpaperCard = memo(function WallpaperCard({ wp, isSelected, onSel
 // src/components/performance/Chart.tsx
 import React, { memo } from "react";
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts';
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { ChartDataPoint } from "@/types/performance";
 
 interface PerformanceChartProps {
@@ -29466,60 +30961,67 @@ interface PerformanceChartProps {
   height?: number;
 }
 
-const PerformanceChart: React.FC<PerformanceChartProps> = memo(({
-  data, color, unit, title, height = 120
-}) => {
-  return (
-    <div style={{ height }} className="w-full">
-      {title && <div className="text-[10px] uppercase text-muted-foreground font-semibold mb-1">{title}</div>}
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data}>
-          <defs>
-            <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={color} stopOpacity={0.2}/>
-              <stop offset="95%" stopColor={color} stopOpacity={0}/>
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
-          <XAxis
-            dataKey="time"
-            hide
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            hide={false}
-            width={30}
-            axisLine={false}
-            tickLine={false}
-            tick={{fontSize: 10, fill: "hsl(var(--muted-foreground))"}}
-            tickFormatter={(value) => `${value}`}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "hsl(var(--card))",
-              borderColor: "hsl(var(--border))",
-              borderRadius: "6px",
-              fontSize: "12px",
-              padding: "4px 8px"
-            }}
-            itemStyle={{ color: "hsl(var(--foreground))" }}
-            formatter={(value: number) => [`${value.toFixed(1)}${unit}`, "Usage"]}
-            labelStyle={{ display: 'none' }}
-          />
-          <Area
-            type="monotone"
-            dataKey="value"
-            stroke={color}
-            strokeWidth={2}
-            fill={`url(#grad-${color})`}
-            isAnimationActive={false}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-  );
-});
+const PerformanceChart: React.FC<PerformanceChartProps> = memo(
+  ({ data, color, unit, title, height = 120 }) => {
+    return (
+      <div style={{ height }} className="w-full">
+        {title && (
+          <div className="text-[10px] uppercase text-muted-foreground font-semibold mb-1">
+            {title}
+          </div>
+        )}
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={color} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={color} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="hsl(var(--border))"
+              opacity={0.4}
+            />
+            <XAxis dataKey="time" hide axisLine={false} tickLine={false} />
+            <YAxis
+              hide={false}
+              width={30}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+              tickFormatter={(value) => `${value}`}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "hsl(var(--card))",
+                borderColor: "hsl(var(--border))",
+                borderRadius: "6px",
+                fontSize: "12px",
+                padding: "4px 8px",
+              }}
+              itemStyle={{ color: "hsl(var(--foreground))" }}
+              formatter={(value: number) => [
+                `${value.toFixed(1)}${unit}`,
+                "Usage",
+              ]}
+              labelStyle={{ display: "none" }}
+            />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke={color}
+              strokeWidth={2}
+              fill={`url(#grad-${color})`}
+              isAnimationActive={false}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  },
+);
 
 PerformanceChart.displayName = "PerformanceChart";
 export default PerformanceChart;
@@ -29548,50 +31050,68 @@ interface OverviewCardProps {
   unit: string;
 }
 
-export const OverviewCard: React.FC<OverviewCardProps> = memo(({ title, value, sub, icon, data, color, unit }) => {
-  return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-0">
-        <div className="p-6 pb-2">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-sm font-medium text-muted-foreground">{title}</span>
-            <div className="p-2 bg-muted/50 rounded-lg">{icon}</div>
+export const OverviewCard: React.FC<OverviewCardProps> = memo(
+  ({ title, value, sub, icon, data, color, unit }) => {
+    return (
+      <Card className="overflow-hidden">
+        <CardContent className="p-0">
+          <div className="p-6 pb-2">
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-sm font-medium text-muted-foreground">
+                {title}
+              </span>
+              <div className="p-2 bg-muted/50 rounded-lg">{icon}</div>
+            </div>
+            <div className="text-2xl font-bold">{value}</div>
+            <div className="text-xs text-muted-foreground">{sub}</div>
           </div>
-          <div className="text-2xl font-bold">{value}</div>
-          <div className="text-xs text-muted-foreground">{sub}</div>
-        </div>
-        <div className="h-[100px] w-full mt-2 pr-4">
-           <PerformanceChart data={data} color={color} unit={unit} height={100} />
-        </div>
-      </CardContent>
-    </Card>
-  );
-});
+          <div className="h-[100px] w-full mt-2 pr-4">
+            <PerformanceChart
+              data={data}
+              color={color}
+              unit={unit}
+              height={100}
+            />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  },
+);
 OverviewCard.displayName = "OverviewCard";
 
-export const ThreadsCard = memo(({ count }: { count: number }) => {
+export const ThreadsCard = memo(({ count, processCount = 1 }: { count: number; processCount?: number }) => {
   return (
     <Card>
       <CardContent className="p-6 flex flex-col justify-between h-full">
-         <div className="flex justify-between items-start">
-            <span className="text-sm font-medium text-muted-foreground">Active Threads</span>
-            <div className="p-2 bg-muted/50 rounded-lg"><Activity className="w-4 h-4 text-green-500" /></div>
-         </div>
-         <div>
-            <div className="text-3xl font-bold">{count}</div>
-            <div className="text-xs text-muted-foreground mt-1">Across 3 processes</div>
-         </div>
-         <div className="h-[100px] flex items-end gap-1 mt-2 opacity-30">
-            {[40, 60, 30, 80, 50, 90, 20, 60].map((h, i) => (
-              <div key={i} className="flex-1 bg-green-500 rounded-t-sm" style={{ height: `${h}%` }}></div>
-            ))}
-         </div>
+        <div className="flex justify-between items-start">
+          <span className="text-sm font-medium text-muted-foreground">
+            Active Threads
+          </span>
+          <div className="p-2 bg-muted/50 rounded-lg">
+            <Activity className="w-4 h-4 text-green-500" />
+          </div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold">{count}</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Across {processCount} process{processCount !== 1 ? "es" : ""}
+          </div>
+        </div>
+        <div className="h-[100px] flex items-end gap-1 mt-2 opacity-30">
+          {[40, 60, 30, 80, 50, 90, 20, 60].map((h, i) => (
+            <div
+              key={i}
+              className="flex-1 bg-green-500 rounded-t-sm"
+              style={{ height: `${h}%` }}
+            ></div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
 });
 ThreadsCard.displayName = "ThreadsCard";
-
 ```
 
 ---
@@ -29600,9 +31120,16 @@ ThreadsCard.displayName = "ThreadsCard";
 
 ```
 // src/components/performance/ProcessList.tsx
-import React, { useState, memo } from "react";
+import React, { useState, memo, useMemo } from "react";
 import {
-  Activity, Cpu, Layout, ArrowDownToLine, Monitor, Layers, Image as ImageIcon, Server
+  Activity,
+  Cpu,
+  Layout,
+  ArrowDownToLine,
+  Monitor,
+  Layers,
+  Image as ImageIcon,
+  Server,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29610,23 +31137,88 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { ProcessStats, SystemStats } from "@/types/performance";
+import { Wallpaper } from "@/types";
 import PerformanceChart from "./Chart";
+import { useActiveWallpapers } from "@/hooks/useActiveWallpapers";
+import { useAppStore } from "@/store/appStore";
+import { convertFileSrc } from "@tauri-apps/api/core";
 
-// ProcessRow 组件
 interface ProcessRowProps {
   type: string;
   data: ProcessStats;
   icon: React.ReactNode;
 }
 
+// Small preview component for wallpaper
+const WallpaperPreview = memo(({ wallpaper }: { wallpaper: Wallpaper | null }) => {
+  const previewUrl = useMemo(() => {
+    if (!wallpaper?.preview) return null;
+    if (wallpaper.preview.startsWith("http://") || wallpaper.preview.startsWith("https://")) {
+      return wallpaper.preview;
+    }
+    return convertFileSrc(wallpaper.preview);
+  }, [wallpaper?.preview]);
+
+    if (!wallpaper) {
+    return (
+      <div className="w-20 h-20 bg-black/40 rounded-md overflow-hidden border border-white/10 shrink-0 relative">
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-500/20 to-gray-600/20">
+          <ImageIcon className="w-6 h-6 text-muted-foreground" />
+        </div>
+        <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-white p-1 text-center truncate">
+          No Wallpaper
+        </div>
+      </div>
+    );
+  }
+
+    return (
+    <div className="w-20 h-20 bg-black/40 rounded-md overflow-hidden border border-white/10 shrink-0 relative group">
+      <img
+        src={previewUrl || ""}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        alt={wallpaper.title}
+        loading="lazy"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.style.display = "none";
+        }}
+      />
+      <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-white p-1 text-center truncate">
+        {wallpaper.type || "Wallpaper"}
+      </div>
+    </div>
+  );
+});
+WallpaperPreview.displayName = "WallpaperPreview";
+
 const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { activeWallpapers } = useActiveWallpapers();
+  const wallpapers = useAppStore((state) => state.wallpapers);
+
   const cpuColor = data.cpu < 20 ? "#22c55e" : data.cpu < 40 ? "#f97316" : "#ef4444";
+
+  // Get active wallpaper info for backend
+  const activeEntries = Array.from(activeWallpapers.entries());
+  const hasActiveWallpaper = activeEntries.length > 0;
+
+  // Find wallpaper details from store
+  const firstWallpaperInfo = useMemo(() => {
+    if (!hasActiveWallpaper || activeEntries.length === 0) return null;
+    const wallpaperId = activeEntries[0][1];
+    const screen = activeEntries[0][0];
+    const wallpaper = wallpapers.find(w => w.id === wallpaperId);
+    return {
+      screen,
+      id: wallpaperId,
+      wallpaper
+    };
+  }, [hasActiveWallpaper, activeEntries, wallpapers]);
 
   return (
     <Card className="overflow-hidden transition-all hover:border-primary/50">
       <div className="p-4 flex flex-col gap-4">
-        {/* Header Row */}
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center shrink-0">
             {icon}
@@ -29634,99 +31226,98 @@ const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
 
           <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
             <div className="col-span-3">
-               <div className="font-bold text-base flex items-center gap-2">
-                 {data.name}
-                 <Badge variant="outline" className="text-[10px] h-5 px-1 font-mono text-muted-foreground">
-                   PID: {data.pid}
-                 </Badge>
-               </div>
-               <div className="text-xs text-muted-foreground truncate" title={data.cmd}>{data.cmd}</div>
+              <div className="font-bold text-base flex items-center gap-2">
+                {data.name}
+                <Badge variant="outline" className="text-[10px] h-5 px-1 font-mono text-muted-foreground">
+                  PID: {data.pid}
+                </Badge>
+              </div>
+              <div className="text-xs text-muted-foreground truncate" title={data.cmd}>
+                {data.cmd}
+              </div>
             </div>
 
             <div className="col-span-3 flex gap-6">
-               <div>
-                  <div className={`font-mono font-bold ${data.cpu > 20 ? 'text-orange-500' : 'text-green-500'}`}>
-                    {data.cpu.toFixed(1)}%
-                  </div>
-                  <div className="text-[10px] text-muted-foreground uppercase">CPU</div>
-               </div>
-               <div>
-                  <div className="font-mono font-bold text-blue-500">
-                    {data.mem.toFixed(0)} MB
-                  </div>
-                  <div className="text-[10px] text-muted-foreground uppercase">Mem</div>
-               </div>
-               <div>
-                  <div className="font-mono text-muted-foreground">{data.status}</div>
-                  <div className="text-[10px] text-muted-foreground uppercase">Status</div>
-               </div>
+              <div>
+                <div className={`font-mono font-bold ${data.cpu > 20 ? "text-orange-500" : "text-green-500"}`}>
+                  {data.cpu.toFixed(1)}%
+                </div>
+                <div className="text-[10px] text-muted-foreground uppercase">CPU</div>
+              </div>
+              <div>
+                <div className="font-mono font-bold text-blue-500">{data.mem.toFixed(0)} MB</div>
+                <div className="text-[10px] text-muted-foreground uppercase">Mem</div>
+              </div>
+              <div>
+                <div className="font-mono text-muted-foreground">{data.status}</div>
+                <div className="text-[10px] text-muted-foreground uppercase">Status</div>
+              </div>
             </div>
 
             <div className="col-span-4 hidden md:flex gap-4 items-center">
-               <div className="flex-1">
-                  <PerformanceChart data={data.cpuHistory} color={cpuColor} unit="%" height={60} title="CPU Trend" />
-               </div>
-               <div className="flex-1">
-                  <PerformanceChart data={data.memHistory} color="#3b82f6" unit=" MB" height={60} title="Mem Trend" />
-               </div>
+              <div className="flex-1">
+                <PerformanceChart data={data.cpuHistory} color={cpuColor} unit="%" height={60} title="CPU Trend" />
+              </div>
+              <div className="flex-1">
+                <PerformanceChart data={data.memHistory} color="#3b82f6" unit=" MB" height={60} title="Mem Trend" />
+              </div>
             </div>
 
             <div className="col-span-2 flex justify-end">
-               <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)}>
-                  {isOpen ? "Hide" : "Details"}
-                  {isOpen ? <ChevronDown className="ml-2 w-4 h-4"/> : <ChevronRight className="ml-2 w-4 h-4"/>}
-               </Button>
+              <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)}>
+                {isOpen ? "Hide" : "Details"}
+                {isOpen ? <ChevronDown className="ml-2 w-4 h-4" /> : <ChevronRight className="ml-2 w-4 h-4" />}
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Expandable Content */}
         <Collapsible open={isOpen} className="space-y-2">
           <CollapsibleContent>
-             <div className="pt-2 pl-[64px] pr-4 space-y-4">
-
-                {/* Backend Specific Info */}
-                {type === 'backend' && (
-                  <div className="rounded-lg bg-secondary/30 border p-4 flex gap-4">
-                     <div className="w-32 h-20 bg-black/40 rounded-md overflow-hidden border border-white/10 shrink-0 relative group">
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
-                            <ImageIcon className="w-6 h-6 text-muted-foreground" />
-                        </div>
-                        <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-white p-1 text-center truncate">
-                            Preview
-                        </div>
-                     </div>
-                     <div className="flex flex-col justify-center space-y-1">
-                        <div className="flex items-center gap-2">
-                            <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20 hover:bg-blue-500/30">Video</Badge>
-                            <span className="text-sm font-bold">Cyberpunk City 2077</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-4">
-                            <span className="flex items-center gap-1"><Monitor className="w-3 h-3"/> Display 1 (2560x1440)</span>
-                            <span className="flex items-center gap-1"><Layers className="w-3 h-3"/> ID: 2849204</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground pt-1">
-                            Rendering at 60 FPS • Hardware Acceleration: On
-                        </div>
-                     </div>
+            <div className="pt-2 pl-[64px] pr-4 space-y-4">
+              {/* Backend Specific Info - Now shows real data with wallpaper preview */}
+              {type === "backend" && hasActiveWallpaper && firstWallpaperInfo && (
+                <div className="rounded-lg bg-secondary/30 border p-4 flex gap-4">
+                  <WallpaperPreview wallpaper={firstWallpaperInfo.wallpaper} />
+                  <div className="flex flex-col justify-center space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20 hover:bg-blue-500/30">
+                        Wallpaper
+                      </Badge>
+                      <span className="text-sm font-bold">
+                        {firstWallpaperInfo.wallpaper?.title || "Unknown"}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-4">
+                      <span className="flex items-center gap-1">
+                        <Monitor className="w-3 h-3" /> {firstWallpaperInfo.screen}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Layers className="w-3 h-3" /> ID: {firstWallpaperInfo.id}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground pt-1">
+                      Running • {data.threads.length} threads active
+                    </div>
                   </div>
-                )}
-
-                {/* Thread Details */}
-                <div className="rounded-lg bg-muted/30 border p-4">
-                   <h4 className="text-xs font-bold uppercase text-muted-foreground mb-3 flex items-center gap-2">
-                     <Activity className="w-3 h-3" /> Active Threads ({data.threads.length})
-                   </h4>
-                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {data.threads.map((t, i) => (
-                        <div key={i} className="text-xs font-mono text-muted-foreground flex items-center gap-2 hover:text-foreground transition-colors cursor-default">
-                           <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
-                           {t}
-                        </div>
-                      ))}
-                   </div>
                 </div>
-             </div>
+              )}
+
+              {/* Thread Details */}
+              <div className="rounded-lg bg-muted/30 border p-4">
+                <h4 className="text-xs font-bold uppercase text-muted-foreground mb-3 flex items-center gap-2">
+                  <Activity className="w-3 h-3" /> Active Threads ({data.threads.length})
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {data.threads.map((t, i) => (
+                    <div key={i} className="text-xs font-mono text-muted-foreground flex items-center gap-2 hover:text-foreground transition-colors cursor-default">
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                      {t}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CollapsibleContent>
         </Collapsible>
       </div>
@@ -29736,29 +31327,39 @@ const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
 
 ProcessRow.displayName = "ProcessRow";
 
-// ProcessList 容器
-export default function ProcessList({ processes }: { processes: SystemStats['processes'] }) {
+export default function ProcessList({ processes }: { processes: SystemStats["processes"] }) {
+  const { activeWallpapers } = useActiveWallpapers();
+  const hasActiveWallpaper = activeWallpapers.size > 0;
+
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold flex items-center gap-2">
         <Server className="w-5 h-5" /> Process Details
       </h2>
 
-      <ProcessRow
-        type="backend"
-        data={processes.backend}
-        icon={<Cpu className="text-orange-500" />}
-      />
+      {/* Only show backend when wallpaper is active */}
+      {hasActiveWallpaper && (
+        <ProcessRow
+          type="backend"
+          data={processes.backend}
+          icon={<Cpu className="text-orange-500" />}
+        />
+      )}
+
       <ProcessRow
         type="frontend"
         data={processes.frontend}
         icon={<Layout className="text-blue-500" />}
       />
-      <ProcessRow
-        type="tray"
-        data={processes.tray}
-        icon={<ArrowDownToLine className="text-purple-500" />}
-      />
+
+      {/* Only show tray when wallpaper is active */}
+      {hasActiveWallpaper && (
+        <ProcessRow
+          type="tray"
+          data={processes.tray}
+          icon={<ArrowDownToLine className="text-purple-500" />}
+        />
+      )}
     </div>
   );
 }
@@ -29772,7 +31373,13 @@ export default function ProcessList({ processes }: { processes: SystemStats['pro
 ```
 // src/components/performance/ScreenshotHistory.tsx
 import React, { memo } from "react";
-import { Camera, FolderOpen, Image as ImageIcon, Clock, Trash2 } from "lucide-react";
+import {
+  Camera,
+  FolderOpen,
+  Image as ImageIcon,
+  Clock,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScreenshotRecord } from "@/types/performance";
 import { toast } from "sonner";
@@ -29784,41 +31391,61 @@ interface ScreenshotRowProps {
 const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
   return (
     <div className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors group">
-       <div className="flex items-center gap-4">
-          <div className="w-16 h-10 bg-muted rounded overflow-hidden border group-hover:border-primary/50 transition-colors flex items-center justify-center relative">
-             <Camera className="w-4 h-4 text-muted-foreground absolute" />
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-10 bg-muted rounded overflow-hidden border group-hover:border-primary/50 transition-colors flex items-center justify-center relative">
+          <Camera className="w-4 h-4 text-muted-foreground absolute" />
+        </div>
+        <div>
+          <div className="text-sm font-medium">{record.name}</div>
+          <div className="text-xs text-muted-foreground flex items-center gap-2">
+            <Clock className="w-3 h-3" /> {record.timestamp}
           </div>
-          <div>
-             <div className="text-sm font-medium">{record.name}</div>
-             <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <Clock className="w-3 h-3" /> {record.timestamp}
-             </div>
-          </div>
-       </div>
+        </div>
+      </div>
 
-       <div className="flex items-center gap-8">
-          <div className="text-right w-20">
-             <div className="text-xs font-bold">{record.duration}s</div>
-             <div className="text-[10px] text-muted-foreground uppercase">Duration</div>
+      <div className="flex items-center gap-8">
+        <div className="text-right w-20">
+          <div className="text-xs font-bold">{record.duration}s</div>
+          <div className="text-[10px] text-muted-foreground uppercase">
+            Duration
           </div>
-          <div className="text-right w-20">
-             <div className="text-xs font-bold text-orange-500">{record.maxCpu}%</div>
-             <div className="text-[10px] text-muted-foreground uppercase">Max CPU</div>
+        </div>
+        <div className="text-right w-20">
+          <div className="text-xs font-bold text-orange-500">
+            {record.maxCpu}%
           </div>
-          <div className="text-right w-20">
-             <div className="text-xs font-bold text-blue-500">{record.maxMem} MB</div>
-             <div className="text-[10px] text-muted-foreground uppercase">Max Mem</div>
+          <div className="text-[10px] text-muted-foreground uppercase">
+            Max CPU
           </div>
-       </div>
+        </div>
+        <div className="text-right w-20">
+          <div className="text-xs font-bold text-blue-500">
+            {record.maxMem} MB
+          </div>
+          <div className="text-[10px] text-muted-foreground uppercase">
+            Max Mem
+          </div>
+        </div>
+      </div>
 
-       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toast.success(`Opening ${record.path}...`)}>
-             <FolderOpen className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toast.success(`Viewing image...`)}>
-             <ImageIcon className="w-4 h-4" />
-          </Button>
-       </div>
+      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => toast.success(`Opening ${record.path}...`)}
+        >
+          <FolderOpen className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => toast.success(`Viewing image...`)}
+        >
+          <ImageIcon className="w-4 h-4" />
+        </Button>
+      </div>
     </div>
   );
 });
@@ -29830,32 +31457,44 @@ interface ScreenshotHistoryProps {
   onClear: () => void;
 }
 
-export default function ScreenshotHistory({ items, onClear }: ScreenshotHistoryProps) {
+export default function ScreenshotHistory({
+  items,
+  onClear,
+}: ScreenshotHistoryProps) {
   return (
     <div className="space-y-4">
-       <div className="flex items-center justify-between">
-          <div>
-             <h2 className="text-lg font-semibold flex items-center gap-2">
-               <Camera className="w-5 h-5" /> Screenshot History
-             </h2>
-             <p className="text-xs text-muted-foreground">Recent performance snapshots.</p>
-          </div>
-          <Button variant="outline" size="sm" onClick={onClear} disabled={items.length === 0}>
-             <Trash2 className="w-4 h-4 mr-2" /> Clear
-          </Button>
-       </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Camera className="w-5 h-5" /> Screenshot History
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Recent performance snapshots.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onClear}
+          disabled={items.length === 0}
+        >
+          <Trash2 className="w-4 h-4 mr-2" /> Clear
+        </Button>
+      </div>
 
-       <div className="rounded-xl border bg-card/50 overflow-hidden">
-          {items.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground text-sm">No screenshots taken yet.</div>
-          ) : (
-            <div className="divide-y">
-               {items.map((record) => (
-                  <ScreenshotRow key={record.id} record={record} />
-               ))}
-            </div>
-          )}
-       </div>
+      <div className="rounded-xl border bg-card/50 overflow-hidden">
+        {items.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground text-sm">
+            No screenshots taken yet.
+          </div>
+        ) : (
+          <div className="divide-y">
+            {items.map((record) => (
+              <ScreenshotRow key={record.id} record={record} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -30082,7 +31721,6 @@ import {
   THEME_OPTIONS,
 } from "./Shared";
 
-
 export function DisplaySettings() {
   const { theme, setTheme } = useTheme();
   const { settings, updateSetting } = useAppStore();
@@ -30091,7 +31729,10 @@ export function DisplaySettings() {
 
   return (
     <div className="space-y-6">
-      <Header title="Audio & Display" desc="Manage multi-monitor setup and audio processing." />
+      <Header
+        title="Audio & Display"
+        desc="Manage multi-monitor setup and audio processing."
+      />
 
       <Card>
         <CardHeader>
@@ -30103,7 +31744,9 @@ export function DisplaySettings() {
           <SelectField
             label="Target Monitor"
             value={settings.lastScreen || "all"}
-            onValueChange={(v) => updateSetting("lastScreen", v === "all" ? null : v)}
+            onValueChange={(v) =>
+              updateSetting("lastScreen", v === "all" ? null : v)
+            }
             options={MONITOR_OPTIONS}
           />
         </CardContent>
@@ -30152,17 +31795,26 @@ export function DisplaySettings() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />} Interface Theme
+            {theme === "dark" ? (
+              <Moon className="w-4 h-4" />
+            ) : (
+              <Sun className="w-4 h-4" />
+            )}{" "}
+            Interface Theme
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between space-x-4">
             <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">App Appearance</label>
-              <p className="text-xs text-muted-foreground">Light or Dark mode</p>
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                App Appearance
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Light or Dark mode
+              </p>
             </div>
             {/* 为了保持原 UI 样式（w-[180px]），这里稍微变通使用 SelectField 或直接内联 */}
-             <SelectField
+            <SelectField
               label=""
               value={theme}
               onValueChange={(v) => setTheme(v as "light" | "dark" | "system")}
@@ -30187,7 +31839,13 @@ import { Filter, Copy, Check } from "lucide-react";
 import { LogEntry } from "@/types";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Header,
   LOG_FILTER_OPTIONS,
@@ -30202,15 +31860,33 @@ export function LogViewer() {
 
   useEffect(() => {
     setLogs([
-      { id: 1, timestamp: "10:00:01", level: "info", source: "GUI", message: "Application initialized" },
-      { id: 2, timestamp: "10:00:02", level: "info", source: "Core", message: "Connected to Wallpaper Engine Core" },
-      { id: 3, timestamp: "10:00:02", level: "warn", source: "Controller", message: "Steam API not detected" },
+      {
+        id: 1,
+        timestamp: "10:00:01",
+        level: "info",
+        source: "GUI",
+        message: "Application initialized",
+      },
+      {
+        id: 2,
+        timestamp: "10:00:02",
+        level: "info",
+        source: "Core",
+        message: "Connected to Wallpaper Engine Core",
+      },
+      {
+        id: 3,
+        timestamp: "10:00:02",
+        level: "warn",
+        source: "Controller",
+        message: "Steam API not detected",
+      },
     ]);
   }, []);
 
   const filteredLogs = useMemo(
     () => logs.filter((log) => filter === "All" || log.source === filter),
-    [logs, filter]
+    [logs, filter],
   );
 
   const handleCopy = useCallback(() => {
@@ -30256,9 +31932,20 @@ export function LogViewer() {
       </div>
 
       <div className="flex justify-between items-center pt-2">
-        <span className="text-[10px] text-muted-foreground">{filteredLogs.length} entries</span>
-        <Button variant="outline" size="sm" onClick={handleCopy} className="h-8 gap-2 text-xs">
-          {isCopied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+        <span className="text-[10px] text-muted-foreground">
+          {filteredLogs.length} entries
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopy}
+          className="h-8 gap-2 text-xs"
+        >
+          {isCopied ? (
+            <Check className="w-3 h-3 text-green-500" />
+          ) : (
+            <Copy className="w-3 h-3" />
+          )}
           {isCopied ? "Copied!" : "Copy"}
         </Button>
       </div>
@@ -30275,7 +31962,13 @@ export function LogViewer() {
 ```
 import { Zap, MousePointer2, Clock } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 // 引入公共组件
@@ -30307,7 +32000,9 @@ export function PlaybackSettings() {
           <CardTitle className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-orange-500" /> Rendering Quality
           </CardTitle>
-          <CardDescription>Optimize for battery life or visual fidelity.</CardDescription>
+          <CardDescription>
+            Optimize for battery life or visual fidelity.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <SliderRow
@@ -30338,7 +32033,9 @@ export function PlaybackSettings() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Display Behavior</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Display Behavior</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SelectField
@@ -30389,7 +32086,9 @@ export function PlaybackSettings() {
               <InputField
                 label="Cycle Interval (minutes)"
                 value={settings.cycleInterval}
-                onChange={(v) => updateSetting("cycleInterval", parseInt(v) || 15)}
+                onChange={(v) =>
+                  updateSetting("cycleInterval", parseInt(v) || 15)
+                }
                 type="number"
                 min={1}
               />
@@ -30408,7 +32107,10 @@ export function PlaybackSettings() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Wayland Tweaks</span>
-            <Badge variant="outline" className="text-xs font-normal border-blue-500/30 text-blue-500">
+            <Badge
+              variant="outline"
+              className="text-xs font-normal border-blue-500/30 text-blue-500"
+            >
               Wayland
             </Badge>
           </CardTitle>
@@ -30442,7 +32144,13 @@ export function PlaybackSettings() {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -30525,7 +32233,12 @@ export const getLevelColor = (level: string): string => {
   return LOG_LEVEL_COLORS[level] || "text-gray-500";
 };
 
-export const formatLogEntry = (log: { timestamp: string; level: string; source: string; message: string }): string => {
+export const formatLogEntry = (log: {
+  timestamp: string;
+  level: string;
+  source: string;
+  message: string;
+}): string => {
   return `[${log.timestamp}] [${log.level.toUpperCase()}] [${log.source}] ${log.message}`;
 };
 
@@ -30543,14 +32256,22 @@ export function Header({ title, desc }: { title: string; desc: string }) {
   );
 }
 
-export function SwitchRow({ label, description, checked, onCheckedChange, icon }: SwitchRowProps) {
+export function SwitchRow({
+  label,
+  description,
+  checked,
+  onCheckedChange,
+  icon,
+}: SwitchRowProps) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         {icon}
         <div className="space-y-0.5">
           <Label>{label}</Label>
-          {description && <p className="text-xs text-muted-foreground">{description}</p>}
+          {description && (
+            <p className="text-xs text-muted-foreground">{description}</p>
+          )}
         </div>
       </div>
       <Switch checked={checked} onCheckedChange={onCheckedChange} />
@@ -30558,13 +32279,22 @@ export function SwitchRow({ label, description, checked, onCheckedChange, icon }
   );
 }
 
-export function SliderRow({ label, value, onValueChange, max, min = 0, step = 1, suffix = "" }: SliderRowProps) {
+export function SliderRow({
+  label,
+  value,
+  onValueChange,
+  max,
+  min = 0,
+  step = 1,
+  suffix = "",
+}: SliderRowProps) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <Label>{label}</Label>
         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {value}{suffix}
+          {value}
+          {suffix}
         </span>
       </div>
       <Slider
@@ -30583,7 +32313,7 @@ export function SelectField({
   label,
   value,
   onValueChange,
-  options
+  options,
 }: {
   label: string;
   value: string;
@@ -30707,12 +32437,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 // 引入公共组件
-import {
-  Header,
-  SwitchRow,
-  InputField,
-  PathInputField,
-} from "./Shared";
+import { Header, SwitchRow, InputField, PathInputField } from "./Shared";
 
 export function SystemSettings() {
   const { settings, updateSetting } = useAppStore();
@@ -30721,7 +32446,9 @@ export function SystemSettings() {
 
   useEffect(() => {
     // 获取自启动状态
-    invoke<boolean>("get_autostart_status").then(setAutostart).catch(() => {});
+    invoke<boolean>("get_autostart_status")
+      .then(setAutostart)
+      .catch(() => {});
   }, []);
 
   const handleAutostartChange = useCallback(
@@ -30734,7 +32461,7 @@ export function SystemSettings() {
         toast.error("Failed to change autostart");
       }
     },
-    [startHidden]
+    [startHidden],
   );
 
   if (!settings) return <div>Loading...</div>;
@@ -30874,27 +32601,27 @@ export default function StatefulButtonDemo() {
 ### 📄 文件: `src\components\theme-provider.tsx`
 
 ```
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "system"
+type Theme = "dark" | "light" | "system";
 
 type ThemeProviderProps = {
-  children: React.ReactNode
-  defaultTheme?: Theme
-  storageKey?: string
-}
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
+};
 
 type ThemeProviderState = {
-  theme: Theme
-  setTheme: (theme: Theme) => void
-}
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+};
 
 const initialState: ThemeProviderState = {
   theme: "system",
   setTheme: () => null,
-}
+};
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
@@ -30903,50 +32630,51 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  )
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
+  );
 
   useEffect(() => {
-    const root = window.document.documentElement
+    const root = window.document.documentElement;
 
-    root.classList.remove("light", "dark")
+    root.classList.remove("light", "dark");
 
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
         ? "dark"
-        : "light"
+        : "light";
 
-      root.classList.add(systemTheme)
-      return
+      root.classList.add(systemTheme);
+      return;
     }
 
-    root.classList.add(theme)
-  }, [theme])
+    root.classList.add(theme);
+  }, [theme]);
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
     },
-  }
+  };
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
       {children}
     </ThemeProviderContext.Provider>
-  )
+  );
 }
 
 export const useTheme = () => {
-  const context = useContext(ThemeProviderContext)
+  const context = useContext(ThemeProviderContext);
 
   if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider")
+    throw new Error("useTheme must be used within a ThemeProvider");
 
-  return context
-}
+  return context;
+};
+
 ```
 
 ---
@@ -31006,7 +32734,7 @@ export const CardContainer = ({
       <div
         className={cn(
           "py-20 flex items-center justify-center",
-          containerClassName
+          containerClassName,
         )}
         style={{
           perspective: "1000px",
@@ -31019,7 +32747,7 @@ export const CardContainer = ({
           onMouseLeave={handleMouseLeave}
           className={cn(
             "flex items-center justify-center relative transition-all duration-200 ease-linear",
-            className
+            className,
           )}
           style={{
             transformStyle: "preserve-3d",
@@ -31043,7 +32771,7 @@ export const CardBody = ({
     <div
       className={cn(
         "h-96 w-96 [transform-style:preserve-3d]  [&>*]:[transform-style:preserve-3d]",
-        className
+        className,
       )}
     >
       {children}
@@ -31117,17 +32845,17 @@ export const useMouseEnter = () => {
 ### 📄 文件: `src\components\ui\alert-dialog.tsx`
 
 ```
-import * as React from "react"
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
+import * as React from "react";
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
-const AlertDialog = AlertDialogPrimitive.Root
+const AlertDialog = AlertDialogPrimitive.Root;
 
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger
+const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
 
-const AlertDialogPortal = AlertDialogPrimitive.Portal
+const AlertDialogPortal = AlertDialogPrimitive.Portal;
 
 const AlertDialogOverlay = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
@@ -31136,13 +32864,13 @@ const AlertDialogOverlay = React.forwardRef<
   <AlertDialogPrimitive.Overlay
     className={cn(
       "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
+      className,
     )}
     {...props}
     ref={ref}
   />
-))
-AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
+));
+AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
 
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
@@ -31154,13 +32882,13 @@ const AlertDialogContent = React.forwardRef<
       ref={ref}
       className={cn(
         "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-        className
+        className,
       )}
       {...props}
     />
   </AlertDialogPortal>
-))
-AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
+));
+AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
 const AlertDialogHeader = ({
   className,
@@ -31169,12 +32897,12 @@ const AlertDialogHeader = ({
   <div
     className={cn(
       "flex flex-col space-y-2 text-center sm:text-left",
-      className
+      className,
     )}
     {...props}
   />
-)
-AlertDialogHeader.displayName = "AlertDialogHeader"
+);
+AlertDialogHeader.displayName = "AlertDialogHeader";
 
 const AlertDialogFooter = ({
   className,
@@ -31183,12 +32911,12 @@ const AlertDialogFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
+      className,
     )}
     {...props}
   />
-)
-AlertDialogFooter.displayName = "AlertDialogFooter"
+);
+AlertDialogFooter.displayName = "AlertDialogFooter";
 
 const AlertDialogTitle = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Title>,
@@ -31199,8 +32927,8 @@ const AlertDialogTitle = React.forwardRef<
     className={cn("text-lg font-semibold", className)}
     {...props}
   />
-))
-AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName
+));
+AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
 
 const AlertDialogDescription = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Description>,
@@ -31211,9 +32939,9 @@ const AlertDialogDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-))
+));
 AlertDialogDescription.displayName =
-  AlertDialogPrimitive.Description.displayName
+  AlertDialogPrimitive.Description.displayName;
 
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
@@ -31224,8 +32952,8 @@ const AlertDialogAction = React.forwardRef<
     className={cn(buttonVariants(), className)}
     {...props}
   />
-))
-AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName
+));
+AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
@@ -31236,12 +32964,12 @@ const AlertDialogCancel = React.forwardRef<
     className={cn(
       buttonVariants({ variant: "outline" }),
       "mt-2 sm:mt-0",
-      className
+      className,
     )}
     {...props}
   />
-))
-AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
+));
+AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 
 export {
   AlertDialog,
@@ -31255,7 +32983,7 @@ export {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-}
+};
 
 ```
 
@@ -31264,10 +32992,10 @@ export {
 ### 📄 文件: `src\components\ui\alert.tsx`
 
 ```
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const alertVariants = cva(
   "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
@@ -31282,8 +33010,8 @@ const alertVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
-)
+  },
+);
 
 const Alert = React.forwardRef<
   HTMLDivElement,
@@ -31295,8 +33023,8 @@ const Alert = React.forwardRef<
     className={cn(alertVariants({ variant }), className)}
     {...props}
   />
-))
-Alert.displayName = "Alert"
+));
+Alert.displayName = "Alert";
 
 const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
@@ -31307,8 +33035,8 @@ const AlertTitle = React.forwardRef<
     className={cn("mb-1 font-medium leading-none tracking-tight", className)}
     {...props}
   />
-))
-AlertTitle.displayName = "AlertTitle"
+));
+AlertTitle.displayName = "AlertTitle";
 
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -31319,10 +33047,10 @@ const AlertDescription = React.forwardRef<
     className={cn("text-sm [&_p]:leading-relaxed", className)}
     {...props}
   />
-))
-AlertDescription.displayName = "AlertDescription"
+));
+AlertDescription.displayName = "AlertDescription";
 
-export { Alert, AlertTitle, AlertDescription }
+export { Alert, AlertTitle, AlertDescription };
 
 ```
 
@@ -31331,10 +33059,10 @@ export { Alert, AlertTitle, AlertDescription }
 ### 📄 文件: `src\components\ui\badge.tsx`
 
 ```
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
   "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
@@ -31353,20 +33081,21 @@ const badgeVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
-)
+  },
+);
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
+  );
 }
 
-export { Badge, badgeVariants }
+export { Badge, badgeVariants };
 
 ```
 
@@ -31375,19 +33104,19 @@ export { Badge, badgeVariants }
 ### 📄 文件: `src\components\ui\breadcrumb.tsx`
 
 ```
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { ChevronRight, MoreHorizontal } from "lucide-react"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { ChevronRight, MoreHorizontal } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,
   React.ComponentPropsWithoutRef<"nav"> & {
-    separator?: React.ReactNode
+    separator?: React.ReactNode;
   }
->(({ ...props }, ref) => <nav ref={ref} aria-label="breadcrumb" {...props} />)
-Breadcrumb.displayName = "Breadcrumb"
+>(({ ...props }, ref) => <nav ref={ref} aria-label="breadcrumb" {...props} />);
+Breadcrumb.displayName = "Breadcrumb";
 
 const BreadcrumbList = React.forwardRef<
   HTMLOListElement,
@@ -31397,12 +33126,12 @@ const BreadcrumbList = React.forwardRef<
     ref={ref}
     className={cn(
       "flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5",
-      className
+      className,
     )}
     {...props}
   />
-))
-BreadcrumbList.displayName = "BreadcrumbList"
+));
+BreadcrumbList.displayName = "BreadcrumbList";
 
 const BreadcrumbItem = React.forwardRef<
   HTMLLIElement,
@@ -31413,16 +33142,16 @@ const BreadcrumbItem = React.forwardRef<
     className={cn("inline-flex items-center gap-1.5", className)}
     {...props}
   />
-))
-BreadcrumbItem.displayName = "BreadcrumbItem"
+));
+BreadcrumbItem.displayName = "BreadcrumbItem";
 
 const BreadcrumbLink = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentPropsWithoutRef<"a"> & {
-    asChild?: boolean
+    asChild?: boolean;
   }
 >(({ asChild, className, ...props }, ref) => {
-  const Comp = asChild ? Slot : "a"
+  const Comp = asChild ? Slot : "a";
 
   return (
     <Comp
@@ -31430,9 +33159,9 @@ const BreadcrumbLink = React.forwardRef<
       className={cn("transition-colors hover:text-foreground", className)}
       {...props}
     />
-  )
-})
-BreadcrumbLink.displayName = "BreadcrumbLink"
+  );
+});
+BreadcrumbLink.displayName = "BreadcrumbLink";
 
 const BreadcrumbPage = React.forwardRef<
   HTMLSpanElement,
@@ -31446,8 +33175,8 @@ const BreadcrumbPage = React.forwardRef<
     className={cn("font-normal text-foreground", className)}
     {...props}
   />
-))
-BreadcrumbPage.displayName = "BreadcrumbPage"
+));
+BreadcrumbPage.displayName = "BreadcrumbPage";
 
 const BreadcrumbSeparator = ({
   children,
@@ -31462,8 +33191,8 @@ const BreadcrumbSeparator = ({
   >
     {children ?? <ChevronRight />}
   </li>
-)
-BreadcrumbSeparator.displayName = "BreadcrumbSeparator"
+);
+BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 
 const BreadcrumbEllipsis = ({
   className,
@@ -31478,8 +33207,8 @@ const BreadcrumbEllipsis = ({
     <MoreHorizontal className="h-4 w-4" />
     <span className="sr-only">More</span>
   </span>
-)
-BreadcrumbEllipsis.displayName = "BreadcrumbElipssis"
+);
+BreadcrumbEllipsis.displayName = "BreadcrumbElipssis";
 
 export {
   Breadcrumb,
@@ -31489,7 +33218,7 @@ export {
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
-}
+};
 
 ```
 
@@ -31498,11 +33227,11 @@ export {
 ### 📄 文件: `src\components\ui\button-group.tsx`
 
 ```
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
-import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 const buttonGroupVariants = cva(
   "flex w-fit items-stretch has-[>[data-slot=button-group]]:gap-2 [&>*]:focus-visible:relative [&>*]:focus-visible:z-10 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1",
@@ -31518,8 +33247,8 @@ const buttonGroupVariants = cva(
     defaultVariants: {
       orientation: "horizontal",
     },
-  }
-)
+  },
+);
 
 function ButtonGroup({
   className,
@@ -31534,7 +33263,7 @@ function ButtonGroup({
       className={cn(buttonGroupVariants({ orientation }), className)}
       {...props}
     />
-  )
+  );
 }
 
 function ButtonGroupText({
@@ -31542,19 +33271,19 @@ function ButtonGroupText({
   asChild = false,
   ...props
 }: React.ComponentProps<"div"> & {
-  asChild?: boolean
+  asChild?: boolean;
 }) {
-  const Comp = asChild ? Slot : "div"
+  const Comp = asChild ? Slot : "div";
 
   return (
     <Comp
       className={cn(
         "bg-muted shadow-xs flex items-center gap-2 rounded-md border px-4 text-sm font-medium [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function ButtonGroupSeparator({
@@ -31568,11 +33297,11 @@ function ButtonGroupSeparator({
       orientation={orientation}
       className={cn(
         "bg-input relative !m-0 self-stretch data-[orientation=vertical]:h-auto",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -31580,7 +33309,7 @@ export {
   ButtonGroupSeparator,
   ButtonGroupText,
   buttonGroupVariants,
-}
+};
 
 ```
 
@@ -31589,11 +33318,11 @@ export {
 ### 📄 文件: `src\components\ui\button.tsx`
 
 ```
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -31622,30 +33351,31 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
-)
+  },
+);
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+  asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+    const Comp = asChild ? Slot : "button";
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       />
-    )
-  }
-)
-Button.displayName = "Button"
+    );
+  },
+);
+Button.displayName = "Button";
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
 
 ```
 
@@ -31654,9 +33384,9 @@ export { Button, buttonVariants }
 ### 📄 文件: `src\components\ui\card.tsx`
 
 ```
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -31666,12 +33396,12 @@ const Card = React.forwardRef<
     ref={ref}
     className={cn(
       "rounded-xl border bg-card text-card-foreground shadow",
-      className
+      className,
     )}
     {...props}
   />
-))
-Card.displayName = "Card"
+));
+Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
@@ -31682,8 +33412,8 @@ const CardHeader = React.forwardRef<
     className={cn("flex flex-col space-y-1.5 p-6", className)}
     {...props}
   />
-))
-CardHeader.displayName = "CardHeader"
+));
+CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<
   HTMLDivElement,
@@ -31694,8 +33424,8 @@ const CardTitle = React.forwardRef<
     className={cn("font-semibold leading-none tracking-tight", className)}
     {...props}
   />
-))
-CardTitle.displayName = "CardTitle"
+));
+CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<
   HTMLDivElement,
@@ -31706,16 +33436,16 @@ const CardDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-))
-CardDescription.displayName = "CardDescription"
+));
+CardDescription.displayName = "CardDescription";
 
 const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
-))
-CardContent.displayName = "CardContent"
+));
+CardContent.displayName = "CardContent";
 
 const CardFooter = React.forwardRef<
   HTMLDivElement,
@@ -31726,10 +33456,17 @@ const CardFooter = React.forwardRef<
     className={cn("flex items-center p-6 pt-0", className)}
     {...props}
   />
-))
-CardFooter.displayName = "CardFooter"
+));
+CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+};
 
 ```
 
@@ -31738,46 +33475,46 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 ### 📄 文件: `src\components\ui\carousel.tsx`
 
 ```
-import * as React from "react"
+import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
-} from "embla-carousel-react"
-import { ArrowLeft, ArrowRight } from "lucide-react"
+} from "embla-carousel-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-type CarouselApi = UseEmblaCarouselType[1]
-type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
-type CarouselOptions = UseCarouselParameters[0]
-type CarouselPlugin = UseCarouselParameters[1]
+type CarouselApi = UseEmblaCarouselType[1];
+type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
+type CarouselOptions = UseCarouselParameters[0];
+type CarouselPlugin = UseCarouselParameters[1];
 
 type CarouselProps = {
-  opts?: CarouselOptions
-  plugins?: CarouselPlugin
-  orientation?: "horizontal" | "vertical"
-  setApi?: (api: CarouselApi) => void
-}
+  opts?: CarouselOptions;
+  plugins?: CarouselPlugin;
+  orientation?: "horizontal" | "vertical";
+  setApi?: (api: CarouselApi) => void;
+};
 
 type CarouselContextProps = {
-  carouselRef: ReturnType<typeof useEmblaCarousel>[0]
-  api: ReturnType<typeof useEmblaCarousel>[1]
-  scrollPrev: () => void
-  scrollNext: () => void
-  canScrollPrev: boolean
-  canScrollNext: boolean
-} & CarouselProps
+  carouselRef: ReturnType<typeof useEmblaCarousel>[0];
+  api: ReturnType<typeof useEmblaCarousel>[1];
+  scrollPrev: () => void;
+  scrollNext: () => void;
+  canScrollPrev: boolean;
+  canScrollNext: boolean;
+} & CarouselProps;
 
-const CarouselContext = React.createContext<CarouselContextProps | null>(null)
+const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
 function useCarousel() {
-  const context = React.useContext(CarouselContext)
+  const context = React.useContext(CarouselContext);
 
   if (!context) {
-    throw new Error("useCarousel must be used within a <Carousel />")
+    throw new Error("useCarousel must be used within a <Carousel />");
   }
 
-  return context
+  return context;
 }
 
 const Carousel = React.forwardRef<
@@ -31794,69 +33531,69 @@ const Carousel = React.forwardRef<
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [carouselRef, api] = useEmblaCarousel(
       {
         ...opts,
         axis: orientation === "horizontal" ? "x" : "y",
       },
-      plugins
-    )
-    const [canScrollPrev, setCanScrollPrev] = React.useState(false)
-    const [canScrollNext, setCanScrollNext] = React.useState(false)
+      plugins,
+    );
+    const [canScrollPrev, setCanScrollPrev] = React.useState(false);
+    const [canScrollNext, setCanScrollNext] = React.useState(false);
 
     const onSelect = React.useCallback((api: CarouselApi) => {
       if (!api) {
-        return
+        return;
       }
 
-      setCanScrollPrev(api.canScrollPrev())
-      setCanScrollNext(api.canScrollNext())
-    }, [])
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    }, []);
 
     const scrollPrev = React.useCallback(() => {
-      api?.scrollPrev()
-    }, [api])
+      api?.scrollPrev();
+    }, [api]);
 
     const scrollNext = React.useCallback(() => {
-      api?.scrollNext()
-    }, [api])
+      api?.scrollNext();
+    }, [api]);
 
     const handleKeyDown = React.useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === "ArrowLeft") {
-          event.preventDefault()
-          scrollPrev()
+          event.preventDefault();
+          scrollPrev();
         } else if (event.key === "ArrowRight") {
-          event.preventDefault()
-          scrollNext()
+          event.preventDefault();
+          scrollNext();
         }
       },
-      [scrollPrev, scrollNext]
-    )
+      [scrollPrev, scrollNext],
+    );
 
     React.useEffect(() => {
       if (!api || !setApi) {
-        return
+        return;
       }
 
-      setApi(api)
-    }, [api, setApi])
+      setApi(api);
+    }, [api, setApi]);
 
     React.useEffect(() => {
       if (!api) {
-        return
+        return;
       }
 
-      onSelect(api)
-      api.on("reInit", onSelect)
-      api.on("select", onSelect)
+      onSelect(api);
+      api.on("reInit", onSelect);
+      api.on("select", onSelect);
 
       return () => {
-        api?.off("select", onSelect)
-      }
-    }, [api, onSelect])
+        api?.off("select", onSelect);
+      };
+    }, [api, onSelect]);
 
     return (
       <CarouselContext.Provider
@@ -31883,16 +33620,16 @@ const Carousel = React.forwardRef<
           {children}
         </div>
       </CarouselContext.Provider>
-    )
-  }
-)
-Carousel.displayName = "Carousel"
+    );
+  },
+);
+Carousel.displayName = "Carousel";
 
 const CarouselContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  const { carouselRef, orientation } = useCarousel()
+  const { carouselRef, orientation } = useCarousel();
 
   return (
     <div ref={carouselRef} className="overflow-hidden">
@@ -31901,20 +33638,20 @@ const CarouselContent = React.forwardRef<
         className={cn(
           "flex",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
-          className
+          className,
         )}
         {...props}
       />
     </div>
-  )
-})
-CarouselContent.displayName = "CarouselContent"
+  );
+});
+CarouselContent.displayName = "CarouselContent";
 
 const CarouselItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  const { orientation } = useCarousel()
+  const { orientation } = useCarousel();
 
   return (
     <div
@@ -31924,19 +33661,19 @@ const CarouselItem = React.forwardRef<
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
         orientation === "horizontal" ? "pl-4" : "pt-4",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-CarouselItem.displayName = "CarouselItem"
+  );
+});
+CarouselItem.displayName = "CarouselItem";
 
 const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollPrev, canScrollPrev } = useCarousel()
+  const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
   return (
     <Button
@@ -31948,7 +33685,7 @@ const CarouselPrevious = React.forwardRef<
         orientation === "horizontal"
           ? "-left-12 top-1/2 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
-        className
+        className,
       )}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
@@ -31957,15 +33694,15 @@ const CarouselPrevious = React.forwardRef<
       <ArrowLeft className="h-4 w-4" />
       <span className="sr-only">Previous slide</span>
     </Button>
-  )
-})
-CarouselPrevious.displayName = "CarouselPrevious"
+  );
+});
+CarouselPrevious.displayName = "CarouselPrevious";
 
 const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollNext, canScrollNext } = useCarousel()
+  const { orientation, scrollNext, canScrollNext } = useCarousel();
 
   return (
     <Button
@@ -31977,7 +33714,7 @@ const CarouselNext = React.forwardRef<
         orientation === "horizontal"
           ? "-right-12 top-1/2 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
-        className
+        className,
       )}
       disabled={!canScrollNext}
       onClick={scrollNext}
@@ -31986,9 +33723,9 @@ const CarouselNext = React.forwardRef<
       <ArrowRight className="h-4 w-4" />
       <span className="sr-only">Next slide</span>
     </Button>
-  )
-})
-CarouselNext.displayName = "CarouselNext"
+  );
+});
+CarouselNext.displayName = "CarouselNext";
 
 export {
   type CarouselApi,
@@ -31997,7 +33734,7 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-}
+};
 
 ```
 
@@ -32006,51 +33743,51 @@ export {
 ### 📄 文件: `src\components\ui\chart.tsx`
 
 ```
-import * as React from "react"
-import * as RechartsPrimitive from "recharts"
+import * as React from "react";
+import * as RechartsPrimitive from "recharts";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const
+const THEMES = { light: "", dark: ".dark" } as const;
 
 export type ChartConfig = {
   [k in string]: {
-    label?: React.ReactNode
-    icon?: React.ComponentType
+    label?: React.ReactNode;
+    icon?: React.ComponentType;
   } & (
     | { color?: string; theme?: never }
     | { color?: never; theme: Record<keyof typeof THEMES, string> }
-  )
-}
+  );
+};
 
 type ChartContextProps = {
-  config: ChartConfig
-}
+  config: ChartConfig;
+};
 
-const ChartContext = React.createContext<ChartContextProps | null>(null)
+const ChartContext = React.createContext<ChartContextProps | null>(null);
 
 function useChart() {
-  const context = React.useContext(ChartContext)
+  const context = React.useContext(ChartContext);
 
   if (!context) {
-    throw new Error("useChart must be used within a <ChartContainer />")
+    throw new Error("useChart must be used within a <ChartContainer />");
   }
 
-  return context
+  return context;
 }
 
 const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    config: ChartConfig
+    config: ChartConfig;
     children: React.ComponentProps<
       typeof RechartsPrimitive.ResponsiveContainer
-    >["children"]
+    >["children"];
   }
 >(({ id, className, children, config, ...props }, ref) => {
-  const uniqueId = React.useId()
-  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
+  const uniqueId = React.useId();
+  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -32059,7 +33796,7 @@ const ChartContainer = React.forwardRef<
         ref={ref}
         className={cn(
           "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
-          className
+          className,
         )}
         {...props}
       >
@@ -32069,17 +33806,17 @@ const ChartContainer = React.forwardRef<
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
-  )
-})
-ChartContainer.displayName = "Chart"
+  );
+});
+ChartContainer.displayName = "Chart";
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
-    ([, config]) => config.theme || config.color
-  )
+    ([, config]) => config.theme || config.color,
+  );
 
   if (!colorConfig.length) {
-    return null
+    return null;
   }
 
   return (
@@ -32093,30 +33830,30 @@ ${colorConfig
   .map(([key, itemConfig]) => {
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+      itemConfig.color;
+    return color ? `  --color-${key}: ${color};` : null;
   })
   .join("\n")}
 }
-`
+`,
           )
           .join("\n"),
       }}
     />
-  )
-}
+  );
+};
 
-const ChartTooltip = RechartsPrimitive.Tooltip
+const ChartTooltip = RechartsPrimitive.Tooltip;
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
     React.ComponentProps<"div"> & {
-      hideLabel?: boolean
-      hideIndicator?: boolean
-      indicator?: "line" | "dot" | "dashed"
-      nameKey?: string
-      labelKey?: string
+      hideLabel?: boolean;
+      hideIndicator?: boolean;
+      indicator?: "line" | "dot" | "dashed";
+      nameKey?: string;
+      labelKey?: string;
     }
 >(
   (
@@ -32135,36 +33872,36 @@ const ChartTooltipContent = React.forwardRef<
       nameKey,
       labelKey,
     },
-    ref
+    ref,
   ) => {
-    const { config } = useChart()
+    const { config } = useChart();
 
     const tooltipLabel = React.useMemo(() => {
       if (hideLabel || !payload?.length) {
-        return null
+        return null;
       }
 
-      const [item] = payload
-      const key = `${labelKey || item?.dataKey || item?.name || "value"}`
-      const itemConfig = getPayloadConfigFromPayload(config, item, key)
+      const [item] = payload;
+      const key = `${labelKey || item?.dataKey || item?.name || "value"}`;
+      const itemConfig = getPayloadConfigFromPayload(config, item, key);
       const value =
         !labelKey && typeof label === "string"
           ? config[label as keyof typeof config]?.label || label
-          : itemConfig?.label
+          : itemConfig?.label;
 
       if (labelFormatter) {
         return (
           <div className={cn("font-medium", labelClassName)}>
             {labelFormatter(value, payload)}
           </div>
-        )
+        );
       }
 
       if (!value) {
-        return null
+        return null;
       }
 
-      return <div className={cn("font-medium", labelClassName)}>{value}</div>
+      return <div className={cn("font-medium", labelClassName)}>{value}</div>;
     }, [
       label,
       labelFormatter,
@@ -32173,20 +33910,20 @@ const ChartTooltipContent = React.forwardRef<
       labelClassName,
       config,
       labelKey,
-    ])
+    ]);
 
     if (!active || !payload?.length) {
-      return null
+      return null;
     }
 
-    const nestLabel = payload.length === 1 && indicator !== "dot"
+    const nestLabel = payload.length === 1 && indicator !== "dot";
 
     return (
       <div
         ref={ref}
         className={cn(
           "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
-          className
+          className,
         )}
       >
         {!nestLabel ? tooltipLabel : null}
@@ -32194,16 +33931,16 @@ const ChartTooltipContent = React.forwardRef<
           {payload
             .filter((item) => item.type !== "none")
             .map((item, index) => {
-              const key = `${nameKey || item.name || item.dataKey || "value"}`
-              const itemConfig = getPayloadConfigFromPayload(config, item, key)
-              const indicatorColor = color || item.payload.fill || item.color
+              const key = `${nameKey || item.name || item.dataKey || "value"}`;
+              const itemConfig = getPayloadConfigFromPayload(config, item, key);
+              const indicatorColor = color || item.payload.fill || item.color;
 
               return (
                 <div
                   key={item.dataKey}
                   className={cn(
                     "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
-                    indicator === "dot" && "items-center"
+                    indicator === "dot" && "items-center",
                   )}
                 >
                   {formatter && item?.value !== undefined && item.name ? (
@@ -32223,7 +33960,7 @@ const ChartTooltipContent = React.forwardRef<
                                 "w-0 border-[1.5px] border-dashed bg-transparent":
                                   indicator === "dashed",
                                 "my-0.5": nestLabel && indicator === "dashed",
-                              }
+                              },
                             )}
                             style={
                               {
@@ -32237,7 +33974,7 @@ const ChartTooltipContent = React.forwardRef<
                       <div
                         className={cn(
                           "flex flex-1 justify-between leading-none",
-                          nestLabel ? "items-end" : "items-center"
+                          nestLabel ? "items-end" : "items-center",
                         )}
                       >
                         <div className="grid gap-1.5">
@@ -32255,33 +33992,33 @@ const ChartTooltipContent = React.forwardRef<
                     </>
                   )}
                 </div>
-              )
+              );
             })}
         </div>
       </div>
-    )
-  }
-)
-ChartTooltipContent.displayName = "ChartTooltip"
+    );
+  },
+);
+ChartTooltipContent.displayName = "ChartTooltip";
 
-const ChartLegend = RechartsPrimitive.Legend
+const ChartLegend = RechartsPrimitive.Legend;
 
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-      hideIcon?: boolean
-      nameKey?: string
+      hideIcon?: boolean;
+      nameKey?: string;
     }
 >(
   (
     { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey },
-    ref
+    ref,
   ) => {
-    const { config } = useChart()
+    const { config } = useChart();
 
     if (!payload?.length) {
-      return null
+      return null;
     }
 
     return (
@@ -32290,20 +34027,20 @@ const ChartLegendContent = React.forwardRef<
         className={cn(
           "flex items-center justify-center gap-4",
           verticalAlign === "top" ? "pb-3" : "pt-3",
-          className
+          className,
         )}
       >
         {payload
           .filter((item) => item.type !== "none")
           .map((item) => {
-            const key = `${nameKey || item.dataKey || "value"}`
-            const itemConfig = getPayloadConfigFromPayload(config, item, key)
+            const key = `${nameKey || item.dataKey || "value"}`;
+            const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
             return (
               <div
                 key={item.value}
                 className={cn(
-                  "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
+                  "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
                 )}
               >
                 {itemConfig?.icon && !hideIcon ? (
@@ -32318,22 +34055,22 @@ const ChartLegendContent = React.forwardRef<
                 )}
                 {itemConfig?.label}
               </div>
-            )
+            );
           })}
       </div>
-    )
-  }
-)
-ChartLegendContent.displayName = "ChartLegend"
+    );
+  },
+);
+ChartLegendContent.displayName = "ChartLegend";
 
 // Helper to extract item config from a payload.
 function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,
-  key: string
+  key: string,
 ) {
   if (typeof payload !== "object" || payload === null) {
-    return undefined
+    return undefined;
   }
 
   const payloadPayload =
@@ -32341,15 +34078,15 @@ function getPayloadConfigFromPayload(
     typeof payload.payload === "object" &&
     payload.payload !== null
       ? payload.payload
-      : undefined
+      : undefined;
 
-  let configLabelKey: string = key
+  let configLabelKey: string = key;
 
   if (
     key in payload &&
     typeof payload[key as keyof typeof payload] === "string"
   ) {
-    configLabelKey = payload[key as keyof typeof payload] as string
+    configLabelKey = payload[key as keyof typeof payload] as string;
   } else if (
     payloadPayload &&
     key in payloadPayload &&
@@ -32357,12 +34094,12 @@ function getPayloadConfigFromPayload(
   ) {
     configLabelKey = payloadPayload[
       key as keyof typeof payloadPayload
-    ] as string
+    ] as string;
   }
 
   return configLabelKey in config
     ? config[configLabelKey]
-    : config[key as keyof typeof config]
+    : config[key as keyof typeof config];
 }
 
 export {
@@ -32372,7 +34109,7 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
-}
+};
 
 ```
 
@@ -32381,11 +34118,11 @@ export {
 ### 📄 文件: `src\components\ui\checkbox.tsx`
 
 ```
-import * as React from "react"
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-import { Check } from "lucide-react"
+import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
@@ -32395,7 +34132,7 @@ const Checkbox = React.forwardRef<
     ref={ref}
     className={cn(
       "grid place-content-center peer h-4 w-4 shrink-0 rounded-sm border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
-      className
+      className,
     )}
     {...props}
   >
@@ -32405,10 +34142,10 @@ const Checkbox = React.forwardRef<
       <Check className="h-4 w-4" />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
-))
-Checkbox.displayName = CheckboxPrimitive.Root.displayName
+));
+Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export { Checkbox }
+export { Checkbox };
 
 ```
 
@@ -32417,15 +34154,15 @@ export { Checkbox }
 ### 📄 文件: `src\components\ui\collapsible.tsx`
 
 ```
-import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
+import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 
-const Collapsible = CollapsiblePrimitive.Root
+const Collapsible = CollapsiblePrimitive.Root;
 
-const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger
+const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger;
 
-const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent
+const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent;
 
-export { Collapsible, CollapsibleTrigger, CollapsibleContent }
+export { Collapsible, CollapsibleTrigger, CollapsibleContent };
 
 ```
 
@@ -32434,11 +34171,11 @@ export { Collapsible, CollapsibleTrigger, CollapsibleContent }
 ### 📄 文件: `src\components\ui\combobox.tsx`
 
 ```
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -32446,25 +34183,25 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 export interface ComboboxOption {
-  value: string
-  label: string
+  value: string;
+  label: string;
 }
 
 interface ComboboxProps {
-  options: ComboboxOption[]
-  value?: string
-  onChange: (value: string) => void
-  placeholder?: string
-  emptyText?: string
-  className?: string
+  options: ComboboxOption[];
+  value?: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  emptyText?: string;
+  className?: string;
 }
 
 export function Combobox({
@@ -32473,9 +34210,9 @@ export function Combobox({
   onChange,
   placeholder = "Select option...",
   emptyText = "No option found.",
-  className
+  className,
 }: ComboboxProps) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -32504,14 +34241,14 @@ export function Combobox({
                   value={option.value}
                   onSelect={(currentValue) => {
                     // shadcn command sometimes lowercases values, be careful
-                    onChange(currentValue === value ? "" : option.value)
-                    setOpen(false)
+                    onChange(currentValue === value ? "" : option.value);
+                    setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === option.value ? "opacity-100" : "opacity-0"
+                      value === option.value ? "opacity-100" : "opacity-0",
                     )}
                   />
                   {option.label}
@@ -32522,8 +34259,9 @@ export function Combobox({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
+
 ```
 
 ---
@@ -32531,15 +34269,15 @@ export function Combobox({
 ### 📄 文件: `src\components\ui\command.tsx`
 
 ```
-"use client"
+"use client";
 
-import * as React from "react"
-import { type DialogProps } from "@radix-ui/react-dialog"
-import { Command as CommandPrimitive } from "cmdk"
-import { Search } from "lucide-react"
+import * as React from "react";
+import { type DialogProps } from "@radix-ui/react-dialog";
+import { Command as CommandPrimitive } from "cmdk";
+import { Search } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { cn } from "@/lib/utils";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -32549,12 +34287,12 @@ const Command = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
-      className
+      className,
     )}
     {...props}
   />
-))
-Command.displayName = CommandPrimitive.displayName
+));
+Command.displayName = CommandPrimitive.displayName;
 
 const CommandDialog = ({ children, ...props }: DialogProps) => {
   return (
@@ -32565,8 +34303,8 @@ const CommandDialog = ({ children, ...props }: DialogProps) => {
         </Command>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
@@ -32578,14 +34316,14 @@ const CommandInput = React.forwardRef<
       ref={ref}
       className={cn(
         "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
-        className
+        className,
       )}
       {...props}
     />
   </div>
-))
+));
 
-CommandInput.displayName = CommandPrimitive.Input.displayName
+CommandInput.displayName = CommandPrimitive.Input.displayName;
 
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
@@ -32596,9 +34334,9 @@ const CommandList = React.forwardRef<
     className={cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className)}
     {...props}
   />
-))
+));
 
-CommandList.displayName = CommandPrimitive.List.displayName
+CommandList.displayName = CommandPrimitive.List.displayName;
 
 const CommandEmpty = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Empty>,
@@ -32609,9 +34347,9 @@ const CommandEmpty = React.forwardRef<
     className="py-6 text-center text-sm"
     {...props}
   />
-))
+));
 
-CommandEmpty.displayName = CommandPrimitive.Empty.displayName
+CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
 
 const CommandGroup = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Group>,
@@ -32621,13 +34359,13 @@ const CommandGroup = React.forwardRef<
     ref={ref}
     className={cn(
       "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
-      className
+      className,
     )}
     {...props}
   />
-))
+));
 
-CommandGroup.displayName = CommandPrimitive.Group.displayName
+CommandGroup.displayName = CommandPrimitive.Group.displayName;
 
 const CommandSeparator = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Separator>,
@@ -32638,8 +34376,8 @@ const CommandSeparator = React.forwardRef<
     className={cn("-mx-1 h-px bg-border", className)}
     {...props}
   />
-))
-CommandSeparator.displayName = CommandPrimitive.Separator.displayName
+));
+CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
 const CommandItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
@@ -32649,13 +34387,13 @@ const CommandItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-      className
+      className,
     )}
     {...props}
   />
-))
+));
 
-CommandItem.displayName = CommandPrimitive.Item.displayName
+CommandItem.displayName = CommandPrimitive.Item.displayName;
 
 const CommandShortcut = ({
   className,
@@ -32665,13 +34403,13 @@ const CommandShortcut = ({
     <span
       className={cn(
         "ml-auto text-xs tracking-widest text-muted-foreground",
-        className
+        className,
       )}
       {...props}
     />
-  )
-}
-CommandShortcut.displayName = "CommandShortcut"
+  );
+};
+CommandShortcut.displayName = "CommandShortcut";
 
 export {
   Command,
@@ -32683,7 +34421,7 @@ export {
   CommandItem,
   CommandShortcut,
   CommandSeparator,
-}
+};
 
 ```
 
@@ -32692,28 +34430,28 @@ export {
 ### 📄 文件: `src\components\ui\context-menu.tsx`
 
 ```
-import * as React from "react"
-import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
-import { Check, ChevronRight, Circle } from "lucide-react"
+import * as React from "react";
+import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
+import { Check, ChevronRight, Circle } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const ContextMenu = ContextMenuPrimitive.Root
+const ContextMenu = ContextMenuPrimitive.Root;
 
-const ContextMenuTrigger = ContextMenuPrimitive.Trigger
+const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
 
-const ContextMenuGroup = ContextMenuPrimitive.Group
+const ContextMenuGroup = ContextMenuPrimitive.Group;
 
-const ContextMenuPortal = ContextMenuPrimitive.Portal
+const ContextMenuPortal = ContextMenuPrimitive.Portal;
 
-const ContextMenuSub = ContextMenuPrimitive.Sub
+const ContextMenuSub = ContextMenuPrimitive.Sub;
 
-const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup
+const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup;
 
 const ContextMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.SubTrigger>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.SubTrigger> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, children, ...props }, ref) => (
   <ContextMenuPrimitive.SubTrigger
@@ -32721,15 +34459,15 @@ const ContextMenuSubTrigger = React.forwardRef<
     className={cn(
       "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   >
     {children}
     <ChevronRight className="ml-auto h-4 w-4" />
   </ContextMenuPrimitive.SubTrigger>
-))
-ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName
+));
+ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName;
 
 const ContextMenuSubContent = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.SubContent>,
@@ -32739,12 +34477,12 @@ const ContextMenuSubContent = React.forwardRef<
     ref={ref}
     className={cn(
       "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-context-menu-content-transform-origin]",
-      className
+      className,
     )}
     {...props}
   />
-))
-ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName
+));
+ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName;
 
 const ContextMenuContent = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Content>,
@@ -32755,18 +34493,18 @@ const ContextMenuContent = React.forwardRef<
       ref={ref}
       className={cn(
         "z-50 max-h-[--radix-context-menu-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-context-menu-content-transform-origin]",
-        className
+        className,
       )}
       {...props}
     />
   </ContextMenuPrimitive.Portal>
-))
-ContextMenuContent.displayName = ContextMenuPrimitive.Content.displayName
+));
+ContextMenuContent.displayName = ContextMenuPrimitive.Content.displayName;
 
 const ContextMenuItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Item> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
   <ContextMenuPrimitive.Item
@@ -32774,12 +34512,12 @@ const ContextMenuItem = React.forwardRef<
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   />
-))
-ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName
+));
+ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 
 const ContextMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.CheckboxItem>,
@@ -32789,7 +34527,7 @@ const ContextMenuCheckboxItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     checked={checked}
     {...props}
@@ -32801,9 +34539,9 @@ const ContextMenuCheckboxItem = React.forwardRef<
     </span>
     {children}
   </ContextMenuPrimitive.CheckboxItem>
-))
+));
 ContextMenuCheckboxItem.displayName =
-  ContextMenuPrimitive.CheckboxItem.displayName
+  ContextMenuPrimitive.CheckboxItem.displayName;
 
 const ContextMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.RadioItem>,
@@ -32813,7 +34551,7 @@ const ContextMenuRadioItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     {...props}
   >
@@ -32824,13 +34562,13 @@ const ContextMenuRadioItem = React.forwardRef<
     </span>
     {children}
   </ContextMenuPrimitive.RadioItem>
-))
-ContextMenuRadioItem.displayName = ContextMenuPrimitive.RadioItem.displayName
+));
+ContextMenuRadioItem.displayName = ContextMenuPrimitive.RadioItem.displayName;
 
 const ContextMenuLabel = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Label> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
   <ContextMenuPrimitive.Label
@@ -32838,12 +34576,12 @@ const ContextMenuLabel = React.forwardRef<
     className={cn(
       "px-2 py-1.5 text-sm font-semibold text-foreground",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   />
-))
-ContextMenuLabel.displayName = ContextMenuPrimitive.Label.displayName
+));
+ContextMenuLabel.displayName = ContextMenuPrimitive.Label.displayName;
 
 const ContextMenuSeparator = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Separator>,
@@ -32854,8 +34592,8 @@ const ContextMenuSeparator = React.forwardRef<
     className={cn("-mx-1 my-1 h-px bg-border", className)}
     {...props}
   />
-))
-ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName
+));
+ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName;
 
 const ContextMenuShortcut = ({
   className,
@@ -32865,13 +34603,13 @@ const ContextMenuShortcut = ({
     <span
       className={cn(
         "ml-auto text-xs tracking-widest text-muted-foreground",
-        className
+        className,
       )}
       {...props}
     />
-  )
-}
-ContextMenuShortcut.displayName = "ContextMenuShortcut"
+  );
+};
+ContextMenuShortcut.displayName = "ContextMenuShortcut";
 
 export {
   ContextMenu,
@@ -32889,7 +34627,7 @@ export {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuRadioGroup,
-}
+};
 
 ```
 
@@ -32898,19 +34636,19 @@ export {
 ### 📄 文件: `src\components\ui\dialog.tsx`
 
 ```
-import * as React from "react"
-import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { X } from "lucide-react"
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const Dialog = DialogPrimitive.Root
+const Dialog = DialogPrimitive.Root;
 
-const DialogTrigger = DialogPrimitive.Trigger
+const DialogTrigger = DialogPrimitive.Trigger;
 
-const DialogPortal = DialogPrimitive.Portal
+const DialogPortal = DialogPrimitive.Portal;
 
-const DialogClose = DialogPrimitive.Close
+const DialogClose = DialogPrimitive.Close;
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
@@ -32920,12 +34658,12 @@ const DialogOverlay = React.forwardRef<
     ref={ref}
     className={cn(
       "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
+      className,
     )}
     {...props}
   />
-))
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+));
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
@@ -32937,7 +34675,7 @@ const DialogContent = React.forwardRef<
       ref={ref}
       className={cn(
         "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-        className
+        className,
       )}
       {...props}
     >
@@ -32948,8 +34686,8 @@ const DialogContent = React.forwardRef<
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
-))
-DialogContent.displayName = DialogPrimitive.Content.displayName
+));
+DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({
   className,
@@ -32958,12 +34696,12 @@ const DialogHeader = ({
   <div
     className={cn(
       "flex flex-col space-y-1.5 text-center sm:text-left",
-      className
+      className,
     )}
     {...props}
   />
-)
-DialogHeader.displayName = "DialogHeader"
+);
+DialogHeader.displayName = "DialogHeader";
 
 const DialogFooter = ({
   className,
@@ -32972,12 +34710,12 @@ const DialogFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
+      className,
     )}
     {...props}
   />
-)
-DialogFooter.displayName = "DialogFooter"
+);
+DialogFooter.displayName = "DialogFooter";
 
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
@@ -32987,12 +34725,12 @@ const DialogTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-lg font-semibold leading-none tracking-tight",
-      className
+      className,
     )}
     {...props}
   />
-))
-DialogTitle.displayName = DialogPrimitive.Title.displayName
+));
+DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 const DialogDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,
@@ -33003,8 +34741,8 @@ const DialogDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-))
-DialogDescription.displayName = DialogPrimitive.Description.displayName
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
   Dialog,
@@ -33017,7 +34755,7 @@ export {
   DialogFooter,
   DialogTitle,
   DialogDescription,
-}
+};
 
 ```
 
@@ -33026,10 +34764,10 @@ export {
 ### 📄 文件: `src\components\ui\drawer.tsx`
 
 ```
-import * as React from "react"
-import { Drawer as DrawerPrimitive } from "vaul"
+import * as React from "react";
+import { Drawer as DrawerPrimitive } from "vaul";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Drawer = ({
   shouldScaleBackground = true,
@@ -33039,14 +34777,14 @@ const Drawer = ({
     shouldScaleBackground={shouldScaleBackground}
     {...props}
   />
-)
-Drawer.displayName = "Drawer"
+);
+Drawer.displayName = "Drawer";
 
-const DrawerTrigger = DrawerPrimitive.Trigger
+const DrawerTrigger = DrawerPrimitive.Trigger;
 
-const DrawerPortal = DrawerPrimitive.Portal
+const DrawerPortal = DrawerPrimitive.Portal;
 
-const DrawerClose = DrawerPrimitive.Close
+const DrawerClose = DrawerPrimitive.Close;
 
 const DrawerOverlay = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Overlay>,
@@ -33057,8 +34795,8 @@ const DrawerOverlay = React.forwardRef<
     className={cn("fixed inset-0 z-50 bg-black/80", className)}
     {...props}
   />
-))
-DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
+));
+DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
 
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
@@ -33070,7 +34808,7 @@ const DrawerContent = React.forwardRef<
       ref={ref}
       className={cn(
         "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
-        className
+        className,
       )}
       {...props}
     >
@@ -33078,8 +34816,8 @@ const DrawerContent = React.forwardRef<
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
-))
-DrawerContent.displayName = "DrawerContent"
+));
+DrawerContent.displayName = "DrawerContent";
 
 const DrawerHeader = ({
   className,
@@ -33089,8 +34827,8 @@ const DrawerHeader = ({
     className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
     {...props}
   />
-)
-DrawerHeader.displayName = "DrawerHeader"
+);
+DrawerHeader.displayName = "DrawerHeader";
 
 const DrawerFooter = ({
   className,
@@ -33100,8 +34838,8 @@ const DrawerFooter = ({
     className={cn("mt-auto flex flex-col gap-2 p-4", className)}
     {...props}
   />
-)
-DrawerFooter.displayName = "DrawerFooter"
+);
+DrawerFooter.displayName = "DrawerFooter";
 
 const DrawerTitle = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Title>,
@@ -33111,12 +34849,12 @@ const DrawerTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-lg font-semibold leading-none tracking-tight",
-      className
+      className,
     )}
     {...props}
   />
-))
-DrawerTitle.displayName = DrawerPrimitive.Title.displayName
+));
+DrawerTitle.displayName = DrawerPrimitive.Title.displayName;
 
 const DrawerDescription = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Description>,
@@ -33127,8 +34865,8 @@ const DrawerDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-))
-DrawerDescription.displayName = DrawerPrimitive.Description.displayName
+));
+DrawerDescription.displayName = DrawerPrimitive.Description.displayName;
 
 export {
   Drawer,
@@ -33141,7 +34879,7 @@ export {
   DrawerFooter,
   DrawerTitle,
   DrawerDescription,
-}
+};
 
 ```
 
@@ -33150,28 +34888,28 @@ export {
 ### 📄 文件: `src\components\ui\dropdown-menu.tsx`
 
 ```
-import * as React from "react"
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { Check, ChevronRight, Circle } from "lucide-react"
+import * as React from "react";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { Check, ChevronRight, Circle } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const DropdownMenu = DropdownMenuPrimitive.Root
+const DropdownMenu = DropdownMenuPrimitive.Root;
 
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
-const DropdownMenuGroup = DropdownMenuPrimitive.Group
+const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
-const DropdownMenuPortal = DropdownMenuPrimitive.Portal
+const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
 
-const DropdownMenuSub = DropdownMenuPrimitive.Sub
+const DropdownMenuSub = DropdownMenuPrimitive.Sub;
 
-const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
+const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
 const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
@@ -33179,16 +34917,16 @@ const DropdownMenuSubTrigger = React.forwardRef<
     className={cn(
       "flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   >
     {children}
     <ChevronRight className="ml-auto" />
   </DropdownMenuPrimitive.SubTrigger>
-))
+));
 DropdownMenuSubTrigger.displayName =
-  DropdownMenuPrimitive.SubTrigger.displayName
+  DropdownMenuPrimitive.SubTrigger.displayName;
 
 const DropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
@@ -33198,13 +34936,13 @@ const DropdownMenuSubContent = React.forwardRef<
     ref={ref}
     className={cn(
       "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-dropdown-menu-content-transform-origin]",
-      className
+      className,
     )}
     {...props}
   />
-))
+));
 DropdownMenuSubContent.displayName =
-  DropdownMenuPrimitive.SubContent.displayName
+  DropdownMenuPrimitive.SubContent.displayName;
 
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
@@ -33217,18 +34955,18 @@ const DropdownMenuContent = React.forwardRef<
       className={cn(
         "z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-dropdown-menu-content-transform-origin]",
-        className
+        className,
       )}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
-))
-DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
+));
+DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
@@ -33236,12 +34974,12 @@ const DropdownMenuItem = React.forwardRef<
     className={cn(
       "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   />
-))
-DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
+));
+DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 
 const DropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
@@ -33251,7 +34989,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     checked={checked}
     {...props}
@@ -33263,9 +35001,9 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     </span>
     {children}
   </DropdownMenuPrimitive.CheckboxItem>
-))
+));
 DropdownMenuCheckboxItem.displayName =
-  DropdownMenuPrimitive.CheckboxItem.displayName
+  DropdownMenuPrimitive.CheckboxItem.displayName;
 
 const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
@@ -33275,7 +35013,7 @@ const DropdownMenuRadioItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     {...props}
   >
@@ -33286,13 +35024,13 @@ const DropdownMenuRadioItem = React.forwardRef<
     </span>
     {children}
   </DropdownMenuPrimitive.RadioItem>
-))
-DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
+));
+DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
 const DropdownMenuLabel = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
@@ -33300,12 +35038,12 @@ const DropdownMenuLabel = React.forwardRef<
     className={cn(
       "px-2 py-1.5 text-sm font-semibold",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   />
-))
-DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
+));
+DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
 
 const DropdownMenuSeparator = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
@@ -33316,8 +35054,8 @@ const DropdownMenuSeparator = React.forwardRef<
     className={cn("-mx-1 my-1 h-px bg-muted", className)}
     {...props}
   />
-))
-DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
+));
+DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 
 const DropdownMenuShortcut = ({
   className,
@@ -33328,9 +35066,9 @@ const DropdownMenuShortcut = ({
       className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
       {...props}
     />
-  )
-}
-DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
+  );
+};
+DropdownMenuShortcut.displayName = "DropdownMenuShortcut";
 
 export {
   DropdownMenu,
@@ -33348,7 +35086,7 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
-}
+};
 
 ```
 
@@ -33357,10 +35095,10 @@ export {
 ### 📄 文件: `src\components\ui\empty.tsx`
 
 ```
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva, type VariantProps } from "class-variance-authority";
 import { Ghost } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Empty({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -33368,11 +35106,11 @@ function Empty({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="empty"
       className={cn(
         "flex min-w-0 flex-1 flex-col items-center justify-center gap-6 text-balance rounded-lg border-dashed p-6 text-center md:p-12",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -33381,11 +35119,11 @@ function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="empty-header"
       className={cn(
         "flex max-w-sm flex-col items-center gap-2 text-center",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 const emptyMediaVariants = cva(
@@ -33400,8 +35138,8 @@ const emptyMediaVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
-)
+  },
+);
 
 function EmptyMedia({
   className,
@@ -33415,7 +35153,7 @@ function EmptyMedia({
       className={cn(emptyMediaVariants({ variant, className }))}
       {...props}
     />
-  )
+  );
 }
 
 function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
@@ -33425,7 +35163,7 @@ function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("text-lg font-medium tracking-tight", className)}
       {...props}
     />
-  )
+  );
 }
 
 function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
@@ -33434,11 +35172,11 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
       data-slot="empty-description"
       className={cn(
         "text-muted-foreground [&>a:hover]:text-primary text-sm/relaxed [&>a]:underline [&>a]:underline-offset-4",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
@@ -33447,11 +35185,11 @@ function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="empty-content"
       className={cn(
         "flex w-full min-w-0 max-w-sm flex-col items-center gap-4 text-balance text-sm",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -33461,7 +35199,7 @@ export {
   EmptyDescription,
   EmptyContent,
   EmptyMedia,
-}
+};
 
 export function EmptyState() {
   return (
@@ -33476,8 +35214,9 @@ export function EmptyState() {
         </EmptyDescription>
       </EmptyHeader>
     </Empty>
-  )
+  );
 }
+
 ```
 
 ---
@@ -33485,14 +35224,14 @@ export function EmptyState() {
 ### 📄 文件: `src\components\ui\hover-card.tsx`
 
 ```
-import * as React from "react"
-import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
+import * as React from "react";
+import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const HoverCard = HoverCardPrimitive.Root
+const HoverCard = HoverCardPrimitive.Root;
 
-const HoverCardTrigger = HoverCardPrimitive.Trigger
+const HoverCardTrigger = HoverCardPrimitive.Trigger;
 
 const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
@@ -33504,14 +35243,14 @@ const HoverCardContent = React.forwardRef<
     sideOffset={sideOffset}
     className={cn(
       "z-50 w-64 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-hover-card-content-transform-origin]",
-      className
+      className,
     )}
     {...props}
   />
-))
-HoverCardContent.displayName = HoverCardPrimitive.Content.displayName
+));
+HoverCardContent.displayName = HoverCardPrimitive.Content.displayName;
 
-export { HoverCard, HoverCardTrigger, HoverCardContent }
+export { HoverCard, HoverCardTrigger, HoverCardContent };
 
 ```
 
@@ -33520,13 +35259,13 @@ export { HoverCard, HoverCardTrigger, HoverCardContent }
 ### 📄 文件: `src\components\ui\input-group.tsx`
 
 ```
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -33549,11 +35288,11 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
         // Error state.
         "has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40",
 
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 const inputGroupAddonVariants = cva(
@@ -33574,8 +35313,8 @@ const inputGroupAddonVariants = cva(
     defaultVariants: {
       align: "inline-start",
     },
-  }
-)
+  },
+);
 
 function InputGroupAddon({
   className,
@@ -33590,13 +35329,13 @@ function InputGroupAddon({
       className={cn(inputGroupAddonVariants({ align }), className)}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("button")) {
-          return
+          return;
         }
-        e.currentTarget.parentElement?.querySelector("input")?.focus()
+        e.currentTarget.parentElement?.querySelector("input")?.focus();
       }}
       {...props}
     />
-  )
+  );
 }
 
 const inputGroupButtonVariants = cva(
@@ -33614,8 +35353,8 @@ const inputGroupButtonVariants = cva(
     defaultVariants: {
       size: "xs",
     },
-  }
-)
+  },
+);
 
 function InputGroupButton({
   className,
@@ -33633,7 +35372,7 @@ function InputGroupButton({
       className={cn(inputGroupButtonVariants({ size }), className)}
       {...props}
     />
-  )
+  );
 }
 
 function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
@@ -33641,11 +35380,11 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
     <span
       className={cn(
         "text-muted-foreground flex items-center gap-2 text-sm [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function InputGroupInput({
@@ -33657,11 +35396,11 @@ function InputGroupInput({
       data-slot="input-group-control"
       className={cn(
         "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function InputGroupTextarea({
@@ -33673,11 +35412,11 @@ function InputGroupTextarea({
       data-slot="input-group-control"
       className={cn(
         "flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 dark:bg-transparent",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -33687,7 +35426,7 @@ export {
   InputGroupText,
   InputGroupInput,
   InputGroupTextarea,
-}
+};
 
 ```
 
@@ -33696,9 +35435,9 @@ export {
 ### 📄 文件: `src\components\ui\input.tsx`
 
 ```
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
@@ -33707,17 +35446,17 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
         type={type}
         className={cn(
           "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className
+          className,
         )}
         ref={ref}
         {...props}
       />
-    )
-  }
-)
-Input.displayName = "Input"
+    );
+  },
+);
+Input.displayName = "Input";
 
-export { Input }
+export { Input };
 
 ```
 
@@ -33726,15 +35465,15 @@ export { Input }
 ### 📄 文件: `src\components\ui\label.tsx`
 
 ```
-import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import * as LabelPrimitive from "@radix-ui/react-label";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const labelVariants = cva(
-  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-)
+  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+);
 
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
@@ -33746,10 +35485,10 @@ const Label = React.forwardRef<
     className={cn(labelVariants(), className)}
     {...props}
   />
-))
-Label.displayName = LabelPrimitive.Root.displayName
+));
+Label.displayName = LabelPrimitive.Root.displayName;
 
-export { Label }
+export { Label };
 
 ```
 
@@ -33758,40 +35497,40 @@ export { Label }
 ### 📄 文件: `src\components\ui\menubar.tsx`
 
 ```
-import * as React from "react"
-import * as MenubarPrimitive from "@radix-ui/react-menubar"
-import { Check, ChevronRight, Circle } from "lucide-react"
+import * as React from "react";
+import * as MenubarPrimitive from "@radix-ui/react-menubar";
+import { Check, ChevronRight, Circle } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function MenubarMenu({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Menu>) {
-  return <MenubarPrimitive.Menu {...props} />
+  return <MenubarPrimitive.Menu {...props} />;
 }
 
 function MenubarGroup({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Group>) {
-  return <MenubarPrimitive.Group {...props} />
+  return <MenubarPrimitive.Group {...props} />;
 }
 
 function MenubarPortal({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Portal>) {
-  return <MenubarPrimitive.Portal {...props} />
+  return <MenubarPrimitive.Portal {...props} />;
 }
 
 function MenubarRadioGroup({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.RadioGroup>) {
-  return <MenubarPrimitive.RadioGroup {...props} />
+  return <MenubarPrimitive.RadioGroup {...props} />;
 }
 
 function MenubarSub({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Sub>) {
-  return <MenubarPrimitive.Sub data-slot="menubar-sub" {...props} />
+  return <MenubarPrimitive.Sub data-slot="menubar-sub" {...props} />;
 }
 
 const Menubar = React.forwardRef<
@@ -33802,12 +35541,12 @@ const Menubar = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-9 items-center space-x-1 rounded-md border bg-background p-1 shadow-sm",
-      className
+      className,
     )}
     {...props}
   />
-))
-Menubar.displayName = MenubarPrimitive.Root.displayName
+));
+Menubar.displayName = MenubarPrimitive.Root.displayName;
 
 const MenubarTrigger = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Trigger>,
@@ -33817,17 +35556,17 @@ const MenubarTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "flex cursor-default select-none items-center rounded-sm px-3 py-1 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
-      className
+      className,
     )}
     {...props}
   />
-))
-MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName
+));
+MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
 
 const MenubarSubTrigger = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.SubTrigger>,
   React.ComponentPropsWithoutRef<typeof MenubarPrimitive.SubTrigger> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, children, ...props }, ref) => (
   <MenubarPrimitive.SubTrigger
@@ -33835,15 +35574,15 @@ const MenubarSubTrigger = React.forwardRef<
     className={cn(
       "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   >
     {children}
     <ChevronRight className="ml-auto h-4 w-4" />
   </MenubarPrimitive.SubTrigger>
-))
-MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName
+));
+MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName;
 
 const MenubarSubContent = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.SubContent>,
@@ -33853,12 +35592,12 @@ const MenubarSubContent = React.forwardRef<
     ref={ref}
     className={cn(
       "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-menubar-content-transform-origin]",
-      className
+      className,
     )}
     {...props}
   />
-))
-MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName
+));
+MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName;
 
 const MenubarContent = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Content>,
@@ -33866,7 +35605,7 @@ const MenubarContent = React.forwardRef<
 >(
   (
     { className, align = "start", alignOffset = -4, sideOffset = 8, ...props },
-    ref
+    ref,
   ) => (
     <MenubarPrimitive.Portal>
       <MenubarPrimitive.Content
@@ -33876,19 +35615,19 @@ const MenubarContent = React.forwardRef<
         sideOffset={sideOffset}
         className={cn(
           "z-50 min-w-[12rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-menubar-content-transform-origin]",
-          className
+          className,
         )}
         {...props}
       />
     </MenubarPrimitive.Portal>
-  )
-)
-MenubarContent.displayName = MenubarPrimitive.Content.displayName
+  ),
+);
+MenubarContent.displayName = MenubarPrimitive.Content.displayName;
 
 const MenubarItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Item> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Item
@@ -33896,12 +35635,12 @@ const MenubarItem = React.forwardRef<
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   />
-))
-MenubarItem.displayName = MenubarPrimitive.Item.displayName
+));
+MenubarItem.displayName = MenubarPrimitive.Item.displayName;
 
 const MenubarCheckboxItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.CheckboxItem>,
@@ -33911,7 +35650,7 @@ const MenubarCheckboxItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     checked={checked}
     {...props}
@@ -33923,8 +35662,8 @@ const MenubarCheckboxItem = React.forwardRef<
     </span>
     {children}
   </MenubarPrimitive.CheckboxItem>
-))
-MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName
+));
+MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName;
 
 const MenubarRadioItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.RadioItem>,
@@ -33934,7 +35673,7 @@ const MenubarRadioItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     {...props}
   >
@@ -33945,13 +35684,13 @@ const MenubarRadioItem = React.forwardRef<
     </span>
     {children}
   </MenubarPrimitive.RadioItem>
-))
-MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName
+));
+MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName;
 
 const MenubarLabel = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Label> & {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Label
@@ -33959,12 +35698,12 @@ const MenubarLabel = React.forwardRef<
     className={cn(
       "px-2 py-1.5 text-sm font-semibold",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   />
-))
-MenubarLabel.displayName = MenubarPrimitive.Label.displayName
+));
+MenubarLabel.displayName = MenubarPrimitive.Label.displayName;
 
 const MenubarSeparator = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Separator>,
@@ -33975,8 +35714,8 @@ const MenubarSeparator = React.forwardRef<
     className={cn("-mx-1 my-1 h-px bg-muted", className)}
     {...props}
   />
-))
-MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName
+));
+MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName;
 
 const MenubarShortcut = ({
   className,
@@ -33986,13 +35725,13 @@ const MenubarShortcut = ({
     <span
       className={cn(
         "ml-auto text-xs tracking-widest text-muted-foreground",
-        className
+        className,
       )}
       {...props}
     />
-  )
-}
-MenubarShortcut.displayname = "MenubarShortcut"
+  );
+};
+MenubarShortcut.displayname = "MenubarShortcut";
 
 export {
   Menubar,
@@ -34011,7 +35750,7 @@ export {
   MenubarGroup,
   MenubarSub,
   MenubarShortcut,
-}
+};
 
 ```
 
@@ -34020,12 +35759,12 @@ export {
 ### 📄 文件: `src\components\ui\navigation-menu.tsx`
 
 ```
-import * as React from "react"
-import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
-import { cva } from "class-variance-authority"
-import { ChevronDown } from "lucide-react"
+import * as React from "react";
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
+import { cva } from "class-variance-authority";
+import { ChevronDown } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
@@ -34035,15 +35774,15 @@ const NavigationMenu = React.forwardRef<
     ref={ref}
     className={cn(
       "relative z-10 flex max-w-max flex-1 items-center justify-center",
-      className
+      className,
     )}
     {...props}
   >
     {children}
     <NavigationMenuViewport />
   </NavigationMenuPrimitive.Root>
-))
-NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
+));
+NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName;
 
 const NavigationMenuList = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.List>,
@@ -34053,18 +35792,18 @@ const NavigationMenuList = React.forwardRef<
     ref={ref}
     className={cn(
       "group flex flex-1 list-none items-center justify-center space-x-1",
-      className
+      className,
     )}
     {...props}
   />
-))
-NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
+));
+NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
-const NavigationMenuItem = NavigationMenuPrimitive.Item
+const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-accent-foreground data-[state=open]:bg-accent/50 data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent"
-)
+  "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-accent-foreground data-[state=open]:bg-accent/50 data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent",
+);
 
 const NavigationMenuTrigger = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
@@ -34081,8 +35820,8 @@ const NavigationMenuTrigger = React.forwardRef<
       aria-hidden="true"
     />
   </NavigationMenuPrimitive.Trigger>
-))
-NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
+));
+NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName;
 
 const NavigationMenuContent = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Content>,
@@ -34092,14 +35831,14 @@ const NavigationMenuContent = React.forwardRef<
     ref={ref}
     className={cn(
       "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto ",
-      className
+      className,
     )}
     {...props}
   />
-))
-NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
+));
+NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
-const NavigationMenuLink = NavigationMenuPrimitive.Link
+const NavigationMenuLink = NavigationMenuPrimitive.Link;
 
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
@@ -34109,15 +35848,15 @@ const NavigationMenuViewport = React.forwardRef<
     <NavigationMenuPrimitive.Viewport
       className={cn(
         "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
-        className
+        className,
       )}
       ref={ref}
       {...props}
     />
   </div>
-))
+));
 NavigationMenuViewport.displayName =
-  NavigationMenuPrimitive.Viewport.displayName
+  NavigationMenuPrimitive.Viewport.displayName;
 
 const NavigationMenuIndicator = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Indicator>,
@@ -34127,15 +35866,15 @@ const NavigationMenuIndicator = React.forwardRef<
     ref={ref}
     className={cn(
       "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in",
-      className
+      className,
     )}
     {...props}
   >
     <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
   </NavigationMenuPrimitive.Indicator>
-))
+));
 NavigationMenuIndicator.displayName =
-  NavigationMenuPrimitive.Indicator.displayName
+  NavigationMenuPrimitive.Indicator.displayName;
 
 export {
   navigationMenuTriggerStyle,
@@ -34147,7 +35886,7 @@ export {
   NavigationMenuLink,
   NavigationMenuIndicator,
   NavigationMenuViewport,
-}
+};
 
 ```
 
@@ -34156,11 +35895,11 @@ export {
 ### 📄 文件: `src\components\ui\pagination.tsx`
 
 ```
-import * as React from "react"
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
+import * as React from "react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { ButtonProps, buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { ButtonProps, buttonVariants } from "@/components/ui/button";
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
@@ -34169,8 +35908,8 @@ const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
     className={cn("mx-auto flex w-full justify-center", className)}
     {...props}
   />
-)
-Pagination.displayName = "Pagination"
+);
+Pagination.displayName = "Pagination";
 
 const PaginationContent = React.forwardRef<
   HTMLUListElement,
@@ -34181,21 +35920,21 @@ const PaginationContent = React.forwardRef<
     className={cn("flex flex-row items-center gap-1", className)}
     {...props}
   />
-))
-PaginationContent.displayName = "PaginationContent"
+));
+PaginationContent.displayName = "PaginationContent";
 
 const PaginationItem = React.forwardRef<
   HTMLLIElement,
   React.ComponentProps<"li">
 >(({ className, ...props }, ref) => (
   <li ref={ref} className={cn("", className)} {...props} />
-))
-PaginationItem.displayName = "PaginationItem"
+));
+PaginationItem.displayName = "PaginationItem";
 
 type PaginationLinkProps = {
-  isActive?: boolean
+  isActive?: boolean;
 } & Pick<ButtonProps, "size"> &
-  React.ComponentProps<"a">
+  React.ComponentProps<"a">;
 
 const PaginationLink = ({
   className,
@@ -34210,12 +35949,12 @@ const PaginationLink = ({
         variant: isActive ? "outline" : "ghost",
         size,
       }),
-      className
+      className,
     )}
     {...props}
   />
-)
-PaginationLink.displayName = "PaginationLink"
+);
+PaginationLink.displayName = "PaginationLink";
 
 const PaginationPrevious = ({
   className,
@@ -34230,8 +35969,8 @@ const PaginationPrevious = ({
     <ChevronLeft className="h-4 w-4" />
     <span>Previous</span>
   </PaginationLink>
-)
-PaginationPrevious.displayName = "PaginationPrevious"
+);
+PaginationPrevious.displayName = "PaginationPrevious";
 
 const PaginationNext = ({
   className,
@@ -34246,8 +35985,8 @@ const PaginationNext = ({
     <span>Next</span>
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
-)
-PaginationNext.displayName = "PaginationNext"
+);
+PaginationNext.displayName = "PaginationNext";
 
 const PaginationEllipsis = ({
   className,
@@ -34261,8 +36000,8 @@ const PaginationEllipsis = ({
     <MoreHorizontal className="h-4 w-4" />
     <span className="sr-only">More pages</span>
   </span>
-)
-PaginationEllipsis.displayName = "PaginationEllipsis"
+);
+PaginationEllipsis.displayName = "PaginationEllipsis";
 
 export {
   Pagination,
@@ -34272,7 +36011,7 @@ export {
   PaginationPrevious,
   PaginationNext,
   PaginationEllipsis,
-}
+};
 
 ```
 
@@ -34281,16 +36020,16 @@ export {
 ### 📄 文件: `src\components\ui\popover.tsx`
 
 ```
-import * as React from "react"
-import * as PopoverPrimitive from "@radix-ui/react-popover"
+import * as React from "react";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const Popover = PopoverPrimitive.Root
+const Popover = PopoverPrimitive.Root;
 
-const PopoverTrigger = PopoverPrimitive.Trigger
+const PopoverTrigger = PopoverPrimitive.Trigger;
 
-const PopoverAnchor = PopoverPrimitive.Anchor
+const PopoverAnchor = PopoverPrimitive.Anchor;
 
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
@@ -34303,15 +36042,15 @@ const PopoverContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         "z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-popover-content-transform-origin]",
-        className
+        className,
       )}
       {...props}
     />
   </PopoverPrimitive.Portal>
-))
-PopoverContent.displayName = PopoverPrimitive.Content.displayName
+));
+PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
 
 ```
 
@@ -34331,7 +36070,6 @@ import {
 } from "motion/react";
 
 import React, { useRef, useState } from "react";
-
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -34616,37 +36354,46 @@ export const NavbarButton = ({
 ### 📄 文件: `src\components\ui\resizable.tsx`
 
 ```
-import { GripVertical } from "lucide-react"
-import * as ResizablePrimitive from "react-resizable-panels"
+import { GripVertical } from "lucide-react";
+import { Group, Panel, Separator } from "react-resizable-panels";
+import type {
+  GroupProps,
+  PanelProps,
+  SeparatorProps,
+} from "react-resizable-panels";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const ResizablePanelGroup = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof ResizablePrimitive.PanelGroup>) => (
-  <ResizablePrimitive.PanelGroup
+const ResizablePanelGroup = ({ className, ...props }: GroupProps) => (
+  <Group
     className={cn(
-      "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
-      className
+      "flex h-full w-full data-[orientation=vertical]:flex-col",
+      className,
     )}
     {...props}
   />
-)
+);
 
-const ResizablePanel = ResizablePrimitive.Panel
+const ResizablePanel = ({ className, ...props }: PanelProps) => (
+  <Panel className={cn("overflow-hidden", className)} {...props} />
+);
 
 const ResizableHandle = ({
   withHandle,
   className,
   ...props
-}: React.ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> & {
-  withHandle?: boolean
-}) => (
-  <ResizablePrimitive.PanelResizeHandle
+}: SeparatorProps & { withHandle?: boolean }) => (
+  <Separator
     className={cn(
-      "relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:after:left-0 data-[panel-group-direction=vertical]:after:h-1 data-[panel-group-direction=vertical]:after:w-full data-[panel-group-direction=vertical]:after:-translate-y-1/2 data-[panel-group-direction=vertical]:after:translate-x-0 [&[data-panel-group-direction=vertical]>div]:rotate-90",
-      className
+      "relative flex w-px items-center justify-center bg-border",
+      "after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2",
+      "focus-visible:outline-none",
+      "data-[orientation=vertical]:h-px data-[orientation=vertical]:w-full",
+      "data-[orientation=vertical]:after:left-0 data-[orientation=vertical]:after:h-1",
+      "data-[orientation=vertical]:after:w-full data-[orientation=vertical]:after:-translate-y-1/2",
+      "data-[orientation=vertical]:after:translate-x-0",
+      "[&[data-orientation=vertical]>div]:rotate-90",
+      className,
     )}
     {...props}
   >
@@ -34655,10 +36402,10 @@ const ResizableHandle = ({
         <GripVertical className="h-2.5 w-2.5" />
       </div>
     )}
-  </ResizablePrimitive.PanelResizeHandle>
-)
+  </Separator>
+);
 
-export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
+export { ResizablePanelGroup, ResizablePanel, ResizableHandle };
 
 ```
 
@@ -34667,10 +36414,10 @@ export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
 ### 📄 文件: `src\components\ui\scroll-area.tsx`
 
 ```
-import * as React from "react"
-import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
+import * as React from "react";
+import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
@@ -34687,8 +36434,8 @@ const ScrollArea = React.forwardRef<
     <ScrollBar />
     <ScrollAreaPrimitive.Corner />
   </ScrollAreaPrimitive.Root>
-))
-ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
+));
+ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
 const ScrollBar = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
@@ -34703,16 +36450,16 @@ const ScrollBar = React.forwardRef<
         "h-full w-2.5 border-l border-l-transparent p-[1px]",
       orientation === "horizontal" &&
         "h-2.5 flex-col border-t border-t-transparent p-[1px]",
-      className
+      className,
     )}
     {...props}
   >
     <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />
   </ScrollAreaPrimitive.ScrollAreaScrollbar>
-))
-ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
+));
+ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
 
-export { ScrollArea, ScrollBar }
+export { ScrollArea, ScrollBar };
 
 ```
 
@@ -34721,17 +36468,17 @@ export { ScrollArea, ScrollBar }
 ### 📄 文件: `src\components\ui\select.tsx`
 
 ```
-import * as React from "react"
-import * as SelectPrimitive from "@radix-ui/react-select"
-import { Check, ChevronDown, ChevronUp } from "lucide-react"
+import * as React from "react";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const Select = SelectPrimitive.Root
+const Select = SelectPrimitive.Root;
 
-const SelectGroup = SelectPrimitive.Group
+const SelectGroup = SelectPrimitive.Group;
 
-const SelectValue = SelectPrimitive.Value
+const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
@@ -34741,7 +36488,7 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-      className
+      className,
     )}
     {...props}
   >
@@ -34750,8 +36497,8 @@ const SelectTrigger = React.forwardRef<
       <ChevronDown className="h-4 w-4 opacity-50" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
-))
-SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
+));
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 const SelectScrollUpButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
@@ -34761,14 +36508,14 @@ const SelectScrollUpButton = React.forwardRef<
     ref={ref}
     className={cn(
       "flex cursor-default items-center justify-center py-1",
-      className
+      className,
     )}
     {...props}
   >
     <ChevronUp className="h-4 w-4" />
   </SelectPrimitive.ScrollUpButton>
-))
-SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
+));
+SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
 
 const SelectScrollDownButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
@@ -34778,15 +36525,15 @@ const SelectScrollDownButton = React.forwardRef<
     ref={ref}
     className={cn(
       "flex cursor-default items-center justify-center py-1",
-      className
+      className,
     )}
     {...props}
   >
     <ChevronDown className="h-4 w-4" />
   </SelectPrimitive.ScrollDownButton>
-))
+));
 SelectScrollDownButton.displayName =
-  SelectPrimitive.ScrollDownButton.displayName
+  SelectPrimitive.ScrollDownButton.displayName;
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
@@ -34799,7 +36546,7 @@ const SelectContent = React.forwardRef<
         "relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-        className
+        className,
       )}
       position={position}
       {...props}
@@ -34809,7 +36556,7 @@ const SelectContent = React.forwardRef<
         className={cn(
           "p-1",
           position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
         )}
       >
         {children}
@@ -34817,8 +36564,8 @@ const SelectContent = React.forwardRef<
       <SelectScrollDownButton />
     </SelectPrimitive.Content>
   </SelectPrimitive.Portal>
-))
-SelectContent.displayName = SelectPrimitive.Content.displayName
+));
+SelectContent.displayName = SelectPrimitive.Content.displayName;
 
 const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
@@ -34829,8 +36576,8 @@ const SelectLabel = React.forwardRef<
     className={cn("px-2 py-1.5 text-sm font-semibold", className)}
     {...props}
   />
-))
-SelectLabel.displayName = SelectPrimitive.Label.displayName
+));
+SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
@@ -34840,7 +36587,7 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     {...props}
   >
@@ -34851,8 +36598,8 @@ const SelectItem = React.forwardRef<
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
-))
-SelectItem.displayName = SelectPrimitive.Item.displayName
+));
+SelectItem.displayName = SelectPrimitive.Item.displayName;
 
 const SelectSeparator = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Separator>,
@@ -34863,8 +36610,8 @@ const SelectSeparator = React.forwardRef<
     className={cn("-mx-1 my-1 h-px bg-muted", className)}
     {...props}
   />
-))
-SelectSeparator.displayName = SelectPrimitive.Separator.displayName
+));
+SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
 export {
   Select,
@@ -34877,7 +36624,7 @@ export {
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
-}
+};
 
 ```
 
@@ -34886,10 +36633,10 @@ export {
 ### 📄 文件: `src\components\ui\separator.tsx`
 
 ```
-import * as React from "react"
-import * as SeparatorPrimitive from "@radix-ui/react-separator"
+import * as React from "react";
+import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Separator = React.forwardRef<
   React.ElementRef<typeof SeparatorPrimitive.Root>,
@@ -34897,7 +36644,7 @@ const Separator = React.forwardRef<
 >(
   (
     { className, orientation = "horizontal", decorative = true, ...props },
-    ref
+    ref,
   ) => (
     <SeparatorPrimitive.Root
       ref={ref}
@@ -34906,15 +36653,15 @@ const Separator = React.forwardRef<
       className={cn(
         "shrink-0 bg-border",
         orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
-        className
+        className,
       )}
       {...props}
     />
-  )
-)
-Separator.displayName = SeparatorPrimitive.Root.displayName
+  ),
+);
+Separator.displayName = SeparatorPrimitive.Root.displayName;
 
-export { Separator }
+export { Separator };
 
 ```
 
@@ -34923,20 +36670,20 @@ export { Separator }
 ### 📄 文件: `src\components\ui\sheet.tsx`
 
 ```
-import * as React from "react"
-import * as SheetPrimitive from "@radix-ui/react-dialog"
-import { cva, type VariantProps } from "class-variance-authority"
-import { X } from "lucide-react"
+import * as React from "react";
+import * as SheetPrimitive from "@radix-ui/react-dialog";
+import { cva, type VariantProps } from "class-variance-authority";
+import { X } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const Sheet = SheetPrimitive.Root
+const Sheet = SheetPrimitive.Root;
 
-const SheetTrigger = SheetPrimitive.Trigger
+const SheetTrigger = SheetPrimitive.Trigger;
 
-const SheetClose = SheetPrimitive.Close
+const SheetClose = SheetPrimitive.Close;
 
-const SheetPortal = SheetPrimitive.Portal
+const SheetPortal = SheetPrimitive.Portal;
 
 const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
@@ -34945,13 +36692,13 @@ const SheetOverlay = React.forwardRef<
   <SheetPrimitive.Overlay
     className={cn(
       "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
+      className,
     )}
     {...props}
     ref={ref}
   />
-))
-SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
+));
+SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -34969,11 +36716,12 @@ const sheetVariants = cva(
     defaultVariants: {
       side: "right",
     },
-  }
-)
+  },
+);
 
 interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
+  extends
+    React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {}
 
 const SheetContent = React.forwardRef<
@@ -34994,8 +36742,8 @@ const SheetContent = React.forwardRef<
       {children}
     </SheetPrimitive.Content>
   </SheetPortal>
-))
-SheetContent.displayName = SheetPrimitive.Content.displayName
+));
+SheetContent.displayName = SheetPrimitive.Content.displayName;
 
 const SheetHeader = ({
   className,
@@ -35004,12 +36752,12 @@ const SheetHeader = ({
   <div
     className={cn(
       "flex flex-col space-y-2 text-center sm:text-left",
-      className
+      className,
     )}
     {...props}
   />
-)
-SheetHeader.displayName = "SheetHeader"
+);
+SheetHeader.displayName = "SheetHeader";
 
 const SheetFooter = ({
   className,
@@ -35018,12 +36766,12 @@ const SheetFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
+      className,
     )}
     {...props}
   />
-)
-SheetFooter.displayName = "SheetFooter"
+);
+SheetFooter.displayName = "SheetFooter";
 
 const SheetTitle = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
@@ -35034,8 +36782,8 @@ const SheetTitle = React.forwardRef<
     className={cn("text-lg font-semibold text-foreground", className)}
     {...props}
   />
-))
-SheetTitle.displayName = SheetPrimitive.Title.displayName
+));
+SheetTitle.displayName = SheetPrimitive.Title.displayName;
 
 const SheetDescription = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Description>,
@@ -35046,8 +36794,8 @@ const SheetDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-))
-SheetDescription.displayName = SheetPrimitive.Description.displayName
+));
+SheetDescription.displayName = SheetPrimitive.Description.displayName;
 
 export {
   Sheet,
@@ -35060,7 +36808,7 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-}
+};
 
 ```
 
@@ -35069,65 +36817,65 @@ export {
 ### 📄 文件: `src\components\ui\sidebar.tsx`
 
 ```
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { PanelLeft } from "lucide-react";
 
-import { useIsMobile } from "@/hooks/use-mobile"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state"
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3rem"
-const SIDEBAR_KEYBOARD_SHORTCUT = "b"
+const SIDEBAR_COOKIE_NAME = "sidebar_state";
+const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
+const SIDEBAR_WIDTH = "16rem";
+const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH_ICON = "3rem";
+const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
 type SidebarContextProps = {
-  state: "expanded" | "collapsed"
-  open: boolean
-  setOpen: (open: boolean) => void
-  openMobile: boolean
-  setOpenMobile: (open: boolean) => void
-  isMobile: boolean
-  toggleSidebar: () => void
-}
+  state: "expanded" | "collapsed";
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  openMobile: boolean;
+  setOpenMobile: (open: boolean) => void;
+  isMobile: boolean;
+  toggleSidebar: () => void;
+};
 
-const SidebarContext = React.createContext<SidebarContextProps | null>(null)
+const SidebarContext = React.createContext<SidebarContextProps | null>(null);
 
 function useSidebar() {
-  const context = React.useContext(SidebarContext)
+  const context = React.useContext(SidebarContext);
   if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider.")
+    throw new Error("useSidebar must be used within a SidebarProvider.");
   }
 
-  return context
+  return context;
 }
 
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    defaultOpen?: boolean
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
+    defaultOpen?: boolean;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
   }
 >(
   (
@@ -35140,36 +36888,36 @@ const SidebarProvider = React.forwardRef<
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const isMobile = useIsMobile()
-    const [openMobile, setOpenMobile] = React.useState(false)
+    const isMobile = useIsMobile();
+    const [openMobile, setOpenMobile] = React.useState(false);
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen)
-    const open = openProp ?? _open
+    const [_open, _setOpen] = React.useState(defaultOpen);
+    const open = openProp ?? _open;
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
-        const openState = typeof value === "function" ? value(open) : value
+        const openState = typeof value === "function" ? value(open) : value;
         if (setOpenProp) {
-          setOpenProp(openState)
+          setOpenProp(openState);
         } else {
-          _setOpen(openState)
+          _setOpen(openState);
         }
 
         // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
       },
-      [setOpenProp, open]
-    )
+      [setOpenProp, open],
+    );
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
       return isMobile
         ? setOpenMobile((open) => !open)
-        : setOpen((open) => !open)
-    }, [isMobile, setOpen, setOpenMobile])
+        : setOpen((open) => !open);
+    }, [isMobile, setOpen, setOpenMobile]);
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -35178,18 +36926,18 @@ const SidebarProvider = React.forwardRef<
           event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
           (event.metaKey || event.ctrlKey)
         ) {
-          event.preventDefault()
-          toggleSidebar()
+          event.preventDefault();
+          toggleSidebar();
         }
-      }
+      };
 
-      window.addEventListener("keydown", handleKeyDown)
-      return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [toggleSidebar])
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [toggleSidebar]);
 
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.
-    const state = open ? "expanded" : "collapsed"
+    const state = open ? "expanded" : "collapsed";
 
     const contextValue = React.useMemo<SidebarContextProps>(
       () => ({
@@ -35201,8 +36949,16 @@ const SidebarProvider = React.forwardRef<
         setOpenMobile,
         toggleSidebar,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
-    )
+      [
+        state,
+        open,
+        setOpen,
+        isMobile,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar,
+      ],
+    );
 
     return (
       <SidebarContext.Provider value={contextValue}>
@@ -35217,7 +36973,7 @@ const SidebarProvider = React.forwardRef<
             }
             className={cn(
               "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
-              className
+              className,
             )}
             ref={ref}
             {...props}
@@ -35226,17 +36982,17 @@ const SidebarProvider = React.forwardRef<
           </div>
         </TooltipProvider>
       </SidebarContext.Provider>
-    )
-  }
-)
-SidebarProvider.displayName = "SidebarProvider"
+    );
+  },
+);
+SidebarProvider.displayName = "SidebarProvider";
 
 const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    side?: "left" | "right"
-    variant?: "sidebar" | "floating" | "inset"
-    collapsible?: "offcanvas" | "icon" | "none"
+    side?: "left" | "right";
+    variant?: "sidebar" | "floating" | "inset";
+    collapsible?: "offcanvas" | "icon" | "none";
   }
 >(
   (
@@ -35248,23 +37004,23 @@ const Sidebar = React.forwardRef<
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
     if (collapsible === "none") {
       return (
         <div
           className={cn(
             "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
-            className
+            className,
           )}
           ref={ref}
           {...props}
         >
           {children}
         </div>
-      )
+      );
     }
 
     if (isMobile) {
@@ -35288,7 +37044,7 @@ const Sidebar = React.forwardRef<
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
         </Sheet>
-      )
+      );
     }
 
     return (
@@ -35308,7 +37064,7 @@ const Sidebar = React.forwardRef<
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
               ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
-              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
+              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]",
           )}
         />
         <div
@@ -35321,7 +37077,7 @@ const Sidebar = React.forwardRef<
             variant === "floating" || variant === "inset"
               ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
-            className
+            className,
           )}
           {...props}
         >
@@ -35333,16 +37089,16 @@ const Sidebar = React.forwardRef<
           </div>
         </div>
       </div>
-    )
-  }
-)
-Sidebar.displayName = "Sidebar"
+    );
+  },
+);
+Sidebar.displayName = "Sidebar";
 
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar } = useSidebar();
 
   return (
     <Button
@@ -35352,23 +37108,23 @@ const SidebarTrigger = React.forwardRef<
       size="icon"
       className={cn("h-7 w-7", className)}
       onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
+        onClick?.(event);
+        toggleSidebar();
       }}
       {...props}
     >
       <PanelLeft />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
-  )
-})
-SidebarTrigger.displayName = "SidebarTrigger"
+  );
+});
+SidebarTrigger.displayName = "SidebarTrigger";
 
 const SidebarRail = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button">
 >(({ className, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar } = useSidebar();
 
   return (
     <button
@@ -35385,13 +37141,13 @@ const SidebarRail = React.forwardRef<
         "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar",
         "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
         "[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-SidebarRail.displayName = "SidebarRail"
+  );
+});
+SidebarRail.displayName = "SidebarRail";
 
 const SidebarInset = React.forwardRef<
   HTMLDivElement,
@@ -35403,13 +37159,13 @@ const SidebarInset = React.forwardRef<
       className={cn(
         "relative flex w-full flex-1 flex-col bg-background",
         "md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-SidebarInset.displayName = "SidebarInset"
+  );
+});
+SidebarInset.displayName = "SidebarInset";
 
 const SidebarInput = React.forwardRef<
   React.ElementRef<typeof Input>,
@@ -35421,13 +37177,13 @@ const SidebarInput = React.forwardRef<
       data-sidebar="input"
       className={cn(
         "h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-SidebarInput.displayName = "SidebarInput"
+  );
+});
+SidebarInput.displayName = "SidebarInput";
 
 const SidebarHeader = React.forwardRef<
   HTMLDivElement,
@@ -35440,9 +37196,9 @@ const SidebarHeader = React.forwardRef<
       className={cn("flex flex-col gap-2 p-2", className)}
       {...props}
     />
-  )
-})
-SidebarHeader.displayName = "SidebarHeader"
+  );
+});
+SidebarHeader.displayName = "SidebarHeader";
 
 const SidebarFooter = React.forwardRef<
   HTMLDivElement,
@@ -35455,9 +37211,9 @@ const SidebarFooter = React.forwardRef<
       className={cn("flex flex-col gap-2 p-2", className)}
       {...props}
     />
-  )
-})
-SidebarFooter.displayName = "SidebarFooter"
+  );
+});
+SidebarFooter.displayName = "SidebarFooter";
 
 const SidebarSeparator = React.forwardRef<
   React.ElementRef<typeof Separator>,
@@ -35470,9 +37226,9 @@ const SidebarSeparator = React.forwardRef<
       className={cn("mx-2 w-auto bg-sidebar-border", className)}
       {...props}
     />
-  )
-})
-SidebarSeparator.displayName = "SidebarSeparator"
+  );
+});
+SidebarSeparator.displayName = "SidebarSeparator";
 
 const SidebarContent = React.forwardRef<
   HTMLDivElement,
@@ -35484,13 +37240,13 @@ const SidebarContent = React.forwardRef<
       data-sidebar="content"
       className={cn(
         "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-SidebarContent.displayName = "SidebarContent"
+  );
+});
+SidebarContent.displayName = "SidebarContent";
 
 const SidebarGroup = React.forwardRef<
   HTMLDivElement,
@@ -35503,15 +37259,15 @@ const SidebarGroup = React.forwardRef<
       className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
       {...props}
     />
-  )
-})
-SidebarGroup.displayName = "SidebarGroup"
+  );
+});
+SidebarGroup.displayName = "SidebarGroup";
 
 const SidebarGroupLabel = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & { asChild?: boolean }
 >(({ className, asChild = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : "div"
+  const Comp = asChild ? Slot : "div";
 
   return (
     <Comp
@@ -35520,19 +37276,19 @@ const SidebarGroupLabel = React.forwardRef<
       className={cn(
         "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-SidebarGroupLabel.displayName = "SidebarGroupLabel"
+  );
+});
+SidebarGroupLabel.displayName = "SidebarGroupLabel";
 
 const SidebarGroupAction = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button"> & { asChild?: boolean }
 >(({ className, asChild = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -35543,13 +37299,13 @@ const SidebarGroupAction = React.forwardRef<
         // Increases the hit area of the button on mobile.
         "after:absolute after:-inset-2 after:md:hidden",
         "group-data-[collapsible=icon]:hidden",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-SidebarGroupAction.displayName = "SidebarGroupAction"
+  );
+});
+SidebarGroupAction.displayName = "SidebarGroupAction";
 
 const SidebarGroupContent = React.forwardRef<
   HTMLDivElement,
@@ -35561,8 +37317,8 @@ const SidebarGroupContent = React.forwardRef<
     className={cn("w-full text-sm", className)}
     {...props}
   />
-))
-SidebarGroupContent.displayName = "SidebarGroupContent"
+));
+SidebarGroupContent.displayName = "SidebarGroupContent";
 
 const SidebarMenu = React.forwardRef<
   HTMLUListElement,
@@ -35574,8 +37330,8 @@ const SidebarMenu = React.forwardRef<
     className={cn("flex w-full min-w-0 flex-col gap-1", className)}
     {...props}
   />
-))
-SidebarMenu.displayName = "SidebarMenu"
+));
+SidebarMenu.displayName = "SidebarMenu";
 
 const SidebarMenuItem = React.forwardRef<
   HTMLLIElement,
@@ -35587,8 +37343,8 @@ const SidebarMenuItem = React.forwardRef<
     className={cn("group/menu-item relative", className)}
     {...props}
   />
-))
-SidebarMenuItem.displayName = "SidebarMenuItem"
+));
+SidebarMenuItem.displayName = "SidebarMenuItem";
 
 const sidebarMenuButtonVariants = cva(
   "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
@@ -35609,15 +37365,15 @@ const sidebarMenuButtonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
-)
+  },
+);
 
 const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button"> & {
-    asChild?: boolean
-    isActive?: boolean
-    tooltip?: string | React.ComponentProps<typeof TooltipContent>
+    asChild?: boolean;
+    isActive?: boolean;
+    tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(
   (
@@ -35630,10 +37386,10 @@ const SidebarMenuButton = React.forwardRef<
       className,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const Comp = asChild ? Slot : "button"
-    const { isMobile, state } = useSidebar()
+    const Comp = asChild ? Slot : "button";
+    const { isMobile, state } = useSidebar();
 
     const button = (
       <Comp
@@ -35644,16 +37400,16 @@ const SidebarMenuButton = React.forwardRef<
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
       />
-    )
+    );
 
     if (!tooltip) {
-      return button
+      return button;
     }
 
     if (typeof tooltip === "string") {
       tooltip = {
         children: tooltip,
-      }
+      };
     }
 
     return (
@@ -35666,19 +37422,19 @@ const SidebarMenuButton = React.forwardRef<
           {...tooltip}
         />
       </Tooltip>
-    )
-  }
-)
-SidebarMenuButton.displayName = "SidebarMenuButton"
+    );
+  },
+);
+SidebarMenuButton.displayName = "SidebarMenuButton";
 
 const SidebarMenuAction = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button"> & {
-    asChild?: boolean
-    showOnHover?: boolean
+    asChild?: boolean;
+    showOnHover?: boolean;
   }
 >(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -35694,13 +37450,13 @@ const SidebarMenuAction = React.forwardRef<
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
           "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-SidebarMenuAction.displayName = "SidebarMenuAction"
+  );
+});
+SidebarMenuAction.displayName = "SidebarMenuAction";
 
 const SidebarMenuBadge = React.forwardRef<
   HTMLDivElement,
@@ -35716,23 +37472,23 @@ const SidebarMenuBadge = React.forwardRef<
       "peer-data-[size=default]/menu-button:top-1.5",
       "peer-data-[size=lg]/menu-button:top-2.5",
       "group-data-[collapsible=icon]:hidden",
-      className
+      className,
     )}
     {...props}
   />
-))
-SidebarMenuBadge.displayName = "SidebarMenuBadge"
+));
+SidebarMenuBadge.displayName = "SidebarMenuBadge";
 
 const SidebarMenuSkeleton = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    showIcon?: boolean
+    showIcon?: boolean;
   }
 >(({ className, showIcon = false, ...props }, ref) => {
   // Random width between 50 to 90%.
   const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  }, [])
+    return `${Math.floor(Math.random() * 40) + 50}%`;
+  }, []);
 
   return (
     <div
@@ -35757,9 +37513,9 @@ const SidebarMenuSkeleton = React.forwardRef<
         }
       />
     </div>
-  )
-})
-SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton"
+  );
+});
+SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton";
 
 const SidebarMenuSub = React.forwardRef<
   HTMLUListElement,
@@ -35771,28 +37527,28 @@ const SidebarMenuSub = React.forwardRef<
     className={cn(
       "mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5",
       "group-data-[collapsible=icon]:hidden",
-      className
+      className,
     )}
     {...props}
   />
-))
-SidebarMenuSub.displayName = "SidebarMenuSub"
+));
+SidebarMenuSub.displayName = "SidebarMenuSub";
 
 const SidebarMenuSubItem = React.forwardRef<
   HTMLLIElement,
   React.ComponentProps<"li">
->(({ ...props }, ref) => <li ref={ref} {...props} />)
-SidebarMenuSubItem.displayName = "SidebarMenuSubItem"
+>(({ ...props }, ref) => <li ref={ref} {...props} />);
+SidebarMenuSubItem.displayName = "SidebarMenuSubItem";
 
 const SidebarMenuSubButton = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentProps<"a"> & {
-    asChild?: boolean
-    size?: "sm" | "md"
-    isActive?: boolean
+    asChild?: boolean;
+    size?: "sm" | "md";
+    isActive?: boolean;
   }
 >(({ asChild = false, size = "md", isActive, className, ...props }, ref) => {
-  const Comp = asChild ? Slot : "a"
+  const Comp = asChild ? Slot : "a";
 
   return (
     <Comp
@@ -35806,13 +37562,13 @@ const SidebarMenuSubButton = React.forwardRef<
         size === "sm" && "text-xs",
         size === "md" && "text-sm",
         "group-data-[collapsible=icon]:hidden",
-        className
+        className,
       )}
       {...props}
     />
-  )
-})
-SidebarMenuSubButton.displayName = "SidebarMenuSubButton"
+  );
+});
+SidebarMenuSubButton.displayName = "SidebarMenuSubButton";
 
 export {
   Sidebar,
@@ -35839,7 +37595,7 @@ export {
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
-}
+};
 
 ```
 
@@ -35848,7 +37604,7 @@ export {
 ### 📄 文件: `src\components\ui\skeleton.tsx`
 
 ```
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Skeleton({
   className,
@@ -35859,10 +37615,10 @@ function Skeleton({
       className={cn("animate-pulse rounded-md bg-primary/10", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Skeleton }
+export { Skeleton };
 
 ```
 
@@ -35871,10 +37627,10 @@ export { Skeleton }
 ### 📄 文件: `src\components\ui\slider.tsx`
 
 ```
-import * as React from "react"
-import * as SliderPrimitive from "@radix-ui/react-slider"
+import * as React from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -35884,7 +37640,7 @@ const Slider = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex w-full touch-none select-none items-center",
-      className
+      className,
     )}
     {...props}
   >
@@ -35893,10 +37649,10 @@ const Slider = React.forwardRef<
     </SliderPrimitive.Track>
     <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50" />
   </SliderPrimitive.Root>
-))
-Slider.displayName = SliderPrimitive.Root.displayName
+));
+Slider.displayName = SliderPrimitive.Root.displayName;
 
-export { Slider }
+export { Slider };
 
 ```
 
@@ -35905,13 +37661,13 @@ export { Slider }
 ### 📄 文件: `src\components\ui\sonner.tsx`
 
 ```
-import { useTheme } from "next-themes"
-import { Toaster as Sonner } from "sonner"
+import { useTheme } from "next-themes";
+import { Toaster as Sonner } from "sonner";
 
-type ToasterProps = React.ComponentProps<typeof Sonner>
+type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme = "system" } = useTheme();
 
   return (
     <Sonner
@@ -35931,10 +37687,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
+export { Toaster };
 
 ```
 
@@ -35943,9 +37699,9 @@ export { Toaster }
 ### 📄 文件: `src\components\ui\spinner.tsx`
 
 ```
-import { Loader2Icon } from "lucide-react"
+import { Loader2Icon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
   return (
@@ -35955,10 +37711,10 @@ function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
       className={cn("size-4 animate-spin", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Spinner }
+export { Spinner };
 
 ```
 
@@ -35968,173 +37724,110 @@ export { Spinner }
 
 ```
 "use client";
-import { cn } from "@/lib/utils";
-import React from "react";
-import { motion, AnimatePresence, useAnimate } from "motion/react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  className?: string;
-  children: React.ReactNode;
+import * as React from "react";
+import { Button as ShadcnButton, ButtonProps } from "@/components/ui/button";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader2, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface StatefulButtonProps extends Omit<ButtonProps, "onClick"> {
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => Promise<void> | void;
 }
 
-export const Button = ({ className, children, ...props }: ButtonProps) => {
-  const [scope, animate] = useAnimate();
+export function Button({
+  children,
+  onClick,
+  className,
+  variant = "ghost",
+  size = "icon",
+  ...props
+}: StatefulButtonProps) {
+  const [status, setStatus] = React.useState<"idle" | "loading" | "success">(
+    "idle",
+  );
 
-  const animateLoading = async () => {
-    await animate(
-      ".loader",
-      {
-        width: "20px",
-        scale: 1,
-        display: "block",
-      },
-      {
-        duration: 0.2,
-      },
-    );
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    // 如果没有传入 onClick，直接返回
+    if (!onClick) return;
+
+    // 如果正在处理中，阻止重复点击
+    if (status !== "idle") {
+      e.preventDefault();
+      return;
+    }
+
+    setStatus("loading");
+    try {
+      // ✨ 修复 3：调用 onClick 时把事件 e 传回去
+      await onClick(e);
+      setStatus("success");
+      setTimeout(() => {
+        setStatus("idle");
+      }, 1500);
+    } catch (error) {
+      console.error(error);
+      setStatus("idle");
+    }
   };
-
-  const animateSuccess = async () => {
-    await animate(
-      ".loader",
-      {
-        width: "0px",
-        scale: 0,
-        display: "none",
-      },
-      {
-        duration: 0.2,
-      },
-    );
-    await animate(
-      ".check",
-      {
-        width: "20px",
-        scale: 1,
-        display: "block",
-      },
-      {
-        duration: 0.2,
-      },
-    );
-
-    await animate(
-      ".check",
-      {
-        width: "0px",
-        scale: 0,
-        display: "none",
-      },
-      {
-        delay: 2,
-        duration: 0.2,
-      },
-    );
-  };
-
-  const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await animateLoading();
-    await props.onClick?.(event);
-    await animateSuccess();
-  };
-
-  const {
-    onClick,
-    onDrag,
-    onDragStart,
-    onDragEnd,
-    onAnimationStart,
-    onAnimationEnd,
-    ...buttonProps
-  } = props;
 
   return (
-    <motion.button
-      layout
-      layoutId="button"
-      ref={scope}
+    <ShadcnButton
+      variant={variant}
+      size={size}
       className={cn(
-        "flex min-w-[120px] cursor-pointer items-center justify-center gap-2 rounded-full bg-green-500 px-4 py-2 font-medium text-white ring-offset-2 transition duration-200 hover:ring-2 hover:ring-green-500 dark:ring-offset-black",
+        "relative transition-all",
+        status === "success" &&
+          "text-green-500 hover:text-green-600 hover:bg-green-500/10",
         className,
       )}
-      {...buttonProps}
       onClick={handleClick}
+      disabled={status === "loading"}
+      {...props}
     >
-      <motion.div layout className="flex items-center gap-2">
-        <Loader />
-        <CheckIcon />
-        <motion.span layout>{children}</motion.span>
-      </motion.div>
-    </motion.button>
-  );
-};
+      <AnimatePresence mode="popLayout" initial={false}>
+        {status === "idle" && (
+          <motion.span
+            key="idle"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center justify-center w-full h-full"
+          >
+            {children}
+          </motion.span>
+        )}
 
-const Loader = () => {
-  return (
-    <motion.svg
-      animate={{
-        rotate: [0, 360],
-      }}
-      initial={{
-        scale: 0,
-        width: 0,
-        display: "none",
-      }}
-      style={{
-        scale: 0.5,
-        display: "none",
-      }}
-      transition={{
-        duration: 0.3,
-        repeat: Infinity,
-        ease: "linear",
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="loader text-white"
-    >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 3a9 9 0 1 0 9 9" />
-    </motion.svg>
-  );
-};
+        {status === "loading" && (
+          <motion.span
+            key="loading"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </motion.span>
+        )}
 
-const CheckIcon = () => {
-  return (
-    <motion.svg
-      initial={{
-        scale: 0,
-        width: 0,
-        display: "none",
-      }}
-      style={{
-        scale: 0.5,
-        display: "none",
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="check text-white"
-    >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-      <path d="M9 12l2 2l4 -4" />
-    </motion.svg>
+        {status === "success" && (
+          <motion.span
+            key="success"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Check className="h-4 w-4" />
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </ShadcnButton>
   );
-};
+}
 
 ```
 
@@ -36143,10 +37836,10 @@ const CheckIcon = () => {
 ### 📄 文件: `src\components\ui\switch.tsx`
 
 ```
-import * as React from "react"
-import * as SwitchPrimitives from "@radix-ui/react-switch"
+import * as React from "react";
+import * as SwitchPrimitives from "@radix-ui/react-switch";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
@@ -36155,21 +37848,21 @@ const Switch = React.forwardRef<
   <SwitchPrimitives.Root
     className={cn(
       "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
-      className
+      className,
     )}
     {...props}
     ref={ref}
   >
     <SwitchPrimitives.Thumb
       className={cn(
-        "pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0"
+        "pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0",
       )}
     />
   </SwitchPrimitives.Root>
-))
-Switch.displayName = SwitchPrimitives.Root.displayName
+));
+Switch.displayName = SwitchPrimitives.Root.displayName;
 
-export { Switch }
+export { Switch };
 
 ```
 
@@ -36178,9 +37871,9 @@ export { Switch }
 ### 📄 文件: `src\components\ui\table.tsx`
 
 ```
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -36193,16 +37886,16 @@ const Table = React.forwardRef<
       {...props}
     />
   </div>
-))
-Table.displayName = "Table"
+));
+Table.displayName = "Table";
 
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
   <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
-))
-TableHeader.displayName = "TableHeader"
+));
+TableHeader.displayName = "TableHeader";
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
@@ -36213,8 +37906,8 @@ const TableBody = React.forwardRef<
     className={cn("[&_tr:last-child]:border-0", className)}
     {...props}
   />
-))
-TableBody.displayName = "TableBody"
+));
+TableBody.displayName = "TableBody";
 
 const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
@@ -36224,12 +37917,12 @@ const TableFooter = React.forwardRef<
     ref={ref}
     className={cn(
       "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-      className
+      className,
     )}
     {...props}
   />
-))
-TableFooter.displayName = "TableFooter"
+));
+TableFooter.displayName = "TableFooter";
 
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
@@ -36239,12 +37932,12 @@ const TableRow = React.forwardRef<
     ref={ref}
     className={cn(
       "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-      className
+      className,
     )}
     {...props}
   />
-))
-TableRow.displayName = "TableRow"
+));
+TableRow.displayName = "TableRow";
 
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
@@ -36254,12 +37947,12 @@ const TableHead = React.forwardRef<
     ref={ref}
     className={cn(
       "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-      className
+      className,
     )}
     {...props}
   />
-))
-TableHead.displayName = "TableHead"
+));
+TableHead.displayName = "TableHead";
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
@@ -36269,12 +37962,12 @@ const TableCell = React.forwardRef<
     ref={ref}
     className={cn(
       "p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-      className
+      className,
     )}
     {...props}
   />
-))
-TableCell.displayName = "TableCell"
+));
+TableCell.displayName = "TableCell";
 
 const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
@@ -36285,8 +37978,8 @@ const TableCaption = React.forwardRef<
     className={cn("mt-4 text-sm text-muted-foreground", className)}
     {...props}
   />
-))
-TableCaption.displayName = "TableCaption"
+));
+TableCaption.displayName = "TableCaption";
 
 export {
   Table,
@@ -36297,7 +37990,7 @@ export {
   TableRow,
   TableCell,
   TableCaption,
-}
+};
 
 ```
 
@@ -36306,12 +37999,12 @@ export {
 ### 📄 文件: `src\components\ui\tabs.tsx`
 
 ```
-import * as React from "react"
-import * as TabsPrimitive from "@radix-ui/react-tabs"
+import * as React from "react";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const Tabs = TabsPrimitive.Root
+const Tabs = TabsPrimitive.Root;
 
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
@@ -36321,12 +38014,12 @@ const TabsList = React.forwardRef<
     ref={ref}
     className={cn(
       "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
-      className
+      className,
     )}
     {...props}
   />
-))
-TabsList.displayName = TabsPrimitive.List.displayName
+));
+TabsList.displayName = TabsPrimitive.List.displayName;
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
@@ -36336,12 +38029,12 @@ const TabsTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow",
-      className
+      className,
     )}
     {...props}
   />
-))
-TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
+));
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
 const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
@@ -36351,14 +38044,14 @@ const TabsContent = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      className
+      className,
     )}
     {...props}
   />
-))
-TabsContent.displayName = TabsPrimitive.Content.displayName
+));
+TabsContent.displayName = TabsPrimitive.Content.displayName;
 
-export { Tabs, TabsList, TabsTrigger, TabsContent }
+export { Tabs, TabsList, TabsTrigger, TabsContent };
 
 ```
 
@@ -36367,9 +38060,9 @@ export { Tabs, TabsList, TabsTrigger, TabsContent }
 ### 📄 文件: `src\components\ui\textarea.tsx`
 
 ```
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Textarea = React.forwardRef<
   HTMLTextAreaElement,
@@ -36379,16 +38072,16 @@ const Textarea = React.forwardRef<
     <textarea
       className={cn(
         "flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className
+        className,
       )}
       ref={ref}
       {...props}
     />
-  )
-})
-Textarea.displayName = "Textarea"
+  );
+});
+Textarea.displayName = "Textarea";
 
-export { Textarea }
+export { Textarea };
 
 ```
 
@@ -36397,11 +38090,11 @@ export { Textarea }
 ### 📄 文件: `src\components\ui\toggle.tsx`
 
 ```
-import * as React from "react"
-import * as TogglePrimitive from "@radix-ui/react-toggle"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import * as TogglePrimitive from "@radix-ui/react-toggle";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const toggleVariants = cva(
   "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -36422,8 +38115,8 @@ const toggleVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
-)
+  },
+);
 
 const Toggle = React.forwardRef<
   React.ElementRef<typeof TogglePrimitive.Root>,
@@ -36435,11 +38128,11 @@ const Toggle = React.forwardRef<
     className={cn(toggleVariants({ variant, size, className }))}
     {...props}
   />
-))
+));
 
-Toggle.displayName = TogglePrimitive.Root.displayName
+Toggle.displayName = TogglePrimitive.Root.displayName;
 
-export { Toggle, toggleVariants }
+export { Toggle, toggleVariants };
 
 ```
 
@@ -36448,16 +38141,16 @@ export { Toggle, toggleVariants }
 ### 📄 文件: `src\components\ui\tooltip.tsx`
 
 ```
-import * as React from "react"
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import * as React from "react";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const TooltipProvider = TooltipPrimitive.Provider
+const TooltipProvider = TooltipPrimitive.Provider;
 
-const Tooltip = TooltipPrimitive.Root
+const Tooltip = TooltipPrimitive.Root;
 
-const TooltipTrigger = TooltipPrimitive.Trigger
+const TooltipTrigger = TooltipPrimitive.Trigger;
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
@@ -36469,15 +38162,15 @@ const TooltipContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         "z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-tooltip-content-transform-origin]",
-        className
+        className,
       )}
       {...props}
     />
   </TooltipPrimitive.Portal>
-))
-TooltipContent.displayName = TooltipPrimitive.Content.displayName
+));
+TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
 
 ```
 
@@ -36486,26 +38179,89 @@ export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
 ### 📄 文件: `src\hooks\use-mobile.tsx`
 
 ```
-import * as React from "react"
+import * as React from "react";
 
-const MOBILE_BREAKPOINT = 768
+const MOBILE_BREAKPOINT = 768;
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(
+    undefined,
+  );
 
   React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
     const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+    mql.addEventListener("change", onChange);
+    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
-  return !!isMobile
+  return !!isMobile;
 }
 
+```
+
+---
+
+### 📄 文件: `src\hooks\useActiveWallpapers.ts`
+
+```typescript
+// src/hooks/useActiveWallpapers.ts
+import { useState, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+
+export interface ActiveWallpaper {
+  screen: string;
+  wallpaperId: string;
+}
+
+export function useActiveWallpapers() {
+  const [activeWallpapers, setActiveWallpapers] = useState<Map<string, string>>(
+    new Map(),
+  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchActiveWallpapers = async () => {
+      try {
+        const result = await invoke<Record<string, string>>(
+          "get_active_wallpapers",
+        );
+        setActiveWallpapers(new Map(Object.entries(result)));
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Failed to get active wallpapers:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchActiveWallpapers();
+
+    // Also listen for performance updates to refresh the wallpaper info
+    const setupListener = async () => {
+      const unlisten = await listen("performance-update", () => {
+        fetchActiveWallpapers();
+      });
+      return unlisten;
+    };
+
+    let unlisten: (() => void) | null = null;
+    setupListener().then((fn) => {
+      unlisten = fn;
+    });
+
+    return () => {
+      if (unlisten) {
+        unlisten();
+      }
+    };
+  }, []);
+
+  return { activeWallpapers, isLoading };
+}
 ```
 
 ---
@@ -36515,135 +38271,209 @@ export function useIsMobile() {
 ```typescript
 // src/hooks/useSystemStats.ts
 import { useState, useEffect } from "react";
+import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
 import {
   SystemStats,
   ScreenshotRecord,
+  ProcessStats,
   ChartDataPoint,
 } from "@/types/performance";
+
+interface RawPerformanceEvent {
+  total_cpu: number;
+  total_memory_mb: number;
+  total_threads: number;
+  processes?: {
+    [key: string]: RawProcessStats;
+  };
+  timestamp?: number;
+  cpu_cores?: number;
+  total_memory_gb?: number;
+  process_count?: number;
+}
+
+interface RawProcessStats {
+  pid: number;
+  name: string;
+  cmd: string;
+  status: string;
+  cpu: number;
+  memory_mb: number;
+  threads: number;
+  cpu_history?: number[];
+  mem_history?: number[];
+  thread_names?: string[];
+}
+
+const HISTORY_SIZE = 60;
+
+function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
+  const createDefaultProcess = (name: string): ProcessStats => ({
+    pid: 0,
+    name,
+    cmd: "N/A",
+    status: "Sleeping",
+    cpu: 0,
+    mem: 0,
+    cpuHistory: [],
+    memHistory: [],
+    threads: [],
+  });
+
+  // Transform flat number array to ChartDataPoint[] with right-aligned data
+  // When data is not full, pad with null on the left so data appears on the right
+  const toChartData = (values: number[] | undefined): ChartDataPoint[] => {
+    if (!values) return [];
+
+    const result: ChartDataPoint[] = [];
+    const dataLen = values.length;
+
+    // Pad left side with empty data so actual data appears on the right
+    for (let i = 0; i < HISTORY_SIZE - dataLen; i++) {
+      result.push({ time: "", value: 0 }); // Empty time label, zero value (won't show line)
+    }
+
+    // Add actual data with time labels
+    // values[0] = oldest, values[dataLen-1] = newest
+    // We want: oldest on left (larger time number), newest on right (smaller time number)
+    for (let i = 0; i < dataLen; i++) {
+      result.push({
+        time: `${dataLen - i}s`, // Newest (right) shows "1s", oldest shows "60s"
+        value: values[i],
+      });
+    }
+
+    return result;
+  };
+
+  const mapProcess = (
+    raw: RawProcessStats | undefined,
+    name: string,
+  ): ProcessStats => {
+    if (!raw) return createDefaultProcess(name);
+    return {
+      pid: raw.pid,
+      name: raw.name || name,
+      cmd: raw.cmd,
+      status: (raw.status || "Sleeping") as "Running" | "Sleeping" | "Idle",
+      cpu: raw.cpu,
+      mem: raw.memory_mb,
+      cpuHistory: toChartData(raw.cpu_history),
+      memHistory: toChartData(raw.mem_history),
+      threads: raw.thread_names || [],
+    };
+  };
+
+  const allProcesses = raw.processes || {};
+  const processValues = Object.values(allProcesses);
+
+  // System-level history aggregation with right alignment
+  const cpuHistory: ChartDataPoint[] = [];
+  const memHistory: ChartDataPoint[] = [];
+
+  // Calculate max history length among all processes
+  let maxDataLen = 0;
+  for (const p of processValues) {
+    if (p?.cpu_history) {
+      maxDataLen = Math.max(maxDataLen, p.cpu_history.length);
+    }
+  }
+  maxDataLen = Math.min(maxDataLen, HISTORY_SIZE);
+
+  // Pad left side
+  for (let i = 0; i < HISTORY_SIZE - maxDataLen; i++) {
+    cpuHistory.push({ time: "", value: 0 });
+    memHistory.push({ time: "", value: 0 });
+  }
+
+  // Add actual aggregated data
+  for (let i = 0; i < maxDataLen; i++) {
+    let totalCpu = 0;
+    let totalMem = 0;
+    for (const p of processValues) {
+      // Calculate offset: we want the newest data (highest index) to be at the end
+      const processLen = p?.cpu_history?.length || 0;
+      const idx = i - (maxDataLen - processLen);
+      if (idx >= 0 && idx < processLen) {
+        totalCpu += p.cpu_history?.[idx] || 0;
+        totalMem += p.mem_history?.[idx] || 0;
+      }
+    }
+    cpuHistory.push({ time: `${maxDataLen - i}s`, value: totalCpu });
+    memHistory.push({ time: `${maxDataLen - i}s`, value: totalMem });
+  }
+
+  return {
+    totalCpu: raw.total_cpu ?? 0,
+    totalMem: raw.total_memory_mb ?? 0,
+    activeThreads: raw.total_threads ?? 0,
+    cpuHistory,
+    memHistory,
+    processes: {
+      backend: mapProcess(raw.processes?.backend, "Backend"),
+      frontend: mapProcess(raw.processes?.frontend, "Frontend"),
+      tray: mapProcess(raw.processes?.tray, "Tray"),
+    },
+    cpuCores: raw.cpu_cores ?? 1,
+    totalMemoryGb: raw.total_memory_gb ?? 16,
+    processCount: raw.process_count ?? 1,
+  };
+}
 
 export function useSystemStats() {
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [history, setHistory] = useState<ScreenshotRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 初始数据生成器
-    const initData = (len: number): ChartDataPoint[] =>
-      Array.from({ length: len }, (_, i) => ({
-        time: `${len - i}s`,
-        value: 0,
-      }));
+    let unlistenPerformance: (() => void) | null = null;
 
-    // 初始化截图历史
-    setHistory([
-      {
-        id: 1,
-        name: "Cyberpunk City",
-        timestamp: "15:45:20",
-        duration: 1.2,
-        maxCpu: 45.2,
-        maxMem: 600.5,
-        path: "/tmp/s1.png",
-      },
-      {
-        id: 2,
-        name: "Ocean Waves",
-        timestamp: "14:20:10",
-        duration: 0.8,
-        maxCpu: 20.1,
-        maxMem: 450.2,
-        path: "/tmp/s2.png",
-      },
-    ]);
+    const setupMonitoring = async () => {
+      try {
+        await invoke("start_performance_monitor");
 
-    const timer = setInterval(() => {
-      setStats((prev) => {
-        const nowStr = "Now";
-
-        const updateArr = (
-          arr: ChartDataPoint[] | undefined,
-          val: number,
-          maxLen = 30,
-        ) => {
-          const current = arr || initData(maxLen);
-          // 移动时间轴标签 (简单模拟)
-          const shifted = current
-            .slice(1)
-            .map((p, i) => ({ ...p, time: `${maxLen - i}s` }));
-          return [...shifted, { time: nowStr, value: val }];
-        };
-
-        const newCpu = Math.random() * 30 + 5;
-        const newMem = Math.random() * 100 + 400;
-
-        return {
-          totalCpu: newCpu,
-          totalMem: newMem,
-          activeThreads: 31,
-          cpuHistory: updateArr(prev?.cpuHistory, newCpu),
-          memHistory: updateArr(prev?.memHistory, newMem),
-          processes: {
-            backend: {
-              pid: 2722,
-              name: "Backend",
-              cmd: "wallpaper-engine-backend",
-              status: "Running",
-              cpu: Math.random() * 15,
-              mem: 370 + Math.random() * 20,
-              cpuHistory: updateArr(
-                prev?.processes.backend.cpuHistory,
-                Math.random() * 15,
-              ),
-              memHistory: updateArr(
-                prev?.processes.backend.memHistory,
-                370 + Math.random() * 20,
-              ),
-              threads: [
-                "render-loop",
-                "video-decoder",
-                "audio-processor",
-                "ipc-worker",
-                "steam-callback",
-              ],
-            },
-            frontend: {
-              pid: 5459,
-              name: "Frontend",
-              cmd: "wallpaper-engine-gui",
-              status: "Sleeping",
-              cpu: Math.random() * 2,
-              mem: 360 + Math.random() * 10,
-              cpuHistory: updateArr(
-                prev?.processes.frontend.cpuHistory,
-                Math.random() * 2,
-              ),
-              memHistory: updateArr(
-                prev?.processes.frontend.memHistory,
-                360 + Math.random() * 10,
-              ),
-              threads: ["gui-main", "event-loop", "dbus-worker"],
-            },
-            tray: {
-              pid: 1233,
-              name: "Tray",
-              cmd: "wallpaper-tray",
-              status: "Running",
-              cpu: 0.1,
-              mem: 65,
-              cpuHistory: updateArr(prev?.processes.tray.cpuHistory, 0.1),
-              memHistory: updateArr(prev?.processes.tray.memHistory, 65),
-              threads: ["gtk-main"],
-            },
+        unlistenPerformance = await listen<RawPerformanceEvent>(
+          "performance-update",
+          (event) => {
+            const mappedStats = mapEventToStats(event.payload);
+            setStats(mappedStats);
+            setIsLoading(false);
           },
-        };
-      });
-    }, 1000);
+        );
 
-    return () => clearInterval(timer);
+        const screenshotHistory = await invoke<ScreenshotRecord[]>(
+          "get_screenshot_history",
+        );
+        setHistory(screenshotHistory);
+      } catch (error) {
+        console.error("Failed to setup performance monitoring:", error);
+        setIsLoading(false);
+      }
+    };
+
+    setupMonitoring();
+
+    return () => {
+      if (unlistenPerformance) {
+        unlistenPerformance();
+      }
+      invoke("stop_performance_monitor").catch((err) => {
+        console.error("Failed to stop performance monitor:", err);
+      });
+    };
   }, []);
 
-  const clearHistory = () => setHistory([]);
+  const clearHistory = async () => {
+    try {
+      await invoke("clear_screenshot_history");
+      setHistory([]);
+    } catch (error) {
+      console.error("Failed to clear history:", error);
+    }
+  };
 
-  return { stats, history, clearHistory };
+  return { stats, history, clearHistory, isLoading };
 }
 ```
 
@@ -36769,8 +38599,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <App />
       <Toaster />
     </ThemeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
+
 ```
 
 ---
@@ -36809,73 +38640,646 @@ export const MOCK_WALLPAPERS = Array.from({ length: 20 }).map((_, i) => {
 
 ---
 
+### 📄 文件: `src\pages\Compact.tsx`
+
+```
+import { useState, useMemo, useEffect } from "react";
+import {
+  Maximize2,
+  Shuffle,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Check,
+} from "lucide-react";
+import { AppMenu } from "@/components/AppMenu";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { WallpaperCard } from "@/components/WallpaperCard";
+import { useAppStore } from "@/store/appStore";
+import { cn } from "@/lib/utils"; // 引入 cn
+
+import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
+
+// ✨ 辅助函数：根据标签内容生成固定的颜色类名
+const getColorForTag = (tag: string) => {
+  const colors = [
+    "bg-blue-100 text-blue-700 hover:bg-blue-100/80 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+    "bg-green-100 text-green-700 hover:bg-green-100/80 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
+    "bg-purple-100 text-purple-700 hover:bg-purple-100/80 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+    "bg-pink-100 text-pink-700 hover:bg-pink-100/80 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800",
+    "bg-yellow-100 text-yellow-700 hover:bg-yellow-100/80 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+    "bg-indigo-100 text-indigo-700 hover:bg-indigo-100/80 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800",
+    "bg-red-100 text-red-700 hover:bg-red-100/80 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
+    "bg-orange-100 text-orange-700 hover:bg-orange-100/80 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
+    "bg-teal-100 text-teal-700 hover:bg-teal-100/80 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
+  ];
+
+  // 简单的哈希算法：计算字符串 ASCII 码之和
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash += tag.charCodeAt(i);
+  }
+
+  return colors[hash % colors.length];
+};
+
+export function CompactMode() {
+  const { wallpapers, selectedId, setSelectedId, toggleCompactMode } =
+    useAppStore();
+
+  const [isCopied, setIsCopied] = useState(false);
+  const [api, setApi] = useState<CarouselApi>();
+
+  const [inputValue, setInputValue] = useState("");
+
+  const currentWallpaper = useMemo(
+    () => wallpapers.find((w) => w.id === selectedId) || wallpapers[0],
+    [wallpapers, selectedId],
+  );
+
+  const currentIndex = useMemo(
+    () => wallpapers.findIndex((w) => w.id === selectedId) + 1,
+    [wallpapers, selectedId],
+  );
+
+  useEffect(() => {
+    setInputValue(currentIndex.toString());
+  }, [currentIndex]);
+
+  useEffect(() => {
+    if (!api) return;
+
+    const onSelect = () => {
+      const snapIndex = api.selectedScrollSnap();
+      const targetWp = wallpapers[snapIndex];
+
+      if (targetWp && targetWp.id !== selectedId) {
+        setSelectedId(targetWp.id);
+      }
+    };
+
+    api.on("select", onSelect);
+
+    const index = wallpapers.findIndex((w) => w.id === selectedId);
+    if (index !== -1 && api.selectedScrollSnap() !== index) {
+      setTimeout(() => api.scrollTo(index), 20);
+    }
+
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api, selectedId, wallpapers, setSelectedId]);
+
+  const handleSwitchToNormal = async () => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    if (!isTauri) {
+      console.warn("Detected non-Tauri environment. Skipping window resize.");
+      toggleCompactMode(false);
+      return;
+    }
+
+    try {
+      const appWindow = getCurrentWindow();
+      if (appWindow) {
+        await appWindow.setSize(new LogicalSize(1200, 800));
+      }
+      toggleCompactMode(false);
+    } catch (err) {
+      console.error("Failed to resize window:", err);
+      toggleCompactMode(false);
+    }
+  };
+
+  const handleNavigate = (direction: -1 | 1) => {
+    const currentIdx = wallpapers.findIndex((w) => w.id === selectedId);
+    if (currentIdx === -1) return;
+    let newIdx = currentIdx + direction;
+    if (newIdx < 0) newIdx = wallpapers.length - 1;
+    if (newIdx >= wallpapers.length) newIdx = 0;
+    setSelectedId(wallpapers[newIdx].id);
+  };
+
+  const handleLucky = () => {
+    const randomIdx = Math.floor(Math.random() * wallpapers.length);
+    setSelectedId(wallpapers[randomIdx].id);
+  };
+
+  const handleJumpToPage = () => {
+    const targetPage = parseInt(inputValue);
+    // 验证输入是否合法：必须是数字，且在 1 到 总数 之间
+    if (
+      !isNaN(targetPage) &&
+      targetPage >= 1 &&
+      targetPage <= wallpapers.length
+    ) {
+      const targetIndex = targetPage - 1;
+      setSelectedId(wallpapers[targetIndex].id);
+    } else {
+      // 如果输入非法（比如乱填或者超出范围），重置回当前页码
+      setInputValue(currentIndex.toString());
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleJumpToPage();
+      e.currentTarget.blur(); // 按回车后让输入框失去焦点
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-background text-foreground select-none">
+      {/* Navbar */}
+      <div className="flex items-center justify-between p-2 border-b bg-muted/20 drag-region">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 no-drag"
+          onClick={handleSwitchToNormal}
+        >
+          <Maximize2 className="h-4 w-4" />
+        </Button>
+
+        <div className="no-drag">
+          <Select defaultValue="all">
+            <SelectTrigger className="h-7 w-[110px] text-xs border-none bg-transparent shadow-none focus:ring-0">
+              <SelectValue placeholder="Screen" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Screens</SelectItem>
+              <SelectItem value="1">Display 1</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="no-drag">
+          <AppMenu />
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-4 flex flex-col items-center">
+          {/* Preview Image */}
+          <WallpaperCard
+            wp={currentWallpaper || wallpapers[0]}
+            isSelected={false}
+            onSelect={() => {}}
+            showTitle={false} // ❌ 隐藏标题（下方已有）
+            showIcons={true} // ✅ 显示图标（方便点收藏）
+            className="w-[200px] h-[200px] shadow-sm" // 自定义尺寸
+          >
+            {/* ✨ 利用 children 插入 Shuffle 按钮 */}
+            {/* 注意：因为父级有 pointer-events-none，这里按钮需要加 pointer-events-auto */}
+            {/* <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-auto">
+              <Button
+                size="icon"
+                variant="secondary"
+                className="rounded-full shadow-lg h-10 w-10"
+                onClick={(e) => {
+                  e.stopPropagation(); // 防止冒泡
+                  handleLucky();
+                }}
+              >
+                <Shuffle className="h-4 w-4" />
+              </Button>
+            </div> */}
+          </WallpaperCard>
+
+          {/* Title & ID */}
+          <div className="w-full text-center space-y-1">
+            <h3 className="font-bold text-lg leading-tight line-clamp-2 px-4">
+              {currentWallpaper?.title || "Select Wallpaper"}
+            </h3>
+            <div
+              className="inline-flex items-center gap-1 text-[10px] bg-muted px-2 py-0.5 rounded-full text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+              onClick={() => {
+                navigator.clipboard.writeText(currentWallpaper?.id || "");
+                setIsCopied(true);
+                setTimeout(() => setIsCopied(false), 1500);
+              }}
+            >
+              <span>{currentWallpaper?.id || "---"}</span>
+              {isCopied ? (
+                <Check className="h-3 w-3 text-green-500" />
+              ) : (
+                <Copy className="h-3 w-3" />
+              )}
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center gap-2 w-full px-4 justify-center">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={() => handleNavigate(-1)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            {/* ✨ 4. 可编辑的页码输入框 */}
+            <div className="flex items-center gap-1 bg-muted rounded-md px-2 h-8 font-mono">
+              <Input
+                // 去掉了 spinner 样式，使其看起来更像纯文本
+                className="h-6 w-10 p-0 text-center border-none bg-transparent focus-visible:ring-0 text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onBlur={handleJumpToPage} // 失去焦点时（点别处）也尝试跳转
+                onKeyDown={handleKeyDown} // 回车跳转
+              />
+              <span className="text-xs text-muted-foreground">
+                / {wallpapers.length}
+              </span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={() => handleNavigate(1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <Button
+            className="w-full font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
+            size="lg"
+          >
+            Apply Wallpaper
+          </Button>
+
+          <Separator />
+
+          {/* Tags & Type Grid */}
+          <div className="w-full grid grid-cols-2 gap-4">
+            {/* Left: Tags with Colors */}
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Tags
+              </div>
+              <div className="flex flex-wrap gap-1.5 content-start">
+                {currentWallpaper?.tags?.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="outline" // 使用 outline 配合自定义颜色
+                    // ✨ 动态计算颜色
+                    className={cn(
+                      "text-[10px] px-1.5 h-5 font-normal border shadow-sm",
+                      getColorForTag(tag),
+                    )}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+                {!currentWallpaper?.tags?.length && (
+                  <span className="text-[10px] text-muted-foreground italic">
+                    No tags
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Right: Type */}
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Type
+              </div>
+              <div className="flex flex-wrap content-start">
+                {/* 这里修改了 className */}
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] h-5 px-1.5 font-mono font-normal bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                >
+                  {currentWallpaper?.type || "Unknown"}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ScrollArea>
+
+      {/* Carousel */}
+      <div className="p-2 border-t bg-muted/10 relative group">
+        <Carousel
+          setApi={setApi}
+          opts={{ align: "center", loop: true }}
+          className="w-full max-w-full"
+        >
+          <CarouselContent className="-ml-1">
+            {wallpapers.map((wp, index) => (
+              <CarouselItem key={wp.id} className="pl-1 basis-1/5 select-none">
+                <div
+                  className={`
+                    aspect-square rounded-md overflow-hidden cursor-pointer transition-all border-2
+                    ${selectedId === wp.id ? "border-primary shadow-md scale-95" : "border-transparent opacity-60 hover:opacity-100"}
+                  `}
+                  onClick={() => api?.scrollTo(index)}
+                >
+                  {wp.preview ? (
+                    <img
+                      src={convertFileSrc(wp.preview)}
+                      alt={wp.title}
+                      className="w-full h-full object-cover"
+                      draggable={false}
+                    />
+                  ) : (
+                    <div className="bg-muted w-full h-full" />
+                  )}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-1 h-6 w-6 opacity-0 group-hover:opacity-70 transition-opacity hover:!opacity-100" />
+          <CarouselNext className="right-1 h-6 w-6 opacity-0 group-hover:opacity-70 transition-opacity hover:!opacity-100" />
+        </Carousel>
+      </div>
+    </div>
+  );
+}
+
+const convertFileSrc = (path: string) => path;
+
+```
+
+---
+
 ### 📄 文件: `src\pages\Library.tsx`
 
 ```
+// src/pages/Library.tsx
+import { useMemo, useCallback, useState, useRef, useEffect } from "react";
+import { AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+
+// Layout & UI Components
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty";
-import { WallpaperCard } from "@/components/library/WallpaperCard";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+
+// Custom Components
+import { LibraryHeader } from "@/components/library/LibraryHeader";
+import { WallpaperSidebar } from "@/components/library/WallpaperSidebar";
+import { WallpaperGrid } from "@/components/library/WallpaperGrid";
+import { LibraryPagination } from "@/components/library/LibraryPagination";
+
+// State & API
 import { useAppStore } from "@/store/appStore";
-import { useMemo, useCallback } from "react";
+import { applyWallpaper, stopWallpaper } from "@/api/wallpaper";
+
+const ITEMS_PER_PAGE = 24;
 
 export function Library() {
+  // Store State
   const wallpapers = useAppStore((state) => state.wallpapers);
   const searchQuery = useAppStore((state) => state.searchQuery);
   const selectedId = useAppStore((state) => state.selectedId);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
 
+  // Local State
+  const [wallpaperToDelete, setWallpaperToDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const scrollTopRef = useRef<HTMLDivElement>(null);
+
+  // --- Logic Layers ---
+
+  // 1. Filtering
   const filteredWallpapers = useMemo(() => {
     if (!searchQuery) return wallpapers;
     const lowerQ = searchQuery.toLowerCase();
-    return wallpapers.filter(w =>
-      w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ)
+    return wallpapers.filter(
+      (w) => w.title.toLowerCase().includes(lowerQ) || w.id.includes(lowerQ),
     );
   }, [wallpapers, searchQuery]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // 2. Pagination
+  const totalItems = filteredWallpapers.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+  const paginatedWallpapers = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredWallpapers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredWallpapers, currentPage]);
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page < 1 || page > totalPages) return;
+      setCurrentPage(page);
+      setTimeout(() => {
+        scrollTopRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 10);
+    },
+    [totalPages],
+  );
+
+  // 3. Selection & Metadata
   const selectedWallpaper = useMemo(() => {
-    return wallpapers.find(w => w.id === selectedId) || null;
+    return wallpapers.find((w) => w.id === selectedId) || null;
   }, [wallpapers, selectedId]);
 
-  const handleSelect = useCallback((id: string) => {
+  const currentIndex = useMemo(() => {
+    if (!selectedId) return 0;
+    const index = filteredWallpapers.findIndex((w) => w.id === selectedId);
+    return index !== -1 ? index + 1 : 0;
+  }, [filteredWallpapers, selectedId]);
+
+  // --- Event Handlers ---
+
+  const handleSelect = useCallback(
+    (id: string) => setSelectedId(id),
+    [setSelectedId],
+  );
+
+  const handleApply = async (id: string, title: string) => {
+    toast.promise(applyWallpaper(id), {
+      loading: `Applying ${title}...`,
+      success: `Applied: ${title}`,
+      error: "Failed to apply wallpaper",
+    });
     setSelectedId(id);
-  }, [setSelectedId]);
+  };
+
+  const handleStop = async () => {
+    await stopWallpaper();
+    toast.success("Wallpaper stopped");
+  };
+
+  const handleOpenFolder = (path: string) => {
+    toast.info("Open Folder", {
+      description: path ? `Path: ${path}` : "Path unknown (Mock)",
+    });
+  };
+
+  const handleDeleteRequest = (id: string, title: string) => {
+    setWallpaperToDelete({ id, title });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!wallpaperToDelete) return;
+    toast.error("Wallpaper Deleted", {
+      description: `"${wallpaperToDelete.title}" has been removed.`,
+    });
+    setWallpaperToDelete(null);
+  };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6">
-      {/* 状态工具栏 */}
-      <div className="flex items-center justify-between bg-muted/20 px-4 py-2 rounded-xl border border-border/50">
-        <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest">
-          <span className="text-pink-500 uppercase">Currently Using</span>
-          <span className="text-foreground truncate max-w-[300px]">
-            {selectedWallpaper?.title || "None"}
-          </span>
-        </div>
-        <span className="text-xs font-mono text-muted-foreground/50">
-          {filteredWallpapers.length} wallpapers
-        </span>
-      </div>
-
-      <ScrollArea className="flex-1">
-        {filteredWallpapers.length === 0 ? (
-          <div className="flex h-full min-h-[50vh] items-center justify-center">
-            <EmptyState />
-          </div>
-        ) : (
-          <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-10 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
-            {filteredWallpapers.map((wp) => (
-              <WallpaperCard
-                key={wp.id}
-                wp={wp}
-                isSelected={selectedId === wp.id}
-                onSelect={() => handleSelect(wp.id)}
+    <div className="h-full w-full overflow-hidden">
+      <ResizablePanelGroup
+        orientation="horizontal"
+        className="h-full w-full rounded-lg"
+      >
+        {/* Left Panel: Main Content */}
+        <ResizablePanel defaultSize="75%" minSize="30%">
+          <div className="flex flex-col h-full overflow-hidden">
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 shrink-0">
+              <LibraryHeader
+                currentTitle={selectedWallpaper?.title || ""}
+                totalCount={filteredWallpapers.length}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                currentIndex={currentIndex}
+                onPageChange={handlePageChange}
               />
-            ))}
+            </div>
+
+            {/* Content Area */}
+            <TooltipProvider>
+              <ScrollArea className="flex-1 w-full h-full">
+                {filteredWallpapers.length === 0 ? (
+                  <div className="flex h-full min-h-[50vh] items-center justify-center">
+                    <EmptyState />
+                  </div>
+                ) : (
+                  <div className="px-6 pb-10">
+                    <div ref={scrollTopRef} />
+
+                    {/* Grid Component */}
+                    <WallpaperGrid
+                      wallpapers={paginatedWallpapers}
+                      selectedId={selectedId}
+                      onSelect={handleSelect}
+                      onApply={handleApply}
+                      onStop={handleStop}
+                      onOpenFolder={handleOpenFolder}
+                      onDelete={handleDeleteRequest}
+                    />
+
+                    {/* Pagination Component */}
+                    <LibraryPagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
+                )}
+              </ScrollArea>
+            </TooltipProvider>
           </div>
-        )}
-      </ScrollArea>
+        </ResizablePanel>
+
+        {/* Handle */}
+        <ResizableHandle
+          withHandle={false}
+          className="relative w-2 bg-transparent z-10 -ml-1 cursor-col-resize group outline-none"
+        >
+          <div className="h-full w-[1px] bg-border/40 mx-auto group-hover:bg-border transition-colors duration-300" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-border opacity-0 group-hover:opacity-100 group-hover:bg-primary group-active:bg-primary/80 transition-all duration-300 ease-in-out shadow-sm" />
+        </ResizableHandle>
+
+        {/* Right Panel: Sidebar */}
+        <ResizablePanel
+          defaultSize="25%"
+          minSize={300}
+          maxSize="50%"
+          className="bg-muted/30"
+        >
+          <WallpaperSidebar />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+
+      {/* Delete Dialog */}
+      <AlertDialog
+        open={!!wallpaperToDelete}
+        onOpenChange={(open) => !open && setWallpaperToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10 dark:bg-red-900/20">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="space-y-1 text-center sm:text-left">
+                <AlertDialogTitle>Delete this wallpaper?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  <span className="font-bold text-foreground">
+                    {" "}
+                    "{wallpaperToDelete?.title}"{" "}
+                  </span>
+                  and remove it from your disk.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
+            >
+              Delete Wallpaper
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
+
 ```
 
 ---
@@ -36884,7 +39288,7 @@ export function Library() {
 
 ```
 // src/pages/Performance.tsx
-import React from "react";
+
 import { Cpu, MemoryStick } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -36893,32 +39297,57 @@ import { Separator } from "@/components/ui/separator";
 import { useSystemStats } from "@/hooks/useSystemStats";
 
 // Components
-import { OverviewCard, ThreadsCard } from "@/components/performance/OverviewCard";
+import {
+  OverviewCard,
+  ThreadsCard,
+} from "@/components/performance/OverviewCard";
 import ProcessList from "@/components/performance/ProcessList";
 import ScreenshotHistory from "@/components/performance/ScreenshotHistory";
 
 export function Performance() {
-  const { stats, history, clearHistory } = useSystemStats();
+  const { stats, history, clearHistory, isLoading } = useSystemStats();
 
-  if (!stats) return <div className="p-8 text-muted-foreground">Initializing Performance Monitor...</div>;
+if (isLoading) {
+  return (
+    <div className="flex flex-col h-full items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="text-base text-muted-foreground">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+        <p className="text-muted-foreground">Initializing Performance Monitor...</p>
+      </div>
+    </div>
+  );
+}
+
+if (!stats) {
+  return (
+    <div className="flex flex-col h-full items-center justify-center">
+      <div className="text-center space-y-2">
+        <p className="text-muted-foreground">Unable to load performance data</p>
+        <p className="text-sm text-muted-foreground/70">Please check if the backend is running</p>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="flex flex-col h-full space-y-6 overflow-hidden">
-
       <div className="flex flex-col space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">System Monitor</h1>
-        <p className="text-sm text-muted-foreground">Real-time resource usage of Wallpaper Engine components.</p>
+        <p className="text-sm text-muted-foreground">
+          Real-time resource usage of Wallpaper Engine components.
+        </p>
       </div>
 
       <ScrollArea className="flex-1 -mx-6 px-6">
         <div className="space-y-8 pb-20">
-
           {/* 1. 总览卡片 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <OverviewCard
               title="Total CPU"
               value={`${stats.totalCpu.toFixed(1)}%`}
-              sub="4 Cores Active"
+              sub={`${stats.cpuCores} Cores Active`}
               icon={<Cpu className="text-primary" />}
               data={stats.cpuHistory}
               color="#ef4444"
@@ -36927,13 +39356,13 @@ export function Performance() {
             <OverviewCard
               title="Total Memory"
               value={`${stats.totalMem.toFixed(0)} MB`}
-              sub="of 16 GB"
+              sub={`of ${stats.totalMemoryGb.toFixed(1)} GB`}
               icon={<MemoryStick className="text-blue-500" />}
               data={stats.memHistory}
               color="#3b82f6"
               unit=" MB"
             />
-            <ThreadsCard count={stats.activeThreads} />
+            <ThreadsCard count={stats.activeThreads} processCount={stats.processCount} />
           </div>
 
           <Separator />
@@ -36945,13 +39374,11 @@ export function Performance() {
 
           {/* 3. 截图历史 */}
           <ScreenshotHistory items={history} onClear={clearHistory} />
-
         </div>
       </ScrollArea>
     </div>
   );
 }
-
 ```
 
 ---
@@ -36961,7 +39388,14 @@ export function Performance() {
 ```
 import { useState, useEffect, useCallback } from "react";
 import {
-  PlayCircle, Monitor, Settings2, FileText, Zap, RotateCw, Save, Square
+  PlayCircle,
+  Monitor,
+  Settings2,
+  FileText,
+  Zap,
+  RotateCw,
+  Save,
+  Square,
 } from "lucide-react";
 
 import { useAppStore } from "@/store/appStore";
@@ -36980,8 +39414,13 @@ type SettingsTab = "playback" | "display" | "system" | "logs";
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("playback");
-  const { settings, fetchSettings, saveSettings, restartWallpapers, settingsLoading } =
-    useAppStore();
+  const {
+    settings,
+    fetchSettings,
+    saveSettings,
+    restartWallpapers,
+    settingsLoading,
+  } = useAppStore();
 
   useEffect(() => {
     if (!settings) {
@@ -37066,7 +39505,12 @@ export function Settings() {
             <Save className="w-4 h-4" /> Save Changes
           </Button>
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" className="gap-2" onClick={handleReload}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleReload}
+            >
               <RotateCw className="w-3 h-3" /> Reload
             </Button>
             <Button
@@ -37094,7 +39538,19 @@ export function Settings() {
 }
 
 // NavButton 是布局专用组件，保留在主文件中
-function NavButton({ active, onClick, icon, label, desc }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; desc: string }) {
+function NavButton({
+  active,
+  onClick,
+  icon,
+  label,
+  desc,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+  desc: string;
+}) {
   return (
     <Button
       variant={active ? "secondary" : "ghost"}
@@ -37107,10 +39563,14 @@ function NavButton({ active, onClick, icon, label, desc }: { active: boolean; on
         {icon}
       </div>
       <div className="text-left flex-1 min-w-0">
-        <div className={`font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}>
+        <div
+          className={`font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}
+        >
           {label}
         </div>
-        <div className="text-xs text-muted-foreground truncate opacity-70">{desc}</div>
+        <div className="text-xs text-muted-foreground truncate opacity-70">
+          {desc}
+        </div>
       </div>
     </Button>
   );
@@ -37133,18 +39593,19 @@ const selectedId = useAppStore((state) => state.selectedId);
 
 // ... 获取数据后
 useEffect(() => {
-    scanWallpapers().then(data => {
-        setWallpapers(data); // 存入 store
-    });
+  scanWallpapers().then((data) => {
+    setWallpapers(data); // 存入 store
+  });
 }, []);
 
 // ... 在渲染 Card 的地方
 <div
-    onClick={() => setSelectedId(item.id)} // 👈 关键：点击选中
-    className={`cursor-pointer border-2 ${selectedId === item.id ? 'border-pink-500' : 'border-transparent'}`}
+  onClick={() => setSelectedId(item.id)} // 👈 关键：点击选中
+  className={`cursor-pointer border-2 ${selectedId === item.id ? "border-pink-500" : "border-transparent"}`}
 >
-    {/* ... Card Content ... */}
-</div>
+  {/* ... Card Content ... */}
+</div>;
+
 ```
 
 ---
@@ -37274,6 +39735,10 @@ interface AppState {
   searchQuery: string;
   activeTab: "wallpapers" | "settings" | "performance";
 
+  // Favorites & nicknames
+  favoriteIds: Set<string>;
+  nicknames: Record<string, string>;
+
   // Settings data
   settings: AppConfig | null;
   settingsLoading: boolean;
@@ -37283,6 +39748,12 @@ interface AppState {
   setSelectedId: (id: string | null) => void;
   setSearchQuery: (query: string) => void;
   setActiveTab: (tab: "wallpapers" | "settings" | "performance") => void;
+
+  // Favorites & nicknames actions
+  toggleFavorite: (id: string) => void;
+  isFavorite: (id: string) => boolean;
+  setNickname: (id: string, nickname: string) => void;
+  getNickname: (id: string) => string | undefined;
 
   // Settings actions
   fetchSettings: () => Promise<void>;
@@ -37296,6 +39767,9 @@ interface AppState {
   // Computed properties (Getter)
   getFilteredWallpapers: () => Wallpaper[];
   getSelectedWallpaper: () => Wallpaper | null;
+
+  isCompactMode: boolean;
+  toggleCompactMode: (enabled: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -37304,6 +39778,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedId: null,
   searchQuery: "",
   activeTab: "wallpapers",
+  favoriteIds: new Set<string>(),
+  nicknames: {},
   settings: null,
   settingsLoading: false,
 
@@ -37319,6 +39795,23 @@ export const useAppStore = create<AppState>((set, get) => ({
   setSelectedId: (id) => set({ selectedId: id }),
   setSearchQuery: (q) => set({ searchQuery: q }),
   setActiveTab: (tab) => set({ activeTab: tab }),
+
+  // Favorites & nicknames actions
+  toggleFavorite: (id: string) => {
+    const current = get().favoriteIds;
+    const next = new Set(current);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    set({ favoriteIds: next });
+  },
+  isFavorite: (id: string) => get().favoriteIds.has(id),
+  setNickname: (id: string, nickname: string) => {
+    set({ nicknames: { ...get().nicknames, [id]: nickname } });
+  },
+  getNickname: (id: string) => get().nicknames[id],
 
   // Settings actions
   fetchSettings: async () => {
@@ -37375,6 +39868,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { wallpapers, selectedId } = get();
     return wallpapers.find((w) => w.id === selectedId) || null;
   },
+
+  isCompactMode: false,
+  toggleCompactMode: (enabled) => set({ isCompactMode: enabled }),
 }));
 ```
 
@@ -37479,7 +39975,7 @@ export interface ProcessStats {
   threads: string[];
 }
 
-export interface SystemStats {
+20#MW|export interface SystemStats {
   totalCpu: number;
   totalMem: number;
   activeThreads: number;
@@ -37490,6 +39986,10 @@ export interface SystemStats {
     frontend: ProcessStats;
     tray: ProcessStats;
   };
+  // System info
+  cpuCores: number;
+  totalMemoryGb: number;
+  processCount: number;
 }
 
 export interface ScreenshotRecord {
@@ -37502,6 +40002,7 @@ export interface ScreenshotRecord {
   maxMem: number;
   path: string;
 }
+
 ```
 
 ---
