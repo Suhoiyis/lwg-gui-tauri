@@ -11,8 +11,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 #[cfg(target_os = "linux")]
 use lwg_core::{
-    ConfigManager as LwgConfigManager, 
-    controller::WallpaperController, 
+    ConfigManager as LwgConfigManager,
+    controller::WallpaperController,
     config::AppConfig as LwgAppConfig,
     wallpaper::WallpaperManager,
     PerformanceMonitor,
@@ -40,8 +40,8 @@ pub struct Wallpaper {
     preview: String,
     wtype: String,
     path: String,
-    tags: Vec<String>, 
-    size: String,      
+    tags: Vec<String>,
+    size: String,
 }
 
 /// 跨平台配置结构体
@@ -190,15 +190,15 @@ impl From<AppConfig> for LwgAppConfig {
 struct AppState {
     #[cfg(target_os = "linux")]
     controller: Mutex<WallpaperController>,
-    
+
     #[cfg(target_os = "linux")]
     config_manager: Mutex<LwgConfigManager>,
-    
+
     #[cfg(target_os = "linux")]
     performance_monitor: Arc<std::sync::Mutex<PerformanceMonitor>>,
-    
+
     monitor_running: Arc<AtomicBool>,
-    
+
     #[cfg(not(target_os = "linux"))]
     _dummy: bool,
 }
@@ -308,21 +308,21 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
     #[cfg(target_os = "linux")]
     {
         println!("🐧 [Linux] 扫描壁纸库...");
-        
+
         // 从配置获取 workshop_path，否则使用默认路径
         let config_manager = _state.config_manager.lock().await;
         let workshop_path = config_manager.config().workshop_path
             .clone()
             .unwrap_or_else(|| get_default_workshop_path());
         drop(config_manager);
-        
+
         println!("📁 [Linux] Workshop 路径: {}", workshop_path);
-        
+
         // 使用 WallpaperManager 扫描
         let mut manager = WallpaperManager::new(&workshop_path);
         let wallpapers = manager.scan()
             .map_err(|e| format!("扫描失败: {:?}", e))?;
-        
+
         // 转换为前端需要的格式
         let result: Vec<Wallpaper> = wallpapers.values().map(|w| {
             Wallpaper {
@@ -335,7 +335,7 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
                 size: format_size(w.size),
             }
         }).collect();
-        
+
         println!("✅ [Linux] 扫描到 {} 张壁纸", result.len());
         Ok(result)
     }
@@ -349,10 +349,10 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
 
 #[tauri::command]
 async fn apply_wallpaper(
-    id: String, 
-    _state: State<'_, AppState> 
+    id: String,
+    _state: State<'_, AppState>
 ) -> Result<(), String> {
-    
+
     #[cfg(target_os = "linux")]
     {
         println!("▶️ [Rust] 正在应用壁纸: {}", id);
@@ -366,7 +366,7 @@ async fn apply_wallpaper(
     #[cfg(not(target_os = "linux"))]
     {
         println!("🪟 [Windows] 模拟应用成功: {}", id);
-        Ok(()) 
+        Ok(())
     }
 }
 
@@ -411,31 +411,31 @@ async fn save_settings(
     #[cfg(target_os = "linux")]
     {
         println!("💾 [Linux] 正在保存配置...");
-        
+
         let mut config_manager = _state.config_manager.lock().await;
         let old_config = config_manager.config().clone();
-        
+
         // 转换并更新配置
         let lwg_config: LwgAppConfig = config.into();
         *config_manager.config_mut() = lwg_config.clone();
-        
+
         // 保存到文件
         config_manager.save().map_err(|e| format!("保存失败: {:?}", e))?;
-        
+
         // 检查是否需要重启壁纸
         let needs_restart = needs_wallpaper_restart(&old_config, &lwg_config);
-        
+
         if needs_restart {
             println!("🔄 [Linux] 检测到壁纸相关配置变更，准备重启壁纸...");
             drop(config_manager); // 释放锁
-            
+
             let mut controller = _state.controller.lock().await;
             controller.restart_wallpapers().await.map_err(|e| format!("重启失败: {:?}", e))?;
             println!("✅ [Linux] 壁纸已重启");
         } else {
             println!("ℹ️ [Linux] 配置已保存（无需重启壁纸）");
         }
-        
+
         Ok(needs_restart)
     }
 
@@ -471,23 +471,23 @@ async fn set_autostart(enabled: bool, hidden: bool) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         use std::io::Write;
-        
+
         let autostart_dir = dirs::config_dir()
             .ok_or_else(|| "无法获取配置目录".to_string())?
             .join("autostart");
-        
+
         std::fs::create_dir_all(&autostart_dir)
             .map_err(|e| format!("创建 autostart 目录失败: {}", e))?;
-        
+
         let desktop_path = autostart_dir.join("linux-wallpaperengine-gui.desktop");
-        
+
         if enabled {
             let current_exe = std::env::current_exe()
                 .map_err(|e| format!("获取程序路径失败: {}", e))?;
             let exe_path = current_exe.to_string_lossy();
-            
+
             let hidden_arg = if hidden { " --hidden" } else { "" };
-            
+
             let desktop_content = format!(
                 r#"[Desktop Entry]
 Type=Application
@@ -500,12 +500,12 @@ Categories=Utility;
 "#,
                 exe_path, hidden_arg
             );
-            
+
             let mut file = std::fs::File::create(&desktop_path)
                 .map_err(|e| format!("创建 desktop 文件失败: {}", e))?;
             file.write_all(desktop_content.as_bytes())
                 .map_err(|e| format!("写入 desktop 文件失败: {}", e))?;
-            
+
             println!("✅ [Rust] Autostart 已启用: {:?}", desktop_path);
         } else {
             if desktop_path.exists() {
@@ -514,7 +514,7 @@ Categories=Utility;
             }
             println!("✅ [Rust] Autostart 已禁用");
         }
-        
+
         Ok(())
     }
 
@@ -552,13 +552,13 @@ async fn start_performance_monitor(
     if state.monitor_running.load(Ordering::SeqCst) {
         return Ok(());
     }
-    
+
     state.monitor_running.store(true, Ordering::SeqCst);
     let running = state.monitor_running.clone();
-    
+
     #[cfg(target_os = "linux")]
     let monitor = state.performance_monitor.clone();
-    
+
     // Spawn background thread for periodic stats emission
     std::thread::spawn(move || {
         while running.load(Ordering::SeqCst) {
@@ -569,7 +569,7 @@ async fn start_performance_monitor(
                     let _ = app.emit("performance-update", &stats);
                 }
             }
-            
+
             #[cfg(not(target_os = "linux"))]
             {
                 // Emit empty stats on non-Linux platforms
@@ -581,11 +581,11 @@ async fn start_performance_monitor(
                     "timestamp": 0
                 }));
             }
-            
+
             std::thread::sleep(std::time::Duration::from_secs(1));
         }
     });
-    
+
     println!("✅ [Rust] Performance monitor started");
     Ok(())
 }
@@ -609,7 +609,7 @@ async fn get_screenshot_history(
             .map_err(|e| format!("Lock error: {}", e))?;
         Ok(monitor.get_screenshot_history())
     }
-    
+
     #[cfg(not(target_os = "linux"))]
     {
         Ok(Vec::new())
@@ -626,7 +626,7 @@ async fn clear_screenshot_history(
             .map_err(|e| format!("Lock error: {}", e))?;
         monitor.clear_screenshot_history();
     }
-    
+
     Ok(())
 }
 
@@ -640,22 +640,24 @@ async fn take_screenshot(
     {
         use std::time::{SystemTime, UNIX_EPOCH};
         use lwg_core::controller::ScreenshotManager;
-        
+
         println!("📸 Screenshot requested for wallpaper: {}", wallpaper_id);
+
+        // 创建 ScreenshotManager 并获取配置
+        let config = state.config_manager.lock().await.config().clone();
         
-        // 获取或生成输出路径
+        // 获取或生成输出路径（需要分辨率）
         let path = output_path.unwrap_or_else(|| {
-            get_default_screenshot_path(&wallpaper_id)
+            get_default_screenshot_path(&wallpaper_id, &config.screenshot_res, "png")
         });
         println!("📁 Output path: {}", path);
-        
+
         // 创建 ScreenshotManager
-        let config = state.config_manager.lock().await.config().clone();
-        println!("⚙️ Config: delay={}, res={}, prefer_xvfb={}", 
+        println!("⚙️ Config: delay={}, res={}, prefer_xvfb={}",
             config.screenshot_delay, config.screenshot_res, config.prefer_xvfb);
         let shared_config = Arc::new(tokio::sync::Mutex::new(config));
         let screenshot_manager = ScreenshotManager::new(shared_config);
-        
+
         // 启动截图并监控
         println!("🚀 Starting screenshot process...");
         let (mut child, tracker) = screenshot_manager
@@ -669,16 +671,16 @@ async fn take_screenshot(
                 println!("❌ Failed to start: {}", e);
                 format!("Failed to start screenshot: {}", e)
             })?;
-        
+
         println!("✅ Process started with PID: {}", child.id());
-        
+
         // 等待截图完成（timeout = delay + 60 秒）
         let config = state.config_manager.lock().await.config().clone();
         let timeout_secs = (config.screenshot_delay + 60) as u64;
         drop(config);
-        
+
         println!("⏳ Waiting for screenshot (timeout: {}s)...", timeout_secs);
-        
+
         // 获取并校验进程退出状态码
         let status = ScreenshotManager::wait_for_screenshot(&mut child, &path, timeout_secs)
             .await
@@ -686,24 +688,24 @@ async fn take_screenshot(
                 println!("❌ Wait failed: {}", e);
                 format!("Screenshot failed: {}", e)
             })?;
-        
+
         if !status.success() {
             let log_msg = std::fs::read_to_string("/tmp/wallpaper_screenshot_error.log").unwrap_or_default();
             println!("❌ Process exited with error: {}\nLogs:\n{}", status, log_msg);
             return Err(format!("截图进程崩溃 ({})。请检查 /tmp/wallpaper_screenshot_error.log", status));
         }
-        
+
         println!("✅ Screenshot process completed");
-        
+
         // 如果文件没生成，必须 return Err，阻断成功弹窗
         if !std::path::Path::new(&path).exists() {
             println!("⚠️ Screenshot file NOT found: {}", path);
             let log_msg = std::fs::read_to_string("/tmp/wallpaper_screenshot_error.log").unwrap_or_default();
             return Err(format!("截图程序已运行完毕，但未能生成文件：{}\n日志：{}", path, log_msg));
         }
-        
+
         println!("✅ Screenshot file exists: {}", path);
-        
+
         // 完成截图并保存历史
         let record = ScreenshotManager::finalize_screenshot(
             tracker,
@@ -712,18 +714,18 @@ async fn take_screenshot(
             state.performance_monitor.clone(),
         )
         .map_err(|e| format!("Failed to finalize screenshot: {}", e))?;
-        
+
         // 添加到历史记录
         {
             let mut monitor = state.performance_monitor.lock()
                 .map_err(|e| format!("Lock error: {}", e))?;
             monitor.add_screenshot_history(record.clone());
         }
-        
+
         println!("✅ Screenshot saved: {}", path);
         Ok(record)
     }
-    
+
     #[cfg(not(target_os = "linux"))]
     {
         Err("Screenshot is only available on Linux".to_string())
@@ -731,29 +733,46 @@ async fn take_screenshot(
 }
 
 /// 生成默认截图路径
-fn get_default_screenshot_path(wallpaper_id: &str) -> String {
+/// 格式：日期_时间_分辨率_壁纸 id.jpg
+/// 生成默认截图路径
+/// 格式：日期_时间_分辨率_壁纸 id.png
+/// 
+/// # Arguments
+/// * `wallpaper_id` - 壁纸 ID
+/// * `resolution` - 分辨率（如 "3840x2160"）
+/// * `format` - 图片格式，支持 "png" 或 "jpg"
+fn get_default_screenshot_path(wallpaper_id: &str, resolution: &str, format: &str) -> String {
     use std::fs;
-    
+    use chrono::Local;
+
     let home = std::env::var("HOME").unwrap_or_else(|_| "/home".to_string());
-    let dir = format!("{}/Pictures/LWG_Screenshots", home);
-    
+    let dir = format!("{}/Pictures/wallpaperengine", home);
+
     // 创建目录
     let _ = fs::create_dir_all(&dir);
-    
-    // 生成文件名
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs();
-    
-    format!("{}/{}_{}.jpg", dir, wallpaper_id, timestamp)
+
+    // 获取当前时间
+    let now = Local::now();
+    let date_str = now.format("%Y%m%d").to_string();
+    let time_str = now.format("%H%M%S").to_string();
+
+    // 转换分辨率格式：3840x2160 -> 3840_2160
+    let resolution_clean = resolution.replace("x", "_");
+
+    // 确定扩展名
+    let extension = if format.to_lowercase() == "png" { "png" } else { "jpg" };
+
+    // 生成文件名：日期_时间_分辨率_壁纸 id.{ext}
+    let filename = format!("{}_@_{}_{}_{}.{}", date_str, time_str, resolution_clean, wallpaper_id, extension);
+
+    format!("{}/{}", dir, filename)
 }
 #[tauri::command]
 async fn open_folder(path: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         use std::process::Command;
-        
+
         // 检查路径是否存在
         let path = std::path::Path::new(&path);
         let folder = if path.is_file() {
@@ -761,7 +780,7 @@ async fn open_folder(path: String) -> Result<(), String> {
         } else {
             path
         };
-        
+
         // 尝试真正的文件管理器（跳过 xdg-open，它可能被错误配置）
         let file_managers = ["nautilus", "thunar", "dolphin", "xdg-open"];
         for fm in &file_managers {
@@ -769,10 +788,10 @@ async fn open_folder(path: String) -> Result<(), String> {
                 return Ok(());
             }
         }
-        
+
         Err("No file manager found. Please install xdg-open, nautilus, thunar, or dolphin.".to_string())
     }
-    
+
     #[cfg(not(target_os = "linux"))]
     {
         let _ = path;
@@ -789,7 +808,7 @@ async fn get_active_wallpapers(
         let controller = state.controller.lock().await;
         Ok(controller.get_active_wallpapers().await)
     }
-    
+
     #[cfg(not(target_os = "linux"))]
     {
         Ok(HashMap::new())
@@ -808,7 +827,7 @@ pub fn run() {
         let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
         let mut controller = WallpaperController::new(shared_config);
         controller.set_performance_monitor(performance_monitor.clone());
-        AppState { 
+        AppState {
             controller: Mutex::new(controller),
             config_manager: Mutex::new(config_manager),
             performance_monitor,
@@ -826,9 +845,9 @@ pub fn run() {
     };
 
     tauri::Builder::default()
-        .manage(app_state) 
+        .manage(app_state)
         .invoke_handler(tauri::generate_handler![
-            get_wallpapers, 
+            get_wallpapers,
             apply_wallpaper,
             stop_wallpaper,
             // Settings commands
