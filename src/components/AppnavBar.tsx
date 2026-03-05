@@ -9,7 +9,6 @@ import {
   Minimize2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// ✨ 1. 引入 StatefulButton，重命名以避免冲突
 import { Button as StatefulButton } from "@/components/ui/stateful-button";
 
 import {
@@ -26,16 +25,11 @@ import {
 } from "@/components/ui/tooltip";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/store/appStore";
-import {
-  applyWallpaper,
-  stopWallpaper,
-  takeScreenshot,
-  getScreenshotHistory,
-} from "@/api/wallpaper";
+import { applyWallpaper, stopWallpaper, takeScreenshot } from "@/api/wallpaper";
 import { toast } from "sonner";
 import { AppMenu } from "@/components/AppMenu";
+import { ScreenSelector } from "@/components/ScreenSelector";
 
-// 引入 Tauri API
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
 export function AppNavbar() {
@@ -49,7 +43,6 @@ export function AppNavbar() {
   const setSelectedId = useAppStore((state) => state.setSelectedId);
   const filteredWallpapers = getFilteredWallpapers();
 
-  // --- 核心修复：安全的切换函数 ---
   const handleSwitchToCompact = async () => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
 
@@ -71,7 +64,6 @@ export function AppNavbar() {
     }
   };
 
-  // --- Actions ---
   const handleStop = async () => {
     try {
       await stopWallpaper();
@@ -99,7 +91,6 @@ export function AppNavbar() {
     }
   };
 
-  // ✨ 2. 真实截图处理函数
   const handleScreenshot = async (): Promise<void> => {
     const selectedId = useAppStore.getState().selectedId;
 
@@ -119,7 +110,7 @@ export function AppNavbar() {
       toast.error("Screenshot failed", {
         description: String(error),
       });
-      throw error; // 让 StatefulButton 知道失败
+      throw error;
     }
   };
 
@@ -185,6 +176,10 @@ export function AppNavbar() {
 
       <TooltipProvider>
         <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border no-drag">
+          <ScreenSelector variant="default" />
+
+          <Separator orientation="vertical" className="h-4 mx-1" />
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -217,10 +212,8 @@ export function AppNavbar() {
             </TooltipContent>
           </Tooltip>
 
-          {/* ✨ 3. 替换为 StatefulButton */}
           <Tooltip>
             <TooltipTrigger asChild>
-              {/* 注意：StatefulButton 内部会自动处理 loading 状态的图标显示 */}
               <StatefulButton
                 variant="ghost"
                 size="icon"

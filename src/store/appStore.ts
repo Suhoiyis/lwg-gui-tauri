@@ -18,6 +18,9 @@ interface AppState {
   settings: AppConfig | null;
   settingsLoading: boolean;
 
+  // Screen selection
+  selectedScreen: string;
+
   // Wallpaper actions
   loadWallpapers: () => Promise<void>;
   setSelectedId: (id: string | null) => void;
@@ -39,6 +42,9 @@ interface AppState {
   saveSettings: () => Promise<void>;
   restartWallpapers: () => Promise<void>;
 
+  // Screen selection action
+  setSelectedScreen: (screen: string) => void;
+
   // Computed properties (Getter)
   getFilteredWallpapers: () => Wallpaper[];
   getSelectedWallpaper: () => Wallpaper | null;
@@ -57,6 +63,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   nicknames: {},
   settings: null,
   settingsLoading: false,
+  selectedScreen: "all",
 
   // Wallpaper actions
   loadWallpapers: async () => {
@@ -129,6 +136,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       throw error;
     }
   },
+
+  // Screen selection action
+  setSelectedScreen: (screen: string) => set({ selectedScreen: screen }),
 
   getFilteredWallpapers: () => {
     const { wallpapers, searchQuery } = get();
