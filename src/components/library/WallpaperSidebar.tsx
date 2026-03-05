@@ -120,14 +120,14 @@ export function WallpaperSidebar() {
               </div>
             </div>
 
-            {/* ✨ 新增：Nickname 编辑 + 收藏切换 */}
+            {/* Nickname  + favorite */}
             <div className="flex gap-2 pt-2 border-t">
               {/* Nickname 编辑按钮 */}
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="flex-1 gap-2 h-10">
                     <Edit3 className="w-4 h-4" />
-                    {nickname ? "Edit Nickname" : "Set Nickname"}
+                    Nickname
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
@@ -164,7 +164,7 @@ export function WallpaperSidebar() {
                 </DialogContent>
               </Dialog>
 
-              {/* 收藏切换按钮 */}
+              {/* favorite */}
               <Toggle
                 pressed={isFavorite}
                 onPressedChange={handleToggleFavorite}
@@ -178,11 +178,12 @@ export function WallpaperSidebar() {
                       : "fill-transparent"
                   }`}
                 />
-                {isFavorite ? "Unfavorite" : "Favorite"}
+                {/* always Favorite */}
+                Favorite
               </Toggle>
             </div>
 
-            {/* ✨ 3. 并排布局：Tags (左) + Type (右) */}
+            {/* Tags (left) + Type (right) */}
             <WallpaperMetadata
               wallpaper={selectedWallpaper}
               className="border-t pt-4"
