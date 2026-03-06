@@ -17,10 +17,20 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] flex flex-col items-center text-center">
-        {/* 1. Logo 区域 (致敬 Adw.AboutDialog 的大图标) */}
-        <div className="h-24 w-24 bg-primary/10 rounded-full flex items-center justify-center mb-2 text-primary">
-          <Code2 className="h-12 w-12" />
-          {/* 这里可以换成你的真实 <img src="/logo.png" /> */}
+        {/* 1. Logo 区域：彻底去除内边距，让图片成为视觉主体 */}
+        <div className="flex items-center justify-center mb-6">
+          <div
+            // ✨ 移除 p-3 (内边距) 和 bg-primary/5 (背景色)
+            // 加上 shadow-xl 让你的圆角图标看起来更有立体感，像浮在纸面上
+            className="h-24 w-24 rounded-[22%] overflow-hidden shadow-xl border border-border/40"
+          >
+            <img
+              src="/GUI_rounded.png"
+              alt="LWG GUI Logo"
+              // ✨ 关键：使用 object-cover 确保图片填满每一寸空间
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
 
         <DialogHeader className="flex flex-col items-center">

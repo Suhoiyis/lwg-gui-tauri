@@ -36,10 +36,58 @@ export function AppMenu() {
   const handleGetStarted = () =>
     toast.info("Show Welcome Screen (Coming soon)");
 
-  const handleCheckUpdate = () => {
-    toast.info("Checking for updates...", {
-      description: "You are on the latest version (v0.1.0)",
-    });
+  const handleCheckUpdate = async () => {
+    const CURRENT_VERSION = "v0.1.0"; // 当前的版号
+
+    toast.promise(
+      (async () => {
+        // 1. 发起请求
+        const response = await fetch(
+          `https://github.com/Suhoiyis/gui-for-linux-wallpaperengine/releaseslatest`,
+        );
+
+        if (!response.ok) throw new Error("Failed to connect to GitHub");
+
+        const data = await response.json();
+        const latestVersion = data.tag_name;
+        const downloadUrl = data.html_url;
+
+        // 2. 逻辑判断
+        if (latestVersion === CURRENT_VERSION) {
+          return { status: "latest", version: latestVersion };
+        } else {
+          return { status: "update", version: latestVersion, url: downloadUrl };
+        }
+      })(),
+      {
+        loading: "Checking for updates...",
+        success: (result: any) => {
+          if (result.status === "latest") {
+            return `You are on the latest version (${CURRENT_VERSION})`;
+          } else {
+            // 如果有更新，返回一个带操作按钮的提示
+            return (
+              <div className="flex flex-col gap-2">
+                <p>
+                  New version{" "}
+                  <span className="font-bold">{result.version}</span> is
+                  available!
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs w-fit"
+                  onClick={() => window.open(result.url, "_blank")}
+                >
+                  Go to Download
+                </Button>
+              </div>
+            );
+          }
+        },
+        error: (err) => `Update check failed: ${err.message}`,
+      },
+    );
   };
 
   const handleAbout = () =>

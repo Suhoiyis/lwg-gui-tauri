@@ -6,10 +6,21 @@ import {
   Image as ImageIcon,
   Clock,
   Trash2,
+  CircleQuestionMark,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScreenshotRecord } from "@/types/performance";
 import { toast } from "sonner";
+
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { ArrowUpRightIcon } from "lucide-react";
 
 interface ScreenshotRowProps {
   record: ScreenshotRecord;
@@ -111,9 +122,20 @@ export default function ScreenshotHistory({
 
       <div className="rounded-xl border bg-card/50 overflow-hidden">
         {items.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground text-sm">
-            No screenshots taken yet.
-          </div>
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <CircleQuestionMark />
+              </EmptyMedia>
+              <EmptyTitle>No Screenshot Records</EmptyTitle>
+              <EmptyDescription>
+                You have no screenshot records to display.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent className="flex-row justify-center gap-2">
+              <Button>Go Screenshot!!</Button>
+            </EmptyContent>
+          </Empty>
         ) : (
           <div className="divide-y">
             {items.map((record) => (

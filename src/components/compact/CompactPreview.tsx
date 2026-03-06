@@ -66,14 +66,16 @@ export function CompactPreview({
   return (
     <div className="p-4 space-y-4 flex flex-col items-center">
       {/* Preview Image */}
-      <WallpaperCard
-        wp={wallpaper}
-        isSelected={false}
-        onSelect={() => {}}
-        showTitle={false}
-        showIcons={true}
-        className="w-[200px] h-[200px] shadow-sm"
-      />
+      {wallpaper && (
+        <WallpaperCard
+          wp={wallpaper}
+          isSelected={false}
+          onSelect={() => {}}
+          showTitle={false}
+          showIcons={true}
+          className="w-[200px] h-[200px] shadow-sm"
+        />
+      )}
 
       {/* Title & ID */}
       <div className="w-full text-center space-y-1">
