@@ -24,17 +24,25 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
         </div>
 
         <DialogHeader className="flex flex-col items-center">
-          <DialogTitle className="text-2xl font-bold">LWG GUI</DialogTitle>
-          <DialogDescription className="text-sm">
-            v0.1.0-alpha
-          </DialogDescription>
+          <DialogTitle className="text-2xl font-bold">
+            LINUX WALLPAPER ENGINE GUI
+          </DialogTitle>
+          <DialogDescription className="text-sm">v1.2.0-pre</DialogDescription>
         </DialogHeader>
 
         {/* 2. 描述文本 */}
         <div className="py-4 text-sm text-muted-foreground">
           <p>
-            A modern, high-performance wallpaper manager built with Tauri,
-            React, and Rust.
+            A modern, high-performance wallpaper manager for{" "}
+            <a
+              href="https://github.com/Almamu/linux-wallpaperengine"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Almamu/linux-wallpaperengine
+            </a>{" "}
+            built with Tauri, React, and Rust.
             <br />
             Designed for simplicity and efficiency.
           </p>
@@ -46,24 +54,29 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
             variant="outline"
             size="sm"
             className="gap-2"
-            onClick={() => window.open("https://github.com", "_blank")}
+            onClick={() =>
+              window.open(
+                "https://github.com/Suhoiyis/gui-for-linux-wallpaperengine",
+                "_blank",
+              )
+            }
           >
             <Github className="h-4 w-4" /> GitHub
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             className="gap-2"
             onClick={() => window.open("https://tauri.app", "_blank")}
           >
             <Globe className="h-4 w-4" /> Website
-          </Button>
+          </Button> */}
         </div>
 
         {/* 4. 底部版权信息 */}
         <div className="mt-4 text-[10px] text-muted-foreground">
-          <p>© 2024 Your Name or Organization.</p>
-          <p>Licensed under MIT License.</p>
+          <p>© 2026 Suhoiyis.</p>
+          <p>Licensed under GPL-3.0 License.</p>
         </div>
       </DialogContent>
     </Dialog>
