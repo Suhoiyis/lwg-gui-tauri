@@ -32,6 +32,9 @@ import { ScreenSelector } from "@/components/ScreenSelector";
 
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
+import { useState, useRef } from "react";
+import { cn } from "@/lib/utils";
+
 export function AppNavbar() {
   const searchQuery = useAppStore((state) => state.searchQuery);
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
@@ -42,6 +45,14 @@ export function AppNavbar() {
   );
   const setSelectedId = useAppStore((state) => state.setSelectedId);
   const filteredWallpapers = getFilteredWallpapers();
+
+  // 搜索框的焦点状态与引用
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // 判断搜索框是否应该处于“展开”状态
+  // 只要获得焦点，或者里面有字，就保持展开
+  const isSearchActive = isSearchFocused || searchQuery.trim().length > 0;
 
   const handleSwitchToCompact = async () => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
@@ -159,19 +170,67 @@ export function AppNavbar() {
 
       <Separator orientation="vertical" className="h-6 mx-2" />
 
-      <div className="no-drag flex-1 max-w-md">
-        <InputGroup className="relative w-full">
-          <InputGroupAddon align="inline-start">
-            <Search className="w-4 h-4" />
-          </InputGroupAddon>
-          <InputGroupInput
-            placeholder="Search wallpapers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </InputGroup>
+      <div
+        className={cn(
+          "no-drag relative flex items-center rounded-md border transition-all duration-300 ease-out overflow-hidden cursor-text",
+          isSearchActive
+            ? "flex-1 max-w-xl border-input bg-background px-3 h-9 shadow-sm" // 展开时的样式：占据空间、有边框背景
+            : "w-8 h-8 border-transparent bg-transparent px-0 hover:bg-muted/60 justify-center cursor-pointer shadow-none", // 收起时的样式：像个透明按钮
+        )}
+        onClick={() => {
+          // 点击容器的任何位置，都触发焦点
+          setIsSearchFocused(true);
+          setTimeout(() => searchInputRef.current?.focus(), 50);
+        }}
+      >
+        <Search
+          className={cn(
+            "shrink-0 transition-colors duration-300",
+            isSearchActive
+              ? "w-4 h-4 text-muted-foreground"
+              : "w-4 h-4 text-foreground",
+          )}
+        />
+
+        {/* 原生 Input，配合外层 div 模拟 Shadcn Input */}
+        <input
+          ref={searchInputRef}
+          className={cn(
+            "bg-transparent text-sm outline-none placeholder:text-muted-foreground transition-all duration-300",
+            // 宽度从 0 到 w-full 的过渡，同时带透明度渐变
+            isSearchActive
+              ? "w-full ml-2 opacity-100"
+              : "w-0 ml-0 opacity-0 pointer-events-none",
+          )}
+          placeholder="Search wallpapers..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setSearchQuery(""); // 按 ESC 清空内容
+              searchInputRef.current?.blur(); // 失去焦点，触发折叠动画
+            }
+          }}
+        />
+
+        {/* 动态显示的 Results 数量标签 */}
+        <div
+          className={cn(
+            "transition-all duration-300 ease-out overflow-hidden whitespace-nowrap shrink-0",
+            isSearchActive && searchQuery.trim().length > 0
+              ? "max-w-[100px] opacity-100 ml-2"
+              : "max-w-0 opacity-0 ml-0",
+          )}
+        >
+          <span className="text-xs text-muted-foreground font-mono">
+            {filteredWallpapers.length} results
+          </span>
+        </div>
       </div>
 
+      {/* 这是一个弹簧占位符，会把右侧的图标推到最右边 */}
       <div className="flex-1" />
 
       <TooltipProvider>

@@ -94,14 +94,14 @@ export const LibraryHeader = memo(
                 <span
                   onClick={() => setIsEditing(true)}
                   className="
-    text-primary/90        /* 使用主题色，比纯白柔和，但比灰色显眼 */
-    hover:text-primary     /* 悬停时加亮 */
-    cursor-pointer
-    transition-colors
-    px-0.5
-    border-b border-dashed border-primary/30 /* 淡淡的虚线下划线，暗示可编辑 */
-    hover:border-solid     /* 悬停时虚线变实线 */
-  "
+                    inline-block w-8 text-center mx-0.5
+                    text-primary/90
+                    hover:text-primary
+                    cursor-pointer
+                    transition-colors
+                    border-b border-dashed border-primary/30
+                    hover:border-solid
+                  "
                 >
                   {currentPage}
                 </span>
