@@ -689,22 +689,30 @@ async fn take_screenshot(
                 format!("Screenshot failed: {}", e)
             })?;
 
-        if !status.success() {
-            let log_msg = std::fs::read_to_string("/tmp/wallpaper_screenshot_error.log").unwrap_or_default();
-            println!("❌ Process exited with error: {}\nLogs:\n{}", status, log_msg);
-            return Err(format!("截图进程崩溃 ({})。请检查 /tmp/wallpaper_screenshot_error.log", status));
+        // 先检查文件是否生成成功（优先于进程状态）
+        // 即使进程被 SIGKILL 强制终止，只要文件存在且有效就算成功
+        if std::path::Path::new(&path).exists() {
+            if let Ok(metadata) = std::fs::metadata(&path) {
+                if metadata.len() > 0 {
+                    println!("✅ Screenshot file exists: {} ({} bytes)", path, metadata.len());
+                    // 文件存在且有效，继续处理（不管进程状态）
+                } else {
+                    println!("⚠️ Screenshot file is empty: {}", path);
+                    return Err("截图文件为空".to_string());
+                }
+            }
+        } else {
+            // 文件不存在，才检查进程状态
+            if !status.success() {
+                let log_msg = std::fs::read_to_string("/tmp/wallpaper_screenshot_error.log").unwrap_or_default();
+                println!("❌ Process exited with error: {}\nLogs:\n{}", status, log_msg);
+                return Err(format!("截图进程崩溃 ({})。请检查 /tmp/wallpaper_screenshot_error.log", status));
+            }
+            println!("⚠️ Screenshot file NOT found: {}", path);
+            return Err(format!("截图程序已运行完毕，但未能生成文件：{}", path));
         }
 
         println!("✅ Screenshot process completed");
-
-        // 如果文件没生成，必须 return Err，阻断成功弹窗
-        if !std::path::Path::new(&path).exists() {
-            println!("⚠️ Screenshot file NOT found: {}", path);
-            let log_msg = std::fs::read_to_string("/tmp/wallpaper_screenshot_error.log").unwrap_or_default();
-            return Err(format!("截图程序已运行完毕，但未能生成文件：{}\n日志：{}", path, log_msg));
-        }
-
-        println!("✅ Screenshot file exists: {}", path);
 
         // 完成截图并保存历史
         let record = ScreenshotManager::finalize_screenshot(

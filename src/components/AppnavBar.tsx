@@ -7,6 +7,7 @@ import {
   Camera,
   ImageIcon,
   Minimize2,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Button as StatefulButton } from "@/components/ui/stateful-button";
@@ -107,6 +108,7 @@ export function AppNavbar() {
 
     if (!selectedId) {
       toast.error("Screenshot failed", {
+        icon: <AlertCircle className="w-5 h-5 text-red-500" />,
         description: "Please select a wallpaper first",
       });
       throw new Error("No wallpaper selected");
@@ -119,6 +121,7 @@ export function AppNavbar() {
       });
     } catch (error) {
       toast.error("Screenshot failed", {
+        icon: <AlertCircle className="w-5 h-5 text-red-500" />,
         description: String(error),
       });
       throw error;
