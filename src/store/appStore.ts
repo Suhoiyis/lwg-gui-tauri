@@ -117,10 +117,53 @@ export const useAppStore = create<AppState>((set, get) => ({
   getNickname: (id: string) => get().nicknames[id],
 
   // Settings actions
+  // Settings actions
   fetchSettings: async () => {
     set({ settingsLoading: true });
     try {
-      const settings = await invoke<AppConfig>("get_settings");
+      // ✨ 1. 检查是否在 Tauri 环境中
+      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+
+      let settings;
+      if (isTauri) {
+        // 如果是 Tauri 客户端，正常调用 Rust 后端
+        settings = await invoke<AppConfig>("get_settings");
+      } else {
+        // ✨ 2. 如果是纯浏览器环境，返回 Mock 数据
+        console.warn("[Browser Mode] Fetching Mock Settings...");
+        // 模拟一点网络延迟，更真实
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        settings = {
+          fps: 60,
+          volume: 50,
+          scaling: "fill",
+          muteAudio: false, // 对应 Rust 侧的 #[serde(rename = "muteAudio")] pub silence: bool
+          noFullscreenPause: false, // 驼峰命名
+          disableMouse: false,
+          noAutomute: false, // 对应 Rust 侧的 #[serde(rename = "noAutomute")] pub no_auto_mute: bool
+          noAudioProcessing: false,
+          disableParallax: false,
+          disableParticles: false,
+          clamping: "clamp",
+          lastWallpaper: null,
+          lastScreen: null,
+          wallpaperProperties: {},
+          screenshotDelay: 2,
+          screenshotRes: "1920x1080",
+          preferXvfb: true,
+          activeMonitors: {},
+          cycleEnabled: true,
+          cycleInterval: 30,
+          cycleOrder: "random",
+          assetsPath: "/mock/assets/path",
+          workshopPath: "/mock/workshop/path",
+          waylandOnlyActive: false,
+          waylandIgnoreAppids: "firefox,steam",
+          compactMode: false,
+          wallpaperNicknames: {},
+        } as unknown as AppConfig; // 使用 unknown 双重断言，极其稳妥
+      }
+
       set({ settings, settingsLoading: false });
     } catch (error) {
       console.error("Failed to fetch settings:", error);
@@ -142,7 +185,14 @@ export const useAppStore = create<AppState>((set, get) => ({
       throw new Error("No settings to save");
     }
     try {
-      await invoke("save_settings", { config: settings });
+      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      if (isTauri) {
+        await invoke("save_settings", { config: settings });
+      } else {
+        console.warn("[Browser Mode] Mock saving settings:", settings);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        // 在浏览器里，数据实际上已经在 store 里更新了，所以不需要做什么，直接成功即可
+      }
     } catch (error) {
       console.error("Failed to save settings:", error);
       throw error;

@@ -106,13 +106,41 @@ export function DisplaySettings() {
                 Light or Dark mode
               </p>
             </div>
-            {/* 为了保持原 UI 样式（w-[180px]），这里稍微变通使用 SelectField 或直接内联 */}
-            <SelectField
-              label=""
-              value={theme}
-              onValueChange={(v) => setTheme(v as "light" | "dark" | "system")}
-              options={THEME_OPTIONS}
-            />
+
+            {/* ✨ 替换后的丝滑三向切换开关 */}
+            <div className="relative grid grid-cols-3 w-[260px] items-center rounded-xl bg-muted/50 p-1 border border-border/50">
+              {/* ✨ 核心：滑动的背景高亮块 */}
+              <div
+                className="absolute left-1 top-1 bottom-1 w-[calc((100%-8px)/3)] rounded-lg bg-background shadow-sm border border-border/50 transition-transform duration-300 ease-out"
+                style={{
+                  transform: `translateX(${
+                    theme === "system"
+                      ? "0"
+                      : theme === "dark"
+                        ? "100%"
+                        : "200%"
+                  })`,
+                }}
+              />
+
+              {/* 三个选项按钮 */}
+              {(["system", "dark", "light"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTheme(t)}
+                  className={`relative z-10 py-1.5 text-xs font-medium capitalize transition-colors flex items-center justify-center gap-1.5 ${
+                    theme === t
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t === "system" && <Monitor className="w-3.5 h-3.5" />}
+                  {t === "dark" && <Moon className="w-3.5 h-3.5" />}
+                  {t === "light" && <Sun className="w-3.5 h-3.5" />}
+                  {t}
+                </button>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>

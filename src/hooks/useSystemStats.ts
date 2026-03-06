@@ -37,6 +37,7 @@ interface RawProcessStats {
 
 const HISTORY_SIZE = 60;
 
+// ... (mapEventToStats 函数完全保持原样)
 function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
   const createDefaultProcess = (name: string): ProcessStats => ({
     pid: 0,
@@ -50,33 +51,30 @@ function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
     threads: [],
   });
 
-  // Transform flat number array to ChartDataPoint[] with right-aligned data
-  // When data is not full, pad with null on the left so data appears on the right
   const toChartData = (values: number[] | undefined): ChartDataPoint[] => {
     if (!values) return [];
-    
+
     const result: ChartDataPoint[] = [];
     const dataLen = values.length;
-    
-    // Pad left side with empty data so actual data appears on the right
+
     for (let i = 0; i < HISTORY_SIZE - dataLen; i++) {
-      result.push({ time: "", value: 0 }); // Empty time label, zero value (won't show line)
+      result.push({ time: "", value: 0 });
     }
-    
-    // Add actual data with time labels
-    // values[0] = oldest, values[dataLen-1] = newest
-    // We want: oldest on left (larger time number), newest on right (smaller time number)
+
     for (let i = 0; i < dataLen; i++) {
       result.push({
-        time: `${dataLen - i}s`, // Newest (right) shows "1s", oldest shows "60s"
+        time: `${dataLen - i}s`,
         value: values[i],
       });
     }
-    
+
     return result;
   };
 
-  const mapProcess = (raw: RawProcessStats | undefined, name: string): ProcessStats => {
+  const mapProcess = (
+    raw: RawProcessStats | undefined,
+    name: string,
+  ): ProcessStats => {
     if (!raw) return createDefaultProcess(name);
     return {
       pid: raw.pid,
@@ -93,12 +91,10 @@ function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
 
   const allProcesses = raw.processes || {};
   const processValues = Object.values(allProcesses);
-  
-  // System-level history aggregation with right alignment
+
   const cpuHistory: ChartDataPoint[] = [];
   const memHistory: ChartDataPoint[] = [];
-  
-  // Calculate max history length among all processes
+
   let maxDataLen = 0;
   for (const p of processValues) {
     if (p?.cpu_history) {
@@ -106,19 +102,16 @@ function mapEventToStats(raw: RawPerformanceEvent): SystemStats {
     }
   }
   maxDataLen = Math.min(maxDataLen, HISTORY_SIZE);
-  
-  // Pad left side
+
   for (let i = 0; i < HISTORY_SIZE - maxDataLen; i++) {
     cpuHistory.push({ time: "", value: 0 });
     memHistory.push({ time: "", value: 0 });
   }
-  
-  // Add actual aggregated data
+
   for (let i = 0; i < maxDataLen; i++) {
     let totalCpu = 0;
     let totalMem = 0;
     for (const p of processValues) {
-      // Calculate offset: we want the newest data (highest index) to be at the end
       const processLen = p?.cpu_history?.length || 0;
       const idx = i - (maxDataLen - processLen);
       if (idx >= 0 && idx < processLen) {
@@ -153,49 +146,169 @@ export function useSystemStats() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
     let unlistenPerformance: (() => void) | null = null;
+    let mockInterval: NodeJS.Timeout | null = null;
 
-    const setupMonitoring = async () => {
-      try {
-        await invoke("start_performance_monitor");
+    if (isTauri) {
+      // ==========================================
+      // 真实环境：Tauri 后端通信
+      // ==========================================
+      const setupMonitoring = async () => {
+        try {
+          await invoke("start_performance_monitor");
 
-        unlistenPerformance = await listen<RawPerformanceEvent>(
-          "performance-update",
-          (event) => {
-            const mappedStats = mapEventToStats(event.payload);
-            setStats(mappedStats);
-            setIsLoading(false);
-          }
-        );
+          unlistenPerformance = await listen<RawPerformanceEvent>(
+            "performance-update",
+            (event) => {
+              const mappedStats = mapEventToStats(event.payload);
+              setStats(mappedStats);
+              setIsLoading(false);
+            },
+          );
 
-        const screenshotHistory = await invoke<ScreenshotRecord[]>(
-          "get_screenshot_history"
-        );
-        setHistory(screenshotHistory);
-      } catch (error) {
-        console.error("Failed to setup performance monitoring:", error);
+          const screenshotHistory = await invoke<ScreenshotRecord[]>(
+            "get_screenshot_history",
+          );
+          setHistory(screenshotHistory);
+        } catch (error) {
+          console.error("Failed to setup performance monitoring:", error);
+          setIsLoading(false);
+        }
+      };
+
+      setupMonitoring();
+    } else {
+      // ==========================================
+      // 浏览器环境：生成动态 Mock 数据
+      // ==========================================
+      console.warn("[Browser Mode] Starting Mock Performance Monitor...");
+
+      // 初始化一段平缓的历史数据（60个点）
+      let mockCpuHistoryBackend = Array(60)
+        .fill(0)
+        .map(() => Math.random() * 5 + 5);
+      let mockMemHistoryBackend = Array(60)
+        .fill(0)
+        .map(() => Math.random() * 20 + 300);
+      let mockCpuHistoryFrontend = Array(60)
+        .fill(0)
+        .map(() => Math.random() * 2 + 1);
+      let mockMemHistoryFrontend = Array(60)
+        .fill(0)
+        .map(() => Math.random() * 10 + 100);
+
+      // 模拟截图历史
+      setHistory([
+        {
+          timestamp: Math.floor(Date.now() / 1000) - 3600,
+          wp_id: "cyberpunk_01",
+          output_path: "/home/user/Pictures/shot1.png",
+          duration: 1.2,
+          max_cpu: 24.5,
+          max_mem: 450.2,
+        } as any,
+        {
+          timestamp: Math.floor(Date.now() / 1000) - 7200,
+          wp_id: "nature_02",
+          output_path: "/home/user/Pictures/shot2.png",
+          duration: 0.8,
+          max_cpu: 15.1,
+          max_mem: 310.5,
+        } as any,
+      ]);
+
+      mockInterval = setInterval(() => {
+        // 生成这一秒的新数据
+        const newBackendCpu = Math.random() * 15 + 5;
+        const newBackendMem = Math.random() * 50 + 400;
+        const newFrontendCpu = Math.random() * 5 + 1;
+        const newFrontendMem = Math.random() * 20 + 150;
+
+        // 推进数组（去掉最老的，加入最新的）
+        mockCpuHistoryBackend = [
+          ...mockCpuHistoryBackend.slice(1),
+          newBackendCpu,
+        ];
+        mockMemHistoryBackend = [
+          ...mockMemHistoryBackend.slice(1),
+          newBackendMem,
+        ];
+        mockCpuHistoryFrontend = [
+          ...mockCpuHistoryFrontend.slice(1),
+          newFrontendCpu,
+        ];
+        mockMemHistoryFrontend = [
+          ...mockMemHistoryFrontend.slice(1),
+          newFrontendMem,
+        ];
+
+        // 组装符合你定义的 Raw 事件结构
+        const fakeEvent: RawPerformanceEvent = {
+          total_cpu: newBackendCpu + newFrontendCpu,
+          total_memory_mb: newBackendMem + newFrontendMem,
+          total_threads: 145,
+          cpu_cores: 16,
+          total_memory_gb: 32,
+          process_count: 3,
+          timestamp: Date.now(),
+          processes: {
+            backend: {
+              pid: 10425,
+              name: "linux-wallpaperengine",
+              cmd: "/opt/linux-wallpaperengine",
+              status: "Running",
+              cpu: newBackendCpu,
+              memory_mb: newBackendMem,
+              threads: 45,
+              cpu_history: mockCpuHistoryBackend,
+              mem_history: mockMemHistoryBackend,
+              thread_names: ["main", "render", "audio_decode"],
+            },
+            frontend: {
+              pid: 10426,
+              name: "lwg-gui",
+              cmd: "/usr/bin/lwg-gui",
+              status: "Running",
+              cpu: newFrontendCpu,
+              memory_mb: newFrontendMem,
+              threads: 24,
+              cpu_history: mockCpuHistoryFrontend,
+              mem_history: mockMemHistoryFrontend,
+              thread_names: ["ui_thread", "ipc_worker"],
+            },
+          },
+        };
+
+        // 经过你原来的 map 函数转换并更新状态
+        setStats(mapEventToStats(fakeEvent));
         setIsLoading(false);
-      }
-    };
-
-    setupMonitoring();
+      }, 1000); // 1秒更新一次图表
+    }
 
     return () => {
-      if (unlistenPerformance) {
-        unlistenPerformance();
+      // 清理逻辑：销毁监听或清除定时器
+      if (isTauri) {
+        if (unlistenPerformance) unlistenPerformance();
+        invoke("stop_performance_monitor").catch(console.error);
+      } else if (mockInterval) {
+        clearInterval(mockInterval);
       }
-      invoke("stop_performance_monitor").catch((err) => {
-        console.error("Failed to stop performance monitor:", err);
-      });
     };
   }, []);
 
   const clearHistory = async () => {
-    try {
-      await invoke("clear_screenshot_history");
-      setHistory([]);
-    } catch (error) {
-      console.error("Failed to clear history:", error);
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    if (isTauri) {
+      try {
+        await invoke("clear_screenshot_history");
+        setHistory([]);
+      } catch (error) {
+        console.error("Failed to clear history:", error);
+      }
+    } else {
+      console.warn("[Browser Mode] Clearing mock history");
+      setHistory([]); // 浏览器端直接清空状态
     }
   };
 
