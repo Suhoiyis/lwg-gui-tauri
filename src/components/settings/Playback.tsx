@@ -19,6 +19,7 @@ import {
   SCALING_OPTIONS,
   CLAMPING_OPTIONS,
   CYCLE_ORDER_OPTIONS,
+  TextareaField,
 } from "./Shared";
 
 export function PlaybackSettings() {
@@ -120,7 +121,8 @@ export function PlaybackSettings() {
             onCheckedChange={(v) => updateSetting("cycleEnabled", v)}
           />
           {settings.cycleEnabled && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            // animate-in 和相关的动画类名
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
               <InputField
                 label="Cycle Interval (minutes)"
                 value={settings.cycleInterval}
@@ -160,8 +162,9 @@ export function PlaybackSettings() {
             checked={settings.waylandOnlyActive}
             onCheckedChange={(v) => updateSetting("waylandOnlyActive", v)}
           />
-          <InputField
+          <TextareaField
             label="Ignore Application IDs"
+            description="Comma-separated list of app IDs to ignore when auto-pausing (e.g., steam, firefox, discord)"
             value={settings.waylandIgnoreAppids}
             onChange={(v) => updateSetting("waylandIgnoreAppids", v)}
             placeholder="dock, bar, launcher..."

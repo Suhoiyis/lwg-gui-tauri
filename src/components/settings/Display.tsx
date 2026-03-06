@@ -52,36 +52,45 @@ export function DisplaySettings() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <SliderRow
-            label="Master Volume"
-            value={settings.volume}
-            onValueChange={(v) => updateSetting("volume", v)}
-            max={100}
-            step={1}
-            suffix="%"
-          />
-          <Separator />
+          {/* Mute Audio */}
           <SwitchRow
             label="Mute Audio"
-            description="Mute all audio"
+            description="Mute all audio output and processing"
             checked={settings.muteAudio}
             onCheckedChange={(v) => updateSetting("muteAudio", v)}
             icon={<Speaker className="w-4 h-4 text-muted-foreground" />}
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-            <SwitchCard
-              label="Disable Auto Mute"
-              description="Prevent muting when other apps play sound"
-              checked={settings.noAutomute}
-              onCheckedChange={(v) => updateSetting("noAutomute", v)}
-            />
-            <SwitchCard
-              label="No Audio Processing"
-              description="Disable spectrum analysis"
-              checked={settings.noAudioProcessing}
-              onCheckedChange={(v) => updateSetting("noAudioProcessing", v)}
-            />
-          </div>
+
+          {/* ✨ 折叠区域：包含音量、分割线以及两个高级音频选项 */}
+          {!settings.muteAudio && (
+            <div className="space-y-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+              <SliderRow
+                label="Master Volume"
+                value={settings.volume}
+                onValueChange={(v) => updateSetting("volume", v)}
+                max={100}
+                step={1}
+                suffix="%"
+              />
+
+              <Separator />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <SwitchCard
+                  label="Disable Auto Mute"
+                  description="Prevent muting when other apps play sound"
+                  checked={settings.noAutomute}
+                  onCheckedChange={(v) => updateSetting("noAutomute", v)}
+                />
+                <SwitchCard
+                  label="No Audio Processing"
+                  description="Disable spectrum analysis for performance"
+                  checked={settings.noAudioProcessing}
+                  onCheckedChange={(v) => updateSetting("noAudioProcessing", v)}
+                />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

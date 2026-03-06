@@ -10,7 +10,15 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 // 引入公共组件
-import { Header, SwitchRow, InputField, PathInputField } from "./Shared";
+import {
+  Header,
+  SwitchRow,
+  InputField,
+  PathInputField,
+  SliderRow,
+  EditableComboboxField,
+  RESOLUTION_OPTIONS,
+} from "./Shared";
 
 export function SystemSettings() {
   const { settings, updateSetting } = useAppStore();
@@ -103,28 +111,31 @@ export function SystemSettings() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Screenshot Slider - 保持原版特定布局 */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label>Capture Delay</Label>
-                <span className="text-xs text-muted-foreground">
-                  {settings.screenshotDelay} seconds
-                </span>
-              </div>
-              <Slider
-                value={[settings.screenshotDelay]}
-                onValueChange={(v) => updateSetting("screenshotDelay", v[0])}
-                max={20}
+            {/* 支持直接输入的高级 SliderRow */}
+            <div className="pt-2">
+              {" "}
+              {/* 加点 padding 保持对其 */}
+              <SliderRow
+                label="Capture Delay"
+                value={settings.screenshotDelay}
+                onValueChange={(v) => updateSetting("screenshotDelay", v)}
+                max={15}
                 min={1}
                 step={1}
+                suffix=" s" // 显示单位
               />
             </div>
-            <InputField
-              label="Target Resolution"
-              value={settings.screenshotRes}
-              onChange={(v) => updateSetting("screenshotRes", v)}
-              placeholder="1920x1080"
-            />
+            <div className="pt-2">
+              {" "}
+              {/* 加一点 pt-2 保证和左边的 Slider 对齐 */}
+              <EditableComboboxField
+                label="Target Resolution"
+                value={settings.screenshotRes}
+                onChange={(v) => updateSetting("screenshotRes", v)}
+                options={RESOLUTION_OPTIONS}
+                placeholder="Select or type..."
+              />
+            </div>
           </div>
 
           <Separator />
