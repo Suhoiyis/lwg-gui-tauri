@@ -594,6 +594,12 @@ fn get_display_server() -> String {
         .to_lowercase()
 }
 
+#[tauri::command]
+fn check_xvfb_available() -> bool {
+    which::which("xvfb-run").is_ok()
+}
+
+
 
 // ================= System Integration Commands =================
 
@@ -1103,6 +1109,7 @@ pub fn run() {
             set_autostart,
             get_autostart_status,
             get_display_server,
+            check_xvfb_available,
             set_autostart,
             get_autostart_status,
             // Performance monitoring commands

@@ -1,21 +1,18 @@
 // src/components/settings/System.tsx
 import { useState, useEffect, useCallback } from "react";
-import { Power, EyeOff, FileImage, FolderOpen } from "lucide-react"; // 修正：FolderOpen 必须在此导入
+import { Power, EyeOff, FileImage, FolderOpen, AlertTriangle } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { useAppStore } from "@/store/appStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 // 引入公共组件
 import {
   Header,
   SwitchRow,
-  InputField,
   PathInputField,
-  SliderRow,
   EditableComboboxField,
   RESOLUTION_OPTIONS,
 } from "./Shared";
@@ -23,6 +20,7 @@ import {
 export function SystemSettings() {
   const { settings, updateSetting } = useAppStore();
   const [autostart, setAutostart] = useState(false);
+  const [hasXvfb, setHasXvfb] = useState<boolean | null>(null);
 
   useEffect(() => {
     // 获取自启动状态
@@ -31,12 +29,30 @@ export function SystemSettings() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    // 检测 Xvfb 是否安装
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    if (isTauri) {
+      invoke<boolean>("check_xvfb_available")
+        .then((available) => {
+          setHasXvfb(available);
+          // 如果没有安装 Xvfb，清除配置
+          if (!available && settings?.preferXvfb) {
+            updateSetting("preferXvfb", false);
+          }
+        })
+        .catch(() => setHasXvfb(false));
+    } else {
+      setHasXvfb(false);
+    }
+  }, [settings, updateSetting]);
+
   const handleAutostartChange = useCallback(
     async (enabled: boolean) => {
       try {
         await invoke("set_autostart", {
           enabled,
-          hidden: settings.startHidden ?? false,
+          hidden: settings?.startHidden ?? false,
         });
         setAutostart(enabled);
         toast.success(enabled ? "Autostart enabled" : "Autostart disabled");
@@ -44,7 +60,7 @@ export function SystemSettings() {
         toast.error("Failed to change autostart");
       }
     },
-    [settings.startHidden],
+    [settings?.startHidden],
   );
 
   if (!settings) return <div>Loading...</div>;
@@ -105,11 +121,34 @@ export function SystemSettings() {
       </Card>
 
       {/* Screenshot Tools Card */}
-      <Card>
+      <Card className={hasXvfb === true ? "border-pink-500/20" : "border-amber-500/20 bg-amber-500/5"}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileImage className="w-4 h-4 text-pink-500" /> Screenshot Tools
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <FileImage className="w-4 h-4 text-pink-500" /> Screenshot Tools
+            </span>
+            <Badge
+              variant="outline"
+              className={
+                "text-xs font-normal " +
+                (hasXvfb === true
+                  ? "border-green-500/30 text-green-500"
+                  : "border-amber-500/30 text-amber-500")
+              }
+            >
+              {hasXvfb === null
+                ? "Checking..."
+                : hasXvfb
+                ? "Xvfb Installed"
+                : "Xvfb Not Found"}
+            </Badge>
           </CardTitle>
+          {hasXvfb === false && (
+            <p className="text-xs text-amber-600 flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3" />
+              Install xvfb-run for silent background capture.
+            </p>
+          )}
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Target Resolution */}
@@ -127,9 +166,10 @@ export function SystemSettings() {
 
           <SwitchRow
             label="Prefer Silent Capture (Xvfb)"
-            description="Capture in background"
+            description="Capture in background without visible window"
             checked={settings.preferXvfb}
             onCheckedChange={(v) => updateSetting("preferXvfb", v)}
+            disabled={hasXvfb === false}
           />
         </CardContent>
       </Card>
