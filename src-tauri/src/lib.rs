@@ -682,13 +682,18 @@ async fn take_screenshot(
         println!("⏳ Waiting for screenshot (timeout: {}s)...", timeout_secs);
 
         // 获取并校验进程退出状态码
-        let status = ScreenshotManager::wait_for_screenshot(&mut child, &path, timeout_secs)
-            .await
-            .map_err(|e| {
-                println!("❌ Wait failed: {}", e);
-                format!("Screenshot failed: {}", e)
-            })?;
-
+        let status = ScreenshotManager::wait_for_screenshot(
+            &mut child,
+            &path,
+            timeout_secs,
+            Some(state.performance_monitor.clone()),
+            Some(&tracker),
+        )
+        .await
+        .map_err(|e| {
+            println!("❌ Wait failed: {}", e);
+            format!("Screenshot failed: {}", e)
+        })?;
         // 先检查文件是否生成成功（优先于进程状态）
         // 即使进程被 SIGKILL 强制终止，只要文件存在且有效就算成功
         if std::path::Path::new(&path).exists() {
