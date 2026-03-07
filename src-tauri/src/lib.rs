@@ -603,20 +603,33 @@ fn check_xvfb_available() -> bool {
 fn get_connected_monitors() -> Result<Vec<String>, String> {
     #[cfg(target_os = "linux")]
     {
-        use std::process::Command;
+        use std::fs;
         
-        let output = Command::new("xrandr")
-            .arg("--query")
-            .output()
-            .map_err(|e| format!("Failed to run xrandr: {}", e))?;
+        let mut monitors = Vec::new();
         
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        let monitors: Vec<String> = stdout
-            .lines()
-            .filter(|line| line.contains(" connected"))
-            .filter_map(|line| line.split_whitespace().next())
-            .map(|s| s.to_string())
-            .collect();
+        let drm_dir = fs::read_dir("/sys/class/drm")
+            .map_err(|e| format!("Failed to read /sys/class/drm: {}", e))?;
+        
+        for entry in drm_dir.flatten() {
+            let name = entry.file_name();
+            let name_str = name.to_string_lossy();
+            
+            // 匹配 cardX-XXX 格式（如 card0-eDP-1）
+            if name_str.starts_with("card") && name_str.contains('-') {
+                let status_path = entry.path().join("status");
+                if let Ok(status) = fs::read_to_string(&status_path) {
+                    // 精确匹配 "connected"，排除 "disconnected"
+                    if status.trim() == "connected" {
+                        // 提取显示器名称：去掉 cardX- 前缀
+                        let monitor_name = name_str
+                            .split_once('-')
+                            .map(|(_, rest)| rest.to_string())
+                            .unwrap_or_else(|| name_str.to_string());
+                        monitors.push(monitor_name);
+                    }
+                }
+            }
+        }
         
         Ok(monitors)
     }
