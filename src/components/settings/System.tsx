@@ -34,7 +34,10 @@ export function SystemSettings() {
   const handleAutostartChange = useCallback(
     async (enabled: boolean) => {
       try {
-        await invoke("set_autostart", { enabled, hidden: settings.startHidden ?? false });
+        await invoke("set_autostart", {
+          enabled,
+          hidden: settings.startHidden ?? false,
+        });
         setAutostart(enabled);
         toast.success(enabled ? "Autostart enabled" : "Autostart disabled");
       } catch {
@@ -65,7 +68,7 @@ export function SystemSettings() {
             label="Steam Workshop Path"
             value={settings.workshopPath || ""}
             onChange={(v) => updateSetting("workshopPath", v)}
-            placeholder="/home/user/.local/share/Steam/..."
+            placeholder="/home/user/.local/share/Steam/steamapps/workshop/content/431960"
           />
           <PathInputField
             label="Assets Directory (Optional)"

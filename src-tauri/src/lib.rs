@@ -1106,6 +1106,9 @@ pub fn run() {
             check_for_updates,
         ])
         .plugin(tauri_plugin_opener::Builder::new().build())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_dialog::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

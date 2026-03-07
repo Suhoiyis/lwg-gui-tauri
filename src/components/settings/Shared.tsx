@@ -15,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { open } from "@tauri-apps/plugin-dialog";
 import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -327,6 +328,28 @@ export function PathInputField({
   onChange: (value: string | null) => void;
   placeholder?: string;
 }) {
+  const handleBrowse = async () => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    if (!isTauri) {
+      console.warn("[Browser Mode] File dialog not available");
+      return;
+    }
+
+    try {
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        defaultPath: value || undefined,
+      });
+
+      if (selected && typeof selected === "string") {
+        onChange(selected);
+      }
+    } catch (error) {
+      console.error("Failed to open directory dialog:", error);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
@@ -336,7 +359,7 @@ export function PathInputField({
           value={value}
           onChange={(e) => onChange(e.target.value || null)}
         />
-        <Button variant="secondary">
+        <Button variant="secondary" onClick={handleBrowse}>
           <FolderOpen className="w-4 h-4" />
         </Button>
       </div>
