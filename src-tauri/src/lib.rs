@@ -645,7 +645,7 @@ async fn take_screenshot(
 
         // 创建 ScreenshotManager 并获取配置
         let config = state.config_manager.lock().await.config().clone();
-        
+
         // 获取或生成输出路径（需要分辨率）
         let path = output_path.unwrap_or_else(|| {
             get_default_screenshot_path(&wallpaper_id, &config.screenshot_res, "png")
@@ -743,8 +743,8 @@ async fn take_screenshot(
 /// 生成默认截图路径
 /// 格式：日期_时间_分辨率_壁纸 id.jpg
 /// 生成默认截图路径
-/// 格式：日期_时间_分辨率_壁纸 id.png
-/// 
+/// 格式：YYYY-MM-DD_HH-MM-SS_分辨率_壁纸ID.png
+///
 /// # Arguments
 /// * `wallpaper_id` - 壁纸 ID
 /// * `resolution` - 分辨率（如 "3840x2160"）
@@ -759,22 +759,18 @@ fn get_default_screenshot_path(wallpaper_id: &str, resolution: &str, format: &st
     // 创建目录
     let _ = fs::create_dir_all(&dir);
 
-    // 获取当前时间
     let now = Local::now();
-    let date_str = now.format("%Y%m%d").to_string();
-    let time_str = now.format("%H%M%S").to_string();
-
-    // 转换分辨率格式：3840x2160 -> 3840_2160
-    let resolution_clean = resolution.replace("x", "_");
+    let datetime_str = now.format("%Y-%m-%d_%H:%M:%S").to_string();
 
     // 确定扩展名
     let extension = if format.to_lowercase() == "png" { "png" } else { "jpg" };
 
-    // 生成文件名：日期_时间_分辨率_壁纸 id.{ext}
-    let filename = format!("{}_@_{}_{}_{}.{}", date_str, time_str, resolution_clean, wallpaper_id, extension);
+    // 生成文件名：YYYY-MM-DD_HH-MM-SS_分辨率_壁纸 id.{ext}
+    let filename = format!("{}_{}_{}.{}", datetime_str, resolution, wallpaper_id, extension);
 
     format!("{}/{}", dir, filename)
 }
+
 #[tauri::command]
 async fn open_folder(path: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
