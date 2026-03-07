@@ -110,32 +110,15 @@ export function SystemSettings() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* 支持直接输入的高级 SliderRow */}
-            <div className="pt-2">
-              {" "}
-              {/* 加点 padding 保持对其 */}
-              <SliderRow
-                label="Capture Delay"
-                value={settings.screenshotDelay}
-                onValueChange={(v) => updateSetting("screenshotDelay", v)}
-                max={15}
-                min={1}
-                step={1}
-                suffix=" s" // 显示单位
-              />
-            </div>
-            <div className="pt-2">
-              {" "}
-              {/* 加一点 pt-2 保证和左边的 Slider 对齐 */}
-              <EditableComboboxField
-                label="Target Resolution"
-                value={settings.screenshotRes}
-                onChange={(v) => updateSetting("screenshotRes", v)}
-                options={RESOLUTION_OPTIONS}
-                placeholder="Select or type..."
-              />
-            </div>
+          {/* Target Resolution */}
+          <div className="max-w-md">
+            <EditableComboboxField
+              label="Target Resolution"
+              value={settings.screenshotRes}
+              onChange={(v) => updateSetting("screenshotRes", v)}
+              options={RESOLUTION_OPTIONS}
+              placeholder="Select or type..."
+            />
           </div>
 
           <Separator />

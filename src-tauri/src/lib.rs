@@ -652,9 +652,10 @@ async fn take_screenshot(
         });
         println!("📁 Output path: {}", path);
 
-        // 创建 ScreenshotManager
+        // 创建 ScreenshotManager (delay 硬编码为 20s)
+        const SCREENSHOT_DELAY: u32 = 10;
         println!("⚙️ Config: delay={}, res={}, prefer_xvfb={}",
-            config.screenshot_delay, config.screenshot_res, config.prefer_xvfb);
+            SCREENSHOT_DELAY, config.screenshot_res, config.prefer_xvfb);
         let shared_config = Arc::new(tokio::sync::Mutex::new(config));
         let screenshot_manager = ScreenshotManager::new(shared_config);
 
@@ -674,10 +675,8 @@ async fn take_screenshot(
 
         println!("✅ Process started with PID: {}", child.id());
 
-        // 等待截图完成（timeout = delay + 60 秒）
-        let config = state.config_manager.lock().await.config().clone();
-        let timeout_secs = (config.screenshot_delay + 60) as u64;
-        drop(config);
+        // 等待截图完成（timeout = delay + 15 秒）
+        let timeout_secs = (SCREENSHOT_DELAY as u64) + 15;
 
         println!("⏳ Waiting for screenshot (timeout: {}s)...", timeout_secs);
 
