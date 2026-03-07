@@ -88,6 +88,8 @@ pub struct AppConfig {
     pub wayland_ignore_appids: String,
     pub compact_mode: bool,
     pub wallpaper_nicknames: std::collections::HashMap<String, String>,
+    #[serde(rename = "startHidden")]
+    pub start_hidden: bool,
 }
 
 impl Default for AppConfig {
@@ -120,6 +122,7 @@ impl Default for AppConfig {
             wayland_ignore_appids: String::new(),
             compact_mode: false,
             wallpaper_nicknames: std::collections::HashMap::new(),
+            start_hidden: false,
         }
     }
 }
@@ -155,6 +158,7 @@ impl From<LwgAppConfig> for AppConfig {
             wayland_ignore_appids: config.wayland_ignore_appids,
             compact_mode: config.compact_mode,
             wallpaper_nicknames: config.wallpaper_nicknames,
+            start_hidden: false,
         }
     }
 }
@@ -452,7 +456,115 @@ async fn save_settings(
     {
         println!("🪟 [Windows Mock] 模拟保存配置: fps={}, volume={}", config.fps, config.volume);
         Ok(false)
+    }}
+
+// Allowed non-runtime keys for single value updates
+const ALLOWED_KEYS: &[&str] = &["lastScreen", "workshopPath", "assetsPath", "screenshotRes", "preferXvfb", "screenshotDelay", "cycleEnabled", "cycleInterval", "cycleOrder"];
+
+#[tauri::command]
+async fn update_config_value(
+    key: String,
+    value: serde_json::Value,
+    _state: State<'_, AppState>,
+) -> Result<AppConfig, String> {
+    #[cfg(target_os = "linux")]
+    {
+        // Check if key is in allowed list
+        if !ALLOWED_KEYS.contains(&key.as_str()) {
+            return Err(format!("Key '{}' is not allowed for update. Only non-runtime settings can be updated individually.", key));
+        }
+
+        println!("🔧 [Linux] 正在更新配置键: {} = {:?}", key, value);
+
+        let mut config_manager = _state.config_manager.lock().await;
+        let mut lwg_config = config_manager.config().clone();
+
+        // Update the specific key based on its name
+        match key.as_str() {
+            "lastScreen" => {
+                if let Some(s) = value.as_str() {
+                    lwg_config.last_screen = Some(s.to_string());
+                } else {
+                    lwg_config.last_screen = None;
+                }
+            },
+            "workshopPath" => {
+                if let Some(s) = value.as_str() {
+                    lwg_config.workshop_path = Some(s.to_string());
+                } else {
+                    lwg_config.workshop_path = None;
+                }
+            },
+            "assetsPath" => {
+                if let Some(s) = value.as_str() {
+                    lwg_config.assets_path = Some(s.to_string());
+                } else {
+                    lwg_config.assets_path = None;
+                }
+            },
+            "screenshotRes" => {
+                if let Some(s) = value.as_str() {
+                    lwg_config.screenshot_res = s.to_string();
+                } else {
+                    return Err("screenshotRes must be a string".to_string());
+                }
+            },
+            "preferXvfb" => {
+                if let Some(b) = value.as_bool() {
+                    lwg_config.prefer_xvfb = b;
+                } else {
+                    return Err("preferXvfb must be a boolean".to_string());
+                }
+            },
+            "screenshotDelay" => {
+                if let Some(n) = value.as_u64() {
+                    lwg_config.screenshot_delay = n as u32;
+                } else {
+                    return Err("screenshotDelay must be a number".to_string());
+                }
+            },
+            "cycleEnabled" => {
+                if let Some(b) = value.as_bool() {
+                    lwg_config.cycle_enabled = b;
+                } else {
+                    return Err("cycleEnabled must be a boolean".to_string());
+                }
+            },
+            "cycleInterval" => {
+                if let Some(n) = value.as_u64() {
+                    lwg_config.cycle_interval = n as u32;
+                } else {
+                    return Err("cycleInterval must be a number".to_string());
+                }
+            },
+            "cycleOrder" => {
+                if let Some(s) = value.as_str() {
+                    lwg_config.cycle_order = s.to_string();
+                } else {
+                    return Err("cycleOrder must be a string".to_string());
+                }
+            },
+            _ => {
+                return Err(format!("Unknown key: {}", key));
+            }
+        }
+
+        // Save to disk
+        *config_manager.config_mut() = lwg_config.clone();
+        config_manager.save().map_err(|e| format!("保存失败: {:?}", e))?;
+
+        println!("✅ [Linux] 配置键已更新并保存");
+
+        // Convert back to AppConfig and return
+        Ok(lwg_config.into())
     }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        println!("🪟 [Windows Mock] 模拟更新配置键: {} = {:?}", key, value);
+        Ok(AppConfig::default())
+    }
+
 }
 
 #[tauri::command]
@@ -975,6 +1087,7 @@ pub fn run() {
             // Settings commands
             get_settings,
             save_settings,
+            update_config_value,
             restart_wallpapers,
             // System integration commands
             set_autostart,

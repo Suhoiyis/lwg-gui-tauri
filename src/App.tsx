@@ -40,6 +40,7 @@ export function App() {
 
   const isCompactMode = useAppStore((s) => s.isCompactMode);
   const toggleCompactMode = useAppStore((s) => s.toggleCompactMode);
+  const initializeSettings = useAppStore((s) => s.initializeSettings);
 
   useEffect(() => {
     const handleResize = () => {
@@ -67,6 +68,11 @@ export function App() {
     loadWallpapers().finally(() => setIsLoading(false));
     loadWallpapers();
   }, [loadWallpapers]); // 简化依赖
+
+  // Initialize settings at app startup
+  useEffect(() => {
+    initializeSettings();
+  }, [initializeSettings]);
 
   // --- 渲染逻辑 ---
 

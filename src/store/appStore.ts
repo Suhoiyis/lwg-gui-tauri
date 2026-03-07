@@ -1,7 +1,35 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
+import { toast } from "sonner";
 // 建议只从一处引入 Wallpaper 类型，以防冲突。这里我们统一使用 src/types 下的。
 import { Wallpaper, AppConfig } from "../types";
+
+// Runtime settings: require explicit Save button (backend restart needed)
+const RUNTIME_SETTINGS = new Set<keyof AppConfig>([
+  'fps', 'volume', 'muteAudio', 'scaling', 'clamping',
+  'disableParallax', 'disableParticles', 'noFullscreenPause',
+  'disableMouse', 'noAutomute', 'noAudioProcessing',
+  'assetsPath', 'waylandOnlyActive', 'waylandIgnoreAppids'
+]);
+
+// Non-runtime settings: immediate save with debounce
+const NON_RUNTIME_SETTINGS = new Set<keyof AppConfig>([
+  'lastScreen', 'workshopPath', 'screenshotRes', 'preferXvfb',
+  'screenshotDelay', 'cycleEnabled', 'cycleInterval', 'cycleOrder'
+]);
+
+const saveTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
+
+const isSliderOrInput = (key: keyof AppConfig): boolean => {
+  const sliderInputKeys: Array<keyof AppConfig> = [
+    'volume',
+    'fps',
+    'screenshotDelay',
+    'cycleInterval',
+    'waylandIgnoreAppids',
+  ];
+  return sliderInputKeys.includes(key);
+};
 import { scanWallpapers } from "../api/wallpaper";
 
 interface AppState {
@@ -40,6 +68,7 @@ interface AppState {
   getNickname: (id: string) => string | undefined;
 
   fetchSettings: () => Promise<void>;
+  initializeSettings: () => Promise<void>;
   updateSetting: <K extends keyof AppConfig>(
     key: K,
     value: AppConfig[K],
@@ -47,6 +76,7 @@ interface AppState {
   saveSettings: () => Promise<void>;
   restartWallpapers: () => Promise<void>;
   setSelectedScreen: (screen: string) => void;
+  flushPendingUpdates: () => void;
 
   // Computed properties
   getFilteredWallpapers: () => Wallpaper[];
@@ -172,11 +202,105 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
+  initializeSettings: async () => {
+    set({ settingsLoading: true });
+    try {
+      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      if (isTauri) {
+        const settings = await invoke<AppConfig>("get_settings");
+        set({ settings, settingsLoading: false });
+        console.log("[App] Settings initialized from backend");
+      } else {
+        // Mock mode - use default settings
+        const defaultSettings: AppConfig = {
+          fps: 30,
+          volume: 50,
+          scaling: "default",
+          clamping: "clamp",
+          muteAudio: false,
+          noFullscreenPause: false,
+          disableMouse: false,
+          noAutomute: false,
+          noAudioProcessing: false,
+          disableParallax: false,
+          disableParticles: false,
+          lastScreen: null,
+          lastWallpaper: undefined,
+          wallpaperProperties: {},
+          screenshotDelay: 20,
+          screenshotRes: "3840x2160",
+          preferXvfb: true,
+          activeMonitors: {},
+          cycleEnabled: false,
+          cycleInterval: 15,
+          cycleOrder: "random",
+          assetsPath: null,
+          workshopPath: null,
+          waylandOnlyActive: false,
+          waylandIgnoreAppids: "",
+          wallpaperNicknames: {},
+          compactMode: false,
+          startHidden: false,
+        };
+        set({ settings: defaultSettings, settingsLoading: false });
+        console.log("[App] Settings initialized with defaults (mock mode)");
+      }
+    } catch (error) {
+      console.error("[App] Failed to initialize settings:", error);
+      set({ settingsLoading: false });
+      // Don't throw - app should still work with defaults
+    }
+  },
+
   updateSetting: <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
     const currentSettings = get().settings;
-    if (currentSettings) {
-      set({ settings: { ...currentSettings, [key]: value } });
+    if (!currentSettings) return;
+
+    const newSettings = { ...currentSettings, [key]: value };
+    set({ settings: newSettings });
+
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    if (!isTauri) {
+      console.log(`[Mock Mode] Updated ${String(key)}:`, value);
+      return;
     }
+
+    if (RUNTIME_SETTINGS.has(key)) {
+      console.log(`[Runtime] ${String(key)} updated locally, waiting for Save button`);
+      return;
+    }
+
+    if (!NON_RUNTIME_SETTINGS.has(key)) {
+      return;
+    }
+
+    if (saveTimeouts[key as string]) {
+      clearTimeout(saveTimeouts[key as string]);
+    }
+
+    const debounceMs = isSliderOrInput(key) ? 500 : 0;
+
+    saveTimeouts[key as string] = setTimeout(async () => {
+      try {
+        console.log(`[Non-Runtime] Saving ${String(key)} to backend...`);
+        const result = await invoke<AppConfig>('update_config_value', {
+          key: key as string,
+          value: value,
+        });
+        set({ settings: result });
+        console.log(`[Non-Runtime] ${String(key)} saved successfully`);
+        toast.success("Setting saved", {
+        description: `${String(key)} has been updated`,
+        duration: 2000,
+        });
+      } catch (error) {
+        console.error(`[Non-Runtime] Failed to save ${String(key)}:`, error);
+        set({ settings: currentSettings });
+        toast.error(`Failed to save ${String(key)}`, {
+          description: String(error),
+        });
+      }
+    }, debounceMs);
   },
 
   saveSettings: async () => {
@@ -197,6 +321,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       console.error("Failed to save settings:", error);
       throw error;
     }
+  },
+
+  flushPendingUpdates: () => {
+    // Clear all pending timeouts
+    Object.values(saveTimeouts).forEach(clearTimeout);
+    // Clear the timeouts object
+    Object.keys(saveTimeouts).forEach(k => delete saveTimeouts[k]);
   },
 
   restartWallpapers: async () => {

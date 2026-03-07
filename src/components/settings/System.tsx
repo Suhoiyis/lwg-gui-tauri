@@ -23,7 +23,6 @@ import {
 export function SystemSettings() {
   const { settings, updateSetting } = useAppStore();
   const [autostart, setAutostart] = useState(false);
-  const [startHidden, setStartHidden] = useState(false);
 
   useEffect(() => {
     // 获取自启动状态
@@ -35,14 +34,14 @@ export function SystemSettings() {
   const handleAutostartChange = useCallback(
     async (enabled: boolean) => {
       try {
-        await invoke("set_autostart", { enabled, hidden: startHidden });
+        await invoke("set_autostart", { enabled, hidden: settings.startHidden ?? false });
         setAutostart(enabled);
         toast.success(enabled ? "Autostart enabled" : "Autostart disabled");
       } catch {
         toast.error("Failed to change autostart");
       }
     },
-    [startHidden],
+    [settings.startHidden],
   );
 
   if (!settings) return <div>Loading...</div>;
@@ -95,8 +94,8 @@ export function SystemSettings() {
           <SwitchRow
             label="Start Hidden"
             description="Minimize to tray on launch"
-            checked={startHidden}
-            onCheckedChange={setStartHidden}
+            checked={settings.startHidden ?? false}
+            onCheckedChange={(v) => updateSetting("startHidden", v)}
             icon={<EyeOff className="w-4 h-4 text-muted-foreground" />}
           />
         </CardContent>

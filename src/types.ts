@@ -44,6 +44,7 @@ export interface AppConfig {
   assetsPath: string | null;
   workshopPath: string | null;
 
+  startHidden: boolean;
   // --- 7. Screenshot Tools ---
   screenshotDelay: number;
   screenshotRes: string;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   PlayCircle,
   Monitor,
@@ -28,26 +28,21 @@ export function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("playback");
   const {
     settings,
-    fetchSettings,
     saveSettings,
+    flushPendingUpdates,
     restartWallpapers,
     settingsLoading,
   } = useAppStore();
-
-  useEffect(() => {
-    if (!settings) {
-      fetchSettings().catch(() => toast.error("Failed to load settings"));
-    }
-  }, [settings, fetchSettings]);
-
   const handleSave = useCallback(async () => {
     try {
+      // Flush any pending debounced updates before bulk save
+      flushPendingUpdates();
       await saveSettings();
       toast.success("Settings saved successfully");
     } catch {
       toast.error("Failed to save settings");
     }
-  }, [saveSettings]);
+  }, [saveSettings, flushPendingUpdates]);
 
   const handleReload = useCallback(async () => {
     try {
