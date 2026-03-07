@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import {
   Menu,
   RefreshCw,
@@ -19,12 +20,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AboutDialog } from "./AboutDialog";
+import { UpdateDialog } from "./UpdateDialog";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
+
+interface UpdateInfo {
+  latest_version: string;
+  download_url: string;
+}
 
 export function AppMenu() {
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
   const [showAbout, setShowAbout] = useState(false);
+  const [showUpdate, setShowUpdate] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [currentVersion, setCurrentVersion] = useState("");
 
   // Mock handlers
   const handleRefresh = () => {
@@ -37,57 +47,41 @@ export function AppMenu() {
     toast.info("Show Welcome Screen (Coming soon)");
 
   const handleCheckUpdate = async () => {
-    const CURRENT_VERSION = "v0.1.0"; // 当前的版号
+    // Guard: Only run in Tauri environment
+    if (!window.__TAURI_INTERNALS__) {
+      toast.error("Update check is only available in the desktop app");
+      return;
+    }
 
-    toast.promise(
-      (async () => {
-        // 1. 发起请求
-        const response = await fetch(
-          `https://github.com/Suhoiyis/gui-for-linux-wallpaperengine/releaseslatest`,
-        );
+    const toastId = toast.loading("Checking for updates...");
 
-        if (!response.ok) throw new Error("Failed to connect to GitHub");
+    try {
+      const result = await invoke<{
+        has_update: boolean;
+        current_version: string;
+        latest_version: string | null;
+        download_url: string | null;
+      }>("check_for_updates");
 
-        const data = await response.json();
-        const latestVersion = data.tag_name;
-        const downloadUrl = data.html_url;
+      toast.dismiss(toastId);
 
-        // 2. 逻辑判断
-        if (latestVersion === CURRENT_VERSION) {
-          return { status: "latest", version: latestVersion };
-        } else {
-          return { status: "update", version: latestVersion, url: downloadUrl };
-        }
-      })(),
-      {
-        loading: "Checking for updates...",
-        success: (result: any) => {
-          if (result.status === "latest") {
-            return `You are on the latest version (${CURRENT_VERSION})`;
-          } else {
-            // 如果有更新，返回一个带操作按钮的提示
-            return (
-              <div className="flex flex-col gap-2">
-                <p>
-                  New version{" "}
-                  <span className="font-bold">{result.version}</span> is
-                  available!
-                </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-7 text-xs w-fit"
-                  onClick={() => window.open(result.url, "_blank")}
-                >
-                  Go to Download
-                </Button>
-              </div>
-            );
-          }
-        },
-        error: (err) => `Update check failed: ${err.message}`,
-      },
-    );
+      if (result.has_update) {
+        // 情况 A：有新版本 → 打开 Dialog
+        setCurrentVersion(result.current_version);
+        setUpdateInfo({
+          latest_version: result.latest_version!,
+          download_url: result.download_url!,
+        });
+        setShowUpdate(true);
+      } else {
+        // 情况 B：已是最新 → 绿色 toast
+        toast.success(`已是最新版本 (v${result.current_version})`);
+      }
+    } catch (err) {
+      toast.dismiss(toastId);
+      // 情况 C：错误 → 红色 toast
+      toast.error(`检查更新失败: ${err}`);
+    }
   };
 
   const handleAbout = () =>
@@ -147,8 +141,17 @@ export function AppMenu() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* ✨ 挂载 Dialog */}
+      {/* Dialogs */}
       <AboutDialog open={showAbout} onOpenChange={setShowAbout} />
+      {updateInfo && (
+        <UpdateDialog
+          open={showUpdate}
+          onOpenChange={setShowUpdate}
+          currentVersion={currentVersion}
+          latestVersion={updateInfo.latest_version}
+          downloadUrl={updateInfo.download_url}
+        />
+      )}
     </>
   );
 }

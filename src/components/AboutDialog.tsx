@@ -37,7 +37,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
           <DialogTitle className="text-2xl font-bold">
             LINUX WALLPAPER ENGINE GUI
           </DialogTitle>
-          <DialogDescription className="text-sm">v1.2.0-pre</DialogDescription>
+          <DialogDescription className="text-sm">v0.1.0</DialogDescription>
         </DialogHeader>
 
         {/* 2. 描述文本 */}

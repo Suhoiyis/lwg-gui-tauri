@@ -44,6 +44,15 @@ pub struct Wallpaper {
     size: String,
 }
 
+/// GitHub 更新检查结果
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateCheckResult {
+    pub has_update: bool,
+    pub current_version: String,
+    pub latest_version: Option<String>,
+    pub download_url: Option<String>,
+}
+
 /// 跨平台配置结构体
 /// Linux: 与 lwg_core::AppConfig 完全一致
 /// Windows: Mock 版本，用于 UI 开发
@@ -850,6 +859,84 @@ async fn get_active_wallpapers(
     }
 }
 
+// ================= Update Check Commands =================
+
+/// GitHub Release API 响应结构
+#[derive(Debug, Deserialize)]
+struct GitHubRelease {
+    tag_name: String,
+    html_url: String,
+}
+
+/// 检查 GitHub 上的最新版本
+#[tauri::command]
+async fn check_for_updates() -> Result<UpdateCheckResult, String> {
+    const GITHUB_API_URL: &str = "https://api.github.com/repos/Suhoiyis/gui-for-linux-wallpaperengine/releases/latest";
+    const USER_AGENT: &str = "tauri-app";
+    
+    // 获取当前版本（从 Cargo.toml 读取）
+    let current_version = env!("CARGO_PKG_VERSION").to_string();
+    
+    // 创建 HTTP 客户端，带超时设置
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|e| format!("创建 HTTP 客户端失败: {}", e))?;
+    
+    // 发送请求，必须包含 User-Agent 头（GitHub API 强制要求）
+    let response = client
+        .get(GITHUB_API_URL)
+        .header("User-Agent", USER_AGENT)
+        .header("Accept", "application/vnd.github.v3+json")
+        .send()
+        .await
+        .map_err(|e| {
+            if e.is_timeout() {
+                "网络请求超时，请检查网络连接".to_string()
+            } else if e.is_connect() {
+                "无法连接到 GitHub，请检查网络".to_string()
+            } else {
+                format!("网络请求失败: {}", e)
+            }
+        })?;
+    
+    // 检查响应状态码
+    let status = response.status();
+    if status == reqwest::StatusCode::NOT_FOUND {
+        // 404: 没有发布版本
+        return Ok(UpdateCheckResult {
+            has_update: false,
+            current_version,
+            latest_version: None,
+            download_url: None,
+        });
+    } else if status == reqwest::StatusCode::FORBIDDEN {
+        // 403: 速率限制
+        return Err("请求过于频繁，请稍后再试".to_string());
+    } else if !status.is_success() {
+        return Err(format!("GitHub API 返回错误: {}", status));
+    }
+    
+    // 解析 JSON 响应
+    let release: GitHubRelease = response
+        .json()
+        .await
+        .map_err(|e| format!("解析响应失败: {}", e))?;
+    
+    // 版本比较：移除 'v' 前缀后比较
+    let latest_version = release.tag_name.trim_start_matches('v').to_string();
+    let current_normalized = current_version.trim_start_matches('v');
+    
+    let has_update = latest_version != current_normalized;
+    
+    Ok(UpdateCheckResult {
+        has_update,
+        current_version,
+        latest_version: Some(release.tag_name),
+        download_url: Some(release.html_url),
+    })
+}
+
 // ================= 主入口 =================
 
 pub fn run() {
@@ -902,7 +989,10 @@ pub fn run() {
             get_active_wallpapers,
             open_folder,
             open_image,
+            // Update check commands
+            check_for_updates,
         ])
+        .plugin(tauri_plugin_opener::Builder::new().build())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
