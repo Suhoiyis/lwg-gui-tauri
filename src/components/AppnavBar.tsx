@@ -201,13 +201,16 @@ export function AppNavbar() {
               </div>
             </div>
 
-            {/* 性能指标 */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="flex flex-col items-center p-3 rounded-lg bg-muted/50">
-                <Clock className="w-4 h-4 text-muted-foreground mb-1" />
-                <p className="text-lg font-bold">{screenshotResult?.duration.toFixed(1)}s</p>
+            {/* 性能指标 - CPU/MEM 暂时禁用 */}
+            <div className="flex justify-center">
+              <div className="flex flex-col items-center p-4 rounded-lg bg-muted/50 min-w-32">
+                <Clock className="w-5 h-5 text-muted-foreground mb-1" />
+                <p className="text-2xl font-bold">{screenshotResult?.duration.toFixed(1)}s</p>
                 <p className="text-xs text-muted-foreground">Duration</p>
               </div>
+            </div>
+            {/* CPU/MEM 监控暂时禁用，后期修复
+            <div className="grid grid-cols-3 gap-3">
               <div className="flex flex-col items-center p-3 rounded-lg bg-muted/50">
                 <Cpu className="w-4 h-4 text-orange-500 mb-1" />
                 <p className="text-lg font-bold text-orange-500">{screenshotResult?.maxCpu.toFixed(1)}%</p>
@@ -219,6 +222,7 @@ export function AppNavbar() {
                 <p className="text-xs text-muted-foreground">Max Mem (MB)</p>
               </div>
             </div>
+            */}
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
