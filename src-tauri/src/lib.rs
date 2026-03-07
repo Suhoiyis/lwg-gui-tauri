@@ -599,6 +599,34 @@ fn check_xvfb_available() -> bool {
     which::which("xvfb-run").is_ok()
 }
 
+#[tauri::command]
+fn get_connected_monitors() -> Result<Vec<String>, String> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::process::Command;
+        
+        let output = Command::new("xrandr")
+            .arg("--query")
+            .output()
+            .map_err(|e| format!("Failed to run xrandr: {}", e))?;
+        
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let monitors: Vec<String> = stdout
+            .lines()
+            .filter(|line| line.contains(" connected"))
+            .filter_map(|line| line.split_whitespace().next())
+            .map(|s| s.to_string())
+            .collect();
+        
+        Ok(monitors)
+    }
+    
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(vec![])
+    }
+}
+
 
 
 // ================= System Integration Commands =================
@@ -1106,6 +1134,12 @@ pub fn run() {
             update_config_value,
             restart_wallpapers,
             // System integration commands
+            set_autostart,
+            get_autostart_status,
+            get_display_server,
+            check_xvfb_available,
+            get_connected_monitors,
+            // Performance monitoring commands
             set_autostart,
             get_autostart_status,
             get_display_server,

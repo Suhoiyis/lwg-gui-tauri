@@ -3,6 +3,17 @@ import { invoke } from "@tauri-apps/api/core";
 import { toast } from "sonner";
 // 建议只从一处引入 Wallpaper 类型，以防冲突。这里我们统一使用 src/types 下的。
 import { Wallpaper, AppConfig } from "../types";
+import { invoke } from "@tauri-apps/api/core";
+import { toast } from "sonner";
+// 建议只从一处引入 Wallpaper 类型，以防冲突。这里我们统一使用 src/types 下的。
+import { Wallpaper, AppConfig } from "../types";
+import { invoke } from "@tauri-apps/api/core";
+import { toast } from "sonner";
+import { invoke } from "@tauri-apps/api/core";
+import { availableMonitors } from "@tauri-apps/api/window";
+import { toast } from "sonner";
+// 建议只从一处引入 Wallpaper 类型，以防冲突。这里我们统一使用 src/types 下的。
+import { Wallpaper, AppConfig } from "../types";
 
 // Runtime settings: require explicit Save button (backend restart needed)
 const RUNTIME_SETTINGS = new Set<keyof AppConfig>([
@@ -50,6 +61,10 @@ interface AppState {
   settings: AppConfig | null;
   settingsLoading: boolean;
 
+  // Monitor detection
+  monitors: string[];
+  monitorsLoading: boolean;
+
   // Screen selection
   selectedScreen: string;
 
@@ -69,6 +84,7 @@ interface AppState {
 
   fetchSettings: () => Promise<void>;
   initializeSettings: () => Promise<void>;
+  fetchMonitors: () => Promise<void>;
   updateSetting: <K extends keyof AppConfig>(
     key: K,
     value: AppConfig[K],
@@ -97,6 +113,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   nicknames: {},
   settings: null,
   settingsLoading: false,
+  monitors: [],
+  monitorsLoading: false,
   selectedScreen: "all",
   isCompactMode: false,
 
@@ -146,7 +164,26 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   getNickname: (id: string) => get().nicknames[id],
 
-  // Settings actions
+  // Monitor detection
+  fetchMonitors: async () => {
+    set({ monitorsLoading: true });
+    try {
+      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      if (!isTauri) {
+        // Browser mode - return empty array
+        set({ monitors: [], monitorsLoading: false });
+        return;
+      }
+
+      // Use Rust backend command to get real monitor names via xrandr
+      const monitors = await invoke<string[]>("get_connected_monitors");
+      set({ monitors, monitorsLoading: false });
+    } catch (error) {
+      console.error("Failed to fetch monitors:", error);
+      set({ monitors: [], monitorsLoading: false });
+    }
+  },
+
   // Settings actions
   fetchSettings: async () => {
     set({ settingsLoading: true });

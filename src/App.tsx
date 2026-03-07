@@ -41,6 +41,7 @@ export function App() {
   const isCompactMode = useAppStore((s) => s.isCompactMode);
   const toggleCompactMode = useAppStore((s) => s.toggleCompactMode);
   const initializeSettings = useAppStore((s) => s.initializeSettings);
+  const fetchMonitors = useAppStore((s) => s.fetchMonitors);
 
   useEffect(() => {
     const handleResize = () => {
@@ -69,10 +70,11 @@ export function App() {
     loadWallpapers();
   }, [loadWallpapers]); // 简化依赖
 
-  // Initialize settings at app startup
+  // Initialize settings and monitors at app startup
   useEffect(() => {
     initializeSettings();
-  }, [initializeSettings]);
+    fetchMonitors();
+  }, [initializeSettings, fetchMonitors]);
 
   // --- 渲染逻辑 ---
 

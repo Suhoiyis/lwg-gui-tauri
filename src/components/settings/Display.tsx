@@ -2,7 +2,6 @@ import { Monitor, Volume2, Moon, Sun, Speaker } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { useTheme } from "@/components/theme-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SelectItem } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
   Header,
@@ -10,15 +9,19 @@ import {
   SwitchRow,
   SwitchCard,
   SelectField,
-  MONITOR_OPTIONS,
-  THEME_OPTIONS,
 } from "./Shared";
 
 export function DisplaySettings() {
   const { theme, setTheme } = useTheme();
-  const { settings, updateSetting } = useAppStore();
+  const { settings, updateSetting, monitors } = useAppStore();
 
   if (!settings) return <div>Loading...</div>;
+
+  // 动态生成显示器选项
+  const monitorOptions = [
+    { value: "all", label: "All Monitors" },
+    ...monitors.map((m) => ({ value: m, label: m })),
+  ];
 
   return (
     <div className="space-y-6">
@@ -40,7 +43,7 @@ export function DisplaySettings() {
             onValueChange={(v) =>
               updateSetting("lastScreen", v === "all" ? null : v)
             }
-            options={MONITOR_OPTIONS}
+            options={monitorOptions}
           />
         </CardContent>
       </Card>

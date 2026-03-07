@@ -79,11 +79,6 @@ export const CYCLE_ORDER_OPTIONS = [
   { value: "size", label: "Size" },
 ] as const;
 
-export const MONITOR_OPTIONS = [
-  { value: "all", label: "All Monitors" },
-  { value: "eDP-1", label: "eDP-1" },
-  { value: "HDMI-1", label: "HDMI-1" },
-] as const;
 
 export const RESOLUTION_OPTIONS = [
   { value: "3840x2160", label: "4K (3840x2160)" },

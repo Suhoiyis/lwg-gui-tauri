@@ -16,8 +16,8 @@ interface ScreenSelectorProps {
 
 /**
  * 屏幕选择器组件
- * 用于选择壁纸应用的目标屏幕（All Screens / Display 1 等）
- * 直接连接 Zustand store 进行状态管理
+ * 用于选择壁纸应用的目标屏幕
+ * 动态获取连接的显示器列表
  */
 export function ScreenSelector({
   variant = "default",
@@ -25,6 +25,7 @@ export function ScreenSelector({
 }: ScreenSelectorProps) {
   const selectedScreen = useAppStore((state) => state.selectedScreen);
   const setSelectedScreen = useAppStore((state) => state.setSelectedScreen);
+  const monitors = useAppStore((state) => state.monitors);
 
   const isCompact = variant === "compact";
 
@@ -41,7 +42,11 @@ export function ScreenSelector({
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All Screens</SelectItem>
-        <SelectItem value="1">Display 1</SelectItem>
+        {monitors.map((monitor) => (
+          <SelectItem key={monitor} value={monitor}>
+            {monitor}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );
