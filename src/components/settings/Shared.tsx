@@ -43,6 +43,7 @@ interface SwitchRowProps {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   icon?: React.ReactNode;
+  disabled?: boolean;
 }
 
 interface SliderRowProps {
@@ -147,9 +148,10 @@ export function SwitchRow({
   checked,
   onCheckedChange,
   icon,
+  disabled,
 }: SwitchRowProps) {
   return (
-    <div className="flex items-center justify-between">
+    <div className={"flex items-center justify-between " + (disabled ? "opacity-50" : "")}>
       <div className="flex items-center gap-2">
         {icon}
         <div className="space-y-0.5">
@@ -159,7 +161,7 @@ export function SwitchRow({
           )}
         </div>
       </div>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+      <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
     </div>
   );
 }
@@ -395,15 +397,17 @@ export function TextareaField({
   onChange,
   placeholder,
   description,
+  disabled,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   description?: string;
+  disabled?: boolean;
 }) {
   return (
-    <div className="space-y-2 flex flex-col">
+    <div className={"space-y-2 flex flex-col " + (disabled ? "opacity-50" : "")}>
       <div className="space-y-0.5">
         <Label>{label}</Label>
         {description && (
@@ -414,7 +418,8 @@ export function TextareaField({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="resize-none min-h-[80px]" // 禁止拖拽大小，设置最小高度
+        className="resize-none min-h-[80px]"
+        disabled={disabled}
       />
     </div>
   );

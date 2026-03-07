@@ -588,6 +588,16 @@ async fn restart_wallpapers(_state: State<'_, AppState>) -> Result<(), String> {
 // ================= System Integration Commands =================
 
 #[tauri::command]
+fn get_display_server() -> String {
+    std::env::var("XDG_SESSION_TYPE")
+        .unwrap_or_else(|_| "unknown".to_string())
+        .to_lowercase()
+}
+
+
+// ================= System Integration Commands =================
+
+#[tauri::command]
 async fn set_autostart(enabled: bool, hidden: bool) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
@@ -1092,6 +1102,9 @@ pub fn run() {
             // System integration commands
             set_autostart,
             get_autostart_status,
+            get_display_server,
+            set_autostart,
+            get_autostart_status,
             // Performance monitoring commands
             start_performance_monitor,
             stop_performance_monitor,
@@ -1107,7 +1120,6 @@ pub fn run() {
         ])
         .plugin(tauri_plugin_opener::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_dialog::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

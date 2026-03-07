@@ -1,4 +1,6 @@
-import { Zap, MousePointer2, Clock } from "lucide-react";
+import { Zap, MousePointer2, Clock, AlertTriangle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { useAppStore } from "@/store/appStore";
 import {
   Card,
@@ -24,6 +26,18 @@ import {
 
 export function PlaybackSettings() {
   const { settings, updateSetting } = useAppStore();
+  const [isWayland, setIsWayland] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    if (isTauri) {
+      invoke<string>("get_display_server")
+        .then((result) => setIsWayland(result === "wayland"))
+        .catch(() => setIsWayland(false));
+    } else {
+      setIsWayland(false);
+    }
+  }, []);
 
   if (!settings) return <div>Loading...</div>;
 
@@ -143,31 +157,42 @@ export function PlaybackSettings() {
         </CardContent>
       </Card>
 
-      <Card className="border-blue-500/20 bg-blue-500/5">
+      {/* Wayland Tweaks - only relevant on Wayland */}
+      <Card className={isWayland === true ? "border-blue-500/20 bg-blue-500/5" : "border-amber-500/20 bg-amber-500/5"}>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Wayland Tweaks</span>
             <Badge
               variant="outline"
-              className="text-xs font-normal border-blue-500/30 text-blue-500"
+              className={"text-xs font-normal " + (isWayland === true
+                ? "border-blue-500/30 text-blue-500"
+                : "border-amber-500/30 text-amber-500")}
             >
-              Wayland
+              {isWayland === null ? "Detecting..." : isWayland ? "Wayland" : "X11"}
             </Badge>
           </CardTitle>
+          {isWayland === false && (
+            <p className="text-xs text-amber-600 flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3" />
+              These settings only work on Wayland. Your session is X11.
+            </p>
+          )}
         </CardHeader>
         <CardContent className="space-y-6">
           <SwitchRow
             label="Pause Only When Active"
             description="Only pause if app is focused"
-            checked={settings.waylandOnlyActive}
+            checked={isWayland === false ? false : settings.waylandOnlyActive}
             onCheckedChange={(v) => updateSetting("waylandOnlyActive", v)}
+            disabled={isWayland === false}
           />
           <TextareaField
             label="Ignore Application IDs"
             description="Comma-separated list of app IDs to ignore when auto-pausing (e.g., steam, firefox, discord)"
-            value={settings.waylandIgnoreAppids}
+            value={isWayland === false ? "" : settings.waylandIgnoreAppids}
             onChange={(v) => updateSetting("waylandIgnoreAppids", v)}
             placeholder="dock, bar, launcher..."
+            disabled={isWayland === false}
           />
         </CardContent>
       </Card>
