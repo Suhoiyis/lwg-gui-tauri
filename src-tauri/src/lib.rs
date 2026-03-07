@@ -363,19 +363,19 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
 #[tauri::command]
 async fn apply_wallpaper(
     id: String,
+    screen: Option<String>,
     _state: State<'_, AppState>
 ) -> Result<(), String> {
 
     #[cfg(target_os = "linux")]
     {
-        println!("▶️ [Rust] 正在应用壁纸: {}", id);
+        println!("▶️ [Rust] 正在应用壁纸: {} (屏幕: {:?})", id, screen);
         let mut controller = _state.controller.lock().await;
-        controller.apply(&id, None).await.map_err(|e| format!("应用失败: {:?}", e))?;
+        controller.apply(&id, screen.as_deref()).await.map_err(|e| format!("应用失败: {:?}", e))?;
         println!("✅ [Rust] 壁纸应用成功！");
-        return Ok(()); // 注意这里要显式返回
+        return Ok(());
     }
 
-    // ✅ 修复方案 2：为非 Linux 平台提供一个显式的默认返回
     #[cfg(not(target_os = "linux"))]
     {
         println!("🪟 [Windows] 模拟应用成功: {}", id);

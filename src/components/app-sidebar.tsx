@@ -41,7 +41,9 @@ export function AppSidebar() {
 
     try {
       console.log("Applying:", selectedWallpaper.title);
-      await applyWallpaper(selectedWallpaper.id);
+      const selectedScreen = useAppStore.getState().selectedScreen;
+      const screen = selectedScreen === "all" ? undefined : selectedScreen;
+      await applyWallpaper(selectedWallpaper.id, screen);
       toast.success(`已应用: ${selectedWallpaper.title}`);
     } catch (error) {
       console.error(error);

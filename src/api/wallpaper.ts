@@ -212,11 +212,11 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
   }
 }
 
-export async function applyWallpaper(id: string): Promise<void> {
+export async function applyWallpaper(id: string, screen?: string): Promise<void> {
   try {
-    await invoke("apply_wallpaper", { id });
+    await invoke("apply_wallpaper", { id, screen });
   } catch (e) {
-    console.log(`[Mock] 假装应用了壁纸 ID: ${id}`);
+    console.log(`[Mock] 假装应用了壁纸 ID: ${id}${screen ? ` 到屏幕 ${screen}` : ""}`);
     const wp = EXPANDED_MOCK_WALLPAPERS.find((w) => w.id === id);
     if (wp) console.log(`   选中: ${wp.title}`);
   }

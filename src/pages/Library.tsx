@@ -148,7 +148,9 @@ export function Library() {
   );
 
   const handleApply = async (id: string, title: string) => {
-    toast.promise(applyWallpaper(id), {
+    const selectedScreen = useAppStore.getState().selectedScreen;
+    const screen = selectedScreen === "all" ? undefined : selectedScreen;
+    toast.promise(applyWallpaper(id, screen), {
       loading: `Applying ${title}...`,
       success: `Applied: ${title}`,
       error: "Failed to apply wallpaper",

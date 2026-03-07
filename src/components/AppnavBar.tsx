@@ -60,6 +60,7 @@ export function AppNavbar() {
   const searchQuery = useAppStore((state) => state.searchQuery);
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
   const toggleCompactMode = useAppStore((state) => state.toggleCompactMode);
+  const selectedScreen = useAppStore((state) => state.selectedScreen);
 
   const getFilteredWallpapers = useAppStore(
     (state) => state.getFilteredWallpapers,
@@ -118,7 +119,8 @@ export function AppNavbar() {
     const randomIndex = Math.floor(Math.random() * filteredWallpapers.length);
     const randomWallpaper = filteredWallpapers[randomIndex];
     try {
-      await applyWallpaper(randomWallpaper.id);
+      const screen = selectedScreen === "all" ? undefined : selectedScreen;
+      await applyWallpaper(randomWallpaper.id, screen);
       setSelectedId(randomWallpaper.id);
       toast.success(`Applied: ${randomWallpaper.title}`);
     } catch (error) {
