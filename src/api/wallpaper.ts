@@ -244,3 +244,7 @@ export async function getScreenshotHistory(): Promise<ScreenshotRecord[]> {
 export async function openFolder(path: string): Promise<void> {
   await invoke("open_folder", { path });
 }
+
+export async function openImage(path: string): Promise<void> {
+  await invoke("open_image", { path });
+}

@@ -802,6 +802,33 @@ async fn open_folder(path: String) -> Result<(), String> {
         Err("Open folder is only available on Linux".to_string())
     }
 }
+#[tauri::command]
+async fn open_image(path: String) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::process::Command;
+
+        // 检查文件是否存在
+        let path = std::path::Path::new(&path);
+        if !path.exists() {
+            return Err(format!("File not found: {}", path.display()));
+        }
+
+        // 使用 xdg-open 打开图片
+        if Command::new("xdg-open").arg(&path).spawn().is_ok() {
+            return Ok(());
+        }
+
+        Err("Failed to open image. Please ensure xdg-open is installed.".to_string())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = path;
+        Err("Open image is only available on Linux".to_string())
+    }
+}
+
 
 #[tauri::command]
 async fn get_active_wallpapers(
@@ -870,6 +897,7 @@ pub fn run() {
             // Active wallpaper commands
             get_active_wallpapers,
             open_folder,
+            open_image,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
