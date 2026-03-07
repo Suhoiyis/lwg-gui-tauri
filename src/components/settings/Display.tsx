@@ -8,45 +8,20 @@ import {
   SliderRow,
   SwitchRow,
   SwitchCard,
-  SelectField,
 } from "./Shared";
 
 export function DisplaySettings() {
   const { theme, setTheme } = useTheme();
-  const { settings, updateSetting, monitors } = useAppStore();
+  const { settings, updateSetting } = useAppStore();
 
   if (!settings) return <div>Loading...</div>;
-
-  // 动态生成显示器选项
-  const monitorOptions = [
-    { value: "all", label: "All Monitors" },
-    ...monitors.map((m) => ({ value: m, label: m })),
-  ];
 
   return (
     <div className="space-y-6">
       <Header
         title="Audio & Display"
-        desc="Manage multi-monitor setup and audio processing."
+        desc="Manage audio processing and interface theme."
       />
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Monitor className="w-4 h-4 text-blue-500" /> Display Output
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <SelectField
-            label="Target Monitor"
-            value={settings.lastScreen || "all"}
-            onValueChange={(v) =>
-              updateSetting("lastScreen", v === "all" ? null : v)
-            }
-            options={monitorOptions}
-          />
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>
