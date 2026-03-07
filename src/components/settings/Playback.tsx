@@ -32,12 +32,24 @@ export function PlaybackSettings() {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
     if (isTauri) {
       invoke<string>("get_display_server")
-        .then((result) => setIsWayland(result === "wayland"))
+        .then((result) => {
+          const wayland = result === "wayland";
+          setIsWayland(wayland);
+          // X11 环境下清除 Wayland 相关配置
+          if (!wayland && settings) {
+            if (settings.waylandOnlyActive) {
+              updateSetting("waylandOnlyActive", false);
+            }
+            if (settings.waylandIgnoreAppids) {
+              updateSetting("waylandIgnoreAppids", "");
+            }
+          }
+        })
         .catch(() => setIsWayland(false));
     } else {
       setIsWayland(false);
     }
-  }, []);
+  }, [settings, updateSetting]);
 
   if (!settings) return <div>Loading...</div>;
 
@@ -182,14 +194,14 @@ export function PlaybackSettings() {
           <SwitchRow
             label="Pause Only When Active"
             description="Only pause if app is focused"
-            checked={isWayland === false ? false : settings.waylandOnlyActive}
+            checked={settings.waylandOnlyActive}
             onCheckedChange={(v) => updateSetting("waylandOnlyActive", v)}
             disabled={isWayland === false}
           />
           <TextareaField
             label="Ignore Application IDs"
             description="Comma-separated list of app IDs to ignore when auto-pausing (e.g., steam, firefox, discord)"
-            value={isWayland === false ? "" : settings.waylandIgnoreAppids}
+            value={settings.waylandIgnoreAppids}
             onChange={(v) => updateSetting("waylandIgnoreAppids", v)}
             placeholder="dock, bar, launcher..."
             disabled={isWayland === false}
