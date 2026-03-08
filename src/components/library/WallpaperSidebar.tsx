@@ -39,6 +39,23 @@ function getPreviewUrl(preview: string): string {
   return convertFileSrc(preview);
 }
 
+/**
+ * 移除 BBCode 标签并清理文本
+ */
+function cleanDescription(text: string): string {
+  return text
+    // 1. 移除 BBCode 标签 [tag]...[/tag] 和 [tag=...]
+    .replace(/\[\/?[a-zA-Z0-9_]+\s*[^\]]*\]/g, "")
+    // 2. 移除裸露的 URL（BBCode 移除后剩下的）
+    .replace(/https?:\/\/\S+/g, "")
+    // 3. Trim 每行的开头和结尾空格（杀死用于居中对齐的大量空格）
+    .split("\n")
+    .map((line) => line.trim())
+    .join("\n")
+    // 4. 压缩多余空行
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
 export function WallpaperSidebar() {
   const selectedWallpaper = useAppStore((state) =>
     state.getSelectedWallpaper(),
@@ -198,14 +215,17 @@ export function WallpaperSidebar() {
             />
 
             {/* 4. 描述 - 使用 Accordion，可折叠展开 */}
-            {selectedWallpaper.description && (
+            {selectedWallpaper.description && cleanDescription(selectedWallpaper.description) && (
               <Accordion type="single" collapsible className="border-t pt-2">
                 <AccordionItem value="description" className="border-0">
                   <AccordionTrigger className="text-xs font-bold text-muted-foreground uppercase tracking-widest py-2 hover:no-underline">
                     Description
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground/80 leading-relaxed italic whitespace-pre-wrap pt-0">
-                    {selectedWallpaper.description}
+                  <AccordionContent
+                    className="text-sm text-muted-foreground/80 leading-relaxed italic break-words pt-0"
+                    style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}
+                  >
+                    {cleanDescription(selectedWallpaper.description)}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
