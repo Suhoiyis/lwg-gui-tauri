@@ -5,6 +5,7 @@ export interface Wallpaper {
   preview: string;
   type: "Video" | "Scene" | "Web";
   path: string;
+  description?: string;  // 新增
   tags?: string[];
   size?: string;
 }

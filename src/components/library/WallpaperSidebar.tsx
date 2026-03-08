@@ -15,6 +15,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { WallpaperCard } from "@/components/WallpaperCard";
 import { WallpaperMetadata } from "@/components/WallpaperMetadata";
 import { useAppStore } from "@/store/appStore";
@@ -191,15 +197,19 @@ export function WallpaperSidebar() {
               className="border-t pt-4"
             />
 
-            {/* 4. 描述 */}
-            <div className="space-y-2 border-t pt-4">
-              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                Description
-              </h3>
-              <p className="text-sm text-muted-foreground/80 leading-relaxed italic">
-                A high-quality live wallpaper for your desktop.
-              </p>
-            </div>
+            {/* 4. 描述 - 使用 Accordion，可折叠展开 */}
+            {selectedWallpaper.description && (
+              <Accordion type="single" collapsible className="border-t pt-2">
+                <AccordionItem value="description" className="border-0">
+                  <AccordionTrigger className="text-xs font-bold text-muted-foreground uppercase tracking-widest py-2 hover:no-underline">
+                    Description
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground/80 leading-relaxed italic whitespace-pre-wrap pt-0">
+                    {selectedWallpaper.description}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground/50 space-y-4">

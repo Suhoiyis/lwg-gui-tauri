@@ -40,6 +40,7 @@ pub struct Wallpaper {
     preview: String,
     wtype: String,
     path: String,
+    description: Option<String>,  // 新增
     tags: Vec<String>,
     size: String,
 }
@@ -343,7 +344,8 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
                 title: w.title.clone(),
                 preview: w.preview.to_string_lossy().to_string(),
                 wtype: w.wp_type.clone(),
-                path: format!("{}/{}", workshop_path, w.id),  // 每个壁纸的具体路径
+                path: format!("{}/{}", workshop_path, w.id),
+                description: if w.description.is_empty() { None } else { Some(w.description.clone()) },
                 tags: w.tags.clone(),
                 size: format_size(w.size),
             }

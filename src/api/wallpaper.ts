@@ -198,6 +198,7 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
       preview: item.preview,
       path: item.path || "",
       type: (item.wtype || "Scene") as "video" | "image" | "web",
+      description: item.description || undefined,  // 新增
       tags: item.tags || [],
       size: item.size || 0,
     }));
