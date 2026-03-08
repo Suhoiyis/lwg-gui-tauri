@@ -343,7 +343,7 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
                 title: w.title.clone(),
                 preview: w.preview.to_string_lossy().to_string(),
                 wtype: w.wp_type.clone(),
-                path: workshop_path.clone(),
+                path: format!("{}/{}", workshop_path, w.id),  // 每个壁纸的具体路径
                 tags: w.tags.clone(),
                 size: format_size(w.size),
             }
