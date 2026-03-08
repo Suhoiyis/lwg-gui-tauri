@@ -17,8 +17,15 @@ use lwg_core::{
     wallpaper::WallpaperManager,
     PerformanceMonitor,
     ScreenshotRecord,
-    LogManager, LogEntry,
+    LogManager, LogEntry, LogSource,
 };
+
+#[cfg(target_os = "linux")]
+fn log_gui(state: &State<'_, AppState>, message: &str) {
+    if let Ok(lm) = state.log_manager.lock() {
+        lm.info(LogSource::GUI, message);
+    }
+}
 
 // Non-Linux: provide local ScreenshotRecord definition
 #[cfg(not(target_os = "linux"))]
@@ -326,6 +333,7 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
     #[cfg(target_os = "linux")]
     {
         println!("🐧 [Linux] 扫描壁纸库...");
+        log_gui(&_state, "Scanning wallpaper library...");
 
         // 从配置获取 workshop_path，否则使用默认路径
         let config_manager = _state.config_manager.lock().await;
@@ -355,6 +363,7 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
             }
         }).collect();
 
+        log_gui(&_state, &format!("Found {} wallpapers", result.len()));
         println!("✅ [Linux] 扫描到 {} 张壁纸", result.len());
         Ok(result)
     }
@@ -377,9 +386,11 @@ async fn apply_wallpaper(
     #[cfg(target_os = "linux")]
     {
         println!("▶️ [Rust] 正在应用壁纸: {} (屏幕: {:?})", id, screen);
+        log_gui(&_state, &format!("Applying wallpaper: {} (screen: {:?})", id, screen));
         let mut controller = _state.controller.lock().await;
         controller.apply(&id, screen.as_deref()).await.map_err(|e| format!("应用失败: {:?}", e))?;
         println!("✅ [Rust] 壁纸应用成功！");
+        log_gui(&_state, "Wallpaper applied successfully");
         // 通知前端刷新活动壁纸
         let _ = app.emit("wallpaper-changed", ());
         return Ok(());
@@ -400,8 +411,10 @@ async fn stop_wallpaper(
 ) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
+        log_gui(&_state, "Stopping wallpaper");
         let mut controller = _state.controller.lock().await;
         controller.stop().await;
+        log_gui(&_state, "Wallpaper stopped");
         // 通知前端刷新活动壁纸
         let _ = app.emit("wallpaper-changed", ());
         Ok(())
@@ -1222,6 +1235,15 @@ pub fn run() {
                     });
                 }
             }
+
+            // 输出启动日志
+            #[cfg(target_os = "linux")]
+            {
+                if let Ok(lm) = log_manager_for_emit.lock() {
+                    lm.info(LogSource::GUI, "LWG GUI started successfully");
+                }
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
