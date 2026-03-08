@@ -15,6 +15,8 @@ import { useAppStore } from "@/store/appStore";
 
 interface LibraryHeaderProps {
   currentTitle: string;
+  activeWallpaperId: string | null;
+  onTitleClick: (id: string) => void;
   totalCount: number;
   currentPage: number;
   totalPages: number;
@@ -25,6 +27,8 @@ interface LibraryHeaderProps {
 export const LibraryHeader = memo(
   ({
     currentTitle,
+    activeWallpaperId,
+    onTitleClick,
     totalCount,
     currentPage,
     totalPages,
@@ -76,9 +80,18 @@ export const LibraryHeader = memo(
         {/* 左侧区域：Current Using */}
         <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest">
           <span className="text-pink-500 uppercase">Currently Using</span>
-          <span className="text-foreground truncate max-w-[300px]">
-            {currentTitle || "None"}
-          </span>
+          {activeWallpaperId ? (
+            <span
+              className="text-foreground truncate max-w-[300px] cursor-pointer hover:text-pink-500 transition-colors underline underline-offset-2 decoration-pink-500/30 hover:decoration-pink-500"
+              onClick={() => onTitleClick(activeWallpaperId)}
+            >
+              {currentTitle || "None"}
+            </span>
+          ) : (
+            <span className="text-foreground truncate max-w-[300px]">
+              {currentTitle || "None"}
+            </span>
+          )}
         </div>
         {/* 右侧区域：排序 + 分页信息 */}
         <div className="flex items-center gap-4">

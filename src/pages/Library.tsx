@@ -165,6 +165,18 @@ export function Library() {
 
     return `${uniqueIds.size} wallpapers playing`;
   }, [activeWallpapers, selectedScreen, wallpapers]);
+
+  // ✨ 5. 计算当前播放壁纸的 ID（用于点击跳转）
+  const activeWallpaperId = useMemo(() => {
+    if (selectedScreen !== "all") {
+      return activeWallpapers.get(selectedScreen) || null;
+    }
+    const allPlayingIds = Array.from(activeWallpapers.values());
+    const uniqueIds = new Set(allPlayingIds);
+    // 只有唯一壁纸时才返回 ID
+    return uniqueIds.size === 1 ? allPlayingIds[0] : null;
+  }, [activeWallpapers, selectedScreen]);
+
   // --- Event Handlers ---
 
   const handleSelect = useCallback(
@@ -230,6 +242,8 @@ export function Library() {
             <div className="px-6 pt-6 pb-4 shrink-0">
               <LibraryHeader
                 currentTitle={activeTitle}
+                activeWallpaperId={activeWallpaperId}
+                onTitleClick={handleSelect}
                 totalCount={filteredWallpapers.length}
                 currentPage={currentPage}
                 totalPages={totalPages}
