@@ -98,6 +98,8 @@ export const LOG_FILTER_OPTIONS = [
   { value: "All", label: "All Sources" },
   { value: "GUI", label: "GUI Only" },
   { value: "Core", label: "Core Only" },
+  { value: "Engine", label: "Engine Only" },
+  { value: "Controller", label: "Controller Only" },
 ] as const;
 
 export const LOG_LEVEL_COLORS: Record<string, string> = {

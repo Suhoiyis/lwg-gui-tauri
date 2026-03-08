@@ -17,6 +17,7 @@ use lwg_core::{
     wallpaper::WallpaperManager,
     PerformanceMonitor,
     ScreenshotRecord,
+    LogManager, LogEntry,
 };
 
 // Non-Linux: provide local ScreenshotRecord definition
@@ -210,6 +211,9 @@ struct AppState {
 
     #[cfg(target_os = "linux")]
     performance_monitor: Arc<std::sync::Mutex<PerformanceMonitor>>,
+
+    #[cfg(target_os = "linux")]
+    log_manager: Arc<std::sync::Mutex<LogManager>>,
 
     monitor_running: Arc<AtomicBool>,
 
@@ -1118,6 +1122,35 @@ async fn check_for_updates() -> Result<UpdateCheckResult, String> {
     })
 }
 
+// ================= 日志命令 =================
+
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn get_logs(state: State<'_, AppState>) -> Result<Vec<LogEntry>, String> {
+    let lm = state.log_manager.lock().map_err(|e| format!("Lock error: {}", e))?;
+    Ok(lm.get_logs())
+}
+
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn clear_logs(state: State<'_, AppState>) -> Result<(), String> {
+    let lm = state.log_manager.lock().map_err(|e| format!("Lock error: {}", e))?;
+    lm.clear();
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn get_logs() -> Result<Vec<serde_json::Value>, String> {
+    Ok(vec![])
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn clear_logs() -> Result<(), String> {
+    Ok(())
+}
+
 // ================= 主入口 =================
 
 pub fn run() {
@@ -1130,6 +1163,10 @@ pub fn run() {
         let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
         let mut controller = WallpaperController::new(shared_config.clone());
         controller.set_performance_monitor(performance_monitor.clone());
+
+        // 创建日志管理器
+        let log_manager = Arc::new(std::sync::Mutex::new(LogManager::new()));
+        controller.set_log_manager(log_manager.clone());
         
         // ✨ 检测已运行的壁纸进程
         let detected = WallpaperController::detect_existing_processes();
@@ -1154,6 +1191,7 @@ pub fn run() {
             controller: Mutex::new(controller),
             config_manager: Mutex::new(config_manager),
             performance_monitor,
+            log_manager,
             monitor_running: Arc::new(AtomicBool::new(false)),
         }
     };
@@ -1167,8 +1205,25 @@ pub fn run() {
         }
     };
 
+    // Clone log_manager BEFORE managing app_state (moved into .manage())
+    #[cfg(target_os = "linux")]
+    let log_manager_for_emit = app_state.log_manager.clone();
+
     tauri::Builder::default()
         .manage(app_state)
+        .setup(move |app| {
+            // Register log subscriber to emit log-entry events to frontend
+            #[cfg(target_os = "linux")]
+            {
+                let app_handle = app.handle().clone();
+                if let Ok(lm) = log_manager_for_emit.lock() {
+                    lm.subscribe(move |entry| {
+                        let _ = app_handle.emit("log-entry", entry);
+                    });
+                }
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             get_wallpapers,
             apply_wallpaper,
@@ -1185,13 +1240,6 @@ pub fn run() {
             check_xvfb_available,
             get_connected_monitors,
             // Performance monitoring commands
-            set_autostart,
-            get_autostart_status,
-            get_display_server,
-            check_xvfb_available,
-            set_autostart,
-            get_autostart_status,
-            // Performance monitoring commands
             start_performance_monitor,
             stop_performance_monitor,
             get_screenshot_history,
@@ -1201,6 +1249,9 @@ pub fn run() {
             get_active_wallpapers,
             open_folder,
             open_image,
+            // Log commands
+            get_logs,
+            clear_logs,
             // Update check commands
             check_for_updates,
         ])

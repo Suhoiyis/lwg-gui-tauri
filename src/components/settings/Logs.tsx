@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Filter, Copy, Check } from "lucide-react";
+import { Filter, Copy, Check, Trash2 } from "lucide-react";
+import { invoke } from "@tauri-apps/api/core";
+import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { LogEntry } from "@/types";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,29 +25,23 @@ export function LogViewer() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
   useEffect(() => {
-    setLogs([
-      {
-        id: 1,
-        timestamp: "10:00:01",
-        level: "info",
-        source: "GUI",
-        message: "Application initialized",
-      },
-      {
-        id: 2,
-        timestamp: "10:00:02",
-        level: "info",
-        source: "Core",
-        message: "Connected to Wallpaper Engine Core",
-      },
-      {
-        id: 3,
-        timestamp: "10:00:02",
-        level: "warn",
-        source: "Controller",
-        message: "Steam API not detected",
-      },
-    ]);
+    // Fetch initial logs from backend
+    invoke<LogEntry[]>("get_logs")
+      .then((data) => setLogs(data))
+      .catch((err) => console.error("Failed to fetch logs:", err));
+
+    // Listen for real-time log entries
+    let unlisten: UnlistenFn | undefined;
+    const setupListener = async () => {
+      unlisten = await listen<LogEntry>("log-entry", (event) => {
+        setLogs((prev) => [...prev, event.payload]);
+      });
+    };
+    setupListener().catch(console.error);
+
+    return () => {
+      if (unlisten) unlisten();
+    };
   }, []);
 
   const filteredLogs = useMemo(
@@ -58,6 +54,12 @@ export function LogViewer() {
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
   }, [filteredLogs]);
+
+  const handleClear = useCallback(() => {
+    invoke("clear_logs")
+      .then(() => setLogs([]))
+      .catch((err) => console.error("Failed to clear logs:", err));
+  }, []);
 
   return (
     <div className="space-y-6 h-full flex flex-col">
@@ -99,19 +101,30 @@ export function LogViewer() {
         <span className="text-[10px] text-muted-foreground">
           {filteredLogs.length} entries
         </span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          className="h-8 gap-2 text-xs"
-        >
-          {isCopied ? (
-            <Check className="w-3 h-3 text-green-500" />
-          ) : (
-            <Copy className="w-3 h-3" />
-          )}
-          {isCopied ? "Copied!" : "Copy"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClear}
+            className="h-8 gap-2 text-xs"
+          >
+            <Trash2 className="w-3 h-3" />
+            Clear
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopy}
+            className="h-8 gap-2 text-xs"
+          >
+            {isCopied ? (
+              <Check className="w-3 h-3 text-green-500" />
+            ) : (
+              <Copy className="w-3 h-3" />
+            )}
+            {isCopied ? "Copied!" : "Copy"}
+          </Button>
+        </div>
       </div>
     </div>
   );
