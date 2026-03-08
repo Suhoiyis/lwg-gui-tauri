@@ -26,23 +26,24 @@ export function useActiveWallpapers() {
 
     fetchActiveWallpapers();
 
-    // Also listen for performance updates to refresh the wallpaper info
-    const setupListener = async () => {
-      const unlisten = await listen("performance-update", () => {
+    // 监听两个事件：performance-update 和 wallpaper-changed
+    const setupListeners = async () => {
+      const unlistenPerf = await listen("performance-update", () => {
         fetchActiveWallpapers();
       });
-      return unlisten;
+      const unlistenWp = await listen("wallpaper-changed", () => {
+        fetchActiveWallpapers();
+      });
+      return [unlistenPerf, unlistenWp];
     };
 
-    let unlisten: (() => void) | null = null;
-    setupListener().then((fn) => {
-      unlisten = fn;
+    let unlisteners: (() => void)[] = [];
+    setupListeners().then((fns) => {
+      unlisteners = fns;
     });
 
     return () => {
-      if (unlisten) {
-        unlisten();
-      }
+      unlisteners.forEach((fn) => fn());
     };
   }, []);
 

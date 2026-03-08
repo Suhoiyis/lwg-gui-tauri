@@ -32,7 +32,7 @@ import { LibraryPagination } from "@/components/library/LibraryPagination";
 // State & API
 import { useAppStore } from "@/store/appStore";
 import { applyWallpaper, stopWallpaper, openFolder } from "@/api/wallpaper";
-
+import { useActiveWallpapers } from "@/hooks/useActiveWallpapers";
 const ITEMS_PER_PAGE = 24;
 
 export function Library() {
@@ -46,6 +46,9 @@ export function Library() {
   // ✨ 2. 订阅排序状态
   const sortBy = useAppStore((state) => state.sortBy);
 
+  // ✨ 3. 获取屏幕选择和活动壁纸状态
+  const selectedScreen = useAppStore((state) => state.selectedScreen);
+  const { activeWallpapers } = useActiveWallpapers();
   // Local State
   const [wallpaperToDelete, setWallpaperToDelete] = useState<{
     id: string;
@@ -140,6 +143,28 @@ export function Library() {
     return index !== -1 ? index + 1 : 0;
   }, [filteredWallpapers, selectedId]);
 
+  // ✨ 4. 计算当前正在播放的壁纸标题（基于 selectedScreen）
+  const activeTitle = useMemo(() => {
+    // 如果选择了特定屏幕
+    if (selectedScreen !== "all") {
+      const wallpaperId = activeWallpapers.get(selectedScreen);
+      if (!wallpaperId) return "None";
+      const wallpaper = wallpapers.find((w) => w.id === wallpaperId);
+      return wallpaper?.title || "None";
+    }
+
+    // 如果选择了 "all"
+    const allPlayingIds = Array.from(activeWallpapers.values());
+    const uniqueIds = new Set(allPlayingIds);
+
+    if (uniqueIds.size === 0) return "None";
+    if (uniqueIds.size === 1) {
+      const wallpaper = wallpapers.find((w) => w.id === allPlayingIds[0]);
+      return wallpaper?.title || "None";
+    }
+
+    return `${uniqueIds.size} wallpapers playing`;
+  }, [activeWallpapers, selectedScreen, wallpapers]);
   // --- Event Handlers ---
 
   const handleSelect = useCallback(
@@ -204,7 +229,7 @@ export function Library() {
             {/* Header */}
             <div className="px-6 pt-6 pb-4 shrink-0">
               <LibraryHeader
-                currentTitle={selectedWallpaper?.title || ""}
+                currentTitle={activeTitle}
                 totalCount={filteredWallpapers.length}
                 currentPage={currentPage}
                 totalPages={totalPages}

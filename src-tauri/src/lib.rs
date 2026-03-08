@@ -366,6 +366,7 @@ async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, S
 async fn apply_wallpaper(
     id: String,
     screen: Option<String>,
+    app: tauri::AppHandle,
     _state: State<'_, AppState>
 ) -> Result<(), String> {
 
@@ -375,29 +376,38 @@ async fn apply_wallpaper(
         let mut controller = _state.controller.lock().await;
         controller.apply(&id, screen.as_deref()).await.map_err(|e| format!("应用失败: {:?}", e))?;
         println!("✅ [Rust] 壁纸应用成功！");
+        // 通知前端刷新活动壁纸
+        let _ = app.emit("wallpaper-changed", ());
         return Ok(());
     }
 
     #[cfg(not(target_os = "linux"))]
     {
         println!("🪟 [Windows] 模拟应用成功: {}", id);
+        let _ = app.emit("wallpaper-changed", ());
         Ok(())
     }
 }
 
 #[tauri::command]
-async fn stop_wallpaper(_state: State<'_, AppState>) -> Result<(), String> {
+async fn stop_wallpaper(
+    app: tauri::AppHandle,
+    _state: State<'_, AppState>
+) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         let mut controller = _state.controller.lock().await;
         controller.stop().await;
+        // 通知前端刷新活动壁纸
+        let _ = app.emit("wallpaper-changed", ());
         Ok(())
     }
 
     #[cfg(not(target_os = "linux"))]
     {
         println!("🪟 [Windows] 模拟停止");
-        Ok(()) // 👈 修复 E0308
+        let _ = app.emit("wallpaper-changed", ());
+        Ok(())
     }
 }
 
