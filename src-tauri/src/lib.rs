@@ -1128,8 +1128,28 @@ pub fn run() {
         let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
         let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
-        let mut controller = WallpaperController::new(shared_config);
+        let mut controller = WallpaperController::new(shared_config.clone());
         controller.set_performance_monitor(performance_monitor.clone());
+        
+        // ✨ 检测已运行的壁纸进程
+        let detected = WallpaperController::detect_existing_processes();
+        if !detected.is_empty() {
+            println!("🔍 检测到 {} 个已运行的壁纸进程", detected.len());
+            
+            // 更新 config.active_monitors
+            let mut config = shared_config.blocking_lock();
+            let mut detected_pids = HashMap::new();
+            
+            for (screen, (pid, wp_id)) in &detected {
+                config.active_monitors.insert(screen.clone(), wp_id.clone());
+                detected_pids.insert(screen.clone(), *pid);
+                println!("  屏幕 {}: PID {}, 壁纸 {}", screen, pid, wp_id);
+            }
+            
+            // 注入 detected_pids 到 controller
+            controller.set_detected_pids(detected_pids);
+        }
+        
         AppState {
             controller: Mutex::new(controller),
             config_manager: Mutex::new(config_manager),
