@@ -8,6 +8,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Wallpaper } from "@/types";
+import { convertFileSrc } from "@tauri-apps/api/core";
 
 interface CompactCarouselProps {
   /** 壁纸列表 */
@@ -19,10 +20,15 @@ interface CompactCarouselProps {
 }
 
 /**
- * 文件路径转换函数
- * 在 Tauri 环境中会使用 convertFileSrc，这里提供默认实现
+ * 获取预览图 URL
+ * 处理本地文件路径和网络 URL 两种情况
  */
-const convertFileSrc = (path: string) => path;
+function getPreviewUrl(preview: string): string {
+  if (preview.startsWith("http://") || preview.startsWith("https://")) {
+    return preview;
+  }
+  return convertFileSrc(preview);
+}
 
 /**
  * Compact 模式底部缩略图轮播组件
@@ -80,10 +86,14 @@ export function CompactCarousel({
               >
                 {wp.preview ? (
                   <img
-                    src={convertFileSrc(wp.preview)}
+                    src={getPreviewUrl(wp.preview)}
                     alt={wp.title}
                     className="w-full h-full object-cover"
                     draggable={false}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
+                    }}
                   />
                 ) : (
                   <div className="bg-muted w-full h-full" />
