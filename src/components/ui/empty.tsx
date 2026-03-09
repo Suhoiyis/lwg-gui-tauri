@@ -1,7 +1,9 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { Ghost } from "lucide-react";
+import { Ghost, Settings } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/appStore";
+import { Button } from "@/components/ui/button";
 
 function Empty({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -105,6 +107,17 @@ export {
 };
 
 export function EmptyState() {
+  const workshopPath = useAppStore((state) => state.settings?.workshopPath);
+  const setActiveTab = useAppStore((state) => state.setActiveTab);
+  const setHighlightSettingField = useAppStore(
+    (state) => state.setHighlightSettingField,
+  );
+
+  const handleConfigurePath = () => {
+    setActiveTab("settings");
+    setHighlightSettingField("workshopPath");
+  };
+
   return (
     <Empty>
       <EmptyMedia>
@@ -113,9 +126,24 @@ export function EmptyState() {
       <EmptyHeader>
         <EmptyTitle>No Wallpapers Found</EmptyTitle>
         <EmptyDescription>
-          Try a correct library path or add some new wallpapers.
+          The wallpaper library appears to be empty.
         </EmptyDescription>
       </EmptyHeader>
+      <EmptyContent>
+        {/* Display current path */}
+        <div className="text-sm text-muted-foreground space-y-2">
+          <span className="font-medium">Current Library Path:</span>
+          <code className="block px-3 py-2 bg-muted rounded text-xs break-all">
+            {workshopPath || "Not configured"}
+          </code>
+        </div>
+
+        {/* Configure button */}
+        <Button onClick={handleConfigurePath} variant="default" size="sm">
+          <Settings className="w-4 h-4 mr-2" />
+          Configure Library Path
+        </Button>
+      </EmptyContent>
     </Empty>
   );
 }

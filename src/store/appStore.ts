@@ -41,6 +41,9 @@ const NON_RUNTIME_SETTINGS = new Set<keyof AppConfig>([
 
 const saveTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
 
+// Highlight timeout for settings field focus
+let highlightTimeout: ReturnType<typeof setTimeout> | undefined;
+
 const isSliderOrInput = (key: keyof AppConfig): boolean => {
   const sliderInputKeys: Array<keyof AppConfig> = [
     "volume",
@@ -80,6 +83,9 @@ interface AppState {
   // ✨✨ 新增：截图引导状态 ✨✨
   screenshotHintActive: boolean;
 
+  // ✨✨ 新增：设置字段高亮状态（用于跨组件通信）✨✨
+  highlightSettingField: string | null;
+
   // Actions
   loadWallpapers: () => Promise<void>;
   setSelectedId: (id: string | null) => void;
@@ -91,6 +97,9 @@ interface AppState {
 
   // ✨✨ 新增：设置截图引导状态的方法 ✨✨
   setScreenshotHintActive: (active: boolean) => void;
+
+  // ✨✨ 新增：设置字段高亮方法 ✨✨
+  setHighlightSettingField: (field: string | null) => void;
 
   toggleFavorite: (id: string) => void;
   isFavorite: (id: string) => boolean;
@@ -136,6 +145,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   // ✨✨ 截图引导提示默认关闭 ✨✨
   screenshotHintActive: false,
 
+  // ✨✨ 设置字段高亮默认为 null ✨✨
+  highlightSettingField: null,
+
   // Wallpaper actions
   loadWallpapers: async () => {
     const data = await scanWallpapers();
@@ -167,6 +179,23 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // ✨✨ 新增截图动作 ✨✨
   setScreenshotHintActive: (active) => set({ screenshotHintActive: active }),
+
+  // ✨✨ 新增设置字段高亮动作 ✨✨
+  setHighlightSettingField: (field) => {
+    // Clear previous timeout BEFORE setting new one (prevents race conditions)
+    if (highlightTimeout) {
+      clearTimeout(highlightTimeout);
+    }
+
+    set({ highlightSettingField: field });
+
+    // Auto-clear highlight after 3 seconds
+    if (field) {
+      highlightTimeout = setTimeout(() => {
+        set({ highlightSettingField: null });
+      }, 3000);
+    }
+  },
 
   // Favorites & nicknames actions
   toggleFavorite: (id: string) => {

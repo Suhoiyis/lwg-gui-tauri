@@ -328,11 +328,13 @@ export function PathInputField({
   value,
   onChange,
   placeholder,
+  className,
 }: {
   label: string | React.ReactNode;
   value: string;
   onChange: (value: string | null) => void;
   placeholder?: string;
+  className?: string;
 }) {
   const handleBrowse = async () => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
@@ -364,6 +366,7 @@ export function PathInputField({
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value || null)}
+          className={className}
         />
         <Button variant="secondary" onClick={handleBrowse}>
           <FolderOpen className="w-4 h-4" />

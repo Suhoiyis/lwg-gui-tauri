@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   PlayCircle,
   Monitor,
@@ -32,6 +32,7 @@ export function Settings() {
     flushPendingUpdates,
     restartWallpapers,
     settingsLoading,
+    highlightSettingField,
   } = useAppStore();
   const handleSave = useCallback(async () => {
     try {
@@ -62,6 +63,22 @@ export function Settings() {
     }
   }, []);
 
+  // ✨ Auto-switch to appropriate tab when highlight is triggered
+  useEffect(() => {
+    if (highlightSettingField) {
+      // Map field names to their corresponding tabs
+      const fieldToTabMap: Record<string, SettingsTab> = {
+        workshopPath: "system",
+        assetsPath: "system",
+        // Add more field mappings as needed
+      };
+
+      const targetTab = fieldToTabMap[highlightSettingField];
+      if (targetTab && activeTab !== targetTab) {
+        setActiveTab(targetTab);
+      }
+    }
+  }, [highlightSettingField, activeTab]);
   return (
     <div className="flex h-full w-full bg-background text-foreground rounded-xl overflow-hidden border">
       {/* Sidebar Navigation */}

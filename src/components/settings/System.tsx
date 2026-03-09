@@ -28,7 +28,7 @@ import {
 } from "./Shared";
 
 export function SystemSettings() {
-  const { settings, updateSetting } = useAppStore();
+  const { settings, updateSetting, highlightSettingField } = useAppStore();
   const [autostart, setAutostart] = useState(false);
   const [hasXvfb, setHasXvfb] = useState<boolean | null>(null);
 
@@ -73,6 +73,21 @@ export function SystemSettings() {
     [settings?.startHidden],
   );
 
+  // ✨ Scroll highlighted field into view
+  useEffect(() => {
+    if (highlightSettingField === "workshopPath") {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        const inputElement = document.querySelector(
+          'input[value*="workshopPath"], input[placeholder*="Steam"]',
+        );
+        if (inputElement) {
+          inputElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightSettingField]);
   if (!settings) return <div>Loading...</div>;
 
   return (
@@ -99,6 +114,11 @@ export function SystemSettings() {
               value={settings.workshopPath || ""}
               onChange={(v) => updateSetting("workshopPath", v)}
               placeholder="/home/user/.local/share/Steam/steamapps/workshop/content/431960"
+              className={
+                highlightSettingField === "workshopPath"
+                  ? "ring-2 ring-primary animate-pulse"
+                  : ""
+              }
             />
             <PathInputField
               label={
