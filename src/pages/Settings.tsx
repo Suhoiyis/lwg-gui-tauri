@@ -133,7 +133,7 @@ export function Settings() {
       </aside>
 
       <ScrollArea className="flex-1 bg-card/10">
-        <div className="p-8 max-w-4xl space-y-8 pb-20">
+        <div className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
           {activeTab === "playback" && <PlaybackSettings />}
           {activeTab === "display" && <DisplaySettings />}
           {activeTab === "system" && <SystemSettings />}
