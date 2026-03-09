@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAppStore } from "@/store/appStore";
 
@@ -20,16 +20,22 @@ export function CompactMode() {
   const { wallpapers, selectedId, setSelectedId, toggleCompactMode } =
     useAppStore();
 
+  // 动态预览状态：当底部轮播图滑动时实时更新的壁纸 ID
+  const [dynamicPreviewId, setDynamicPreviewId] = useState<string | null>(null);
+
+  // 计算当前显示的壁纸（优先显示滑动预览，没有则显示已选中的）
+  const displayId = dynamicPreviewId || selectedId;
+
   // 计算当前壁纸
   const currentWallpaper = useMemo(
-    () => wallpapers.find((w) => w.id === selectedId) || wallpapers[0],
-    [wallpapers, selectedId],
+    () => wallpapers.find((w) => w.id === displayId) || wallpapers[0],
+    [wallpapers, displayId],
   );
 
   // 计算当前索引 (1-based)
   const currentIndex = useMemo(
-    () => wallpapers.findIndex((w) => w.id === selectedId) + 1,
-    [wallpapers, selectedId],
+    () => wallpapers.findIndex((w) => w.id === displayId) + 1,
+    [wallpapers, displayId],
   );
 
   // 切换到正常窗口模式
@@ -108,6 +114,7 @@ export function CompactMode() {
         wallpapers={wallpapers}
         selectedId={selectedId}
         onSelect={handleSelect}
+        onHoverPreview={setDynamicPreviewId}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -17,6 +17,8 @@ interface CompactCarouselProps {
   selectedId: string | null;
   /** 选择壁纸回调 */
   onSelect: (id: string) => void;
+  /** 滑动/悬停时的实时预览回调 */
+  onHoverPreview?: (id: string | null) => void;
 }
 
 
@@ -29,8 +31,14 @@ export function CompactCarousel({
   wallpapers,
   selectedId,
   onSelect,
+  onHoverPreview,
 }: CompactCarouselProps) {
-  const apiRef = useRef<CarouselApi | undefined>(undefined);
+  const [api, setApi] = useState<CarouselApi | undefined>(undefined);
+  const [localHoverId, setLocalHoverId] = useState<string | null>(null);
+  
+  // 用于区分“用户手动拖拽”和“外部触发的 api.scrollTo()”
+  // 外部触发的滚动不应该发射 onHoverPreview 事件，避免上方大图闪烁
+  const isAutoScrollingRef = useRef(false);
 
   // 使用 ref 保持回调最新，避免 useEffect 因 onSelect 变化重新注册
   const onSelectRef = useRef(onSelect);
@@ -42,36 +50,75 @@ export function CompactCarousel({
   const wallpapersRef = useRef(wallpapers);
   wallpapersRef.current = wallpapers;
 
-  const handleSetApi = useCallback((api: CarouselApi) => {
-    apiRef.current = api;
+  const onHoverPreviewRef = useRef(onHoverPreview);
+  onHoverPreviewRef.current = onHoverPreview;
+
+  const handleSetApi = useCallback((newApi: CarouselApi) => {
+    setApi(newApi);
   }, []);
 
-  // 监听 Embla 的 "select" 事件，同步选中状态
+  // 监听 Embla 的事件，同步选中和实时预览状态
   useEffect(() => {
-    const api = apiRef.current;
     if (!api) return;
 
+    // 当滚动完全停止并锁定到一个 snap point 时
     const handleSelect = () => {
       const snapIndex = api.selectedScrollSnap();
       const targetWp = wallpapersRef.current[snapIndex];
       if (targetWp && targetWp.id !== selectedIdRef.current) {
         onSelectRef.current(targetWp.id);
       }
+      // 触发真实选中后，清除悬停预览
+      onHoverPreviewRef.current?.(null);
+      setLocalHoverId(null);
+      isAutoScrollingRef.current = false;
+    };
+
+    // 当用户正在滚动时实时触发
+    const handleScroll = () => {
+      // 如果是外部调用 scrollTo 引起的滚动动画，则忽略，避免画面闪烁
+      if (isAutoScrollingRef.current) return;
+
+      // selectedScrollSnap() 会略过中间项，直接报告终点
+      // slidesInView() 会实时返回当前视野内的卡片索引数组（通常是奇数个）
+      const inView = api.slidesInView();
+      if (inView.length > 0) {
+        // 取视野正中间的索引
+        const centerIndex = inView[Math.floor(inView.length / 2)];
+        const targetWp = wallpapersRef.current[centerIndex];
+        if (targetWp) {
+          onHoverPreviewRef.current?.(targetWp.id);
+          setLocalHoverId(targetWp.id);
+        }
+      }
+    };
+
+    // 当手指松开，轮播图惯性停止时，清除预览状态让视图恢复到 selectedId
+    // 用户停下来如果不改变选择，这里会触发；如果改变了，会触发 select
+    const handleSettle = () => {
+      onHoverPreviewRef.current?.(null);
+      setLocalHoverId(null);
+      isAutoScrollingRef.current = false;
     };
 
     api.on("select", handleSelect);
+    api.on("scroll", handleScroll);
+    api.on("settle", handleSettle);
+    
     return () => {
       api.off("select", handleSelect);
+      api.off("scroll", handleScroll);
+      api.off("settle", handleSettle);
     };
-  }, [apiRef.current]); // re-register when api becomes available
+  }, [api]); // re-register when api becomes available
 
   // 当外部 selectedId 变化时，同步轮播位置
   useEffect(() => {
-    const api = apiRef.current;
     if (!api) return;
 
     const index = wallpapers.findIndex((w) => w.id === selectedId);
     if (index !== -1 && api.selectedScrollSnap() !== index) {
+      isAutoScrollingRef.current = true;
       api.scrollTo(index);
     }
   }, [selectedId, wallpapers]);
@@ -82,9 +129,10 @@ export function CompactCarousel({
       // 直接触发选中，不依赖 Embla 的 "select" 事件
       onSelect(wp.id);
       // 同时滚动到该位置
-      apiRef.current?.scrollTo(index);
+      isAutoScrollingRef.current = true;
+      api?.scrollTo(index);
     },
-    [onSelect],
+    [onSelect, api],
   );
 
   return (
@@ -104,7 +152,7 @@ export function CompactCarousel({
               <div
                 className={`
                   aspect-square rounded-md overflow-hidden cursor-pointer transition-all border-2
-                  ${selectedId === wp.id ? "border-primary shadow-md scale-95" : "border-transparent opacity-60 hover:opacity-100"}
+                  ${(localHoverId || selectedId) === wp.id ? "border-primary shadow-md scale-95" : "border-transparent opacity-60 hover:opacity-100"}
                 `}
                 onClick={() => handleItemClick(wp, index)}
               >
