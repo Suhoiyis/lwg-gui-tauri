@@ -2,6 +2,7 @@
 import { memo, useMemo } from "react";
 import { Star, Video, Monitor, Globe, Image as ImageIcon } from "lucide-react";
 import { Wallpaper } from "@/types";
+import { renderInlineMarkdown } from "@/lib/markdown";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
@@ -151,7 +152,7 @@ export const WallpaperCard = memo(function WallpaperCard({
         {showTitle && (
           <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-muted/90 via-muted/50 to-transparent p-3 pt-8 pointer-events-none">
             <p className="text-[11px] font-bold text-foreground truncate">
-              {wp.title}
+              {renderInlineMarkdown(wp.title)}
             </p>
           </div>
         )}

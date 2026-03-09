@@ -22,6 +22,7 @@ import PerformanceChart from "./Chart";
 import { useActiveWallpapers } from "@/hooks/useActiveWallpapers";
 import { useAppStore } from "@/store/appStore";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import { renderInlineMarkdown } from "@/lib/markdown";
 
 interface ProcessRowProps {
   type: string;
@@ -209,7 +210,7 @@ const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
                           Wallpaper
                         </Badge>
                         <span className="text-sm font-bold">
-                          {firstWallpaperInfo.wallpaper?.title || "Unknown"}
+                          {firstWallpaperInfo.wallpaper?.title ? renderInlineMarkdown(firstWallpaperInfo.wallpaper.title) : "Unknown"}
                         </span>
                       </div>
                       <div className="text-xs text-muted-foreground flex items-center gap-4">

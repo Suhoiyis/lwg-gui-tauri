@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WallpaperCard } from "@/components/WallpaperCard";
 import { Wallpaper } from "@/types";
+import { renderInlineMarkdown } from "@/lib/markdown";
 
 interface CompactPreviewProps {
   /** 当前壁纸 */
@@ -80,7 +81,7 @@ export function CompactPreview({
       {/* Title & ID */}
       <div className="w-full text-center space-y-1">
         <h3 className="font-bold text-lg leading-tight line-clamp-2 px-4">
-          {wallpaper?.title || "Select Wallpaper"}
+          {wallpaper?.title ? renderInlineMarkdown(wallpaper.title) : "Select Wallpaper"}
         </h3>
         <div
           className="inline-flex items-center gap-1 text-[10px] bg-muted px-2 py-0.5 rounded-full text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors"

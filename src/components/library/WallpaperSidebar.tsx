@@ -29,6 +29,7 @@ import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { cn } from "@/lib/utils";
+import { renderInlineMarkdown } from "@/lib/markdown";
 
 /**
  * 将本地文件路径转换为浏览器可加载的 URL
@@ -121,7 +122,7 @@ export function WallpaperSidebar() {
             {/* 2. 标题与基础信息 */}
             <div className="space-y-2">
               <h1 className="text-xl font-bold leading-tight break-words">
-                {selectedWallpaper.title}
+                {renderInlineMarkdown(selectedWallpaper.title)}
               </h1>
               {/* ID 和 Size */}
               <div className="flex flex-wrap gap-2">

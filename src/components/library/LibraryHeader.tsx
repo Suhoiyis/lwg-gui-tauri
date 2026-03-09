@@ -2,6 +2,7 @@
 import { memo, useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { renderInlineMarkdown } from "@/lib/markdown";
 
 import {
   Select,
@@ -172,11 +173,11 @@ export const LibraryHeader = memo(
                   className="text-foreground truncate flex-1 min-w-0 cursor-pointer hover:text-brand transition-colors underline underline-offset-2 decoration-brand/30 hover:decoration-brand"
                   onClick={() => onTitleClick(activeWallpaperId)}
                 >
-                  {currentTitle || "None"}
+                  {currentTitle ? renderInlineMarkdown(currentTitle) : "None"}
                 </span>
               ) : (
                 <span className="text-foreground truncate flex-1 min-w-0">
-                  {currentTitle || "None"}
+                  {currentTitle ? renderInlineMarkdown(currentTitle) : "None"}
                 </span>
               )}
             </div>
@@ -201,11 +202,11 @@ export const LibraryHeader = memo(
                   className="text-foreground truncate flex-1 min-w-0 cursor-pointer hover:text-brand transition-colors"
                   onClick={() => onTitleClick(activeWallpaperId)}
                 >
-                  {currentTitle || "None"}
+                  {currentTitle ? renderInlineMarkdown(currentTitle) : "None"}
                 </span>
               ) : (
                 <span className="text-foreground truncate flex-1 min-w-0">
-                  {currentTitle || "None"}
+                  {currentTitle ? renderInlineMarkdown(currentTitle) : "None"}
                 </span>
               )}
             </div>
