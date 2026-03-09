@@ -15,7 +15,7 @@ import { useAppStore } from "@/store/appStore";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { openFolder, openImage } from "@/api/wallpaper";
 import { toast } from "sonner";
-
+import { Thumbnail } from "@/components/ui/thumbnail";
 import {
   Empty,
   EmptyContent,
@@ -104,14 +104,11 @@ const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
     <div className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors group">
       {/* 左侧：缩略图 + 壁纸信息 */}
       <div className="flex items-center gap-4">
-        <ScreenshotThumbnail wallpaperId={record.wpId} />
+        <Thumbnail wallpaperId={record.wpId} className="w-12 h-12" />
+
         <div>
           <div className="text-base font-bold">
             {wallpaper?.title || "Unknown Wallpaper"}
-          </div>
-          <div className="text-xs text-muted-foreground flex items-center gap-1">
-            <Layers className="w-3 h-3" />
-            ID: {record.wpId}
           </div>
         </div>
       </div>

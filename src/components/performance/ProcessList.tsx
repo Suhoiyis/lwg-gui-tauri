@@ -13,6 +13,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Thumbnail } from "@/components/ui/thumbnail";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { ProcessStats, SystemStats } from "@/types/performance";
@@ -56,19 +57,15 @@ const WallpaperPreview = memo(
     }
 
     return (
-      <div className="w-20 h-20 bg-muted/60 rounded-md overflow-hidden border border-border/50 shrink-0 relative group">
-        <img
-          src={previewUrl || ""}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          alt={wallpaper.title}
-          loading="lazy"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = "none";
-          }}
+      <div className="relative group rounded-md overflow-hidden">
+        {/* 1. 直接复用通用缩略图组件，并在这里传入外壳的尺寸 w-20 h-20 */}
+        <Thumbnail
+          wallpaperId={wallpaper?.id || ""}
+          className="w-20 h-20 rounded-md"
         />
-        <div className="absolute bottom-0 inset-x-0 bg-muted/80 text-[10px] text-foreground p-1 text-center truncate">
-          {wallpaper.type || "Wallpaper"}
+
+        <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-white p-1 text-center truncate">
+          {wallpaper?.type || "No Wallpaper"}
         </div>
       </div>
     );

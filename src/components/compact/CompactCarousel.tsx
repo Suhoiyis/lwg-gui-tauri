@@ -7,6 +7,7 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { Thumbnail } from "@/components/ui/thumbnail";
 import { Wallpaper } from "@/types";
 import { convertFileSrc } from "@tauri-apps/api/core";
 
@@ -17,17 +18,6 @@ interface CompactCarouselProps {
   selectedId: string | null;
   /** 选择壁纸回调 */
   onSelect: (id: string) => void;
-}
-
-/**
- * 获取预览图 URL
- * 处理本地文件路径和网络 URL 两种情况
- */
-function getPreviewUrl(preview: string): string {
-  if (preview.startsWith("http://") || preview.startsWith("https://")) {
-    return preview;
-  }
-  return convertFileSrc(preview);
 }
 
 /**
@@ -85,16 +75,29 @@ export function CompactCarousel({
                 onClick={() => api?.scrollTo(index)}
               >
                 {wp.preview ? (
-                  <img
-                    src={getPreviewUrl(wp.preview)}
-                    alt={wp.title}
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
-                    }}
-                  />
+                  <CarouselContent className="-ml-1">
+                    {wallpapers.map((wp, index) => (
+                      <CarouselItem
+                        key={wp.id}
+                        className="pl-1 basis-1/5 select-none"
+                      >
+                        <div
+                          className={`
+                  aspect-square rounded-md overflow-hidden cursor-pointer transition-all border-2
+                  ${selectedId === wp.id ? "border-primary shadow-md scale-95" : "border-transparent opacity-60 hover:opacity-100"}
+                `}
+                          onClick={() => api?.scrollTo(index)}
+                        >
+                          {/* ✨ 替换开始：使用通用 Thumbnail 组件，把宽度高度 100% 交给它 */}
+                          <Thumbnail
+                            wallpaperId={wp.id}
+                            className="w-full h-full"
+                          />
+                          {/* ✨ 替换结束 */}
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
                 ) : (
                   <div className="bg-muted w-full h-full" />
                 )}
