@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/appStore";
 
 // 子组件
@@ -8,6 +7,7 @@ import { CompactNavbar } from "@/components/compact/CompactNavbar";
 import { CompactPreview } from "@/components/compact/CompactPreview";
 import { WallpaperMetadata } from "@/components/WallpaperMetadata";
 import { CompactCarousel } from "@/components/compact/CompactCarousel";
+import { ApplyButton } from "@/components/ApplyButton";
 
 // Tauri API
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
@@ -93,12 +93,10 @@ export function CompactMode() {
           />
 
           {/* Apply Button */}
-          <Button
-            className="w-full font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
+          <ApplyButton
             size="lg"
-          >
-            Apply Wallpaper
-          </Button>
+            className="w-full font-bold bg-brand hover:bg-brand/90 text-brand-foreground shadow-lg shadow-brand/20 transition-all active:scale-95"
+          />
 
           {/* Metadata */}
           <WallpaperMetadata wallpaper={currentWallpaper} />

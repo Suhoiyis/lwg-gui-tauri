@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Star, Edit3 } from "lucide-react";
+import { Star, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import {
@@ -24,8 +24,8 @@ import {
 } from "@/components/ui/accordion";
 import { WallpaperCard } from "@/components/WallpaperCard";
 import { WallpaperMetadata } from "@/components/WallpaperMetadata";
+import { ApplyButton } from "@/components/ApplyButton";
 import { useAppStore } from "@/store/appStore";
-import { applyWallpaper } from "@/api/wallpaper";
 import { toast } from "sonner";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { cn } from "@/lib/utils";
@@ -98,20 +98,6 @@ export function WallpaperSidebar() {
         isFavorite ? "Removed from favorites" : "Added to favorites",
         { description: selectedWallpaper.title },
       );
-    }
-  };
-
-  const handleApply = async () => {
-    if (!selectedWallpaper) return;
-    try {
-      console.log("Applying:", selectedWallpaper.title);
-      const selectedScreen = useAppStore.getState().selectedScreen;
-      const screen = selectedScreen === "all" ? undefined : selectedScreen;
-      await applyWallpaper(selectedWallpaper.id, screen);
-      toast.success(`已应用: ${selectedWallpaper.title}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("应用失败，请检查后台日志");
     }
   };
 
@@ -258,13 +244,7 @@ export function WallpaperSidebar() {
       {/* 这个底部的区域本来就不受 space-y-6 的影响，所以不需要包，结构保持干净即可 */}
       <Separator />
       <div className="p-6 bg-background/50">
-        <Button
-          onClick={handleApply}
-          disabled={!selectedWallpaper}
-          className="w-full h-12 bg-brand hover:bg-brand/90 text-brand-foreground font-bold rounded-xl shadow-lg shadow-brand/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Play className="w-5 h-5 fill-current" /> Apply Wallpaper
-        </Button>
+        <ApplyButton className="w-full h-12 bg-brand hover:bg-brand/90 text-brand-foreground font-bold rounded-xl shadow-lg shadow-brand/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed" />
       </div>
     </div>
   );
