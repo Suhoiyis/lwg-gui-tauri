@@ -8,7 +8,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Wallpaper } from "@/types";
-import { convertFileSrc } from "@tauri-apps/api/core";
+import { Thumbnail } from "@/components/ui/thumbnail";
 
 interface CompactCarouselProps {
   /** 壁纸列表 */
@@ -19,15 +19,7 @@ interface CompactCarouselProps {
   onSelect: (id: string) => void;
 }
 
-/**
- * 获取预览图 URL
- */
-function getPreviewUrl(preview: string): string {
-  if (preview.startsWith("http://") || preview.startsWith("https://")) {
-    return preview;
-  }
-  return convertFileSrc(preview);
-}
+
 
 /**
  * Compact 模式底部缩略图轮播组件
@@ -116,21 +108,10 @@ export function CompactCarousel({
                 `}
                 onClick={() => handleItemClick(wp, index)}
               >
-                {wp.preview ? (
-                  <img
-                    src={getPreviewUrl(wp.preview)}
-                    alt={wp.title}
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src =
-                        'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23374151" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%239ca3af" font-size="12">No Preview</text></svg>';
-                    }}
-                  />
-                ) : (
-                  <div className="bg-muted w-full h-full" />
-                )}
+                <Thumbnail 
+                  wallpaperId={wp.id} 
+                  className="w-full h-full rounded-none border-none"
+                />
               </div>
             </CarouselItem>
           ))}
