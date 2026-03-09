@@ -4,10 +4,14 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
   	extend: {
-  		colors: {
-  			background: 'hsl(var(--background))',
-  			surface: 'hsl(var(--surface) / 0.8)',
-  			primary: {
+colors: {
+   			background: 'hsl(var(--background))',
+   			surface: 'hsl(var(--surface) / 0.8)',
+   			brand: {
+   				DEFAULT: 'hsl(var(--brand))',
+   				foreground: 'hsl(var(--brand-foreground))'
+   			},
+   			primary: {
   				DEFAULT: 'hsl(var(--primary))',
   				foreground: 'hsl(var(--primary-foreground))'
   			},

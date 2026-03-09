@@ -164,12 +164,12 @@ export const LibraryHeader = memo(
           <div className="flex items-center justify-between gap-4">
             {/* 左侧：Current Using */}
             <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground tracking-widest flex-shrink min-w-0">
-              <span className="text-pink-500 uppercase whitespace-nowrap">
+              <span className="text-brand uppercase whitespace-nowrap">
                 Currently Using
               </span>
               {activeWallpaperId ? (
                 <span
-                  className="text-foreground truncate flex-1 min-w-0 cursor-pointer hover:text-pink-500 transition-colors underline underline-offset-2 decoration-pink-500/30 hover:decoration-pink-500"
+                  className="text-foreground truncate flex-1 min-w-0 cursor-pointer hover:text-brand transition-colors underline underline-offset-2 decoration-brand/30 hover:decoration-brand"
                   onClick={() => onTitleClick(activeWallpaperId)}
                 >
                   {currentTitle || "None"}
@@ -193,12 +193,12 @@ export const LibraryHeader = memo(
           <div>
             {/* 第一行（状态区）：Active 徽章 + 壁纸名称（全宽） */}
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground tracking-widest">
-              <span className="px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-500 text-[10px] uppercase whitespace-nowrap">
+              <span className="px-2 py-0.5 rounded-full bg-brand/20 text-brand text-[10px] uppercase whitespace-nowrap">
                 Active
               </span>
               {activeWallpaperId ? (
                 <span
-                  className="text-foreground truncate flex-1 min-w-0 cursor-pointer hover:text-pink-500 transition-colors"
+                  className="text-foreground truncate flex-1 min-w-0 cursor-pointer hover:text-brand transition-colors"
                   onClick={() => onTitleClick(activeWallpaperId)}
                 >
                   {currentTitle || "None"}

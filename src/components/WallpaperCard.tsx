@@ -83,8 +83,8 @@ export const WallpaperCard = memo(function WallpaperCard({
         className={cn(
           "relative w-full h-full overflow-hidden rounded-2xl border-2 bg-muted transition-all duration-300",
           isSelected
-            ? "border-pink-500 ring-2 ring-pink-500 ring-offset-4 ring-offset-background shadow-lg shadow-pink-500/20"
-            : "border-border/50 hover:border-pink-500/50 hover:shadow-xl hover:shadow-pink-500/10",
+            ? "border-brand ring-2 ring-brand ring-offset-4 ring-offset-background shadow-lg shadow-brand/20"
+            : "border-border/50 hover:border-brand/50 hover:shadow-xl hover:shadow-brand/10",
         )}
       >
         {/* 3. 内容层：图片和叠加元素 */}

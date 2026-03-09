@@ -261,7 +261,7 @@ export function WallpaperSidebar() {
         <Button
           onClick={handleApply}
           disabled={!selectedWallpaper}
-          className="w-full h-12 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg shadow-pink-500/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full h-12 bg-brand hover:bg-brand/90 text-brand-foreground font-bold rounded-xl shadow-lg shadow-brand/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Play className="w-5 h-5 fill-current" /> Apply Wallpaper
         </Button>
