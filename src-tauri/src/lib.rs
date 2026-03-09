@@ -1,3 +1,5 @@
+mod tray;
+
 use serde::{Deserialize, Serialize};
 use tauri::{Emitter, State};
 use std::sync::Arc;
@@ -1225,6 +1227,10 @@ pub fn run() {
     tauri::Builder::default()
         .manage(app_state)
         .setup(move |app| {
+            // ── System tray ───────────────────────────────────────────────────
+            #[cfg(target_os = "linux")]
+            tray::setup_tray(app)?;
+
             // Register log subscriber to emit log-entry events to frontend
             #[cfg(target_os = "linux")]
             {

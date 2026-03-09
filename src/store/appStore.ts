@@ -115,6 +115,12 @@ interface AppState {
   ) => void;
   saveSettings: () => Promise<void>;
   restartWallpapers: () => Promise<void>;
+
+  // ✨✨ 新增全局壁纸控制方法（供托盘和快捷键调用）✨✨
+  applyWallpaper: (id: string, screen?: string) => Promise<void>;
+  stopWallpaper: () => Promise<void>;
+  applyRandomWallpaper: () => Promise<void>;
+
   setSelectedScreen: (screen: string) => void;
   flushPendingUpdates: () => void;
 
@@ -426,6 +432,46 @@ export const useAppStore = create<AppState>((set, get) => ({
       console.error("Failed to restart wallpapers:", error);
       throw error;
     }
+  },
+
+  applyWallpaper: async (id: string, screen?: string) => {
+    try {
+      // 触发后端应用壁纸
+      const targetScreen = screen || (get().selectedScreen === "all" ? undefined : get().selectedScreen);
+      await invoke("apply_wallpaper", { id, screen: targetScreen });
+
+      // 本地状态乐观更新（保存最后一次应用的壁纸）
+      const currentSettings = get().settings;
+      if (currentSettings) {
+        set({ settings: { ...currentSettings, lastWallpaper: id } });
+        // 触发防抖保存
+        get().updateSetting("lastWallpaper", id);
+      }
+    } catch (error) {
+      console.error("Failed to apply wallpaper:", error);
+      toast.error("Failed to apply wallpaper", { description: String(error) });
+    }
+  },
+
+  stopWallpaper: async () => {
+    try {
+      await invoke("stop_wallpaper");
+      toast.success("Wallpaper stopped");
+    } catch (error) {
+      console.error("Failed to stop wallpaper:", error);
+      toast.error("Failed to stop wallpaper", { description: String(error) });
+    }
+  },
+
+  applyRandomWallpaper: async () => {
+    const { wallpapers, applyWallpaper } = get();
+    if (wallpapers.length === 0) {
+      toast.warning("No wallpapers available");
+      return;
+    }
+    const randomIndex = Math.floor(Math.random() * wallpapers.length);
+    const randomWp = wallpapers[randomIndex];
+    await applyWallpaper(randomWp.id);
   },
 
   setSelectedScreen: (screen: string) => set({ selectedScreen: screen }),

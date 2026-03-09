@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { listen } from "@tauri-apps/api/event";
 
 // Shadcn UI 组件
 import { Tabs } from "@/components/ui/tabs";
@@ -75,6 +76,35 @@ export function App() {
     initializeSettings();
     fetchMonitors();
   }, [initializeSettings, fetchMonitors]);
+
+  // 监听 Tauri System Tray 事件
+  useEffect(() => {
+    // 闭包中捕获 store 的最新方法
+    const unlistenRandom = listen("tray-random-wallpaper", () => {
+      // 通过 getState() 获取最新的方法，避免因为依赖导致的重新绑定
+      useAppStore.getState().applyRandomWallpaper();
+    });
+
+    const unlistenStop = listen("tray-stop-wallpaper", () => {
+      useAppStore.getState().stopWallpaper();
+    });
+
+    const unlistenApplyLast = listen("tray-apply-last", () => {
+      // 为了安全起见，我们直接调用 loadWallpapers 后再尝试应用最后的壁纸（或者复用 store 里现有的 applyWallpaper 逻辑）
+      // 这里简化的实现：
+      const state = useAppStore.getState();
+      const lastWp = state.settings.lastWallpaper;
+      if (lastWp) {
+        state.applyWallpaper(lastWp);
+      }
+    });
+
+    return () => {
+      unlistenRandom.then((f) => f());
+      unlistenStop.then((f) => f());
+      unlistenApplyLast.then((f) => f());
+    };
+  }, []);
 
   // --- 渲染逻辑 ---
 
