@@ -139,7 +139,11 @@ export function EmptyState() {
         </div>
 
         {/* Configure button */}
-        <Button onClick={handleConfigurePath} variant="default" size="sm">
+        <Button
+          onClick={handleConfigurePath}
+          size="sm"
+          className="bg-brand text-brand-foreground hover:bg-brand/90"
+        >
           <Settings className="w-4 h-4 mr-2" />
           Configure Library Path
         </Button>
