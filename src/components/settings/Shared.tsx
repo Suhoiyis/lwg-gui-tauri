@@ -133,7 +133,7 @@ export function Header({ title, desc }: { title: string; desc: string }) {
     <div>
       <h3 className="text-lg font-medium">{title}</h3>
       <p className="text-sm text-muted-foreground">{desc}</p>
-      <Separator className="mt-4" />
+      <Separator className="my-2" />
     </div>
   );
 }
