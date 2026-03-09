@@ -10,9 +10,9 @@ import { useAppStore } from "../store/appStore";
 
 export function Layout({ navbar, sidebar, children }: LayoutProps) {
   return (
-    <div className="flex flex-col h-screen bg-background text-white overflow-hidden">
+    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
       {/* 顶部导航 */}
-      <div className="h-16 border-b border-white/10 flex-shrink-0 px-4 flex items-center bg-surface z-20">
+      <div className="h-16 border-b border-border flex-shrink-0 px-4 flex items-center bg-surface z-20">
         {navbar}
       </div>
 
@@ -25,7 +25,7 @@ export function Layout({ navbar, sidebar, children }: LayoutProps) {
 
         {/* 右侧侧边栏 */}
         {sidebar && (
-          <aside className="w-80 border-l border-white/10 bg-surface flex-shrink-0 flex flex-col shadow-xl z-10 overflow-y-auto animate-in slide-in-from-right duration-300">
+          <aside className="w-80 border-l border-border bg-surface flex-shrink-0 flex flex-col shadow-xl z-10 overflow-y-auto animate-in slide-in-from-right duration-300">
             {sidebar}
           </aside>
         )}

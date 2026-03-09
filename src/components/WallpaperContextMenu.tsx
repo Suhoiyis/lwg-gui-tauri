@@ -20,13 +20,13 @@ export function WallpaperContextMenu({
       <ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
 
       <ContextMenu.Portal>
-        <ContextMenu.Content className="min-w-[180px] bg-[#1e1e2e] rounded-lg border border-white/10 p-1.5 shadow-xl animate-in fade-in duration-200 z-50">
+        <ContextMenu.Content className="min-w-[180px] bg-popover rounded-lg border border-border p-1.5 shadow-xl animate-in fade-in duration-200 z-50">
           <Item
             onClick={onOpenFolder}
             icon={<Play size={14} />}
             label="Apply Wallpaper"
           />
-          <ContextMenu.Separator className="h-px bg-white/10 my-1" />
+          <ContextMenu.Separator className="h-px bg-border my-1" />
 
           <Item
             onClick={onOpenFolder}
@@ -39,7 +39,7 @@ export function WallpaperContextMenu({
             label="Properties"
           />
 
-          <ContextMenu.Separator className="h-px bg-white/10 my-1" />
+          <ContextMenu.Separator className="h-px bg-border my-1" />
           <Item
             onClick={onDelete}
             icon={<Trash2 size={14} />}
@@ -58,8 +58,8 @@ function Item({ icon, label, onClick, destructive }: any) {
     <ContextMenu.Item
       className={`
         flex items-center gap-2 px-2 py-1.5 rounded text-sm outline-none cursor-pointer select-none
-        data-[highlighted]:bg-white/10 
-        ${destructive ? "text-red-400 data-[highlighted]:text-red-300" : "text-gray-200"}
+        data-[highlighted]:bg-accent 
+        ${destructive ? "text-red-400 data-[highlighted]:text-red-300" : "text-popover-foreground"}
       `}
       onClick={onClick}
     >

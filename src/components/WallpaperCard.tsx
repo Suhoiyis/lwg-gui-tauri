@@ -64,7 +64,7 @@ export const WallpaperCard = memo(function WallpaperCard({
       case "scene":
         return <Monitor className="w-3.5 h-3.5 text-emerald-400" />;
       default:
-        return <ImageIcon className="w-3.5 h-3.5 text-slate-400" />;
+        return <ImageIcon className="w-3.5 h-3.5 text-muted-foreground" />;
     }
   }, [wp.type]);
 
@@ -116,11 +116,11 @@ export const WallpaperCard = memo(function WallpaperCard({
                   onPressedChange={handleToggleFavorite}
                   size="sm"
                   className={cn(
-                    "h-7 w-7 p-0 rounded-full border border-white/10 backdrop-blur-sm transition-all",
+                    "h-7 w-7 p-0 rounded-full border border-border/50 backdrop-blur-sm transition-all",
                     // 未选中时半透明黑底，选中时淡黄底
                     isFavorite
                       ? "bg-yellow-500/20 border-yellow-500/50 opacity-100"
-                      : "bg-black/40 hover:bg-black/60 opacity-0 group-hover:opacity-100",
+                      : "bg-muted/60 hover:bg-muted/80 opacity-0 group-hover:opacity-100",
                   )}
                 >
                   <Star
@@ -128,7 +128,7 @@ export const WallpaperCard = memo(function WallpaperCard({
                       "h-3.5 w-3.5 transition-colors",
                       isFavorite
                         ? "fill-yellow-400 text-yellow-400"
-                        : "fill-transparent text-white/90",
+                        : "fill-transparent text-foreground/90",
                     )}
                   />
                 </Toggle>
@@ -142,15 +142,15 @@ export const WallpaperCard = memo(function WallpaperCard({
 
         {/* 类型图标 (右上) */}
         {showIcons && (
-          <div className="absolute top-2 right-2 z-20 bg-black/50 backdrop-blur-md p-1.5 rounded-lg border border-white/5 shadow-sm flex items-center justify-center pointer-events-none">
+          <div className="absolute top-2 right-2 z-20 bg-muted/70 backdrop-blur-md p-1.5 rounded-lg border border-border/30 shadow-sm flex items-center justify-center pointer-events-none">
             {TypeIcon}
           </div>
         )}
 
         {/* 底部标题 (渐变层) */}
         {showTitle && (
-          <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-8 pointer-events-none">
-            <p className="text-[11px] font-bold text-white truncate">
+          <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-muted/90 via-muted/50 to-transparent p-3 pt-8 pointer-events-none">
+            <p className="text-[11px] font-bold text-foreground truncate">
               {wp.title}
             </p>
           </div>

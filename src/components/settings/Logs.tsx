@@ -82,16 +82,16 @@ export function LogViewer() {
         </div>
       </div>
 
-      <div className="flex-1 rounded-lg border bg-[#0f0f12] font-mono text-xs overflow-hidden flex flex-col">
+      <div className="flex-1 rounded-lg border bg-muted font-mono text-xs overflow-hidden flex flex-col">
         <ScrollArea className="flex-1 p-4">
           {filteredLogs.map((log) => (
             <div key={log.id} className="flex gap-4 py-0.5">
-              <span className="text-gray-500 w-16">{log.timestamp}</span>
+              <span className="text-muted-foreground w-16">{log.timestamp}</span>
               <span className={`w-10 font-bold ${getLevelColor(log.level)}`}>
                 {log.level.toUpperCase()}
               </span>
               <span className="text-purple-500 w-20">[{log.source}]</span>
-              <span className="text-gray-200 flex-1">{log.message}</span>
+              <span className="text-foreground flex-1">{log.message}</span>
             </div>
           ))}
         </ScrollArea>

@@ -44,11 +44,11 @@ const WallpaperPreview = memo(
 
     if (!wallpaper) {
       return (
-        <div className="w-20 h-20 bg-black/40 rounded-md overflow-hidden border border-white/10 shrink-0 relative">
+        <div className="w-20 h-20 bg-muted/60 rounded-md overflow-hidden border border-border/50 shrink-0 relative">
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-500/20 to-gray-600/20">
             <ImageIcon className="w-6 h-6 text-muted-foreground" />
           </div>
-          <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-white p-1 text-center truncate">
+          <div className="absolute bottom-0 inset-x-0 bg-muted/80 text-[10px] text-foreground p-1 text-center truncate">
             No Wallpaper
           </div>
         </div>
@@ -56,7 +56,7 @@ const WallpaperPreview = memo(
     }
 
     return (
-      <div className="w-20 h-20 bg-black/40 rounded-md overflow-hidden border border-white/10 shrink-0 relative group">
+      <div className="w-20 h-20 bg-muted/60 rounded-md overflow-hidden border border-border/50 shrink-0 relative group">
         <img
           src={previewUrl || ""}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -67,7 +67,7 @@ const WallpaperPreview = memo(
             target.style.display = "none";
           }}
         />
-        <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-white p-1 text-center truncate">
+        <div className="absolute bottom-0 inset-x-0 bg-muted/80 text-[10px] text-foreground p-1 text-center truncate">
           {wallpaper.type || "Wallpaper"}
         </div>
       </div>
@@ -244,7 +244,7 @@ const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
                       key={i}
                       className="text-xs font-mono text-muted-foreground flex items-center gap-2 hover:text-foreground transition-colors cursor-default"
                     >
-                      <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
                       {t}
                     </div>
                   ))}

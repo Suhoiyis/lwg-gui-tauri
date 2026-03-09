@@ -6,7 +6,7 @@ export default {
   	extend: {
   		colors: {
   			background: 'hsl(var(--background))',
-  			surface: 'rgba(30, 30, 46, 0.8)',
+  			surface: 'hsl(var(--surface) / 0.8)',
   			primary: {
   				DEFAULT: 'hsl(var(--primary))',
   				foreground: 'hsl(var(--primary-foreground))'
@@ -15,7 +15,7 @@ export default {
   				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
-  			danger: '#f38ba8',
+  			danger: 'hsl(var(--destructive))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',

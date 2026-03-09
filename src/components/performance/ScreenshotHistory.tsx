@@ -51,14 +51,14 @@ const ScreenshotThumbnail: React.FC<{ wallpaperId: string }> = memo(
 
     if (!wallpaper) {
       return (
-        <div className="w-16 h-10 bg-muted rounded overflow-hidden border border-white/10 flex items-center justify-center shrink-0">
+        <div className="w-16 h-10 bg-muted rounded overflow-hidden border border-border/50 flex items-center justify-center shrink-0">
           <Camera className="w-4 h-4 text-muted-foreground" />
         </div>
       );
     }
 
     return (
-      <div className="w-16 h-10 bg-black/40 rounded overflow-hidden border border-white/10 shrink-0 relative group">
+      <div className="w-16 h-10 bg-muted/60 rounded overflow-hidden border border-border/50 shrink-0 relative group">
         {previewUrl && (
           <img
             src={previewUrl}

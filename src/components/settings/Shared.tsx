@@ -112,7 +112,7 @@ export const LOG_LEVEL_COLORS: Record<string, string> = {
 // ============================================================================
 
 export const getLevelColor = (level: string): string => {
-  return LOG_LEVEL_COLORS[level] || "text-gray-500";
+  return LOG_LEVEL_COLORS[level] || "text-muted-foreground";
 };
 
 export const formatLogEntry = (log: {
