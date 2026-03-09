@@ -30,55 +30,60 @@ interface ScreenshotRowProps {
 }
 
 // 缩略图预览组件
-const ScreenshotThumbnail: React.FC<{ wallpaperId: string }> = memo(({ wallpaperId }) => {
-  const wallpapers = useAppStore((state) => state.wallpapers);
-  
-  const wallpaper = useMemo(() => {
-    return wallpapers.find((w) => w.id === wallpaperId);
-  }, [wallpapers, wallpaperId]);
-  
-  const previewUrl = useMemo(() => {
-    if (!wallpaper?.preview) return null;
-    if (wallpaper.preview.startsWith("http://") || wallpaper.preview.startsWith("https://")) {
-      return wallpaper.preview;
+const ScreenshotThumbnail: React.FC<{ wallpaperId: string }> = memo(
+  ({ wallpaperId }) => {
+    const wallpapers = useAppStore((state) => state.wallpapers);
+
+    const wallpaper = useMemo(() => {
+      return wallpapers.find((w) => w.id === wallpaperId);
+    }, [wallpapers, wallpaperId]);
+
+    const previewUrl = useMemo(() => {
+      if (!wallpaper?.preview) return null;
+      if (
+        wallpaper.preview.startsWith("http://") ||
+        wallpaper.preview.startsWith("https://")
+      ) {
+        return wallpaper.preview;
+      }
+      return convertFileSrc(wallpaper.preview);
+    }, [wallpaper?.preview]);
+
+    if (!wallpaper) {
+      return (
+        <div className="w-16 h-10 bg-muted rounded overflow-hidden border border-white/10 flex items-center justify-center shrink-0">
+          <Camera className="w-4 h-4 text-muted-foreground" />
+        </div>
+      );
     }
-    return convertFileSrc(wallpaper.preview);
-  }, [wallpaper?.preview]);
-  
-  if (!wallpaper) {
+
     return (
-      <div className="w-16 h-10 bg-muted rounded overflow-hidden border border-white/10 flex items-center justify-center shrink-0">
-        <Camera className="w-4 h-4 text-muted-foreground" />
+      <div className="w-16 h-10 bg-black/40 rounded overflow-hidden border border-white/10 shrink-0 relative group">
+        {previewUrl && (
+          <img
+            src={previewUrl}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            alt={wallpaper.title}
+            loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = "none";
+            }}
+          />
+        )}
       </div>
     );
-  }
-  
-  return (
-    <div className="w-16 h-10 bg-black/40 rounded overflow-hidden border border-white/10 shrink-0 relative group">
-      {previewUrl && (
-        <img
-          src={previewUrl}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          alt={wallpaper.title}
-          loading="lazy"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = "none";
-          }}
-        />
-      )}
-    </div>
-  );
-});
+  },
+);
 ScreenshotThumbnail.displayName = "ScreenshotThumbnail";
 
 const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
   const wallpapers = useAppStore((state) => state.wallpapers);
-  
+
   const wallpaper = useMemo(() => {
     return wallpapers.find((w) => w.id === record.wpId);
   }, [wallpapers, record.wpId]);
-  
+
   const handleOpenFolder = async () => {
     try {
       await openFolder(record.outputPath);
@@ -86,7 +91,7 @@ const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
       toast.error("Failed to open folder", { description: String(error) });
     }
   };
-  
+
   const handleOpenImage = async () => {
     try {
       await openImage(record.outputPath);
@@ -94,7 +99,7 @@ const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
       toast.error("Failed to open image", { description: String(error) });
     }
   };
-  
+
   return (
     <div className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors group">
       {/* 左侧：缩略图 + 壁纸信息 */}
@@ -153,6 +158,26 @@ export default function ScreenshotHistory({
   items,
   onClear,
 }: ScreenshotHistoryProps) {
+  // ✨ 新增：获取 appStore 的 setter 和 activeTab 控制
+  const setScreenshotHintActive = useAppStore(
+    (state) => state.setScreenshotHintActive,
+  );
+  const setActiveTab = useAppStore((state) => state.setActiveTab);
+
+  // ✨ 新增：处理点击跳转和高亮的逻辑
+  const handleGoScreenshot = () => {
+    // 1. 跳转回 Library Tab
+    setActiveTab("wallpapers");
+
+    // 2. 激活高亮提示
+    setScreenshotHintActive(true);
+
+    // 3. 3秒后自动移除高亮
+    setTimeout(() => {
+      setScreenshotHintActive(false);
+    }, 3000);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -187,13 +212,17 @@ export default function ScreenshotHistory({
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent className="flex-row justify-center gap-2">
-              <Button>Go Screenshot!!</Button>
+              {/* ✨ 修改：绑定 onClick 事件 */}
+              <Button onClick={handleGoScreenshot}>Go Screenshot!!</Button>
             </EmptyContent>
           </Empty>
         ) : (
           <div className="divide-y">
             {items.map((record, index) => (
-              <ScreenshotRow key={record.wpId + '-' + record.timestamp + '-' + index} record={record} />
+              <ScreenshotRow
+                key={record.wpId + "-" + record.timestamp + "-" + index}
+                record={record}
+              />
             ))}
           </div>
         )}

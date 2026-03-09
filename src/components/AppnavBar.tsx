@@ -39,7 +39,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useAppStore } from "@/store/appStore";
-import { applyWallpaper, stopWallpaper, takeScreenshot, openFolder, openImage } from "@/api/wallpaper";
+import {
+  applyWallpaper,
+  stopWallpaper,
+  takeScreenshot,
+  openFolder,
+  openImage,
+} from "@/api/wallpaper";
 import { toast } from "sonner";
 import { AppMenu } from "@/components/AppMenu";
 import { ScreenSelector } from "@/components/ScreenSelector";
@@ -57,6 +63,17 @@ interface ScreenshotResult {
 }
 
 export function AppNavbar() {
+  // 1. 获取全局高亮状态
+  const screenshotHintActive = useAppStore(
+    (state) => state.screenshotHintActive,
+  );
+  const setScreenshotHintActive = useAppStore(
+    (state) => state.setScreenshotHintActive,
+  );
+
+  // 2. 维护 Tooltip 自身的 hover 状态
+  const [isHovered, setIsHovered] = useState(false);
+
   const searchQuery = useAppStore((state) => state.searchQuery);
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
   const toggleCompactMode = useAppStore((state) => state.toggleCompactMode);
@@ -74,7 +91,8 @@ export function AppNavbar() {
 
   // 截图成功 Dialog 状态
   const [screenshotDialogOpen, setScreenshotDialogOpen] = useState(false);
-  const [screenshotResult, setScreenshotResult] = useState<ScreenshotResult | null>(null);
+  const [screenshotResult, setScreenshotResult] =
+    useState<ScreenshotResult | null>(null);
 
   // 判断搜索框是否应该处于"展开"状态
   // 只要获得焦点，或者里面有字，就保持展开
@@ -181,7 +199,10 @@ export function AppNavbar() {
   return (
     <>
       {/* 截图成功 Dialog */}
-      <Dialog open={screenshotDialogOpen} onOpenChange={setScreenshotDialogOpen}>
+      <Dialog
+        open={screenshotDialogOpen}
+        onOpenChange={setScreenshotDialogOpen}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-green-600 dark:text-green-400">
@@ -199,7 +220,9 @@ export function AppNavbar() {
               <FolderOpen className="w-4 h-4 mt-0.5 text-muted-foreground shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground mb-1">Path</p>
-                <p className="text-sm font-mono break-all">{screenshotResult?.outputPath}</p>
+                <p className="text-sm font-mono break-all">
+                  {screenshotResult?.outputPath}
+                </p>
               </div>
             </div>
 
@@ -207,7 +230,9 @@ export function AppNavbar() {
             <div className="flex justify-center">
               <div className="flex flex-col items-center p-4 rounded-lg bg-muted/50 min-w-32">
                 <Clock className="w-5 h-5 text-muted-foreground mb-1" />
-                <p className="text-2xl font-bold">{screenshotResult?.duration.toFixed(1)}s</p>
+                <p className="text-2xl font-bold">
+                  {screenshotResult?.duration.toFixed(1)}s
+                </p>
                 <p className="text-xs text-muted-foreground">Duration</p>
               </div>
             </div>
@@ -236,9 +261,7 @@ export function AppNavbar() {
               <ImageIcon className="w-4 h-4 mr-2" />
               Open Image
             </Button>
-            <Button onClick={() => setScreenshotDialogOpen(false)}>
-              Done
-            </Button>
+            <Button onClick={() => setScreenshotDialogOpen(false)}>Done</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -389,19 +412,47 @@ export function AppNavbar() {
               </TooltipContent>
             </Tooltip>
 
-            <Tooltip>
+            <Tooltip
+              // 当鼠标悬浮 或者 全局提示激活时，都显示 Tooltip
+              open={isHovered || screenshotHintActive}
+              onOpenChange={(open) => {
+                setIsHovered(open);
+                // 如果用户主动移开鼠标，也可以顺便关掉全局提示
+                if (!open && screenshotHintActive)
+                  setScreenshotHintActive(false);
+              }}
+            >
               <TooltipTrigger asChild>
                 <StatefulButton
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
-                  onClick={handleScreenshot}
+                  // 动态添加高亮和呼吸灯动画
+                  className={cn(
+                    "h-8 w-8 transition-all duration-300",
+                    screenshotHintActive &&
+                      "ring-2 ring-primary ring-offset-1 bg-primary/20 text-primary animate-pulse",
+                  )}
+                  onClick={() => {
+                    setScreenshotHintActive(false); // 用户点击后立刻取消高亮
+                    handleScreenshot();
+                  }}
                 >
                   <Camera className="w-4 h-4" />
                 </StatefulButton>
               </TooltipTrigger>
-              <TooltipContent>
-                <p>Screenshot</p>
+              <TooltipContent
+                // 动态改变 Tooltip 的样式，让它更醒目
+                className={cn(
+                  "transition-colors",
+                  screenshotHintActive &&
+                    "bg-primary text-primary-foreground font-bold shadow-lg",
+                )}
+              >
+                <p>
+                  {screenshotHintActive
+                    ? "Click me to screenshot!!"
+                    : "Screenshot"}
+                </p>
               </TooltipContent>
             </Tooltip>
 

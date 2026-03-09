@@ -1,47 +1,56 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "sonner";
-// 建议只从一处引入 Wallpaper 类型，以防冲突。这里我们统一使用 src/types 下的。
-import { Wallpaper, AppConfig } from "../types";
-import { invoke } from "@tauri-apps/api/core";
-import { toast } from "sonner";
-// 建议只从一处引入 Wallpaper 类型，以防冲突。这里我们统一使用 src/types 下的。
-import { Wallpaper, AppConfig } from "../types";
-import { invoke } from "@tauri-apps/api/core";
-import { toast } from "sonner";
-import { invoke } from "@tauri-apps/api/core";
 import { availableMonitors } from "@tauri-apps/api/window";
-import { toast } from "sonner";
+
 // 建议只从一处引入 Wallpaper 类型，以防冲突。这里我们统一使用 src/types 下的。
 import { Wallpaper, AppConfig } from "../types";
+import { scanWallpapers } from "../api/wallpaper";
+
+const IS_TAURI = "__TAURI_INTERNALS__" in window;
 
 // Runtime settings: require explicit Save button (backend restart needed)
 const RUNTIME_SETTINGS = new Set<keyof AppConfig>([
-  'fps', 'volume', 'muteAudio', 'scaling', 'clamping',
-  'disableParallax', 'disableParticles', 'noFullscreenPause',
-  'disableMouse', 'noAutomute', 'noAudioProcessing',
-  'assetsPath', 'waylandOnlyActive', 'waylandIgnoreAppids'
+  "fps",
+  "volume",
+  "muteAudio",
+  "scaling",
+  "clamping",
+  "disableParallax",
+  "disableParticles",
+  "noFullscreenPause",
+  "disableMouse",
+  "noAutomute",
+  "noAudioProcessing",
+  "assetsPath",
+  "waylandOnlyActive",
+  "waylandIgnoreAppids",
 ]);
 
 // Non-runtime settings: immediate save with debounce
 const NON_RUNTIME_SETTINGS = new Set<keyof AppConfig>([
-  'lastScreen', 'workshopPath', 'screenshotRes', 'preferXvfb',
-  'screenshotDelay', 'cycleEnabled', 'cycleInterval', 'cycleOrder'
+  "lastScreen",
+  "workshopPath",
+  "screenshotRes",
+  "preferXvfb",
+  "screenshotDelay",
+  "cycleEnabled",
+  "cycleInterval",
+  "cycleOrder",
 ]);
 
 const saveTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
 
 const isSliderOrInput = (key: keyof AppConfig): boolean => {
   const sliderInputKeys: Array<keyof AppConfig> = [
-    'volume',
-    'fps',
-    'screenshotDelay',
-    'cycleInterval',
-    'waylandIgnoreAppids',
+    "volume",
+    "fps",
+    "screenshotDelay",
+    "cycleInterval",
+    "waylandIgnoreAppids",
   ];
   return sliderInputKeys.includes(key);
 };
-import { scanWallpapers } from "../api/wallpaper";
 
 interface AppState {
   // Wallpaper data
@@ -68,6 +77,9 @@ interface AppState {
   // Screen selection
   selectedScreen: string;
 
+  // ✨✨ 新增：截图引导状态 ✨✨
+  screenshotHintActive: boolean;
+
   // Actions
   loadWallpapers: () => Promise<void>;
   setSelectedId: (id: string | null) => void;
@@ -76,6 +88,9 @@ interface AppState {
 
   // ✨ 新增：设置排序方式的方法
   setSortBy: (sort: "name" | "id" | "size") => void;
+
+  // ✨✨ 新增：设置截图引导状态的方法 ✨✨
+  setScreenshotHintActive: (active: boolean) => void;
 
   toggleFavorite: (id: string) => void;
   isFavorite: (id: string) => boolean;
@@ -118,6 +133,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedScreen: "all",
   isCompactMode: false,
 
+  // ✨✨ 截图引导提示默认关闭 ✨✨
+  screenshotHintActive: false,
+
   // Wallpaper actions
   loadWallpapers: async () => {
     const data = await scanWallpapers();
@@ -146,6 +164,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // ✨ 新增
   setSortBy: (sortBy) => set({ sortBy }),
+
+  // ✨✨ 新增截图动作 ✨✨
+  setScreenshotHintActive: (active) => set({ screenshotHintActive: active }),
 
   // Favorites & nicknames actions
   toggleFavorite: (id: string) => {
@@ -303,7 +324,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
 
     if (RUNTIME_SETTINGS.has(key)) {
-      console.log(`[Runtime] ${String(key)} updated locally, waiting for Save button`);
+      console.log(
+        `[Runtime] ${String(key)} updated locally, waiting for Save button`,
+      );
       return;
     }
 
@@ -320,15 +343,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     saveTimeouts[key as string] = setTimeout(async () => {
       try {
         console.log(`[Non-Runtime] Saving ${String(key)} to backend...`);
-        const result = await invoke<AppConfig>('update_config_value', {
+        const result = await invoke<AppConfig>("update_config_value", {
           key: key as string,
           value: value,
         });
         set({ settings: result });
         console.log(`[Non-Runtime] ${String(key)} saved successfully`);
         toast.success("Setting saved", {
-        description: `${String(key)} has been updated`,
-        duration: 2000,
+          description: `${String(key)} has been updated`,
+          duration: 2000,
         });
       } catch (error) {
         console.error(`[Non-Runtime] Failed to save ${String(key)}:`, error);
@@ -364,7 +387,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Clear all pending timeouts
     Object.values(saveTimeouts).forEach(clearTimeout);
     // Clear the timeouts object
-    Object.keys(saveTimeouts).forEach(k => delete saveTimeouts[k]);
+    Object.keys(saveTimeouts).forEach((k) => delete saveTimeouts[k]);
   },
 
   restartWallpapers: async () => {
