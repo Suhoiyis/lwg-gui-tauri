@@ -298,10 +298,10 @@ export function Library() {
 
         {/* Right Panel: Sidebar */}
         <ResizablePanel
-          defaultSize="25%"
+          defaultSize="20%"
           minSize={300}
-          maxSize="50%"
-          className="bg-muted/30"
+          maxSize="40%"
+          className="bg-muted/30 min-w-[300px] max-w-[450px]"
         >
           <WallpaperSidebar />
         </ResizablePanel>
