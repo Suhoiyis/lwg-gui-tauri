@@ -1,14 +1,24 @@
 // src/components/settings/System.tsx
 import { useState, useEffect, useCallback } from "react";
-import { Power, EyeOff, FileImage, FolderOpen, AlertTriangle } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { useAppStore } from "@/store/appStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-
-// 引入公共组件
+import {
+  Power,
+  EyeOff,
+  FileImage,
+  FolderOpen,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import {
   Header,
   SwitchRow,
@@ -87,7 +97,33 @@ export function SystemSettings() {
             placeholder="/home/user/.local/share/Steam/steamapps/workshop/content/431960"
           />
           <PathInputField
-            label="Assets Directory (Optional)"
+            label={
+              <div className="flex items-center gap-1.5">
+                Assets Directory
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <Info className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-help transition-colors outline-none" />
+                  </HoverCardTrigger>
+                  {/* 设置 max-w-fit 并且给稍微宽一点的尺寸，确保路径能在一行内尽量展示 */}
+                  <HoverCardContent
+                    className="w-fit max-w-[450px] text-sm"
+                    side="top"
+                  >
+                    <p className="mb-2 font-medium">Auto-detected paths:</p>
+                    <ul className="list-disc pl-4 space-y-1 text-muted-foreground font-mono text-[11px] break-all">
+                      <li>~/.steam/steam/steamapps/common</li>
+                      <li>~/.local/share/Steam/steamapps/common</li>
+                      <li>
+                        ~/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common
+                      </li>
+                      <li>
+                        ~/snap/steam/common/.local/share/Steam/steamapps/common
+                      </li>
+                    </ul>
+                  </HoverCardContent>
+                </HoverCard>
+              </div>
+            }
             value={settings.assetsPath || ""}
             onChange={(v) => updateSetting("assetsPath", v)}
             placeholder="Leave empty to auto-detect"
@@ -121,7 +157,13 @@ export function SystemSettings() {
       </Card>
 
       {/* Screenshot Tools Card */}
-      <Card className={hasXvfb === true ? "border-pink-500/20" : "border-amber-500/20 bg-amber-500/5"}>
+      <Card
+        className={
+          hasXvfb === true
+            ? "border-pink-500/20"
+            : "border-amber-500/20 bg-amber-500/5"
+        }
+      >
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
@@ -139,8 +181,8 @@ export function SystemSettings() {
               {hasXvfb === null
                 ? "Checking..."
                 : hasXvfb
-                ? "Xvfb Installed"
-                : "Xvfb Not Found"}
+                  ? "Xvfb Installed"
+                  : "Xvfb Not Found"}
             </Badge>
           </CardTitle>
           {hasXvfb === false && (

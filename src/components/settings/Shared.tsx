@@ -79,7 +79,6 @@ export const CYCLE_ORDER_OPTIONS = [
   { value: "size", label: "Size" },
 ] as const;
 
-
 export const RESOLUTION_OPTIONS = [
   { value: "3840x2160", label: "4K (3840x2160)" },
   { value: "2560x1440", label: "2K (2560x1440)" },
@@ -148,7 +147,11 @@ export function SwitchRow({
   disabled,
 }: SwitchRowProps) {
   return (
-    <div className={"flex items-center justify-between " + (disabled ? "opacity-50" : "")}>
+    <div
+      className={
+        "flex items-center justify-between " + (disabled ? "opacity-50" : "")
+      }
+    >
       <div className="flex items-center gap-2">
         {icon}
         <div className="space-y-0.5">
@@ -158,7 +161,11 @@ export function SwitchRow({
           )}
         </div>
       </div>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
+      <Switch
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        disabled={disabled}
+      />
     </div>
   );
 }
@@ -322,7 +329,7 @@ export function PathInputField({
   onChange,
   placeholder,
 }: {
-  label: string;
+  label: string | React.ReactNode;
   value: string;
   onChange: (value: string | null) => void;
   placeholder?: string;
@@ -404,7 +411,9 @@ export function TextareaField({
   disabled?: boolean;
 }) {
   return (
-    <div className={"space-y-2 flex flex-col " + (disabled ? "opacity-50" : "")}>
+    <div
+      className={"space-y-2 flex flex-col " + (disabled ? "opacity-50" : "")}
+    >
       <div className="space-y-0.5">
         <Label>{label}</Label>
         {description && (
