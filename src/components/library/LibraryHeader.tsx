@@ -102,8 +102,8 @@ export const LibraryHeader = memo(
       setInputValue(currentPage.toString());
     };
 
-    // 分页信息组件（复用）
-    const PaginationInfo = () => (
+    // 分页信息（JSX 表达式，非组件函数，避免重渲染丢失焦点）
+    const paginationInfo = (
       <span className="flex items-center gap-1 text-xs font-mono text-muted-foreground/50 select-none">
         <span>
           {currentIndex > 0 ? currentIndex : "-"}/{totalCount} wallpapers
@@ -134,8 +134,8 @@ export const LibraryHeader = memo(
       </span>
     );
 
-    // 排序选择器组件（复用）
-    const SortSelect = () => (
+    // 排序选择器（JSX 表达式）
+    const sortSelect = (
       <Select
         value={sortBy}
         onValueChange={(value: "name" | "id" | "size") => setSortBy(value)}
@@ -183,9 +183,9 @@ export const LibraryHeader = memo(
 
             {/* 右侧：排序 + 分页 */}
             <div className="flex items-center gap-4 flex-shrink-0">
-              <SortSelect />
+              {sortSelect}
               <div className="h-4 w-px bg-border/50"></div>
-              <PaginationInfo />
+              {paginationInfo}
             </div>
           </div>
         ) : (
@@ -212,9 +212,9 @@ export const LibraryHeader = memo(
 
             {/* 第二行（控制区）：分页 + 排序，整体靠右 */}
             <div className="flex items-center justify-end gap-3 mt-1">
-              <PaginationInfo />
+              {paginationInfo}
               <div className="h-4 w-px bg-border/50"></div>
-              <SortSelect />
+              {sortSelect}
             </div>
           </div>
         )}

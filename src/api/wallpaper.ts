@@ -156,7 +156,7 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
 
 // ================= 🚀 自动生成扩充版 Mock 数据 (60张) =================
 // 这里的逻辑是：把上面5张模板，重复循环12次，生成60张，并修改ID防止重复
-const EXPANDED_MOCK_WALLPAPERS = Array.from({ length: 150 }).map((_, i) => {
+const EXPANDED_MOCK_WALLPAPERS = Array.from({ length: 1500 }).map((_, i) => {
   const template = BASE_MOCK_TEMPLATES[i % BASE_MOCK_TEMPLATES.length];
   return {
     ...template,
@@ -198,7 +198,7 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
       preview: item.preview,
       path: item.path || "",
       type: (item.wtype || "Scene") as "video" | "image" | "web",
-      description: item.description || undefined,  // 新增
+      description: item.description || undefined, // 新增
       tags: item.tags || [],
       size: item.size || 0,
     }));
@@ -213,11 +213,16 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
   }
 }
 
-export async function applyWallpaper(id: string, screen?: string): Promise<void> {
+export async function applyWallpaper(
+  id: string,
+  screen?: string,
+): Promise<void> {
   try {
     await invoke("apply_wallpaper", { id, screen });
   } catch (e) {
-    console.log(`[Mock] 假装应用了壁纸 ID: ${id}${screen ? ` 到屏幕 ${screen}` : ""}`);
+    console.log(
+      `[Mock] 假装应用了壁纸 ID: ${id}${screen ? ` 到屏幕 ${screen}` : ""}`,
+    );
     const wp = EXPANDED_MOCK_WALLPAPERS.find((w) => w.id === id);
     if (wp) console.log(`   选中: ${wp.title}`);
   }
