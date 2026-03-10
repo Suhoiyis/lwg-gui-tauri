@@ -43,6 +43,7 @@ export function App() {
   const toggleCompactMode = useAppStore((s) => s.toggleCompactMode);
   const initializeSettings = useAppStore((s) => s.initializeSettings);
   const fetchMonitors = useAppStore((s) => s.fetchMonitors);
+  const fetchAppVersion = useAppStore((s) => s.fetchAppVersion);
 
   useEffect(() => {
     const handleResize = () => {
@@ -75,7 +76,8 @@ export function App() {
   useEffect(() => {
     initializeSettings();
     fetchMonitors();
-  }, [initializeSettings, fetchMonitors]);
+    fetchAppVersion();
+  }, [initializeSettings, fetchMonitors, fetchAppVersion]);
 
   // 监听 Tauri System Tray 事件
   useEffect(() => {

@@ -1068,6 +1068,12 @@ struct GitHubRelease {
     html_url: String,
 }
 
+/// 获取应用程序版本号
+#[tauri::command]
+fn get_app_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
 /// 检查 GitHub 上的最新版本
 #[tauri::command]
 async fn check_for_updates() -> Result<UpdateCheckResult, String> {
@@ -1282,6 +1288,7 @@ pub fn run() {
             clear_logs,
             // Update check commands
             check_for_updates,
+            get_app_version,
         ])
         .plugin(tauri_plugin_opener::Builder::new().build())
         .plugin(tauri_plugin_fs::init())

@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Github, Globe, Code2 } from "lucide-react";
+import { useAppStore } from "@/store/appStore";
 
 interface AboutDialogProps {
   open: boolean;
@@ -14,6 +15,8 @@ interface AboutDialogProps {
 }
 
 export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
+  const appVersion = useAppStore((state) => state.appVersion);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] flex flex-col items-center text-center">
@@ -37,7 +40,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
           <DialogTitle className="text-2xl font-bold">
             LINUX WALLPAPER ENGINE GUI
           </DialogTitle>
-          <DialogDescription className="text-sm">v0.1.0</DialogDescription>
+          <DialogDescription className="text-sm">v{appVersion}</DialogDescription>
         </DialogHeader>
 
         {/* 2. 描述文本 */}

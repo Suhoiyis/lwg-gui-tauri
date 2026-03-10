@@ -4,10 +4,15 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "sync-version": "node scripts/sync-version.cjs",
+    "predev": "npm run sync-version",
+    "prebuild": "npm run sync-version",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev": "npm run sync-version && tauri dev",
+    "tauri:build": "npm run sync-version && tauri build"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

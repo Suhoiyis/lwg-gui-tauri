@@ -31,6 +31,7 @@ interface UpdateInfo {
 
 export function AppMenu() {
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
+  const appVersion = useAppStore((state) => state.appVersion);
   const [showAbout, setShowAbout] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
@@ -85,7 +86,7 @@ export function AppMenu() {
   };
 
   const handleAbout = () =>
-    toast.info("LWG GUI v0.1.0\nCreated with Tauri & React");
+    toast.info(`LWG GUI v${appVersion}\nCreated with Tauri & React`);
   const handleRestart = () => toast.warning("Restarting app... (Mock)");
   const handleQuit = () => toast.error("Quitting app... (Mock)");
 

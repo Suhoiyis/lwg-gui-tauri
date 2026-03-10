@@ -56,6 +56,9 @@ const isSliderOrInput = (key: keyof AppConfig): boolean => {
 };
 
 interface AppState {
+  // App version
+  appVersion: string;
+
   // Wallpaper data
   wallpapers: Wallpaper[];
   selectedId: string | null;
@@ -87,6 +90,7 @@ interface AppState {
   highlightSettingField: string | null;
 
   // Actions
+  fetchAppVersion: () => Promise<void>;
   loadWallpapers: () => Promise<void>;
   setSelectedId: (id: string | null) => void;
   setSearchQuery: (query: string) => void;
@@ -134,6 +138,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set, get) => ({
   // Initial state
+  appVersion: "0.0.0",
   wallpapers: [],
   selectedId: null,
   searchQuery: "",
@@ -153,6 +158,19 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // ✨✨ 设置字段高亮默认为 null ✨✨
   highlightSettingField: null,
+
+  // App version action
+  fetchAppVersion: async () => {
+    try {
+      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      if (isTauri) {
+        const version = await invoke<string>("get_app_version");
+        set({ appVersion: version });
+      }
+    } catch (error) {
+      console.error("Failed to fetch app version:", error);
+    }
+  },
 
   // Wallpaper actions
   loadWallpapers: async () => {
