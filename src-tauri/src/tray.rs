@@ -95,6 +95,18 @@ fn load_icon(app: &AppHandle, filename: &str) -> Option<Image<'static>> {
 pub fn setup_tray(app: &mut App) -> tauri::Result<()> {
     let app_handle = app.handle().clone();
 
+    // 🔧 Override GLib's application name so Waybar shows a human-readable tooltip
+    // instead of the binary name "lwg-gui-tauri". The glib library is already linked
+    // transitively via GTK/webkit2gtk.
+    #[cfg(target_os = "linux")]
+    {
+        extern "C" {
+            fn g_set_application_name(application_name: *const std::os::raw::c_char);
+        }
+        let name = std::ffi::CString::new("Wallpaper Engine GUI").unwrap();
+        unsafe { g_set_application_name(name.as_ptr()); }
+    }
+
     // ── Build context menu ────────────────────────────────────────────────────
     let show_item = MenuItemBuilder::new("Show Window")
         .id("show_window")
@@ -135,10 +147,12 @@ pub fn setup_tray(app: &mut App) -> tauri::Result<()> {
     };
 
     // ── Build tray icon ───────────────────────────────────────────────────────
-    let mut tray_builder = TrayIconBuilder::new()
+    // NOTE: On Linux with libappindicator, `set_tooltip()` is a no-op.
+    // Waybar reads the app's `productName` from tauri.conf.json as the tooltip.
+    let mut tray_builder = TrayIconBuilder::with_id("lwg-tray")
         .menu(&menu)
-        .tooltip("Wallpaper Engine GUI\nStatus: checking...")
-        .show_menu_on_left_click(false); // we handle left-click manually
+        .tooltip("Wallpaper Engine GUI")
+        .show_menu_on_left_click(false);
 
     if let Some(icon) = initial_icon {
         tray_builder = tray_builder.icon(icon);
