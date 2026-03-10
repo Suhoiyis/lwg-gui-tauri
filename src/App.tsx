@@ -95,7 +95,7 @@ export function App() {
       // 为了安全起见，我们直接调用 loadWallpapers 后再尝试应用最后的壁纸（或者复用 store 里现有的 applyWallpaper 逻辑）
       // 这里简化的实现：
       const state = useAppStore.getState();
-      const lastWp = state.settings.lastWallpaper;
+      const lastWp = state.runtimeState?.lastWallpaper;
       if (lastWp) {
         state.applyWallpaper(lastWp);
       }

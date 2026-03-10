@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::collections::HashMap;
 use tokio::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH};
+// std::time imported locally where needed
 
 
 // ================= 平台特定导入 =================
@@ -20,10 +20,14 @@ use lwg_core::{
     PerformanceMonitor,
     ScreenshotRecord,
     LogManager, LogEntry, LogSource,
+    StateManager,
+    state::AppState as LwgAppState,
+    HistoryManager,
 };
 
+
 #[cfg(target_os = "linux")]
-fn log_gui(state: &State<'_, AppState>, message: &str) {
+fn log_gui(state: &State<'_, TauriState>, message: &str) {
     if let Ok(lm) = state.log_manager.lock() {
         lm.info(LogSource::GUI, message);
     }
@@ -64,7 +68,7 @@ pub struct UpdateCheckResult {
     pub download_url: Option<String>,
 }
 
-/// 跨平台配置结构体
+/// 跨平台配置结构体 (user preferences only)
 /// Linux: 与 lwg_core::AppConfig 完全一致
 /// Windows: Mock 版本，用于 UI 开发
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -83,13 +87,10 @@ pub struct AppConfig {
     pub disable_parallax: bool,
     pub disable_particles: bool,
     pub clamping: String,
-    pub last_wallpaper: Option<String>,
-    pub last_screen: Option<String>,
     pub wallpaper_properties: std::collections::HashMap<String, serde_json::Value>,
     pub screenshot_delay: u32,
     pub screenshot_res: String,
     pub prefer_xvfb: bool,
-    pub active_monitors: std::collections::HashMap<String, String>,
     pub cycle_enabled: bool,
     pub cycle_interval: u32,
     pub cycle_order: String,
@@ -117,13 +118,10 @@ impl Default for AppConfig {
             disable_parallax: false,
             disable_particles: false,
             clamping: "clamp".to_string(),
-            last_wallpaper: None,
-            last_screen: None,
             wallpaper_properties: std::collections::HashMap::new(),
             screenshot_delay: 20,
             screenshot_res: "3840x2160".to_string(),
             prefer_xvfb: true,
-            active_monitors: std::collections::HashMap::new(),
             cycle_enabled: false,
             cycle_interval: 15,
             cycle_order: "random".to_string(),
@@ -134,6 +132,29 @@ impl Default for AppConfig {
             compact_mode: false,
             wallpaper_nicknames: std::collections::HashMap::new(),
             start_hidden: false,
+        }
+    }
+}
+
+/// Runtime state (maps to state.json)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppState {
+    pub last_wallpaper: Option<String>,
+    pub last_screen: Option<String>,
+    pub active_monitors: std::collections::HashMap<String, String>,
+}
+
+
+
+
+
+impl Default for AppState {
+    fn default() -> Self {
+        Self {
+            last_wallpaper: None,
+            last_screen: None,
+            active_monitors: std::collections::HashMap::new(),
         }
     }
 }
@@ -153,13 +174,10 @@ impl From<LwgAppConfig> for AppConfig {
             disable_parallax: config.disable_parallax,
             disable_particles: config.disable_particles,
             clamping: config.clamping,
-            last_wallpaper: config.last_wallpaper,
-            last_screen: config.last_screen,
             wallpaper_properties: config.wallpaper_properties,
             screenshot_delay: config.screenshot_delay,
             screenshot_res: config.screenshot_res,
             prefer_xvfb: config.prefer_xvfb,
-            active_monitors: config.active_monitors,
             cycle_enabled: config.cycle_enabled,
             cycle_interval: config.cycle_interval,
             cycle_order: config.cycle_order,
@@ -189,13 +207,10 @@ impl From<AppConfig> for LwgAppConfig {
             disable_parallax: config.disable_parallax,
             disable_particles: config.disable_particles,
             clamping: config.clamping,
-            last_wallpaper: config.last_wallpaper,
-            last_screen: config.last_screen,
             wallpaper_properties: config.wallpaper_properties,
             screenshot_delay: config.screenshot_delay,
             screenshot_res: config.screenshot_res,
             prefer_xvfb: config.prefer_xvfb,
-            active_monitors: config.active_monitors,
             cycle_enabled: config.cycle_enabled,
             cycle_interval: config.cycle_interval,
             cycle_order: config.cycle_order,
@@ -209,14 +224,42 @@ impl From<AppConfig> for LwgAppConfig {
     }
 }
 
-// ================= AppState =================
+#[cfg(target_os = "linux")]
+impl From<LwgAppState> for AppState {
+    fn from(state: LwgAppState) -> Self {
+        Self {
+            last_wallpaper: state.last_wallpaper,
+            last_screen: state.last_screen,
+            active_monitors: state.active_monitors,
+        }
+    }
+}
 
-struct AppState {
+#[cfg(target_os = "linux")]
+impl From<AppState> for LwgAppState {
+    fn from(state: AppState) -> Self {
+        Self {
+            last_wallpaper: state.last_wallpaper,
+            last_screen: state.last_screen,
+            active_monitors: state.active_monitors,
+        }
+    }
+}
+
+// ================= TauriState =================
+
+struct TauriState {
     #[cfg(target_os = "linux")]
     controller: Mutex<WallpaperController>,
 
     #[cfg(target_os = "linux")]
     config_manager: Mutex<LwgConfigManager>,
+
+    #[cfg(target_os = "linux")]
+    state_manager: Mutex<StateManager>,
+
+    #[cfg(target_os = "linux")]
+    history_manager: Mutex<HistoryManager>,
 
     #[cfg(target_os = "linux")]
     performance_monitor: Arc<std::sync::Mutex<PerformanceMonitor>>,
@@ -229,6 +272,7 @@ struct AppState {
     #[cfg(not(target_os = "linux"))]
     _dummy: bool,
 }
+
 
 // ================= 辅助函数 =================
 
@@ -250,8 +294,7 @@ fn needs_wallpaper_restart(old: &LwgAppConfig, new: &LwgAppConfig) -> bool {
     old.no_audio_processing != new.no_audio_processing ||
     old.assets_path != new.assets_path ||
     old.wayland_only_active != new.wayland_only_active ||
-    old.wayland_ignore_appids != new.wayland_ignore_appids ||
-    old.active_monitors != new.active_monitors
+    old.wayland_ignore_appids != new.wayland_ignore_appids
 }
 
 /// 格式化文件大小
@@ -331,7 +374,7 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
 // ================= Tauri 命令 =================
 
 #[tauri::command]
-async fn get_wallpapers(_state: State<'_, AppState>) -> Result<Vec<Wallpaper>, String> {
+async fn get_wallpapers(_state: State<'_, TauriState>) -> Result<Vec<Wallpaper>, String> {
     #[cfg(target_os = "linux")]
     {
         println!("🐧 [Linux] 扫描壁纸库...");
@@ -382,7 +425,7 @@ async fn apply_wallpaper(
     id: String,
     screen: Option<String>,
     app: tauri::AppHandle,
-    _state: State<'_, AppState>
+    _state: State<'_, TauriState>
 ) -> Result<(), String> {
 
     #[cfg(target_os = "linux")]
@@ -409,7 +452,7 @@ async fn apply_wallpaper(
 #[tauri::command]
 async fn stop_wallpaper(
     app: tauri::AppHandle,
-    _state: State<'_, AppState>
+    _state: State<'_, TauriState>
 ) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
@@ -433,7 +476,7 @@ async fn stop_wallpaper(
 // ================= Settings Commands =================
 
 #[tauri::command]
-async fn get_settings(_state: State<'_, AppState>) -> Result<AppConfig, String> {
+async fn get_settings(_state: State<'_, TauriState>) -> Result<AppConfig, String> {
     #[cfg(target_os = "linux")]
     {
         let config_manager = _state.config_manager.lock().await;
@@ -450,7 +493,7 @@ async fn get_settings(_state: State<'_, AppState>) -> Result<AppConfig, String> 
 #[tauri::command]
 async fn save_settings(
     config: AppConfig,
-    _state: State<'_, AppState>
+    _state: State<'_, TauriState>
 ) -> Result<bool, String> {
     #[cfg(target_os = "linux")]
     {
@@ -489,6 +532,64 @@ async fn save_settings(
         Ok(false)
     }}
 
+// ================= State Commands =================
+
+#[tauri::command]
+async fn get_state(_state: State<'_, TauriState>) -> Result<AppState, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let state_manager = _state.state_manager.lock().await;
+        Ok(state_manager.state().clone().into())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(AppState::default())
+    }
+}
+
+#[tauri::command]
+async fn save_state(
+    app_state: AppState,
+    _state: State<'_, TauriState>
+) -> Result<bool, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut state_manager = _state.state_manager.lock().await;
+        *state_manager.state_mut() = app_state.into();
+        state_manager.save().map_err(|e| format!("Failed to save state: {:?}", e))?;
+        Ok(true)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(true)
+    }
+}
+
+#[tauri::command]
+async fn add_history(
+    id: String,
+    title: String,
+    preview: String,
+    _state: State<'_, TauriState>
+) -> Result<bool, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut history_manager = _state.history_manager.lock().await;
+        history_manager.add(&id, &title, &preview)
+            .map_err(|e| format!("Failed to add history: {:?}", e))?;
+        Ok(true)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(true)
+    }
+}
+
+// Allowed non-runtime keys for single value updates
+
 // Allowed non-runtime keys for single value updates
 const ALLOWED_KEYS: &[&str] = &["lastScreen", "workshopPath", "assetsPath", "screenshotRes", "preferXvfb", "screenshotDelay", "cycleEnabled", "cycleInterval", "cycleOrder"];
 
@@ -496,7 +597,7 @@ const ALLOWED_KEYS: &[&str] = &["lastScreen", "workshopPath", "assetsPath", "scr
 async fn update_config_value(
     key: String,
     value: serde_json::Value,
-    _state: State<'_, AppState>,
+    _state: State<'_, TauriState>,
 ) -> Result<AppConfig, String> {
     #[cfg(target_os = "linux")]
     {
@@ -507,18 +608,26 @@ async fn update_config_value(
 
         println!("🔧 [Linux] 正在更新配置键: {} = {:?}", key, value);
 
+        // Handle lastScreen specially - it now lives in state, not config
+        if key == "lastScreen" {
+            let mut state_manager = _state.state_manager.lock().await;
+            if let Some(s) = value.as_str() {
+                state_manager.state_mut().last_screen = Some(s.to_string());
+            } else {
+                state_manager.state_mut().last_screen = None;
+            }
+            state_manager.save().map_err(|e| format!("保存失败: {:?}", e))?;
+            println!("✅ [Linux] State 键已更新并保存 (lastScreen)");
+            // Return current config unchanged
+            let config_manager = _state.config_manager.lock().await;
+            return Ok(config_manager.config().clone().into());
+        }
+
         let mut config_manager = _state.config_manager.lock().await;
         let mut lwg_config = config_manager.config().clone();
 
         // Update the specific key based on its name
         match key.as_str() {
-            "lastScreen" => {
-                if let Some(s) = value.as_str() {
-                    lwg_config.last_screen = Some(s.to_string());
-                } else {
-                    lwg_config.last_screen = None;
-                }
-            },
             "workshopPath" => {
                 if let Some(s) = value.as_str() {
                     lwg_config.workshop_path = Some(s.to_string());
@@ -599,7 +708,7 @@ async fn update_config_value(
 }
 
 #[tauri::command]
-async fn restart_wallpapers(_state: State<'_, AppState>) -> Result<(), String> {
+async fn restart_wallpapers(_state: State<'_, TauriState>) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         println!("🔄 [Rust] 手动重启壁纸...");
@@ -635,16 +744,16 @@ fn get_connected_monitors() -> Result<Vec<String>, String> {
     #[cfg(target_os = "linux")]
     {
         use std::fs;
-        
+
         let mut monitors = Vec::new();
-        
+
         let drm_dir = fs::read_dir("/sys/class/drm")
             .map_err(|e| format!("Failed to read /sys/class/drm: {}", e))?;
-        
+
         for entry in drm_dir.flatten() {
             let name = entry.file_name();
             let name_str = name.to_string_lossy();
-            
+
             // 匹配 cardX-XXX 格式（如 card0-eDP-1）
             if name_str.starts_with("card") && name_str.contains('-') {
                 let status_path = entry.path().join("status");
@@ -661,10 +770,10 @@ fn get_connected_monitors() -> Result<Vec<String>, String> {
                 }
             }
         }
-        
+
         Ok(monitors)
     }
-    
+
     #[cfg(not(target_os = "linux"))]
     {
         Ok(vec![])
@@ -755,7 +864,7 @@ async fn get_autostart_status() -> Result<bool, String> {
 #[tauri::command]
 async fn start_performance_monitor(
     app: tauri::AppHandle,
-    state: State<'_, AppState>,
+    state: State<'_, TauriState>,
 ) -> Result<(), String> {
     // Check if already running
     if state.monitor_running.load(Ordering::SeqCst) {
@@ -801,7 +910,7 @@ async fn start_performance_monitor(
 
 #[tauri::command]
 async fn stop_performance_monitor(
-    state: State<'_, AppState>,
+    state: State<'_, TauriState>,
 ) -> Result<(), String> {
     state.monitor_running.store(false, Ordering::SeqCst);
     println!("✅ [Rust] Performance monitor stopped");
@@ -810,7 +919,7 @@ async fn stop_performance_monitor(
 
 #[tauri::command]
 async fn get_screenshot_history(
-    _state: State<'_, AppState>,
+    _state: State<'_, TauriState>,
 ) -> Result<Vec<ScreenshotRecord>, String> {
     #[cfg(target_os = "linux")]
     {
@@ -827,7 +936,7 @@ async fn get_screenshot_history(
 
 #[tauri::command]
 async fn clear_screenshot_history(
-    _state: State<'_, AppState>,
+    _state: State<'_, TauriState>,
 ) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
@@ -843,11 +952,11 @@ async fn clear_screenshot_history(
 async fn take_screenshot(
     wallpaper_id: String,
     output_path: Option<String>,
-    state: State<'_, AppState>,
+    state: State<'_, TauriState>,
 ) -> Result<ScreenshotRecord, String> {
     #[cfg(target_os = "linux")]
     {
-        use std::time::{SystemTime, UNIX_EPOCH};
+
         use lwg_core::controller::ScreenshotManager;
 
         println!("📸 Screenshot requested for wallpaper: {}", wallpaper_id);
@@ -1045,7 +1154,7 @@ async fn open_image(path: String) -> Result<(), String> {
 
 #[tauri::command]
 async fn get_active_wallpapers(
-    state: State<'_, AppState>,
+    state: State<'_, TauriState>,
 ) -> Result<HashMap<String, String>, String> {
     #[cfg(target_os = "linux")]
     {
@@ -1079,16 +1188,16 @@ fn get_app_version() -> String {
 async fn check_for_updates() -> Result<UpdateCheckResult, String> {
     const GITHUB_API_URL: &str = "https://api.github.com/repos/Suhoiyis/gui-for-linux-wallpaperengine/releases/latest";
     const USER_AGENT: &str = "tauri-app";
-    
+
     // 获取当前版本（从 Cargo.toml 读取）
     let current_version = env!("CARGO_PKG_VERSION").to_string();
-    
+
     // 创建 HTTP 客户端，带超时设置
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(30))
         .build()
         .map_err(|e| format!("创建 HTTP 客户端失败: {}", e))?;
-    
+
     // 发送请求，必须包含 User-Agent 头（GitHub API 强制要求）
     let response = client
         .get(GITHUB_API_URL)
@@ -1105,7 +1214,7 @@ async fn check_for_updates() -> Result<UpdateCheckResult, String> {
                 format!("网络请求失败: {}", e)
             }
         })?;
-    
+
     // 检查响应状态码
     let status = response.status();
     if status == reqwest::StatusCode::NOT_FOUND {
@@ -1122,19 +1231,19 @@ async fn check_for_updates() -> Result<UpdateCheckResult, String> {
     } else if !status.is_success() {
         return Err(format!("GitHub API 返回错误: {}", status));
     }
-    
+
     // 解析 JSON 响应
     let release: GitHubRelease = response
         .json()
         .await
         .map_err(|e| format!("解析响应失败: {}", e))?;
-    
+
     // 版本比较：移除 'v' 前缀后比较
     let latest_version = release.tag_name.trim_start_matches('v').to_string();
     let current_normalized = current_version.trim_start_matches('v');
-    
+
     let has_update = latest_version != current_normalized;
-    
+
     Ok(UpdateCheckResult {
         has_update,
         current_version,
@@ -1147,14 +1256,14 @@ async fn check_for_updates() -> Result<UpdateCheckResult, String> {
 
 #[cfg(target_os = "linux")]
 #[tauri::command]
-async fn get_logs(state: State<'_, AppState>) -> Result<Vec<LogEntry>, String> {
+async fn get_logs(state: State<'_, TauriState>) -> Result<Vec<LogEntry>, String> {
     let lm = state.log_manager.lock().map_err(|e| format!("Lock error: {}", e))?;
     Ok(lm.get_logs())
 }
 
 #[cfg(target_os = "linux")]
 #[tauri::command]
-async fn clear_logs(state: State<'_, AppState>) -> Result<(), String> {
+async fn clear_logs(state: State<'_, TauriState>) -> Result<(), String> {
     let lm = state.log_manager.lock().map_err(|e| format!("Lock error: {}", e))?;
     lm.clear();
     Ok(())
@@ -1180,47 +1289,58 @@ pub fn run() {
     let app_state = {
         println!("🐧 [Linux] 初始化应用状态...");
         let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
+        let state_manager = StateManager::new().expect("Failed to create StateManager");
+        let history_manager = HistoryManager::new().expect("Failed to create HistoryManager");
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
+        let state_manager = StateManager::new().expect("Failed to create StateManager");
+        let history_manager = HistoryManager::new().expect("Failed to create HistoryManager");
+        let state_manager = StateManager::new().expect("Failed to create StateManager");
+        let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
+        let shared_state = Arc::new(tokio::sync::Mutex::new(state_manager.state().clone()));
         let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
-        let mut controller = WallpaperController::new(shared_config.clone());
+        let mut controller = WallpaperController::new(shared_config.clone(), shared_state);
         controller.set_performance_monitor(performance_monitor.clone());
 
         // 创建日志管理器
         let log_manager = Arc::new(std::sync::Mutex::new(LogManager::new()));
         controller.set_log_manager(log_manager.clone());
-        
+
         // ✨ 检测已运行的壁纸进程
         let detected = WallpaperController::detect_existing_processes();
         if !detected.is_empty() {
             println!("🔍 检测到 {} 个已运行的壁纸进程", detected.len());
-            
-            // 更新 config.active_monitors
-            let mut config = shared_config.blocking_lock();
+
+            // 更新 state.active_monitors (now in shared state, not config)
+            let state = shared_config.blocking_lock();
             let mut detected_pids = HashMap::new();
-            
+
             for (screen, (pid, wp_id)) in &detected {
-                config.active_monitors.insert(screen.clone(), wp_id.clone());
+                // Note: active_monitors now tracked via controller's state
                 detected_pids.insert(screen.clone(), *pid);
                 println!("  屏幕 {}: PID {}, 壁纸 {}", screen, pid, wp_id);
             }
-            
+            drop(state);
+
             // 注入 detected_pids 到 controller
             controller.set_detected_pids(detected_pids);
         }
-        
-        AppState {
+
+        TauriState {
             controller: Mutex::new(controller),
             config_manager: Mutex::new(config_manager),
+            state_manager: Mutex::new(state_manager),
+            history_manager: Mutex::new(history_manager),
             performance_monitor,
             log_manager,
             monitor_running: Arc::new(AtomicBool::new(false)),
         }
+
     };
 
     #[cfg(not(target_os = "linux"))]
     let app_state = {
         println!("🪟 [Windows Mock] 初始化 Mock 应用状态...");
-        AppState {
+        TauriState {
             _dummy: true,
             monitor_running: Arc::new(AtomicBool::new(false)),
         }
@@ -1267,6 +1387,12 @@ pub fn run() {
             save_settings,
             update_config_value,
             restart_wallpapers,
+            // State commands
+            get_state,
+            save_state,
+            add_history,
+            get_state,
+            save_state,
             // System integration commands
             set_autostart,
             get_autostart_status,

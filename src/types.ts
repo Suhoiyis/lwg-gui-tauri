@@ -27,34 +27,41 @@ export interface AppConfig {
   noAutomute: boolean; // no_auto_mute -> noAutomute
   noAudioProcessing: boolean;
 
-  // --- 3. Monitor & Display ---
-  lastScreen?: string | null;
-  lastWallpaper?: string;
-  activeMonitors: Record<string, string>;
-
-  // --- 4. Automation (Cycling) ---
+  // --- 3. Automation (Cycling) ---
   cycleEnabled: boolean;
   cycleInterval: number;
   cycleOrder: string;
 
-  // --- 5. Wayland Tweaks ---
+  // --- 4. Wayland Tweaks ---
   waylandOnlyActive: boolean;
   waylandIgnoreAppids: string;
 
-  // --- 6. System & Storage ---
+  // --- 5. System & Storage ---
   assetsPath: string | null;
   workshopPath: string | null;
 
   startHidden: boolean;
-  // --- 7. Screenshot Tools ---
+  // --- 6. Screenshot Tools ---
   screenshotDelay: number;
   screenshotRes: string;
   preferXvfb: boolean;
 
-  // --- 8. Wallpaper Properties ---
+  // --- 7. Wallpaper Properties ---
   wallpaperProperties: Record<string, any>;
   wallpaperNicknames: Record<string, string>;
   compactMode: boolean;
+}
+
+// Runtime state (persisted to ~/.local/state/linux-wallpaperengine-gui/state.json)
+export interface AppState {
+  lastWallpaper?: string;         // Last applied wallpaper ID
+  lastScreen?: string;            // Last applied screen
+  activeMonitors?: Record<string, string>;  // Multi-monitor mapping: screen -> wallpaper ID
+}
+export interface AppState {
+  lastWallpaper?: string;
+  lastScreen?: string;
+  activeMonitors?: Record<string, string>;
 }
 
 // System integration settings (not stored in AppConfig)
