@@ -9,6 +9,8 @@ import {
   Layers,
   Image as ImageIcon,
   Server,
+  MonitorIcon,
+  BrickWall,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -210,7 +212,11 @@ const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
                           Wallpaper
                         </Badge>
                         <span className="text-sm font-bold">
-                          {firstWallpaperInfo.wallpaper?.title ? renderInlineMarkdown(firstWallpaperInfo.wallpaper.title) : "Unknown"}
+                          {firstWallpaperInfo.wallpaper?.title
+                            ? renderInlineMarkdown(
+                                firstWallpaperInfo.wallpaper.title,
+                              )
+                            : "Unknown"}
                         </span>
                       </div>
                       <div className="text-xs text-muted-foreground flex items-center gap-4">
@@ -275,20 +281,20 @@ export default function ProcessList({
       <ProcessRow
         type="backend"
         data={processes.backend}
-        icon={<Cpu className="text-orange-500" />}
+        icon={<BrickWall className="text-yellow-500" />}
       />
 
       <ProcessRow
         type="frontend"
         data={processes.frontend}
-        icon={<Layout className="text-blue-500" />}
+        icon={<MonitorIcon className="text-pink-500" />}
       />
 
-      <ProcessRow
+      {/* <ProcessRow
         type="tray"
         data={processes.tray}
         icon={<ArrowDownToLine className="text-purple-500" />}
-      />
+      /> */}
     </div>
   );
 }

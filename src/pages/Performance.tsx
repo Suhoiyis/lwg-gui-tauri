@@ -18,29 +18,35 @@ import ScreenshotHistory from "@/components/performance/ScreenshotHistory";
 export function Performance() {
   const { stats, history, clearHistory, isLoading } = useSystemStats();
 
-if (isLoading) {
-  return (
-    <div className="flex flex-col h-full items-center justify-center">
-      <div className="text-center space-y-4">
-        <div className="text-base text-muted-foreground">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-base text-muted-foreground">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+          <p className="text-muted-foreground">
+            Initializing Performance Monitor...
+          </p>
         </div>
-        <p className="text-muted-foreground">Initializing Performance Monitor...</p>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-if (!stats) {
-  return (
-    <div className="flex flex-col h-full items-center justify-center">
-      <div className="text-center space-y-2">
-        <p className="text-muted-foreground">Unable to load performance data</p>
-        <p className="text-sm text-muted-foreground/70">Please check if the backend is running</p>
+  if (!stats) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center">
+        <div className="text-center space-y-2">
+          <p className="text-muted-foreground">
+            Unable to load performance data
+          </p>
+          <p className="text-sm text-muted-foreground/70">
+            Please check if the backend is running
+          </p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
     <div className="flex flex-col h-full space-y-6 overflow-hidden">
@@ -59,21 +65,25 @@ if (!stats) {
               title="Total CPU"
               value={`${stats.totalCpu.toFixed(1)}%`}
               sub={`${stats.cpuCores} Cores Active`}
-              icon={<Cpu className="text-primary" />}
+              icon={<Cpu className="text-purple-500" />}
               data={stats.cpuHistory}
-              color="#ef4444"
+              color="#a855f7"
               unit="%"
             />
+
             <OverviewCard
               title="Total Memory"
               value={`${stats.totalMem.toFixed(0)} MB`}
               sub={`of ${stats.totalMemoryGb.toFixed(1)} GB`}
-              icon={<MemoryStick className="text-blue-500" />}
+              icon={<MemoryStick className="text-cyan-500" />}
               data={stats.memHistory}
-              color="#3b82f6"
+              color="#06b6d4"
               unit=" MB"
             />
-            <ThreadsCard count={stats.activeThreads} processCount={stats.processCount} />
+            <ThreadsCard
+              count={stats.activeThreads}
+              processCount={stats.processCount}
+            />
           </div>
 
           <Separator />

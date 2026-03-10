@@ -45,35 +45,38 @@ export const OverviewCard: React.FC<OverviewCardProps> = memo(
 );
 OverviewCard.displayName = "OverviewCard";
 
-export const ThreadsCard = memo(({ count, processCount = 1 }: { count: number; processCount?: number }) => {
-  return (
-    <Card>
-      <CardContent className="p-6 flex flex-col justify-between h-full">
-        <div className="flex justify-between items-start">
-          <span className="text-sm font-medium text-muted-foreground">
-            Active Threads
-          </span>
-          <div className="p-2 bg-muted/50 rounded-lg">
-            <Activity className="w-4 h-4 text-green-500" />
+export const ThreadsCard = memo(
+  ({ count, processCount = 1 }: { count: number; processCount?: number }) => {
+    return (
+      <Card>
+        <CardContent className="p-6 flex flex-col justify-between h-full">
+          <div className="flex justify-between items-start">
+            <span className="text-sm font-medium text-muted-foreground">
+              Active Threads
+            </span>
+            <div className="p-2 bg-muted/50 rounded-lg">
+              {/* 修改为 emerald-500 */}
+              <Activity className="w-4 h-4 text-emerald-500" />
+            </div>
           </div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold">{count}</div>
-          <div className="text-xs text-muted-foreground mt-1">
-            Across {processCount} process{processCount !== 1 ? "es" : ""}
+          <div>
+            <div className="text-3xl font-bold">{count}</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Across {processCount} process{processCount !== 1 ? "es" : ""}
+            </div>
           </div>
-        </div>
-        <div className="h-[100px] flex items-end gap-1 mt-2 opacity-30">
-          {[40, 60, 30, 80, 50, 90, 20, 60].map((h, i) => (
-            <div
-              key={i}
-              className="flex-1 bg-green-500 rounded-t-sm"
-              style={{ height: `${h}%` }}
-            ></div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-});
+          <div className="h-[100px] flex items-end gap-1 mt-2 opacity-30">
+            {[40, 60, 30, 80, 50, 90, 20, 60].map((h, i) => (
+              <div
+                key={i}
+                className="flex-1 bg-emerald-500 rounded-t-sm" // 修改为 emerald-500
+                style={{ height: `${h}%` }}
+              ></div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  },
+);
 ThreadsCard.displayName = "ThreadsCard";

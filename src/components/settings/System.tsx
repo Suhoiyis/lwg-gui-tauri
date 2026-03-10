@@ -159,8 +159,7 @@ export function SystemSettings() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Power className="w-4 h-4 text-purple-500" /> Startup &
-              Integration
+              <Power className="w-4 h-4 text-red-500" /> Startup & Integration
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
