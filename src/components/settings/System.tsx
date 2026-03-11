@@ -177,6 +177,13 @@ export function SystemSettings() {
               onCheckedChange={(v) => updateSetting("startHidden", v)}
               icon={<EyeOff className="w-4 h-4 text-muted-foreground" />}
             />
+
+            <SwitchRow
+              label="Auto Restore"
+              description="Restore last wallpapers on launch"
+              checked={settings.autoRestore ?? false}
+              onCheckedChange={(v) => updateSetting("autoRestore", v)}
+            />
           </CardContent>
         </Card>
 

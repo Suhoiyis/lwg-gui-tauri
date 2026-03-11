@@ -103,6 +103,8 @@ pub struct AppConfig {
     pub wallpaper_nicknames: std::collections::HashMap<String, String>,
     #[serde(rename = "startHidden")]
     pub start_hidden: bool,
+    #[serde(rename = "autoRestore")]
+    pub auto_restore: bool,
 }
 
 impl Default for AppConfig {
@@ -133,6 +135,7 @@ impl Default for AppConfig {
             compact_mode: false,
             wallpaper_nicknames: std::collections::HashMap::new(),
             start_hidden: false,
+            auto_restore: false,
         }
     }
 }
@@ -177,6 +180,7 @@ impl From<LwgAppConfig> for AppConfig {
             compact_mode: config.compact_mode,
             wallpaper_nicknames: config.wallpaper_nicknames,
             start_hidden: false,
+            auto_restore: config.auto_restore,
         }
     }
 }
@@ -209,6 +213,7 @@ impl From<AppConfig> for LwgAppConfig {
             wayland_ignore_appids: config.wayland_ignore_appids,
             compact_mode: config.compact_mode,
             wallpaper_nicknames: config.wallpaper_nicknames,
+            auto_restore: config.auto_restore,
         }
     }
 }

@@ -381,6 +381,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
           wallpaperNicknames: {},
           compactMode: false,
           startHidden: false,
+          autoRestore: false,
         };
         set({ settings: defaultSettings, settingsLoading: false });
         // Mock runtime state

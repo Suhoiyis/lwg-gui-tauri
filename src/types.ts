@@ -50,6 +50,7 @@ export interface AppConfig {
   wallpaperProperties: Record<string, any>;
   wallpaperNicknames: Record<string, string>;
   compactMode: boolean;
+  autoRestore: boolean;
 }
 
 // Represents an active wallpaper on a screen
