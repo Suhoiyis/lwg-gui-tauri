@@ -21,9 +21,10 @@ use lwg_core::{
     ScreenshotRecord,
     LogManager, LogEntry, LogSource,
     StateManager,
-    state::AppState as LwgAppState,
+    state::{AppState as LwgAppState, ActiveWallpaper as LwgActiveWallpaper},
     HistoryManager,
 };
+
 
 
 #[cfg(target_os = "linux")]
@@ -136,28 +137,16 @@ impl Default for AppConfig {
     }
 }
 
-/// Runtime state (maps to state.json)
+/// Represents an active wallpaper on a screen
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AppState {
-    pub last_wallpaper: Option<String>,
-    pub last_screen: Option<String>,
-    pub active_monitors: std::collections::HashMap<String, String>,
+pub struct ActiveWallpaper {
+    pub wallpaper_id: String,
+    pub is_playing: bool,
 }
 
-
-
-
-
-impl Default for AppState {
-    fn default() -> Self {
-        Self {
-            last_wallpaper: None,
-            last_screen: None,
-            active_monitors: std::collections::HashMap::new(),
-        }
-    }
-}
+/// Runtime state - direct mapping of screen -> active wallpaper
+pub type AppState = std::collections::HashMap<String, ActiveWallpaper>;
 
 #[cfg(target_os = "linux")]
 impl From<LwgAppConfig> for AppConfig {
@@ -225,26 +214,27 @@ impl From<AppConfig> for LwgAppConfig {
 }
 
 #[cfg(target_os = "linux")]
-impl From<LwgAppState> for AppState {
-    fn from(state: LwgAppState) -> Self {
+impl From<LwgActiveWallpaper> for ActiveWallpaper {
+    fn from(aw: LwgActiveWallpaper) -> Self {
         Self {
-            last_wallpaper: state.last_wallpaper,
-            last_screen: state.last_screen,
-            active_monitors: state.active_monitors,
+            wallpaper_id: aw.wallpaper_id,
+            is_playing: aw.is_playing,
         }
     }
 }
 
 #[cfg(target_os = "linux")]
-impl From<AppState> for LwgAppState {
-    fn from(state: AppState) -> Self {
+impl From<ActiveWallpaper> for LwgActiveWallpaper {
+    fn from(aw: ActiveWallpaper) -> Self {
         Self {
-            last_wallpaper: state.last_wallpaper,
-            last_screen: state.last_screen,
-            active_monitors: state.active_monitors,
+            wallpaper_id: aw.wallpaper_id,
+            is_playing: aw.is_playing,
         }
     }
 }
+
+
+
 
 // ================= TauriState =================
 
@@ -530,7 +520,9 @@ async fn save_settings(
     {
         println!("🪟 [Windows Mock] 模拟保存配置: fps={}, volume={}", config.fps, config.volume);
         Ok(false)
-    }}
+    }
+}
+
 
 // ================= State Commands =================
 
@@ -539,14 +531,21 @@ async fn get_state(_state: State<'_, TauriState>) -> Result<AppState, String> {
     #[cfg(target_os = "linux")]
     {
         let state_manager = _state.state_manager.lock().await;
-        Ok(state_manager.state().clone().into())
+        Ok(state_manager.state().iter()
+            .map(|(k, v)| (k.clone(), ActiveWallpaper {
+                wallpaper_id: v.wallpaper_id.clone(),
+                is_playing: v.is_playing,
+            }))
+            .collect())
     }
 
     #[cfg(not(target_os = "linux"))]
     {
-        Ok(AppState::default())
+        Ok(AppState::new())
     }
 }
+
+
 
 #[tauri::command]
 async fn save_state(
@@ -556,7 +555,12 @@ async fn save_state(
     #[cfg(target_os = "linux")]
     {
         let mut state_manager = _state.state_manager.lock().await;
-        *state_manager.state_mut() = app_state.into();
+        *state_manager.state_mut() = app_state.into_iter()
+            .map(|(k, v)| (k, LwgActiveWallpaper {
+                wallpaper_id: v.wallpaper_id,
+                is_playing: v.is_playing,
+            }))
+            .collect();
         state_manager.save().map_err(|e| format!("Failed to save state: {:?}", e))?;
         Ok(true)
     }
@@ -566,6 +570,7 @@ async fn save_state(
         Ok(true)
     }
 }
+
 
 #[tauri::command]
 async fn add_history(
@@ -608,23 +613,9 @@ async fn update_config_value(
 
         println!("🔧 [Linux] 正在更新配置键: {} = {:?}", key, value);
 
-        // Handle lastScreen specially - it now lives in state, not config
-        if key == "lastScreen" {
-            let mut state_manager = _state.state_manager.lock().await;
-            if let Some(s) = value.as_str() {
-                state_manager.state_mut().last_screen = Some(s.to_string());
-            } else {
-                state_manager.state_mut().last_screen = None;
-            }
-            state_manager.save().map_err(|e| format!("保存失败: {:?}", e))?;
-            println!("✅ [Linux] State 键已更新并保存 (lastScreen)");
-            // Return current config unchanged
-            let config_manager = _state.config_manager.lock().await;
-            return Ok(config_manager.config().clone().into());
-        }
-
         let mut config_manager = _state.config_manager.lock().await;
         let mut lwg_config = config_manager.config().clone();
+
 
         // Update the specific key based on its name
         match key.as_str() {
@@ -1155,11 +1146,12 @@ async fn open_image(path: String) -> Result<(), String> {
 #[tauri::command]
 async fn get_active_wallpapers(
     state: State<'_, TauriState>,
-) -> Result<HashMap<String, String>, String> {
+) -> Result<HashMap<String, ActiveWallpaper>, String> {
     #[cfg(target_os = "linux")]
     {
         let controller = state.controller.lock().await;
-        Ok(controller.get_active_wallpapers().await)
+        let active = controller.get_active_wallpapers().await;
+        Ok(active.into_iter().map(|(k, v)| (k, v.into())).collect())
     }
 
     #[cfg(not(target_os = "linux"))]
@@ -1167,6 +1159,8 @@ async fn get_active_wallpapers(
         Ok(HashMap::new())
     }
 }
+
+
 
 // ================= Update Check Commands =================
 

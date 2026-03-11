@@ -52,17 +52,14 @@ export interface AppConfig {
   compactMode: boolean;
 }
 
-// Runtime state (persisted to ~/.local/state/linux-wallpaperengine-gui/state.json)
-export interface AppState {
-  lastWallpaper?: string;         // Last applied wallpaper ID
-  lastScreen?: string;            // Last applied screen
-  activeMonitors?: Record<string, string>;  // Multi-monitor mapping: screen -> wallpaper ID
+// Represents an active wallpaper on a screen
+export interface ActiveWallpaper {
+  wallpaperId: string;
+  isPlaying: boolean;
 }
-export interface AppState {
-  lastWallpaper?: string;
-  lastScreen?: string;
-  activeMonitors?: Record<string, string>;
-}
+
+// Runtime state - direct mapping of screen -> active wallpaper
+export type AppState = Record<string, ActiveWallpaper>;
 
 // System integration settings (not stored in AppConfig)
 export interface SystemIntegration {

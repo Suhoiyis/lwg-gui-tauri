@@ -11,11 +11,7 @@ import { scanWallpapers } from "../api/wallpaper";
 export const getState = async (): Promise<AppState> => {
   const isTauri = !!(window as any).__TAURI_INTERNALS__;
   if (!isTauri) {
-    return {
-      lastWallpaper: undefined,
-      lastScreen: undefined,
-      activeMonitors: {},
-    };
+    return {};
   }
   return await invoke<AppState>('get_state');
 };
@@ -25,6 +21,9 @@ export const saveState = async (state: AppState): Promise<boolean> => {
   if (!isTauri) return true;
   return await invoke<boolean>('save_state', { appState: state });
 };
+
+
+
 
 
 
@@ -109,11 +108,9 @@ interface AppStoreState {
   // ✨✨ 新增：设置字段高亮状态（用于跨组件通信）✨✨
   highlightSettingField: string | null;
   // Runtime state (loaded from separate state endpoint)
-  runtimeState: {
-    lastWallpaper?: string;
-    lastScreen?: string;
-    activeMonitors: Record<string, string>;
-  };
+  runtimeState: import('../types').AppState;
+
+
 
 
   // Actions
@@ -189,11 +186,8 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   highlightSettingField: null,
 
   // Runtime state from separate API endpoint
-  runtimeState: {
-    lastWallpaper: undefined,
-    lastScreen: undefined,
-    activeMonitors: {},
-  },
+  runtimeState: {},
+
 
   // App version action
   fetchAppVersion: async () => {
@@ -356,13 +350,9 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         console.log("[App] Settings initialized from backend");
         // Also load runtime state
         const state = await getState();
-        set({
-          runtimeState: {
-            lastWallpaper: state.lastWallpaper,
-            lastScreen: state.lastScreen,
-            activeMonitors: state.activeMonitors || {},
-          },
-        });
+        set({ runtimeState: state });
+
+
       } else {
         // Mock mode - use default settings
         const defaultSettings: AppConfig = {
@@ -394,14 +384,9 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         };
         set({ settings: defaultSettings, settingsLoading: false });
         // Mock runtime state
-        set({
-          runtimeState: {
-            lastWallpaper: undefined,
-            lastScreen: undefined,
-            activeMonitors: {},
-          },
-        });
+        set({ runtimeState: {} });
         console.log("[App] Settings initialized with defaults (mock mode)");
+
       }
     } catch (error) {
       console.error("[App] Failed to initialize settings:", error);
@@ -487,14 +472,10 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     try {
       const isTauri = !!(window as any).__TAURI_INTERNALS__;
       if (!isTauri) {
-        return {
-          lastWallpaper: undefined,
-          lastScreen: undefined,
-          activeMonitors: {},
-        };
+        return {};
       }
       const state = await invoke<AppState>("get_state");
-      set({ runtimeState: { lastWallpaper: state?.lastWallpaper, lastScreen: state?.lastScreen, activeMonitors: state?.activeMonitors || {} } });
+      set({ runtimeState: state });
 
       return state;
     } catch (error) {
@@ -503,20 +484,22 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     }
   },
 
+
   saveRuntimeState: async (state: AppState) => {
     try {
       const isTauri = !!(window as any).__TAURI_INTERNALS__;
       if (!isTauri) {
-        set({ runtimeState: { lastWallpaper: state?.lastWallpaper, lastScreen: state?.lastScreen, activeMonitors: state?.activeMonitors || {} } });
+        set({ runtimeState: state });
         return;
       }
       await invoke("save_state", { appState: state });
-      set({ runtimeState: { lastWallpaper: state?.lastWallpaper, lastScreen: state?.lastScreen, activeMonitors: state?.activeMonitors || {} } });
+      set({ runtimeState: state });
     } catch (error) {
       console.error("Failed to save runtime state:", error);
       throw error;
     }
   },
+
 
 
   flushPendingUpdates: () => {
@@ -544,13 +527,12 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
       // Update runtime state (not config) - optimistic update
       const currentRuntimeState = get().runtimeState;
       const newRuntimeState = {
-        lastWallpaper: id,
-        lastScreen: targetScreen || get().selectedScreen,
-        activeMonitors: {
-          ...currentRuntimeState.activeMonitors,
-          ...(targetScreen ? { [targetScreen]: id } : {}),
-        },
+        ...currentRuntimeState,
+        ...(targetScreen ? { [targetScreen]: { wallpaperId: id, isPlaying: true } } : {}),
       };
+
+
+
       set({ runtimeState: newRuntimeState });
       // Persist runtime state to backend
       await get().saveRuntimeState(newRuntimeState);
@@ -575,12 +557,25 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   stopWallpaper: async () => {
     try {
       await invoke("stop_wallpaper");
+      
+      // 更新 runtimeState：设置所有 isPlaying = false
+      const currentRuntimeState = get().runtimeState;
+      const newRuntimeState = Object.fromEntries(
+        Object.entries(currentRuntimeState).map(([screen, aw]) => [
+          screen,
+          { ...aw, isPlaying: false }
+        ])
+      );
+      set({ runtimeState: newRuntimeState });
+      await get().saveRuntimeState(newRuntimeState);
+      
       toast.success("Wallpaper stopped");
     } catch (error) {
       console.error("Failed to stop wallpaper:", error);
       toast.error("Failed to stop wallpaper", { description: String(error) });
     }
   },
+
 
   applyRandomWallpaper: async () => {
     const { wallpapers, applyWallpaper } = get();

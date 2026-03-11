@@ -92,13 +92,16 @@ export function App() {
     });
 
     const unlistenApplyLast = listen("tray-apply-last", () => {
-      // 为了安全起见，我们直接调用 loadWallpapers 后再尝试应用最后的壁纸（或者复用 store 里现有的 applyWallpaper 逻辑）
-      // 这里简化的实现：
+      // 应用上次使用的壁纸（从 runtimeState 恢复）
       const state = useAppStore.getState();
-      const lastWp = state.runtimeState?.lastWallpaper;
-      if (lastWp) {
-        state.applyWallpaper(lastWp);
+      const activeMonitors = state.runtimeState || {};
+      // 对每个屏幕恢复壁纸
+      for (const [screen, aw] of Object.entries(activeMonitors)) {
+        if (aw.isPlaying) {
+          state.applyWallpaper(aw.wallpaperId, screen);
+        }
       }
+
     });
 
     return () => {
