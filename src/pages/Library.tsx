@@ -31,7 +31,7 @@ import { LibraryPagination } from "@/components/library/LibraryPagination";
 
 // State & API
 import { useAppStore } from "@/store/appStore";
-import { applyWallpaper, stopWallpaper, openFolder } from "@/api/wallpaper";
+import { openFolder } from "@/api/wallpaper";
 import { useActiveWallpapers } from "@/hooks/useActiveWallpapers";
 const ITEMS_PER_PAGE = 24;
 
@@ -184,20 +184,15 @@ export function Library() {
     [setSelectedId],
   );
 
-  const handleApply = async (id: string, title: string) => {
+  const handleApply = async (id: string, _title: string) => {
     const selectedScreen = useAppStore.getState().selectedScreen;
     const screen = selectedScreen === "all" ? undefined : selectedScreen;
-    toast.promise(applyWallpaper(id, screen), {
-      loading: `Applying ${title}...`,
-      success: `Applied: ${title}`,
-      error: "Failed to apply wallpaper",
-    });
+    await useAppStore.getState().applyWallpaper(id, screen);
     setSelectedId(id);
   };
 
   const handleStop = async () => {
-    await stopWallpaper();
-    toast.success("Wallpaper stopped");
+    await useAppStore.getState().stopWallpaper();
   };
 
   const handleOpenFolder = async (path: string) => {

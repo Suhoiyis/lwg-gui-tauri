@@ -527,12 +527,27 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
 
       // Update runtime state (not config) - optimistic update
       const currentRuntimeState = get().runtimeState;
-      const newRuntimeState = {
-        ...currentRuntimeState,
-        ...(targetScreen ? { [targetScreen]: { wallpaperId: id, isPlaying: true } } : {}),
-      };
-
-
+      const monitors = get().monitors;
+      
+      let newRuntimeState: typeof currentRuntimeState;
+      
+      if (targetScreen) {
+        // Update specific screen
+        newRuntimeState = {
+          ...currentRuntimeState,
+          [targetScreen]: { wallpaperId: id, isPlaying: true },
+        };
+      } else {
+        // Update all monitors (when screen is undefined/"all")
+        const updates: Record<string, { wallpaperId: string; isPlaying: boolean }> = {};
+        monitors.forEach(monitor => {
+          updates[monitor] = { wallpaperId: id, isPlaying: true };
+        });
+        newRuntimeState = {
+          ...currentRuntimeState,
+          ...updates,
+        };
+      }
 
       set({ runtimeState: newRuntimeState });
       // Persist runtime state to backend
@@ -552,6 +567,8 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
       toast.error("Failed to apply wallpaper", { description: String(error) });
     }
   },
+
+
 
 
 

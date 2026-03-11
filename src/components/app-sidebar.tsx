@@ -18,9 +18,9 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
-import { applyWallpaper } from "@/api/wallpaper";
+
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+
 
 // 菜单项配置
 const items = [
@@ -38,17 +38,9 @@ export function AppSidebar() {
   // 2. 处理应用壁纸逻辑
   const handleApply = async () => {
     if (!selectedWallpaper) return;
-
-    try {
-      console.log("Applying:", selectedWallpaper.title);
-      const selectedScreen = useAppStore.getState().selectedScreen;
-      const screen = selectedScreen === "all" ? undefined : selectedScreen;
-      await applyWallpaper(selectedWallpaper.id, screen);
-      toast.success(`已应用: ${selectedWallpaper.title}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("应用失败，请检查后台日志");
-    }
+    const selectedScreen = useAppStore.getState().selectedScreen;
+    const screen = selectedScreen === "all" ? undefined : selectedScreen;
+    await useAppStore.getState().applyWallpaper(selectedWallpaper.id, screen);
   };
 
   // 3. 获取 setActiveTab

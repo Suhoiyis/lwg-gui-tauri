@@ -40,8 +40,6 @@ import {
 } from "@/components/ui/dialog";
 import { useAppStore } from "@/store/appStore";
 import {
-  applyWallpaper,
-  stopWallpaper,
   takeScreenshot,
   openFolder,
   openImage,
@@ -120,13 +118,7 @@ export function AppNavbar() {
   };
 
   const handleStop = async () => {
-    try {
-      await stopWallpaper();
-      toast.success("Wallpaper stopped");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to stop");
-    }
+    await useAppStore.getState().stopWallpaper();
   };
 
   const handleShuffle = async () => {
@@ -136,15 +128,9 @@ export function AppNavbar() {
     }
     const randomIndex = Math.floor(Math.random() * filteredWallpapers.length);
     const randomWallpaper = filteredWallpapers[randomIndex];
-    try {
-      const screen = selectedScreen === "all" ? undefined : selectedScreen;
-      await applyWallpaper(randomWallpaper.id, screen);
-      setSelectedId(randomWallpaper.id);
-      toast.success(`Applied: ${randomWallpaper.title}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to apply");
-    }
+    const screen = selectedScreen === "all" ? undefined : selectedScreen;
+    await useAppStore.getState().applyWallpaper(randomWallpaper.id, screen);
+    setSelectedId(randomWallpaper.id);
   };
 
   const handleScreenshot = async (): Promise<void> => {

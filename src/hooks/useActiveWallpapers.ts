@@ -15,8 +15,16 @@ export function useActiveWallpapers() {
   useEffect(() => {
     const fetchActiveWallpapers = async () => {
       try {
-        const result = await invoke<Record<string, string>>("get_active_wallpapers");
-        setActiveWallpapers(new Map(Object.entries(result)));
+        // Backend returns HashMap<String, ActiveWallpaper> with { wallpaperId, isPlaying }
+        // We extract just the wallpaperId for each screen where isPlaying is true
+        const result = await invoke<Record<string, { wallpaperId: string; isPlaying: boolean }>>("get_active_wallpapers");
+        const activeMap = new Map<string, string>();
+        for (const [screen, aw] of Object.entries(result)) {
+          if (aw.isPlaying) {
+            activeMap.set(screen, aw.wallpaperId);
+          }
+        }
+        setActiveWallpapers(activeMap);
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to get active wallpapers:", error);

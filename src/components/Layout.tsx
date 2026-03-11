@@ -5,8 +5,7 @@ interface LayoutProps {
   sidebar: ReactNode;
   children: ReactNode;
 }
-import { applyWallpaper } from "../api/wallpaper";
-import { useAppStore } from "../store/appStore";
+
 
 export function Layout({ navbar, sidebar, children }: LayoutProps) {
   return (

@@ -14,7 +14,7 @@ import { useAppStore } from "@/store/appStore";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { stopWallpaper } from "@/api/wallpaper";
+
 
 // 引入拆分后的子组件
 import { PlaybackSettings } from "@/components/settings/Playback";
@@ -55,12 +55,7 @@ export function Settings() {
   }, [restartWallpapers]);
 
   const handleStop = useCallback(async () => {
-    try {
-      await stopWallpaper();
-      toast.success("Wallpaper stopped");
-    } catch {
-      toast.error("Failed to stop wallpaper");
-    }
+    await useAppStore.getState().stopWallpaper();
   }, []);
 
   // ✨ Auto-switch to appropriate tab when highlight is triggered

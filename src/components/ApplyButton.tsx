@@ -1,8 +1,6 @@
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/appStore";
-import { applyWallpaper } from "@/api/wallpaper";
-import { toast } from "sonner";
 
 interface ApplyButtonProps {
   className?: string;
@@ -14,16 +12,9 @@ export function ApplyButton({ className, size = "default" }: ApplyButtonProps) {
 
   const handleApply = async () => {
     if (!selectedWallpaper) return;
-    try {
-      console.log("Applying:", selectedWallpaper.title);
-      const selectedScreen = useAppStore.getState().selectedScreen;
-      const screen = selectedScreen === "all" ? undefined : selectedScreen;
-      await applyWallpaper(selectedWallpaper.id, screen);
-      toast.success(`已应用: ${selectedWallpaper.title}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("应用失败，请检查后台日志");
-    }
+    const selectedScreen = useAppStore.getState().selectedScreen;
+    const screen = selectedScreen === "all" ? undefined : selectedScreen;
+    await useAppStore.getState().applyWallpaper(selectedWallpaper.id, screen);
   };
 
   return (

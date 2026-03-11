@@ -559,14 +559,22 @@ async fn save_state(
 ) -> Result<bool, String> {
     #[cfg(target_os = "linux")]
     {
+        // 更新 state_manager（持久化）
         let mut state_manager = _state.state_manager.lock().await;
-        *state_manager.state_mut() = app_state.into_iter()
+        let new_state: HashMap<String, LwgActiveWallpaper> = app_state.into_iter()
             .map(|(k, v)| (k, LwgActiveWallpaper {
                 wallpaper_id: v.wallpaper_id,
                 is_playing: v.is_playing,
             }))
             .collect();
+        *state_manager.state_mut() = new_state.clone();
         state_manager.save().map_err(|e| format!("Failed to save state: {:?}", e))?;
+        drop(state_manager);
+
+        // 同步控制器的内存状态
+        let mut controller = _state.controller.lock().await;
+        controller.sync_state(new_state).await;
+
         Ok(true)
     }
 
