@@ -48,7 +48,7 @@ const HistoryRow = memo(({ entry, onReuse }: { entry: HistoryEntry; onReuse: (id
       <div className="flex items-center gap-4 flex-1 min-w-0">
         <Thumbnail wallpaperId={entry.id} className="w-12 h-12 shrink-0" />
         <div className="flex-1 min-w-0">
-          <div className="font-medium truncate">
+          <div className="font-medium truncate text-foreground">
             {wallpaper?.title || entry.title || "Unknown Wallpaper"}
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
