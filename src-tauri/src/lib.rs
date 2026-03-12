@@ -21,7 +21,7 @@ use lwg_core::{
     LogManager, LogEntry, LogSource,
     StateManager,
     state::{AppState as LwgAppState, ActiveWallpaper as LwgActiveWallpaper},
-    HistoryManager,
+    HistoryManager, HistoryEntry,
 };
 
 
@@ -43,6 +43,15 @@ pub struct ScreenshotRecord {
     pub duration: f32,
     pub max_cpu: f32,
     pub max_mem: f32,
+}
+
+#[cfg(not(target_os = "linux"))]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HistoryEntry {
+    pub id: String,
+    pub title: String,
+    pub preview: String,
+    pub timestamp: String,
 }
 
 // ================= 数据结构 =================
@@ -613,6 +622,40 @@ async fn add_history(
         let mut history_manager = _state.history_manager.lock().await;
         history_manager.add(&id, &title, &preview)
             .map_err(|e| format!("Failed to add history: {:?}", e))?;
+        Ok(true)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(true)
+    }
+}
+
+#[tauri::command]
+async fn get_history(
+    _state: State<'_, TauriState>
+) -> Result<Vec<HistoryEntry>, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let history_manager = _state.history_manager.lock().await;
+        Ok(history_manager.list().iter().cloned().collect())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(vec![])
+    }
+}
+
+#[tauri::command]
+async fn clear_history(
+    _state: State<'_, TauriState>
+) -> Result<bool, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut history_manager = _state.history_manager.lock().await;
+        history_manager.clear()
+            .map_err(|e| format!("Failed to clear history: {:?}", e))?;
         Ok(true)
     }
 
@@ -1426,6 +1469,8 @@ pub fn run() {
             get_state,
             save_state,
             add_history,
+            get_history,
+            clear_history,
             // System integration commands
             set_autostart,
             get_autostart_status,
