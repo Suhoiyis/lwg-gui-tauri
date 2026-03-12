@@ -1,10 +1,11 @@
 mod tray;
 
 use serde::{Deserialize, Serialize};
-use tauri::{Emitter, Manager, State};
+use tauri::{Emitter, State};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::collections::HashMap;
+use tokio::sync::Mutex;
 // std::time imported locally where needed
 
 
@@ -271,9 +272,6 @@ struct TauriState {
     log_manager: Arc<std::sync::Mutex<LogManager>>,
 
     monitor_running: Arc<AtomicBool>,
-    
-    /// 用于通知后台线程退出的取消令牌
-    cancel_token: Arc<AtomicBool>,
 
     #[cfg(not(target_os = "linux"))]
     _dummy: bool,
@@ -326,7 +324,6 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/cyber/400/225".to_string(),
             wtype: "web".to_string(),
             path: "/mock/path/cyberpunk".to_string(),
-            description: None,
             tags: vec!["cyberpunk".to_string(), "city".to_string(), "neon".to_string()],
             size: "45.2 MB".to_string(),
         },
@@ -336,7 +333,6 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/mountain/400/225".to_string(),
             wtype: "video".to_string(),
             path: "/mock/path/mountain".to_string(),
-            description: None,
             tags: vec!["nature".to_string(), "sunset".to_string(), "mountain".to_string()],
             size: "128.5 MB".to_string(),
         },
@@ -346,7 +342,6 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/space/400/225".to_string(),
             wtype: "scene".to_string(),
             path: "/mock/path/space".to_string(),
-            description: None,
             tags: vec!["space".to_string(), "scifi".to_string(), "station".to_string()],
             size: "256.8 MB".to_string(),
         },
@@ -356,7 +351,6 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/tokyo/400/225".to_string(),
             wtype: "web".to_string(),
             path: "/mock/path/tokyo".to_string(),
-            description: None,
             tags: vec!["japan".to_string(), "rain".to_string(), "city".to_string()],
             size: "67.3 MB".to_string(),
         },
@@ -366,7 +360,6 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/ocean/400/225".to_string(),
             wtype: "video".to_string(),
             path: "/mock/path/ocean".to_string(),
-            description: None,
             tags: vec!["ocean".to_string(), "waves".to_string(), "nature".to_string()],
             size: "189.1 MB".to_string(),
         },
@@ -376,7 +369,6 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/fire/400/225".to_string(),
             wtype: "video".to_string(),
             path: "/mock/path/fireplace".to_string(),
-            description: None,
             tags: vec!["cozy".to_string(), "fire".to_string(), "warm".to_string()],
             size: "52.4 MB".to_string(),
         },
@@ -939,14 +931,13 @@ async fn start_performance_monitor(
     }
 
     let running = state.monitor_running.clone();
-    let cancel_token = state.cancel_token.clone();
 
     #[cfg(target_os = "linux")]
     let monitor = state.performance_monitor.clone();
 
     // Spawn background thread for periodic stats emission
     std::thread::spawn(move || {
-        while running.load(Ordering::SeqCst) && !cancel_token.load(Ordering::SeqCst) {
+        while running.load(Ordering::SeqCst) {
             #[cfg(target_os = "linux")]
             {
                 if let Ok(monitor) = monitor.lock() {
@@ -973,7 +964,6 @@ async fn start_performance_monitor(
 
             std::thread::sleep(std::time::Duration::from_secs(1));
         }
-        println!("[Rust] Performance monitor thread exited");
     });
 
     println!("✅ [Rust] Performance monitor started");
@@ -1363,12 +1353,13 @@ pub fn run() {
     #[cfg(target_os = "linux")]
     let app_state = {
         println!("🐧 [Linux] 初始化应用状态...");
-        let config_manager = LwgConfigManager::new()
-            .expect("Failed to create ConfigManager. Please check if config directory is writable.");
-        let state_manager = StateManager::new()
-            .expect("Failed to create StateManager. Please check if state directory is writable.");
-        let history_manager = HistoryManager::new()
-            .expect("Failed to create HistoryManager. Please check if history directory is writable.");
+        let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
+        let state_manager = StateManager::new().expect("Failed to create StateManager");
+        let history_manager = HistoryManager::new().expect("Failed to create HistoryManager");
+        let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
+        let state_manager = StateManager::new().expect("Failed to create StateManager");
+        let history_manager = HistoryManager::new().expect("Failed to create HistoryManager");
+        let state_manager = StateManager::new().expect("Failed to create StateManager");
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
         let shared_state = Arc::new(tokio::sync::Mutex::new(state_manager.state().clone()));
         let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
@@ -1407,7 +1398,6 @@ pub fn run() {
             performance_monitor,
             log_manager,
             monitor_running: Arc::new(AtomicBool::new(false)),
-            cancel_token: Arc::new(AtomicBool::new(false)),
         }
 
     };
@@ -1418,7 +1408,6 @@ pub fn run() {
         TauriState {
             _dummy: true,
             monitor_running: Arc::new(AtomicBool::new(false)),
-            cancel_token: Arc::new(AtomicBool::new(false)),
         }
     };
 
@@ -1497,25 +1486,6 @@ pub fn run() {
         .plugin(tauri_plugin_opener::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
-        .build(tauri::generate_context!())
-        .expect("error while building tauri application")
-        .run(|app_handle, event| {
-            match event {
-                tauri::RunEvent::ExitRequested { .. } | tauri::RunEvent::Exit => {
-                    // 触发性能监控线程退出
-                    if let Some(state) = app_handle.try_state::<TauriState>() {
-                        state.cancel_token.store(true, Ordering::SeqCst);
-                    }
-                    
-                    // 触发 tray 轮询线程退出
-                    if let Some(tray_token) = app_handle.try_state::<tray::TrayExitToken>() {
-                        tray_token.running.store(false, Ordering::SeqCst);
-                    }
-                    
-                    // 给后台线程一点时间优雅退出
-                    std::thread::sleep(std::time::Duration::from_millis(100));
-                }
-                _ => {}
-            }
-        });
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }

@@ -1,6 +1,27 @@
-import { invoke } from "@tauri-apps/api/core";
+﻿import { invoke } from "@tauri-apps/api/core";
 import { Wallpaper, HistoryEntry } from "@/types";
 import { normalizeType } from "@/lib/utils";
+
+// ================= 🛠️ 类型定义 =================
+export interface Wallpaper {
+  id: string;
+  title: string;
+  preview: string;
+  path: string;
+  type: "video" | "image" | "web";
+  tags: string[];
+  size?: number;
+}
+
+// 类型转换函数：后端 wtype -> 前端 type
+function normalizeType(wtype: string | undefined): "Video" | "Scene" | "Web" {
+  const map: Record<string, "Video" | "Scene" | "Web"> = {
+    video: "Video",
+    scene: "Scene",
+    web: "Web",
+  };
+  return map[wtype?.toLowerCase() || ""] || "Scene";
+}
 
 export interface ScreenshotRecord {
   timestamp: number;
@@ -9,6 +30,15 @@ export interface ScreenshotRecord {
   duration: number;
   maxCpu: number;
   maxMem: number;
+}
+export interface Wallpaper {
+  id: string;
+  title: string;
+  preview: string;
+  path: string;
+  type: "video" | "image" | "web";
+  tags: string[];
+  size?: number;
 }
 
 // ================= 🧬 基础 Mock 模板 (5张) =================
@@ -19,9 +49,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
   //   preview:
   //     "https://images.unsplash.com/photo-1605218427306-635ba2439af2?w=500&q=80",
   //   path: "mock/path/1.mp4",
-  //   type: "Video",
+  //   type: "video",
   //   tags: ["Cyberpunk", "Night", "City"],
-  //   size: "50 MB",
+  //   size: 52428800,
   // },
   {
     id: "base_2",
@@ -29,9 +59,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
     path: "mock/path/2.jpg",
-    type: "Scene",
+    type: "image",
     tags: ["Anime", "Scenery"],
-    size: "5 MB",
+    size: 5242880,
   },
   {
     id: "base_3",
@@ -39,9 +69,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500&q=80",
     path: "mock/path/3.jpg",
-    type: "Scene",
+    type: "image",
     tags: ["Cars", "Neon"],
-    size: "8 MB",
+    size: 8388608,
   },
   {
     id: "base_4",
@@ -49,9 +79,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500&q=80",
     path: "mock/path/4.mp4",
-    type: "Video",
+    type: "video",
     tags: ["Abstract", "4K"],
-    size: "120 MB",
+    size: 125829120,
   },
   // {
   //   id: "base_5",
@@ -59,9 +89,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
   //   preview:
   //     "https://images.unsplash.com/photo-1448375240586-dfd8f3793371?w=500&q=80",
   //   path: "mock/path/5.mp4",
-  //   type: "Video",
+  //   type: "video",
   //   tags: ["Nature", "Relaxing"],
-  //   size: "200 MB",
+  //   size: 205829120,
   // },
   // --- 新增抓取的数据 ---
   {
@@ -70,9 +100,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
     path: "mock/path/6.jpg",
-    type: "Scene",
+    type: "image",
     tags: ["Nature", "Mountain", "Mist"],
-    size: "6 MB",
+    size: 6291456,
   },
   {
     id: "base_7",
@@ -80,9 +110,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500&q=80",
     path: "mock/path/7.jpg",
-    type: "Scene",
+    type: "image",
     tags: ["Space", "Stars", "Dark"],
-    size: "7 MB",
+    size: 7340032,
   },
   {
     id: "base_8",
@@ -90,9 +120,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?w=500&q=80",
     path: "mock/path/8.mp4",
-    type: "Video",
+    type: "video",
     tags: ["Minimal", "Geometry", "Art"],
-    size: "90 MB",
+    size: 94371840,
   },
   {
     id: "base_9",
@@ -100,9 +130,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80",
     path: "mock/path/9.jpg",
-    type: "Scene",
+    type: "image",
     tags: ["Ocean", "Sunset", "Warm"],
-    size: "5.5 MB",
+    size: 5767168,
   },
   {
     id: "base_10",
@@ -110,9 +140,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=500&q=80",
     path: "mock/path/10.mp4",
-    type: "Video",
+    type: "video",
     tags: ["City", "Rain", "Japan"],
-    size: "150 MB",
+    size: 157286400,
   },
   {
     id: "base_11",
@@ -120,9 +150,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=500&q=80",
     path: "mock/path/11.jpg",
-    type: "Scene",
+    type: "image",
     tags: ["Desert", "Sand", "Hot"],
-    size: "4.5 MB",
+    size: 4718592,
   },
   {
     id: "base_12",
@@ -130,9 +160,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80",
     path: "mock/path/12.jpg",
-    type: "Scene",
+    type: "image",
     tags: ["Aurora", "Night", "Green"],
-    size: "8.5 MB",
+    size: 8912896,
   },
 ];
 
@@ -156,15 +186,13 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
       title: item.title,
       preview: item.preview,
       path: item.path || "",
-      type: normalizeType(item.wtype),
-      description: item.description || undefined,
+      type: (item.wtype || "Scene") as "video" | "image" | "web",
+      description: item.description || undefined, // 新增
       tags: item.tags || [],
-      size: item.size || "0 MB",
+      size: item.size || 0,
     }));
   } catch (error) {
-    console.warn(
-      "⚠️ 环境检测：无法连接 Rust 后端，已切换至 Mock 数据模式。",
-    );
+    console.warn("⚠️ 环境检测：无法连接 Rust 后端，已切换至 Mock 数据模式。");
     await new Promise((resolve) => setTimeout(resolve, 600));
     return EXPANDED_MOCK_WALLPAPERS;
   }
@@ -216,31 +244,36 @@ const MOCK_HISTORY: HistoryEntry[] = [
   {
     id: "2874425843",
     title: "Cyberpunk City Night",
-    preview: "https://images.unsplash.com/photo-1605218427306-635ba2439af2?w=500&q=80",
+    preview:
+      "https://images.unsplash.com/photo-1605218427306-635ba2439af2?w=500&q=80",
     timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
   },
   {
     id: "2810924556",
     title: "Anime Landscape",
-    preview: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
+    preview:
+      "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
     timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
   },
   {
     id: "2874425844",
     title: "Neon Tokyo Streets",
-    preview: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=500&q=80",
+    preview:
+      "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=500&q=80",
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
   },
   {
     id: "2810924557",
     title: "Mountain Mist",
-    preview: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
+    preview:
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
   },
   {
     id: "2874425845",
     title: "Northern Lights Aurora",
-    preview: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80",
+    preview:
+      "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80",
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
   },
 ];

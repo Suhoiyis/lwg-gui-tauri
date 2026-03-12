@@ -4,10 +4,10 @@ import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import {
   SystemStats,
+  ScreenshotRecord,
   ProcessStats,
   ChartDataPoint,
 } from "@/types/performance";
-import { ScreenshotRecord } from "@/api/wallpaper";
 
 interface RawPerformanceEvent {
   total_cpu: number;
