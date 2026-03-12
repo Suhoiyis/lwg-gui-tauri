@@ -59,54 +59,10 @@ export function Library() {
 
   // --- Logic Layers ---
 
-  // ✨ 3. 将过滤和排序逻辑直接写在组件内部，确保 100% 响应！
+  // 使用 store 的 getFilteredWallpapers 方法
   const filteredWallpapers = useMemo(() => {
-    // 拷贝一份原数组，防止修改原始状态
-    let result = [...wallpapers];
-
-    // 1. 过滤搜索词
-    if (searchQuery) {
-      const lowerQ = searchQuery.toLowerCase();
-      result = result.filter(
-        (w) =>
-          (w.title || "").toLowerCase().includes(lowerQ) ||
-          (w.id || "").includes(lowerQ),
-      );
-    }
-
-    // 2. 实时排序
-    result.sort((a, b) => {
-      if (sortBy === "name") {
-        return (a.title || "").localeCompare(b.title || "");
-      } else if (sortBy === "id") {
-        return (a.id || "").localeCompare(b.id || "");
-      } else if (sortBy === "size") {
-        // ✨ 修改：把参数类型改为 any，并且在内部做极其严密的容错处理
-        const parseSize = (rawSize?: any) => {
-          if (rawSize === null || rawSize === undefined) return 0;
-
-          // 如果后端传过来的直接就是纯数字，那我们就直接用它！
-          if (typeof rawSize === "number") return rawSize;
-
-          // 强制转换为字符串，彻底杜绝 toUpperCase is not a function 报错
-          const sizeStr = String(rawSize).toUpperCase();
-          const num = parseFloat(sizeStr);
-
-          if (isNaN(num)) return 0;
-
-          if (sizeStr.includes("GB")) return num * 1024;
-          if (sizeStr.includes("KB")) return num / 1024;
-          return num; // 默认按 MB 算
-        };
-
-        // 降序排列（体积大的在前面）
-        return parseSize(b.size) - parseSize(a.size);
-      }
-      return 0;
-    });
-
-    return result;
-  }, [wallpapers, searchQuery, sortBy]); // 💡 关键：只要这三个状态任何一个变化，立刻重新计算！
+    return useAppStore.getState().getFilteredWallpapers();
+  }, [wallpapers, searchQuery, sortBy]);
 
   useEffect(() => {
     setCurrentPage(1);

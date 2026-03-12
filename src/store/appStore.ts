@@ -2,31 +2,9 @@ import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "sonner";
 
-
-// 建议只从一处引入 Wallpaper 类型，以防冲突。这里我们统一使用 src/types 下的。
 import { Wallpaper, AppConfig, AppState } from "../types";
 import { scanWallpapers } from "../api/wallpaper";
-
-// API Helper Functions
-export const getState = async (): Promise<AppState> => {
-  const isTauri = !!(window as any).__TAURI_INTERNALS__;
-  if (!isTauri) {
-    return {};
-  }
-  return await invoke<AppState>('get_state');
-};
-
-export const saveState = async (state: AppState): Promise<boolean> => {
-  const isTauri = !!(window as any).__TAURI_INTERNALS__;
-  if (!isTauri) return true;
-  return await invoke<boolean>('save_state', { appState: state });
-};
-
-
-
-
-
-
+import { parseSize, normalizeType } from "../lib/utils";
 
 // Runtime settings: require explicit Save button (backend restart needed)
 const RUNTIME_SETTINGS = new Set<keyof AppConfig>([
@@ -207,14 +185,9 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     const data = await scanWallpapers();
 
     // 🛠️ 解决 TS 报错：
-    // 方案 1 (强转): set({ wallpapers: data as unknown as Wallpaper[] });
-    // 方案 2 (映射，更安全): 把来自 API 的小写 type 统统转成合规的类型
     const mappedWallpapers = data.map((w: any) => ({
       ...w,
-      // 保证类型安全，将小写转大写，如果没有值就填 Unknown
-      type: w.type
-        ? w.type.charAt(0).toUpperCase() + w.type.slice(1).toLowerCase()
-        : "Unknown",
+      type: normalizeType(w.type || w.wtype),
     })) as Wallpaper[];
 
     set({ wallpapers: mappedWallpapers });
@@ -349,7 +322,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         set({ settings, settingsLoading: false });
         console.log("[App] Settings initialized from backend");
         // Also load runtime state
-        const state = await getState();
+        const state = await invoke<AppState>("get_state");
         set({ runtimeState: state });
 
 
@@ -635,21 +608,10 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     // 2. 排序 (浅拷贝防止修改原数组)
     return [...filtered].sort((a, b) => {
       if (sortBy === "name") {
-        // 加上 || "" 防止 title 为 undefined 导致 localeCompare 报错
         return (a.title || "").localeCompare(b.title || "");
       } else if (sortBy === "id") {
         return (a.id || "").localeCompare(b.id || "");
       } else if (sortBy === "size") {
-        // ✨ 修改这里：允许传入 string | undefined
-        const parseSize = (sizeStr?: string) => {
-          if (!sizeStr) return 0;
-          const num = parseFloat(sizeStr);
-          if (isNaN(num)) return 0; // 额外增加一道防线，防止 parseFloat 解析失败
-          if (sizeStr.toUpperCase().includes("GB")) return num * 1024;
-          if (sizeStr.toUpperCase().includes("KB")) return num / 1024;
-          return num; // 默认按 MB 算
-        };
-        // 降序排列（体积大的在前面）
         return parseSize(b.size) - parseSize(a.size);
       }
       return 0;

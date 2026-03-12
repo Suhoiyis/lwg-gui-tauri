@@ -48,6 +48,19 @@ export const parseSize = (rawSize?: string | number | null): number => {
 };
 
 /**
+ * 标准化壁纸类型
+ * 将后端返回的 wtype 转换为前端统一类型
+ */
+export const normalizeType = (wtype: string | undefined): "Video" | "Scene" | "Web" => {
+  const map: Record<string, "Video" | "Scene" | "Web"> = {
+    video: "Video",
+    scene: "Scene",
+    web: "Web",
+  };
+  return map[wtype?.toLowerCase() || ""] || "Scene";
+};
+
+/**
  * 根据标签内容生成固定的颜色类名
  * 使用简单的哈希算法确保同一标签始终显示相同颜色
  */

@@ -1,15 +1,6 @@
-﻿import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core";
 import { Wallpaper } from "@/types";
-
-// 类型转换函数：后端 wtype -> 前端 type
-function normalizeType(wtype: string | undefined): "Video" | "Scene" | "Web" {
-  const map: Record<string, "Video" | "Scene" | "Web"> = {
-    video: "Video",
-    scene: "Scene",
-    web: "Web",
-  };
-  return map[wtype?.toLowerCase() || ""] || "Scene";
-}
+import { normalizeType } from "@/lib/utils";
 
 export interface ScreenshotRecord {
   timestamp: number;
@@ -151,38 +142,15 @@ const EXPANDED_MOCK_WALLPAPERS = Array.from({ length: 1500 }).map((_, i) => {
   const template = BASE_MOCK_TEMPLATES[i % BASE_MOCK_TEMPLATES.length];
   return {
     ...template,
-    id: `mock_wp_${i}`, // 强制生成唯一 ID
-    title: `${template.title} #${i + 1}`, // 标题加个序号方便区分
+    id: `mock_wp_${i}`,
+    title: `${template.title} #${i + 1}`,
   };
 });
 
-// ================= 🛠️ 调试配置 =================
-const FORCE_EMPTY = false; // 是否强制返回空列表测试 UI
-const FORCE_MOCK = false; // 是否强制在 App 环境也使用 Mock
-
-// ===================================================
-
 export async function scanWallpapers(): Promise<Wallpaper[]> {
-  // 1. 测试空状态
-  if (FORCE_EMPTY) {
-    console.log("🈳 [Debug] 模拟空壁纸库...");
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return [];
-  }
-
-  // 2. 强制 Mock
-  if (FORCE_MOCK) {
-    console.log("🧪 [Debug] 强制使用 Mock 数据");
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return EXPANDED_MOCK_WALLPAPERS;
-  }
-
-  // 3. 真实环境 (带自动降级)
   try {
-    // 尝试调用 Rust
     const data = await invoke<any[]>("get_wallpapers");
 
-    // 真实数据转换
     return data.map((item) => ({
       id: item.id,
       title: item.title,
@@ -194,12 +162,10 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
       size: item.size || "0 MB",
     }));
   } catch (error) {
-    // ⚠️ 浏览器环境捕获错误 -> 返回扩充后的 Mock 数据
     console.warn(
-      "⚠️ 环境检测：无法连接 Rust 后端，已切换至 [扩充版] Mock 数据模式。",
+      "⚠️ 环境检测：无法连接 Rust 后端，已切换至 Mock 数据模式。",
     );
-    await new Promise((resolve) => setTimeout(resolve, 600)); // 假装加载一会儿
-
+    await new Promise((resolve) => setTimeout(resolve, 600));
     return EXPANDED_MOCK_WALLPAPERS;
   }
 }
