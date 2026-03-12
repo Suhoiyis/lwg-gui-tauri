@@ -19,12 +19,12 @@ use lwg_core::{
     wallpaper::WallpaperManager,
     PerformanceMonitor,
     ScreenshotRecord,
+    ScreenshotHistoryManager,
     LogManager, LogEntry, LogSource,
     StateManager,
-    state::{AppState as LwgAppState, ActiveWallpaper as LwgActiveWallpaper},
+    state::{ActiveWallpaper as LwgActiveWallpaper},
     HistoryManager, HistoryEntry,
 };
-
 
 
 #[cfg(target_os = "linux")]
@@ -264,6 +264,9 @@ struct TauriState {
 
     #[cfg(target_os = "linux")]
     history_manager: Mutex<HistoryManager>,
+
+    #[cfg(target_os = "linux")]
+    screenshot_history_manager: Mutex<ScreenshotHistoryManager>,
 
     #[cfg(target_os = "linux")]
     performance_monitor: Arc<std::sync::Mutex<PerformanceMonitor>>,
@@ -981,13 +984,12 @@ async fn stop_performance_monitor(
 
 #[tauri::command]
 async fn get_screenshot_history(
-    _state: State<'_, TauriState>,
+    state: State<'_, TauriState>,
 ) -> Result<Vec<ScreenshotRecord>, String> {
     #[cfg(target_os = "linux")]
     {
-        let monitor = _state.performance_monitor.lock()
-            .map_err(|e| format!("Lock error: {}", e))?;
-        Ok(monitor.get_screenshot_history())
+        let manager = state.screenshot_history_manager.lock().await;
+        Ok(manager.list())
     }
 
     #[cfg(not(target_os = "linux"))]
@@ -998,15 +1000,13 @@ async fn get_screenshot_history(
 
 #[tauri::command]
 async fn clear_screenshot_history(
-    _state: State<'_, TauriState>,
+    state: State<'_, TauriState>,
 ) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
-        let mut monitor = _state.performance_monitor.lock()
-            .map_err(|e| format!("Lock error: {}", e))?;
-        monitor.clear_screenshot_history();
+        let mut manager = state.screenshot_history_manager.lock().await;
+        manager.clear().map_err(|e| format!("Failed to clear: {}", e))?;
     }
-
     Ok(())
 }
 
@@ -1023,8 +1023,10 @@ async fn take_screenshot(
 
         println!("📸 Screenshot requested for wallpaper: {}", wallpaper_id);
 
+
         // 创建 ScreenshotManager 并获取配置
         let config = state.config_manager.lock().await.config().clone();
+
 
         // 获取或生成输出路径（需要分辨率）
         let path = output_path.unwrap_or_else(|| {
@@ -1109,9 +1111,8 @@ async fn take_screenshot(
 
         // 添加到历史记录
         {
-            let mut monitor = state.performance_monitor.lock()
-                .map_err(|e| format!("Lock error: {}", e))?;
-            monitor.add_screenshot_history(record.clone());
+            let mut manager = state.screenshot_history_manager.lock().await;
+            manager.add(record.clone()).map_err(|e| format!("Failed to add screenshot history: {}", e))?;
         }
 
         println!("✅ Screenshot saved: {}", path);
@@ -1356,10 +1357,7 @@ pub fn run() {
         let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
         let state_manager = StateManager::new().expect("Failed to create StateManager");
         let history_manager = HistoryManager::new().expect("Failed to create HistoryManager");
-        let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
-        let state_manager = StateManager::new().expect("Failed to create StateManager");
-        let history_manager = HistoryManager::new().expect("Failed to create HistoryManager");
-        let state_manager = StateManager::new().expect("Failed to create StateManager");
+        let screenshot_history_manager = ScreenshotHistoryManager::new().expect("Failed to create ScreenshotHistoryManager");
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
         let shared_state = Arc::new(tokio::sync::Mutex::new(state_manager.state().clone()));
         let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
@@ -1395,6 +1393,7 @@ pub fn run() {
             config_manager: Mutex::new(config_manager),
             state_manager: Mutex::new(state_manager),
             history_manager: Mutex::new(history_manager),
+            screenshot_history_manager: Mutex::new(screenshot_history_manager),
             performance_monitor,
             log_manager,
             monitor_running: Arc::new(AtomicBool::new(false)),
