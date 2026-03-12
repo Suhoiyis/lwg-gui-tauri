@@ -886,12 +886,17 @@ async fn start_performance_monitor(
     app: tauri::AppHandle,
     state: State<'_, TauriState>,
 ) -> Result<(), String> {
-    // Check if already running
-    if state.monitor_running.load(Ordering::SeqCst) {
-        return Ok(());
+    // 使用 compare_exchange 原子操作避免竞态条件
+    // 如果当前值是 false，则设置为 true；如果已经是 true，则直接返回
+    if state.monitor_running.compare_exchange(
+        false,
+        true,
+        Ordering::SeqCst,
+        Ordering::SeqCst
+    ).is_err() {
+        return Ok(()); // 已经在运行
     }
 
-    state.monitor_running.store(true, Ordering::SeqCst);
     let running = state.monitor_running.clone();
     let cancel_token = state.cancel_token.clone();
 
