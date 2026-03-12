@@ -202,20 +202,20 @@ export function useSystemStats() {
       setHistory([
         {
           timestamp: Math.floor(Date.now() / 1000) - 3600,
-          wp_id: "cyberpunk_01",
-          output_path: "/home/user/Pictures/shot1.png",
+          wpId: "cyberpunk_01",
+          outputPath: "/home/user/Pictures/shot1.png",
           duration: 1.2,
-          max_cpu: 24.5,
-          max_mem: 450.2,
-        } as any,
+          maxCpu: 24.5,
+          maxMem: 450.2,
+        },
         {
           timestamp: Math.floor(Date.now() / 1000) - 7200,
-          wp_id: "nature_02",
-          output_path: "/home/user/Pictures/shot2.png",
+          wpId: "nature_02",
+          outputPath: "/home/user/Pictures/shot2.png",
           duration: 0.8,
-          max_cpu: 15.1,
-          max_mem: 310.5,
-        } as any,
+          maxCpu: 15.1,
+          maxMem: 310.5,
+        },
       ]);
 
       mockInterval = setInterval(() => {

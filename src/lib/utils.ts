@@ -1,9 +1,51 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { convertFileSrc } from "@tauri-apps/api/core";
+
+/**
+ * Tauri window 接口，用于类型安全的环境检测
+ */
+interface TauriWindow extends Window {
+  __TAURI_INTERNALS__?: unknown;
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+/**
+ * 检测是否在 Tauri 环境中运行
+ */
+export const isTauriEnv = (): boolean => {
+  return !!(window as TauriWindow).__TAURI_INTERNALS__;
+};
+
+/**
+ * 获取壁纸预览 URL
+ * 处理本地路径和远程 URL
+ */
+export const getPreviewUrl = (preview: string): string => {
+  if (preview.startsWith("http://") || preview.startsWith("https://")) {
+    return preview;
+  }
+  return convertFileSrc(preview);
+};
+
+/**
+ * 解析文件大小字符串为 MB 数值
+ */
+export const parseSize = (rawSize?: string | number | null): number => {
+  if (rawSize === null || rawSize === undefined) return 0;
+  if (typeof rawSize === "number") return rawSize;
+
+  const sizeStr = String(rawSize).toUpperCase();
+  const num = parseFloat(sizeStr);
+  if (isNaN(num)) return 0;
+
+  if (sizeStr.includes("GB")) return num * 1024;
+  if (sizeStr.includes("KB")) return num / 1024;
+  return num; // MB
+};
 
 /**
  * 根据标签内容生成固定的颜色类名

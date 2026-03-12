@@ -520,21 +520,22 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   },
 
   applyWallpaper: async (id: string, screen?: string) => {
+    const previousRuntimeState = get().runtimeState;
+    
     try {
       // Trigger backend to apply wallpaper
       const targetScreen = screen || (get().selectedScreen === "all" ? undefined : get().selectedScreen);
       await invoke("apply_wallpaper", { id, screen: targetScreen });
 
       // Update runtime state (not config) - optimistic update
-      const currentRuntimeState = get().runtimeState;
       const monitors = get().monitors;
       
-      let newRuntimeState: typeof currentRuntimeState;
+      let newRuntimeState: typeof previousRuntimeState;
       
       if (targetScreen) {
         // Update specific screen
         newRuntimeState = {
-          ...currentRuntimeState,
+          ...previousRuntimeState,
           [targetScreen]: { wallpaperId: id, isPlaying: true },
         };
       } else {
@@ -544,14 +545,21 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
           updates[monitor] = { wallpaperId: id, isPlaying: true };
         });
         newRuntimeState = {
-          ...currentRuntimeState,
+          ...previousRuntimeState,
           ...updates,
         };
       }
 
       set({ runtimeState: newRuntimeState });
+      
       // Persist runtime state to backend
-      await get().saveRuntimeState(newRuntimeState);
+      try {
+        await get().saveRuntimeState(newRuntimeState);
+      } catch (saveError) {
+        console.error("Failed to save runtime state:", saveError);
+        // 状态已更新但持久化失败，只记录警告不回滚（本地状态更可靠）
+        toast.warning("State saved locally but sync failed");
+      }
 
       // Add to history
       const wallpaper = get().wallpapers.find(w => w.id === id);
@@ -563,6 +571,8 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         });
       }
     } catch (error) {
+      // 回滚到之前的状态
+      set({ runtimeState: previousRuntimeState });
       console.error("Failed to apply wallpaper:", error);
       toast.error("Failed to apply wallpaper", { description: String(error) });
     }

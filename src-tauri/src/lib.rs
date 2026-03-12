@@ -440,14 +440,18 @@ async fn apply_wallpaper(
         println!("✅ [Rust] 壁纸应用成功！");
         log_gui(&_state, "Wallpaper applied successfully");
         // 通知前端刷新活动壁纸
-        let _ = app.emit("wallpaper-changed", ());
+        if let Err(e) = app.emit("wallpaper-changed", ()) {
+            eprintln!("[WARN] Failed to emit wallpaper-changed event: {:?}", e);
+        }
         return Ok(());
     }
 
     #[cfg(not(target_os = "linux"))]
     {
         println!("🪟 [Windows] 模拟应用成功: {}", id);
-        let _ = app.emit("wallpaper-changed", ());
+        if let Err(e) = app.emit("wallpaper-changed", ()) {
+            eprintln!("[WARN] Failed to emit wallpaper-changed event: {:?}", e);
+        }
         Ok(())
     }
 }
@@ -464,14 +468,18 @@ async fn stop_wallpaper(
         controller.stop().await;
         log_gui(&_state, "Wallpaper stopped");
         // 通知前端刷新活动壁纸
-        let _ = app.emit("wallpaper-changed", ());
+        if let Err(e) = app.emit("wallpaper-changed", ()) {
+            eprintln!("[WARN] Failed to emit wallpaper-changed event: {:?}", e);
+        }
         Ok(())
     }
 
     #[cfg(not(target_os = "linux"))]
     {
         println!("🪟 [Windows] 模拟停止");
-        let _ = app.emit("wallpaper-changed", ());
+        if let Err(e) = app.emit("wallpaper-changed", ()) {
+            eprintln!("[WARN] Failed to emit wallpaper-changed event: {:?}", e);
+        }
         Ok(())
     }
 }
@@ -897,20 +905,24 @@ async fn start_performance_monitor(
             {
                 if let Ok(monitor) = monitor.lock() {
                     let stats = monitor.get_stats();
-                    let _ = app.emit("performance-update", &stats);
+                    if let Err(e) = app.emit("performance-update", &stats) {
+                        eprintln!("[WARN] Failed to emit performance-update: {:?}", e);
+                    }
                 }
             }
 
             #[cfg(not(target_os = "linux"))]
-            {
+{
                 // Emit empty stats on non-Linux platforms
-                let _ = app.emit("performance-update", serde_json::json!({
+                if let Err(e) = app.emit("performance-update", serde_json::json!({
                     "total_cpu": 0.0,
                     "total_memory_mb": 0.0,
                     "total_threads": 0,
                     "processes": {},
                     "timestamp": 0
-                }));
+                })) {
+                    eprintln!("[WARN] Failed to emit performance-update: {:?}", e);
+                }
             }
 
             std::thread::sleep(std::time::Duration::from_secs(1));
@@ -1093,7 +1105,9 @@ fn get_default_screenshot_path(wallpaper_id: &str, resolution: &str, format: &st
     let dir = format!("{}/Pictures/wallpaperengine", home);
 
     // 创建目录
-    let _ = fs::create_dir_all(&dir);
+    if let Err(e) = fs::create_dir_all(&dir) {
+        eprintln!("[WARN] Failed to create screenshot directory '{}': {:?}", dir, e);
+    }
 
     let now = Local::now();
     let datetime_str = now.format("%Y-%m-%d_%H:%M:%S").to_string();
@@ -1381,7 +1395,9 @@ pub fn run() {
                 let app_handle = app.handle().clone();
                 if let Ok(lm) = log_manager_for_emit.lock() {
                     lm.subscribe(move |entry| {
-                        let _ = app_handle.emit("log-entry", entry);
+                        if let Err(e) = app_handle.emit("log-entry", entry) {
+                            eprintln!("[WARN] Failed to emit log-entry: {:?}", e);
+                        }
                     });
                 }
             }

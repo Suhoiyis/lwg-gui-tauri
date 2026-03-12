@@ -89,33 +89,60 @@ export function App() {
 
   // 监听 Tauri System Tray 事件
   useEffect(() => {
-    // 闭包中捕获 store 的最新方法
-    const unlistenRandom = listen("tray-random-wallpaper", () => {
-      // 通过 getState() 获取最新的方法，避免因为依赖导致的重新绑定
-      useAppStore.getState().applyRandomWallpaper();
-    });
+    // 挂载状态锁 - 防止异步操作完成时组件已卸载
+    let mounted = true;
+    let unlistenRandom: (() => void) | undefined;
+    let unlistenStop: (() => void) | undefined;
+    let unlistenApplyLast: (() => void) | undefined;
 
-    const unlistenStop = listen("tray-stop-wallpaper", () => {
-      useAppStore.getState().stopWallpaper();
-    });
+    const setupListeners = async () => {
+      const unlisten1 = await listen("tray-random-wallpaper", () => {
+        useAppStore.getState().applyRandomWallpaper();
+      });
 
-    const unlistenApplyLast = listen("tray-apply-last", () => {
-      // 应用上次使用的壁纸（从 runtimeState 恢复）
-      const state = useAppStore.getState();
-      const activeMonitors = state.runtimeState || {};
-      // 对每个屏幕恢复壁纸
-      for (const [screen, aw] of Object.entries(activeMonitors)) {
-        if (aw.isPlaying) {
-          state.applyWallpaper(aw.wallpaperId, screen);
-        }
+      if (!mounted) {
+        unlisten1();
+        return;
       }
+      unlistenRandom = unlisten1;
 
-    });
+      const unlisten2 = await listen("tray-stop-wallpaper", () => {
+        useAppStore.getState().stopWallpaper();
+      });
+
+      if (!mounted) {
+        unlisten2();
+        unlistenRandom?.();
+        return;
+      }
+      unlistenStop = unlisten2;
+
+      const unlisten3 = await listen("tray-apply-last", () => {
+        const state = useAppStore.getState();
+        const activeMonitors = state.runtimeState || {};
+        for (const [screen, aw] of Object.entries(activeMonitors)) {
+          if (aw.isPlaying) {
+            state.applyWallpaper(aw.wallpaperId, screen);
+          }
+        }
+      });
+
+      if (!mounted) {
+        unlisten3();
+        unlistenRandom?.();
+        unlistenStop?.();
+        return;
+      }
+      unlistenApplyLast = unlisten3;
+    };
+
+    setupListeners();
 
     return () => {
-      unlistenRandom.then((f) => f());
-      unlistenStop.then((f) => f());
-      unlistenApplyLast.then((f) => f());
+      mounted = false;
+      unlistenRandom?.();
+      unlistenStop?.();
+      unlistenApplyLast?.();
     };
   }, []);
 
