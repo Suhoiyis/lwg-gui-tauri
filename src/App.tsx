@@ -122,7 +122,7 @@ export function App() {
         const state = useAppStore.getState();
         const activeMonitors = state.runtimeState || {};
         for (const [screen, aw] of Object.entries(activeMonitors)) {
-          if (aw.isPlaying) {
+          if (aw.wallpaperId) {
             state.applyWallpaper(aw.wallpaperId, screen);
           }
         }
@@ -159,9 +159,9 @@ export function App() {
       hasAutoRestored.current = true; // Lock immediately
 
       if (settings.autoRestore) {
-        // Filter for wallpapers that were playing
+        // Filter for wallpapers that have a wallpaperId recorded
         const toRestore = Object.entries(runtimeState).filter(
-          ([_, aw]) => aw.isPlaying
+          ([_, aw]) => aw.wallpaperId
         );
 
         if (toRestore.length > 0) {
