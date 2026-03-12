@@ -1,14 +1,14 @@
 ﻿import { invoke } from "@tauri-apps/api/core";
+import { Wallpaper } from "@/types";
 
-// ================= 🛠️ 类型定义 =================
-export interface Wallpaper {
-  id: string;
-  title: string;
-  preview: string;
-  path: string;
-  type: "video" | "image" | "web";
-  tags: string[];
-  size?: number;
+// 类型转换函数：后端 wtype -> 前端 type
+function normalizeType(wtype: string | undefined): "Video" | "Scene" | "Web" {
+  const map: Record<string, "Video" | "Scene" | "Web"> = {
+    video: "Video",
+    scene: "Scene",
+    web: "Web",
+  };
+  return map[wtype?.toLowerCase() || ""] || "Scene";
 }
 
 export interface ScreenshotRecord {
@@ -19,15 +19,6 @@ export interface ScreenshotRecord {
   maxCpu: number;
   maxMem: number;
 }
-export interface Wallpaper {
-  id: string;
-  title: string;
-  preview: string;
-  path: string;
-  type: "video" | "image" | "web";
-  tags: string[];
-  size?: number;
-}
 
 // ================= 🧬 基础 Mock 模板 (5张) =================
 const BASE_MOCK_TEMPLATES: Wallpaper[] = [
@@ -37,9 +28,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
   //   preview:
   //     "https://images.unsplash.com/photo-1605218427306-635ba2439af2?w=500&q=80",
   //   path: "mock/path/1.mp4",
-  //   type: "video",
+  //   type: "Video",
   //   tags: ["Cyberpunk", "Night", "City"],
-  //   size: 52428800,
+  //   size: "50 MB",
   // },
   {
     id: "base_2",
@@ -47,9 +38,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
     path: "mock/path/2.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Anime", "Scenery"],
-    size: 5242880,
+    size: "5 MB",
   },
   {
     id: "base_3",
@@ -57,9 +48,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500&q=80",
     path: "mock/path/3.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Cars", "Neon"],
-    size: 8388608,
+    size: "8 MB",
   },
   {
     id: "base_4",
@@ -67,9 +58,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500&q=80",
     path: "mock/path/4.mp4",
-    type: "video",
+    type: "Video",
     tags: ["Abstract", "4K"],
-    size: 125829120,
+    size: "120 MB",
   },
   // {
   //   id: "base_5",
@@ -77,9 +68,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
   //   preview:
   //     "https://images.unsplash.com/photo-1448375240586-dfd8f3793371?w=500&q=80",
   //   path: "mock/path/5.mp4",
-  //   type: "video",
+  //   type: "Video",
   //   tags: ["Nature", "Relaxing"],
-  //   size: 205829120,
+  //   size: "200 MB",
   // },
   // --- 新增抓取的数据 ---
   {
@@ -88,9 +79,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
     path: "mock/path/6.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Nature", "Mountain", "Mist"],
-    size: 6291456,
+    size: "6 MB",
   },
   {
     id: "base_7",
@@ -98,9 +89,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500&q=80",
     path: "mock/path/7.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Space", "Stars", "Dark"],
-    size: 7340032,
+    size: "7 MB",
   },
   {
     id: "base_8",
@@ -108,9 +99,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?w=500&q=80",
     path: "mock/path/8.mp4",
-    type: "video",
+    type: "Video",
     tags: ["Minimal", "Geometry", "Art"],
-    size: 94371840,
+    size: "90 MB",
   },
   {
     id: "base_9",
@@ -118,9 +109,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80",
     path: "mock/path/9.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Ocean", "Sunset", "Warm"],
-    size: 5767168,
+    size: "5.5 MB",
   },
   {
     id: "base_10",
@@ -128,9 +119,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=500&q=80",
     path: "mock/path/10.mp4",
-    type: "video",
+    type: "Video",
     tags: ["City", "Rain", "Japan"],
-    size: 157286400,
+    size: "150 MB",
   },
   {
     id: "base_11",
@@ -138,9 +129,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=500&q=80",
     path: "mock/path/11.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Desert", "Sand", "Hot"],
-    size: 4718592,
+    size: "4.5 MB",
   },
   {
     id: "base_12",
@@ -148,9 +139,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80",
     path: "mock/path/12.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Aurora", "Night", "Green"],
-    size: 8912896,
+    size: "8.5 MB",
   },
 ];
 
@@ -197,10 +188,10 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
       title: item.title,
       preview: item.preview,
       path: item.path || "",
-      type: (item.wtype || "Scene") as "video" | "image" | "web",
-      description: item.description || undefined, // 新增
+      type: normalizeType(item.wtype),
+      description: item.description || undefined,
       tags: item.tags || [],
-      size: item.size || 0,
+      size: item.size || "0 MB",
     }));
   } catch (error) {
     // ⚠️ 浏览器环境捕获错误 -> 返回扩充后的 Mock 数据

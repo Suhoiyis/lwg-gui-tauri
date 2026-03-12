@@ -22,6 +22,11 @@ use tauri::{
     tray::{TrayIconBuilder, TrayIconEvent, MouseButton, MouseButtonState},
 };
 
+/// 用于存储 tray 的退出令牌，供外部触发
+pub struct TrayExitToken {
+    pub running: Arc<AtomicBool>,
+}
+
 // ─── Engine detection (ported from tray_rs) ──────────────────────────────────
 
 /// Returns true if `linux-wallpaperengine` is currently running in /proc.
@@ -95,6 +100,12 @@ fn load_icon(app: &AppHandle, filename: &str) -> Option<Image<'static>> {
 pub fn setup_tray(app: &mut App) -> tauri::Result<()> {
     let app_handle = app.handle().clone();
 
+    // 创建退出令牌
+    let running = Arc::new(AtomicBool::new(true));
+    
+    // 将令牌存入 app state，以便外部访问
+    app.manage(TrayExitToken { running: running.clone() });
+
     // 🔧 Override GLib's application name so Waybar shows a human-readable tooltip
     // instead of the binary name "lwg-gui-tauri". The glib library is already linked
     // transitively via GTK/webkit2gtk.
@@ -103,7 +114,14 @@ pub fn setup_tray(app: &mut App) -> tauri::Result<()> {
         extern "C" {
             fn g_set_application_name(application_name: *const std::os::raw::c_char);
         }
-        let name = std::ffi::CString::new("Wallpaper Engine GUI").unwrap();
+        // SAFETY: CString::new ensures the string contains no null bytes.
+        // The string is hardcoded and will always succeed.
+        let name = std::ffi::CString::new("Wallpaper Engine GUI")
+            .expect("Application name should not contain null bytes");
+        
+        // SAFETY: g_set_application_name is a thread-safe GLib function.
+        // It copies the string content internally, so the pointer remains valid
+        // for the duration of this call.
         unsafe { g_set_application_name(name.as_ptr()); }
     }
 
@@ -207,29 +225,30 @@ pub fn setup_tray(app: &mut App) -> tauri::Result<()> {
         });
     }
 
-    // ── Background polling loop: refresh icon + tooltip every 2 seconds ───────
+    // ─── Background polling loop: refresh icon + tooltip every 2 seconds ───────
     {
         let ah = app_handle.clone();
         // We pick up the tray handle by ID after spawning
         let tray_id_clone = tray_id.clone();
+        let running = running.clone();
 
         thread::spawn(move || {
             let mut last_state: Option<bool> = None;
 
-            loop {
+            while running.load(Ordering::SeqCst) {
                 thread::sleep(Duration::from_secs(2));
 
-                let running = is_engine_running();
+                let engine_running = is_engine_running();
 
-                if last_state == Some(running) {
+                if last_state == Some(engine_running) {
                     continue; // No change — skip the update
                 }
-                last_state = Some(running);
+                last_state = Some(engine_running);
 
                 // Retrieve the live TrayIcon handle from the app
                 if let Some(tray_handle) = ah.tray_by_id(&tray_id_clone) {
                     // Update tooltip
-                    let tooltip = if running {
+                    let tooltip = if engine_running {
                         "Wallpaper Engine GUI\nStatus: Running"
                     } else {
                         "Wallpaper Engine GUI\nStatus: Stopped"
@@ -237,12 +256,13 @@ pub fn setup_tray(app: &mut App) -> tauri::Result<()> {
                     let _ = tray_handle.set_tooltip(Some(tooltip));
 
                     // Update icon
-                    let icon_file = if running { "tray.png" } else { "tray-stopped.png" };
+                    let icon_file = if engine_running { "tray.png" } else { "tray-stopped.png" };
                     if let Some(icon) = load_icon(&ah, icon_file) {
                         let _ = tray_handle.set_icon(Some(icon));
                     }
                 }
             }
+            println!("[Tray] Background polling thread exited");
         });
     }
 

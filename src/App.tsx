@@ -78,8 +78,7 @@ export function App() {
   useEffect(() => {
     setIsLoading(true);
     loadWallpapers().finally(() => setIsLoading(false));
-    loadWallpapers();
-  }, [loadWallpapers]); // 简化依赖
+  }, [loadWallpapers]);
 
   // Initialize settings and monitors at app startup
   useEffect(() => {
@@ -123,12 +122,9 @@ export function App() {
   // Auto-restore wallpapers on startup (if enabled)
   useEffect(() => {
     // Execution lock to prevent double-trigger in React Strict Mode
-    if (
-      !hasAutoRestored.current &&
-      settings &&
-      runtimeState &&
-      monitors.length > 0
-    ) {
+    if (hasAutoRestored.current) return;
+    
+    if (settings && runtimeState && monitors.length > 0) {
       hasAutoRestored.current = true; // Lock immediately
 
       if (settings.autoRestore) {
