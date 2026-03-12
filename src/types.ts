@@ -75,3 +75,10 @@ export interface LogEntry {
   source: "GUI" | "Core" | "Engine" | "Controller";
   message: string;
 }
+
+export interface HistoryEntry {
+  id: string;
+  title: string;
+  preview: string;
+  timestamp: string;
+}

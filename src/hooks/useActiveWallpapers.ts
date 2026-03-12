@@ -13,10 +13,10 @@ export function useActiveWallpapers() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+
     const fetchActiveWallpapers = async () => {
       try {
-        // Backend returns HashMap<String, ActiveWallpaper> with { wallpaperId, isPlaying }
-        // We extract just the wallpaperId for each screen where isPlaying is true
         const result = await invoke<Record<string, { wallpaperId: string; isPlaying: boolean }>>("get_active_wallpapers");
         const activeMap = new Map<string, string>();
         for (const [screen, aw] of Object.entries(result)) {
@@ -34,7 +34,10 @@ export function useActiveWallpapers() {
 
     fetchActiveWallpapers();
 
-    // 监听两个事件：performance-update 和 wallpaper-changed
+    if (!isTauri) {
+      return;
+    }
+
     const setupListeners = async () => {
       const unlistenPerf = await listen("performance-update", () => {
         fetchActiveWallpapers();

@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Wallpaper } from "@/types";
+import { Wallpaper, HistoryEntry } from "@/types";
 import { normalizeType } from "@/lib/utils";
 
 export interface ScreenshotRecord {
@@ -210,4 +210,58 @@ export async function openFolder(path: string): Promise<void> {
 
 export async function openImage(path: string): Promise<void> {
   await invoke("open_image", { path });
+}
+
+const MOCK_HISTORY: HistoryEntry[] = [
+  {
+    id: "2874425843",
+    title: "Cyberpunk City Night",
+    preview: "https://images.unsplash.com/photo-1605218427306-635ba2439af2?w=500&q=80",
+    timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+  },
+  {
+    id: "2810924556",
+    title: "Anime Landscape",
+    preview: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
+    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+  },
+  {
+    id: "2874425844",
+    title: "Neon Tokyo Streets",
+    preview: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=500&q=80",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+  },
+  {
+    id: "2810924557",
+    title: "Mountain Mist",
+    preview: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+  },
+  {
+    id: "2874425845",
+    title: "Northern Lights Aurora",
+    preview: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+  },
+];
+
+let mockHistoryStore = [...MOCK_HISTORY];
+
+export async function getHistory(): Promise<HistoryEntry[]> {
+  try {
+    return await invoke("get_history");
+  } catch (e) {
+    console.warn("⚠️ [Mock] 使用假的播放历史数据");
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return [...mockHistoryStore];
+  }
+}
+
+export async function clearHistory(): Promise<void> {
+  try {
+    await invoke("clear_history");
+  } catch (e) {
+    console.warn("⚠️ [Mock] 清空假的播放历史数据");
+    mockHistoryStore = [];
+  }
 }

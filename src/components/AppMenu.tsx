@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AboutDialog } from "./AboutDialog";
 import { UpdateDialog } from "./UpdateDialog";
+import { HistoryDialog } from "./HistoryDialog";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 
@@ -34,6 +35,7 @@ export function AppMenu() {
   const appVersion = useAppStore((state) => state.appVersion);
   const [showAbout, setShowAbout] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [currentVersion, setCurrentVersion] = useState("");
 
@@ -43,7 +45,7 @@ export function AppMenu() {
     toast.info("Refreshing library...");
   };
 
-  const handleHistory = () => toast.info("History Panel (Coming soon)");
+  const handleHistory = () => setShowHistory(true);
   const handleGetStarted = () =>
     toast.info("Show Welcome Screen (Coming soon)");
 
@@ -153,6 +155,7 @@ export function AppMenu() {
           downloadUrl={updateInfo.download_url}
         />
       )}
+      <HistoryDialog open={showHistory} onOpenChange={setShowHistory} />
     </>
   );
 }
