@@ -1,7 +1,7 @@
 mod tray;
 
 use serde::{Deserialize, Serialize};
-use tauri::{Emitter, State};
+use tauri::{Emitter, Manager, State};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::collections::HashMap;
@@ -1440,6 +1440,43 @@ pub fn run() {
                 if let Ok(lm) = log_manager_for_emit.lock() {
                     lm.info(LogSource::GUI, "LWG GUI started successfully");
                 }
+            }
+
+            // ✨ Auto-restore wallpapers on startup
+            #[cfg(target_os = "linux")]
+            {
+                let app_handle = app.handle().clone();
+
+                tauri::async_runtime::spawn(async move {
+                    let tauri_state = app_handle.state::<TauriState>();
+
+                    let auto_restore = {
+                        let cm = tauri_state.config_manager.lock().await;
+                        cm.config().auto_restore
+                    };
+
+                    if auto_restore {
+                        let has_active = {
+                            let controller = tauri_state.controller.lock().await;
+                            let active = controller.get_active_wallpapers().await;
+                            active.values().any(|aw| aw.is_playing)
+                        };
+
+                        if has_active {
+                            println!("🔄 [Auto-Restore] Restoring wallpapers...");
+                            let mut controller = tauri_state.controller.lock().await;
+                            match controller.restart_wallpapers().await {
+                                Ok(()) => {
+                                    println!("✅ [Auto-Restore] Wallpapers restored successfully");
+                                    let _ = app_handle.emit("wallpaper-changed", ());
+                                }
+                                Err(e) => {
+                                    eprintln!("❌ [Auto-Restore] Failed to restore wallpapers: {:?}", e);
+                                }
+                            }
+                        }
+                    }
+                });
             }
 
             Ok(())

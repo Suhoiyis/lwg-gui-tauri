@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { listen } from "@tauri-apps/api/event";
-import { toast } from "sonner";
 
 // Shadcn UI 组件
 import { Tabs } from "@/components/ui/tabs";
@@ -46,13 +45,6 @@ export function App() {
   const initializeSettings = useAppStore((s) => s.initializeSettings);
   const fetchMonitors = useAppStore((s) => s.fetchMonitors);
   const fetchAppVersion = useAppStore((s) => s.fetchAppVersion);
-
-  // Auto-restore state
-  const settings = useAppStore((s) => s.settings);
-  const runtimeState = useAppStore((s) => s.runtimeState);
-  const monitors = useAppStore((s) => s.monitors);
-  const applyWallpaper = useAppStore((s) => s.applyWallpaper);
-  const hasAutoRestored = useRef(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -147,33 +139,6 @@ export function App() {
     };
   }, []);
 
-  // Auto-restore wallpapers on startup (if enabled)
-  useEffect(() => {
-    // Execution lock to prevent double-trigger in React Strict Mode
-    if (
-      !hasAutoRestored.current &&
-      settings &&
-      runtimeState &&
-      monitors.length > 0
-    ) {
-      hasAutoRestored.current = true; // Lock immediately
-
-      if (settings.autoRestore) {
-        // Filter for wallpapers that have a wallpaperId recorded
-        const toRestore = Object.entries(runtimeState).filter(
-          ([_, aw]) => aw.wallpaperId
-        );
-
-        if (toRestore.length > 0) {
-          // Restore each wallpaper
-          toRestore.forEach(([screen, aw]) => {
-            applyWallpaper(aw.wallpaperId, screen);
-          });
-          toast.success(`Auto-restored ${toRestore.length} wallpaper(s)`);
-        }
-      }
-    }
-  }, [settings, runtimeState, monitors, applyWallpaper]);
 
   // --- 渲染逻辑 ---
 
