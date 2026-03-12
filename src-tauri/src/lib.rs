@@ -623,8 +623,6 @@ async fn add_history(
 }
 
 // Allowed non-runtime keys for single value updates
-
-// Allowed non-runtime keys for single value updates
 const ALLOWED_KEYS: &[&str] = &["lastScreen", "workshopPath", "assetsPath", "screenshotRes", "preferXvfb", "screenshotDelay", "cycleEnabled", "cycleInterval", "cycleOrder"];
 
 #[tauri::command]
@@ -1093,8 +1091,6 @@ async fn take_screenshot(
     }
 }
 
-/// 生成默认截图路径
-/// 格式：日期_时间_分辨率_壁纸 id.jpg
 /// 生成默认截图路径
 /// 格式：YYYY-MM-DD_HH-MM-SS_分辨率_壁纸ID.png
 ///
