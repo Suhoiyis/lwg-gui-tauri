@@ -82,9 +82,9 @@ export function WallpaperSidebar() {
     }
   }, [selectedWallpaper, nickname, isDialogOpen]);
 
-  const handleSaveNickname = () => {
+  const handleSaveNickname = async () => {
     if (selectedWallpaper) {
-      setNickname(selectedWallpaper.id, nicknameInput);
+      await setNickname(selectedWallpaper.id, nicknameInput);
       toast.success("Nickname updated", {
         description: nicknameInput || "(Cleared)",
       });

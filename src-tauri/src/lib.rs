@@ -24,6 +24,7 @@ use lwg_core::{
     StateManager,
     state::{ActiveWallpaper as LwgActiveWallpaper},
     HistoryManager, HistoryEntry,
+    NicknameManager,
 };
 
 
@@ -274,6 +275,9 @@ struct TauriState {
     #[cfg(target_os = "linux")]
     log_manager: Arc<std::sync::Mutex<LogManager>>,
 
+    #[cfg(target_os = "linux")]
+    nickname_manager: Mutex<NicknameManager>,
+
     monitor_running: Arc<AtomicBool>,
 
     #[cfg(not(target_os = "linux"))]
@@ -327,6 +331,7 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/cyber/400/225".to_string(),
             wtype: "web".to_string(),
             path: "/mock/path/cyberpunk".to_string(),
+            description: None,
             tags: vec!["cyberpunk".to_string(), "city".to_string(), "neon".to_string()],
             size: "45.2 MB".to_string(),
         },
@@ -336,6 +341,7 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/mountain/400/225".to_string(),
             wtype: "video".to_string(),
             path: "/mock/path/mountain".to_string(),
+            description: None,
             tags: vec!["nature".to_string(), "sunset".to_string(), "mountain".to_string()],
             size: "128.5 MB".to_string(),
         },
@@ -345,6 +351,7 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/space/400/225".to_string(),
             wtype: "scene".to_string(),
             path: "/mock/path/space".to_string(),
+            description: None,
             tags: vec!["space".to_string(), "scifi".to_string(), "station".to_string()],
             size: "256.8 MB".to_string(),
         },
@@ -354,6 +361,7 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/tokyo/400/225".to_string(),
             wtype: "web".to_string(),
             path: "/mock/path/tokyo".to_string(),
+            description: None,
             tags: vec!["japan".to_string(), "rain".to_string(), "city".to_string()],
             size: "67.3 MB".to_string(),
         },
@@ -363,6 +371,7 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/ocean/400/225".to_string(),
             wtype: "video".to_string(),
             path: "/mock/path/ocean".to_string(),
+            description: None,
             tags: vec!["ocean".to_string(), "waves".to_string(), "nature".to_string()],
             size: "189.1 MB".to_string(),
         },
@@ -372,6 +381,7 @@ fn generate_mock_wallpapers() -> Vec<Wallpaper> {
             preview: "https://picsum.photos/seed/fire/400/225".to_string(),
             wtype: "video".to_string(),
             path: "/mock/path/fireplace".to_string(),
+            description: None,
             tags: vec!["cozy".to_string(), "fire".to_string(), "warm".to_string()],
             size: "52.4 MB".to_string(),
         },
@@ -657,6 +667,45 @@ async fn clear_history(
     #[cfg(not(target_os = "linux"))]
     {
         Ok(true)
+    }
+}
+
+// ================= Nickname Commands =================
+
+#[tauri::command]
+async fn get_nicknames(
+    state: State<'_, TauriState>
+) -> Result<HashMap<String, String>, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let manager = state.nickname_manager.lock().await;
+        Ok(manager.list().clone())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(HashMap::new())
+    }
+}
+
+#[tauri::command]
+async fn set_nickname(
+    id: String,
+    nickname: String,
+    state: State<'_, TauriState>
+) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut manager = state.nickname_manager.lock().await;
+        manager.set(&id, &nickname)
+            .map_err(|e| format!("Failed to set nickname: {}", e))?;
+        Ok(())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = (id, nickname);
+        Ok(())
     }
 }
 
@@ -1354,10 +1403,34 @@ pub fn run() {
     #[cfg(target_os = "linux")]
     let app_state = {
         println!("🐧 [Linux] 初始化应用状态...");
-        let config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
+        let mut config_manager = LwgConfigManager::new().expect("Failed to create ConfigManager");
         let state_manager = StateManager::new().expect("Failed to create StateManager");
         let history_manager = HistoryManager::new().expect("Failed to create HistoryManager");
         let screenshot_history_manager = ScreenshotHistoryManager::new().expect("Failed to create ScreenshotHistoryManager");
+        
+        // 初始化 NicknameManager
+        let mut nickname_manager = NicknameManager::new().expect("Failed to create NicknameManager");
+        
+        // 迁移旧的 wallpaperNicknames 数据（如果存在）
+        let old_nicknames = config_manager.config().wallpaper_nicknames.clone();
+        if !old_nicknames.is_empty() {
+            println!("🔄 [Migration] Migrating {} nicknames from config.json to nicknames.json", old_nicknames.len());
+            let json = serde_json::to_value(&old_nicknames).unwrap_or(serde_json::Value::Object(serde_json::Map::new()));
+            if let Err(e) = nickname_manager.load_from_config(&json) {
+                eprintln!("⚠️ [Migration] Failed to migrate nicknames: {}", e);
+            } else if let Err(e) = nickname_manager.save() {
+                eprintln!("⚠️ [Migration] Failed to save migrated nicknames: {}", e);
+            } else {
+                // 清空 config 中的旧数据
+                config_manager.config_mut().wallpaper_nicknames.clear();
+                if let Err(e) = config_manager.save() {
+                    eprintln!("⚠️ [Migration] Failed to clear old nicknames from config: {}", e);
+                } else {
+                    println!("✅ [Migration] Nicknames migrated successfully");
+                }
+            }
+        }
+        
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
         let shared_state = Arc::new(tokio::sync::Mutex::new(state_manager.state().clone()));
         let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
@@ -1396,6 +1469,7 @@ pub fn run() {
             screenshot_history_manager: Mutex::new(screenshot_history_manager),
             performance_monitor,
             log_manager,
+            nickname_manager: Mutex::new(nickname_manager),
             monitor_running: Arc::new(AtomicBool::new(false)),
         }
 
@@ -1496,6 +1570,9 @@ pub fn run() {
             add_history,
             get_history,
             clear_history,
+            // Nickname commands
+            get_nicknames,
+            set_nickname,
             // System integration commands
             set_autostart,
             get_autostart_status,

@@ -109,7 +109,7 @@ interface AppStoreState {
 
   toggleFavorite: (id: string) => void;
   isFavorite: (id: string) => boolean;
-  setNickname: (id: string, nickname: string) => void;
+  setNickname: (id: string, nickname: string) => Promise<void>;
   getNickname: (id: string) => string | undefined;
 
   fetchSettings: () => Promise<void>;
@@ -236,8 +236,28 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     set({ favoriteIds: next });
   },
   isFavorite: (id: string) => get().favoriteIds.has(id),
-  setNickname: (id: string, nickname: string) => {
-    set({ nicknames: { ...get().nicknames, [id]: nickname } });
+  setNickname: async (id: string, nickname: string) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    
+    // Optimistic update
+    const newNicknames = { ...get().nicknames };
+    const trimmed = nickname.trim().slice(0, 100);
+    if (trimmed === "") {
+      delete newNicknames[id];
+    } else {
+      newNicknames[id] = trimmed;
+    }
+    set({ nicknames: newNicknames });
+    
+    // Save to backend
+    if (isTauri) {
+      try {
+        await invoke("set_nickname", { id, nickname });
+      } catch (error) {
+        console.error("Failed to save nickname:", error);
+        toast.error("Failed to save nickname");
+      }
+    }
   },
   getNickname: (id: string) => get().nicknames[id],
 
@@ -324,7 +344,15 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         // Also load runtime state
         const state = await invoke<AppState>("get_state");
         set({ runtimeState: state });
-
+        
+        // Load nicknames from backend
+        try {
+          const nicknames = await invoke<Record<string, string>>("get_nicknames");
+          set({ nicknames });
+          console.log("[App] Nicknames loaded:", Object.keys(nicknames).length);
+        } catch (error) {
+          console.error("[App] Failed to load nicknames:", error);
+        }
 
       } else {
         // Mock mode - use default settings
