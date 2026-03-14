@@ -13,7 +13,8 @@ import {
   FolderOpen,
   AlertTriangle,
   Info,
-  Edit3,
+  Database,
+  Star,
 } from "lucide-react";
 import {
   HoverCard,
@@ -28,6 +29,7 @@ import {
   RESOLUTION_OPTIONS,
 } from "./Shared";
 import { NicknameManagerDialog } from "@/components/NicknameManagerDialog";
+import { FavoriteManagerDialog } from "@/components/FavoriteManagerDialog";
 import { Button } from "@/components/ui/button";
 
 export function SystemSettings() {
@@ -35,6 +37,7 @@ export function SystemSettings() {
   const [autostart, setAutostart] = useState(false);
   const [hasXvfb, setHasXvfb] = useState<boolean | null>(null);
   const [nicknameDialogOpen, setNicknameDialogOpen] = useState(false);
+  const [favoriteDialogOpen, setFavoriteDialogOpen] = useState(false);
 
   useEffect(() => {
     // 获取自启动状态
@@ -251,22 +254,40 @@ export function SystemSettings() {
           </CardContent>
         </Card>
 
-        {/* Wallpaper Nicknames Card */}
+        {/* Wallpaper Data Card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Edit3 className="w-4 h-4 text-brand" /> Wallpaper Nicknames
+              <Database className="w-4 h-4 text-brand" /> Wallpaper Data
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Nicknames */}
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-sm font-medium">Manage Nicknames</p>
+                <p className="text-sm font-medium">Nicknames</p>
                 <p className="text-xs text-muted-foreground">
-                  Set custom names for your wallpapers.
+                  Custom names for your wallpapers.
                 </p>
               </div>
               <Button variant="outline" onClick={() => setNicknameDialogOpen(true)}>
+                Manage
+              </Button>
+            </div>
+
+            <Separator />
+
+            {/* Favorites */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <p className="text-sm font-medium flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-yellow-500" /> Favorites
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Your starred wallpapers.
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => setFavoriteDialogOpen(true)}>
                 Manage
               </Button>
             </div>
@@ -278,6 +299,12 @@ export function SystemSettings() {
       <NicknameManagerDialog
         open={nicknameDialogOpen}
         onOpenChange={setNicknameDialogOpen}
+      />
+
+      {/* Favorite Manager Dialog */}
+      <FavoriteManagerDialog
+        open={favoriteDialogOpen}
+        onOpenChange={setFavoriteDialogOpen}
       />
     </div>
   );

@@ -3,55 +3,52 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Thumbnail } from "@/components/ui/thumbnail";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Star } from "lucide-react";
 
-interface NicknameManagerDialogProps {
+interface FavoriteManagerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface NicknameRow {
+interface FavoriteRow {
   wallpaperId: string;
   title: string;
-  nickname: string;
   selected: boolean;
 }
 
-export function NicknameManagerDialog({ open, onOpenChange }: NicknameManagerDialogProps) {
-  const nicknames = useAppStore((state) => state.nicknames);
+export function FavoriteManagerDialog({ open, onOpenChange }: FavoriteManagerDialogProps) {
+  const favoriteIds = useAppStore((state) => state.favoriteIds);
   const wallpapers = useAppStore((state) => state.wallpapers);
-  const setNickname = useAppStore((state) => state.setNickname);
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
 
-  const [rows, setRows] = useState<NicknameRow[]>([]);
+  const [rows, setRows] = useState<FavoriteRow[]>([]);
 
-  // Load nicknames sorted alphabetically when dialog opens
+  // Load favorites sorted alphabetically by title when dialog opens
   useEffect(() => {
     if (open) {
-      const sortedNicknames = Object.entries(nicknames)
-        .sort((a, b) => a[1].toLowerCase().localeCompare(b[1].toLowerCase()))
-        .map(([wallpaperId, nickname]) => {
+      const sortedFavorites = Array.from(favoriteIds)
+        .map((wallpaperId) => {
           const wp = wallpapers.find((w) => w.id === wallpaperId);
           return {
             wallpaperId,
             title: wp?.title || `ID: ${wallpaperId}`,
-            nickname,
             selected: false,
           };
-        });
-      setRows(sortedNicknames);
+        })
+        .sort((a, b) => a.title.toLowerCase().localeCompare(b.title.toLowerCase()));
+      setRows(sortedFavorites);
     }
-  }, [open, nicknames, wallpapers]);
+  }, [open, favoriteIds, wallpapers]);
 
   const handleSelectAll = () => {
     setRows((prev) => prev.map((row) => ({ ...row, selected: true })));
@@ -61,10 +58,17 @@ export function NicknameManagerDialog({ open, onOpenChange }: NicknameManagerDia
     setRows((prev) => prev.map((row) => ({ ...row, selected: false })));
   };
 
-  const handleDeleteSelected = () => {
-    setRows((prev) =>
-      prev.map((row) => (row.selected ? { ...row, nickname: "" } : row))
-    );
+  const handleRemoveSelected = async () => {
+    const selectedRows = rows.filter((r) => r.selected);
+    try {
+      for (const row of selectedRows) {
+        await toggleFavorite(row.wallpaperId);
+      }
+      toast.success(`Removed ${selectedRows.length} favorites`);
+    } catch (error) {
+      console.error("Failed to remove favorites:", error);
+      toast.error("Failed to remove favorites");
+    }
   };
 
   const handleToggleSelected = (wallpaperId: string) => {
@@ -75,37 +79,17 @@ export function NicknameManagerDialog({ open, onOpenChange }: NicknameManagerDia
     );
   };
 
-  const handleNicknameChange = (wallpaperId: string, newNickname: string) => {
-    setRows((prev) =>
-      prev.map((row) =>
-        row.wallpaperId === wallpaperId ? { ...row, nickname: newNickname } : row
-      )
-    );
-  };
-
-  const handleSave = async () => {
-    try {
-      // Update all nicknames
-      for (const row of rows) {
-        await setNickname(row.wallpaperId, row.nickname);
-      }
-      toast.success("Nicknames saved");
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Failed to save nicknames:", error);
-      toast.error("Failed to save nicknames");
-    }
-  };
-
   const selectedCount = useMemo(() => rows.filter((r) => r.selected).length, [rows]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Nickname Manager</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Star className="w-4 h-4 text-yellow-500" /> Favorite Manager
+          </DialogTitle>
           <DialogDescription>
-            Manage custom names for your wallpapers.
+            Manage your starred wallpapers. {rows.length} favorite{rows.length !== 1 ? "s" : ""}.
           </DialogDescription>
         </DialogHeader>
 
@@ -121,18 +105,20 @@ export function NicknameManagerDialog({ open, onOpenChange }: NicknameManagerDia
           <Button
             variant="destructive"
             size="sm"
-            onClick={handleDeleteSelected}
+            onClick={handleRemoveSelected}
             disabled={selectedCount === 0}
           >
-            Delete Selected {selectedCount > 0 && `(${selectedCount})`}
+            Remove Selected {selectedCount > 0 && `(${selectedCount})`}
           </Button>
         </div>
 
         {/* List */}
         <ScrollArea className="flex-1 min-h-0">
           {rows.length === 0 ? (
-            <div className="flex items-center justify-center py-8 text-muted-foreground">
-              No nicknames set.
+            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground gap-2">
+              <Star className="w-8 h-8 opacity-50" />
+              <p>No favorites yet.</p>
+              <p className="text-xs">Star wallpapers in the Library to add them here.</p>
             </div>
           ) : (
             <div className="space-y-2 pr-4">
@@ -141,7 +127,7 @@ export function NicknameManagerDialog({ open, onOpenChange }: NicknameManagerDia
                   key={row.wallpaperId}
                   className={cn(
                     "flex items-center gap-3 p-3 rounded-lg border bg-card/50 overflow-hidden",
-                    row.selected && "border-brand/50 bg-brand/5"
+                    row.selected && "border-yellow-500/50 bg-yellow-500/5"
                   )}
                 >
                   {/* Checkbox */}
@@ -153,30 +139,23 @@ export function NicknameManagerDialog({ open, onOpenChange }: NicknameManagerDia
                   {/* Thumbnail */}
                   <Thumbnail wallpaperId={row.wallpaperId} className="w-12 h-12 shrink-0" />
 
-                  {/* Title & Input */}
+                  {/* Title */}
                   <div className="flex-1 min-w-0 w-0">
-                    <p className="text-xs text-muted-foreground truncate mb-1">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {row.title}
                     </p>
-                    <Input
-                      value={row.nickname}
-                      onChange={(e) => handleNicknameChange(row.wallpaperId, e.target.value)}
-                      placeholder="Nickname"
-                      className="h-8"
-                    />
+                    <p className="text-xs text-muted-foreground truncate">
+                      ID: {row.wallpaperId}
+                    </p>
                   </div>
+
+                  {/* Star indicator */}
+                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 shrink-0" />
                 </div>
               ))}
             </div>
           )}
         </ScrollArea>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>Save Changes</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
