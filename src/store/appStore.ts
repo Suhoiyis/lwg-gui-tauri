@@ -619,17 +619,19 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
 
   setSelectedScreen: (screen: string) => set({ selectedScreen: screen }),
 
-  getFilteredWallpapers: () => {
-    const { wallpapers, searchQuery, sortBy } = get();
+getFilteredWallpapers: () => {
+    const { wallpapers, searchQuery, sortBy, nicknames } = get();
 
     // 1. 过滤
     let filtered = wallpapers;
     if (searchQuery) {
       const lowerQ = searchQuery.toLowerCase();
       filtered = wallpapers.filter(
-        (w) =>
-          (w.title || "").toLowerCase().includes(lowerQ) ||
-          (w.id || "").includes(lowerQ),
+        (w) => {
+          const title = (w.title || "").toLowerCase();
+          const nick = (nicknames[w.id] || "").toLowerCase();
+          return title.includes(lowerQ) || w.id.includes(lowerQ) || nick.includes(lowerQ);
+        },
       );
     }
 

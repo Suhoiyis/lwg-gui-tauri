@@ -1,6 +1,6 @@
 // src/components/library/WallpaperGrid.tsx
-import { memo } from "react";
-import { Play, Square, FolderOpen, Trash2 } from "lucide-react";
+import { memo, useState } from "react";
+import { Play, Square, FolderOpen, Trash2, Edit3 } from "lucide-react";
 import { WallpaperCard } from "@/components/WallpaperCard";
 import {
   ContextMenu,
@@ -10,6 +10,7 @@ import {
   ContextMenuTrigger,
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
+import { EditNicknameDialog } from "@/components/EditNicknameDialog";
 
 // 假设 Wallpaper 类型定义在 @/types，如果没有则需在此定义
 import { Wallpaper } from "@/types";
@@ -34,50 +35,76 @@ export const WallpaperGrid = memo(
     onOpenFolder,
     onDelete,
   }: WallpaperGridProps) => {
-    return (
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
-        {wallpapers.map((wp) => (
-          <ContextMenu key={wp.id}>
-            <ContextMenuTrigger asChild>
-              <div
-                className="w-full h-full relative cursor-context-menu select-none"
-                onDoubleClick={() => onApply(wp.id, wp.title)}
-              >
-                <WallpaperCard
-                  wp={wp}
-                  isSelected={selectedId === wp.id}
-                  onSelect={() => onSelect(wp.id)}
-                />
-              </div>
-            </ContextMenuTrigger>
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [editWallpaperId, setEditWallpaperId] = useState<string | null>(null);
+    const [editWallpaperTitle, setEditWallpaperTitle] = useState("");
 
-            <ContextMenuContent className="w-56">
-              <ContextMenuItem onClick={() => onApply(wp.id, wp.title)}>
-                <Play className="mr-2 h-4 w-4" />
-                Apply Wallpaper
-              </ContextMenuItem>
-              <ContextMenuItem onClick={onStop}>
-                <Square className="mr-2 h-4 w-4" />
-                Stop Wallpaper
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem onClick={() => onOpenFolder(wp.path)}>
-                <FolderOpen className="mr-2 h-4 w-4" />
-                Open Folder...
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem
-                className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
-                onClick={() => onDelete(wp.id, wp.title)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-                <ContextMenuShortcut>Del</ContextMenuShortcut>
-              </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
-        ))}
-      </div>
+    const handleEditNickname = (id: string, title: string) => {
+      setEditWallpaperId(id);
+      setEditWallpaperTitle(title);
+      setEditDialogOpen(true);
+    };
+
+    return (
+      <>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
+          {wallpapers.map((wp) => (
+            <ContextMenu key={wp.id}>
+              <ContextMenuTrigger asChild>
+                <div
+                  className="w-full h-full relative cursor-context-menu select-none"
+                  onDoubleClick={() => onApply(wp.id, wp.title)}
+                >
+                  <WallpaperCard
+                    wp={wp}
+                    isSelected={selectedId === wp.id}
+                    onSelect={() => onSelect(wp.id)}
+                  />
+                </div>
+              </ContextMenuTrigger>
+
+              <ContextMenuContent className="w-56">
+                <ContextMenuItem onClick={() => onApply(wp.id, wp.title)}>
+                  <Play className="mr-2 h-4 w-4" />
+                  Apply Wallpaper
+                </ContextMenuItem>
+                <ContextMenuItem onClick={onStop}>
+                  <Square className="mr-2 h-4 w-4" />
+                  Stop Wallpaper
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem onClick={() => handleEditNickname(wp.id, wp.title)}>
+                  <Edit3 className="mr-2 h-4 w-4" />
+                  Edit Nickname
+                </ContextMenuItem>
+                <ContextMenuItem onClick={() => onOpenFolder(wp.path)}>
+                  <FolderOpen className="mr-2 h-4 w-4" />
+                  Open Folder...
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
+                  onClick={() => onDelete(wp.id, wp.title)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                  <ContextMenuShortcut>Del</ContextMenuShortcut>
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+          ))}
+        </div>
+
+        {/* Edit Nickname Dialog */}
+        {editWallpaperId && (
+          <EditNicknameDialog
+            wallpaperId={editWallpaperId}
+            wallpaperTitle={editWallpaperTitle}
+            open={editDialogOpen}
+            onOpenChange={setEditDialogOpen}
+          />
+        )}
+      </>
     );
   },
 );

@@ -98,3 +98,17 @@ body {
     --brand-foreground: 0 0% 100%;
   }
 }
+
+@layer components {
+  /* Nickname Support - Italic bold style for custom names */
+  .nickname-text {
+    font-style: italic;
+    font-weight: 600;
+  }
+  
+  /* Original name display below nickname */
+  .original-name-text {
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+  }
+}

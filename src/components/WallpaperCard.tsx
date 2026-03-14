@@ -7,12 +7,8 @@ import { convertFileSrc } from "@tauri-apps/api/core";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 import { Toggle } from "@/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { cn, getDisplayName } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface WallpaperCardProps {
   wp: Wallpaper;
@@ -42,14 +38,19 @@ export const WallpaperCard = memo(function WallpaperCard({
   className,
   children,
 }: WallpaperCardProps) {
+  const nicknames = useAppStore((state) => state.nicknames);
   const isFavorite = useAppStore((state) => state.isFavorite(wp.id));
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+  
+  // Get display name with nickname support
+  const { displayName, originalTitle } = getDisplayName(nicknames, wp.id, wp.title);
+  const isNickname = originalTitle !== null;
 
   const handleToggleFavorite = () => {
     toggleFavorite(wp.id);
     toast.success(
       isFavorite ? "Removed from favorites" : "Added to favorites",
-      { description: wp.title },
+      { description: displayName },
     );
   };
 
@@ -150,11 +151,23 @@ export const WallpaperCard = memo(function WallpaperCard({
 
         {/* 底部标题 (渐变层) */}
         {showTitle && (
-          <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-muted/90 via-muted/50 to-transparent p-3 pt-8 pointer-events-none">
-            <p className="text-[11px] font-bold text-foreground truncate">
-              {renderInlineMarkdown(wp.title)}
-            </p>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-muted/90 via-muted/50 to-transparent p-3 pt-8 pointer-events-none">
+                <p className={cn(
+                  "text-[11px] font-bold text-foreground truncate",
+                  isNickname && "nickname-text"
+                )}>
+                  {renderInlineMarkdown(displayName)}
+                </p>
+              </div>
+            </TooltipTrigger>
+            {isNickname && (
+              <TooltipContent side="top">
+                <p className="text-xs">Original: {originalTitle}</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
         )}
 
         {/* 子元素插槽 (覆盖在最上层) */}

@@ -85,3 +85,29 @@ export const getColorForTag = (tag: string) => {
 
   return colors[hash % colors.length];
 };
+export interface DisplayNameResult {
+  displayName: string;
+  originalTitle: string | null;
+}
+
+/**
+ * Get display name for a wallpaper, considering nickname
+ * Returns both the display name and original title (if nickname exists)
+ * 
+ * IMPORTANT: This is a PURE FUNCTION - components must subscribe to nicknames
+ * state via selector for React reactivity:
+ * 
+ * const nicknames = useAppStore((state) => state.nicknames);
+ * const { displayName, originalTitle } = getDisplayName(nicknames, wp.id, wp.title);
+ */
+export function getDisplayName(
+  nicknames: Record<string, string>,
+  wallpaperId: string,
+  fallbackTitle: string
+): DisplayNameResult {
+  const nickname = nicknames[wallpaperId];
+  if (nickname) {
+    return { displayName: nickname, originalTitle: fallbackTitle };
+  }
+  return { displayName: fallbackTitle, originalTitle: null };
+}

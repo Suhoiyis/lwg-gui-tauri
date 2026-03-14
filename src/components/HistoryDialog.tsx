@@ -21,6 +21,7 @@ import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 import { History, Play, Trash2, Clock, Hash, CircleQuestionMark } from "lucide-react";
 import { HistoryEntry } from "@/types";
+import { getDisplayName, cn } from "@/lib/utils";
 
 interface HistoryDialogProps {
   open: boolean;
@@ -28,11 +29,17 @@ interface HistoryDialogProps {
 }
 
 const HistoryRow = memo(({ entry, onReuse }: { entry: HistoryEntry; onReuse: (id: string) => void }) => {
+  const nicknames = useAppStore((state) => state.nicknames);
   const wallpapers = useAppStore((state) => state.wallpapers);
 
   const wallpaper = useMemo(() => {
     return wallpapers.find((w) => w.id === entry.id);
   }, [wallpapers, entry.id]);
+  
+  // Get display name with nickname support
+  const title = wallpaper?.title || entry.title || "Unknown Wallpaper";
+  const { displayName, originalTitle } = getDisplayName(nicknames, entry.id, title);
+  const isNickname = originalTitle !== null;
 
   const formattedTime = useMemo(() => {
     try {
@@ -48,8 +55,14 @@ const HistoryRow = memo(({ entry, onReuse }: { entry: HistoryEntry; onReuse: (id
       <div className="flex items-center gap-4 flex-1 min-w-0">
         <Thumbnail wallpaperId={entry.id} className="w-12 h-12 shrink-0" />
         <div className="flex-1 min-w-0">
-          <div className="font-medium truncate text-foreground">
-            {wallpaper?.title || entry.title || "Unknown Wallpaper"}
+          <div 
+            className={cn(
+              "font-medium truncate text-foreground",
+              isNickname && "nickname-text"
+            )}
+            title={isNickname ? `Original: ${originalTitle}` : undefined}
+          >
+            {displayName}
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">

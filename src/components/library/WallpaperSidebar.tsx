@@ -2,17 +2,6 @@ import React from "react";
 import { Star, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,22 +14,15 @@ import {
 import { WallpaperCard } from "@/components/WallpaperCard";
 import { WallpaperMetadata } from "@/components/WallpaperMetadata";
 import { ApplyButton } from "@/components/ApplyButton";
+import { EditNicknameDialog } from "@/components/EditNicknameDialog";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
-import { convertFileSrc } from "@tauri-apps/api/core";
-import { cn } from "@/lib/utils";
+import { cn, getDisplayName } from "@/lib/utils";
 import { renderInlineMarkdown } from "@/lib/markdown";
 
 /**
- * 将本地文件路径转换为浏览器可加载的 URL
+ * 移除 BBCode 标签并清理文本
  */
-function getPreviewUrl(preview: string): string {
-  if (preview.startsWith("http://") || preview.startsWith("https://")) {
-    return preview;
-  }
-  return convertFileSrc(preview);
-}
-
 /**
  * 移除 BBCode 标签并清理文本
  */
@@ -61,43 +43,30 @@ function cleanDescription(text: string): string {
   );
 }
 export function WallpaperSidebar() {
+  const nicknames = useAppStore((state) => state.nicknames);
   const selectedWallpaper = useAppStore((state) =>
     state.getSelectedWallpaper(),
   );
+  
+  // Get display name with nickname support
+  const { displayName, originalTitle } = selectedWallpaper
+    ? getDisplayName(nicknames, selectedWallpaper.id, selectedWallpaper.title)
+    : { displayName: '', originalTitle: null };
+  const isNickname = originalTitle !== null;
+  
   const isFavorite = useAppStore((state) =>
     selectedWallpaper ? state.isFavorite(selectedWallpaper.id) : false,
   );
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
-  const nickname = useAppStore((state) =>
-    selectedWallpaper ? state.getNickname(selectedWallpaper.id) : undefined,
-  );
-  const setNickname = useAppStore((state) => state.setNickname);
 
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [nicknameInput, setNicknameInput] = React.useState("");
-
-  React.useEffect(() => {
-    if (selectedWallpaper && isDialogOpen) {
-      setNicknameInput(nickname || "");
-    }
-  }, [selectedWallpaper, nickname, isDialogOpen]);
-
-  const handleSaveNickname = async () => {
-    if (selectedWallpaper) {
-      await setNickname(selectedWallpaper.id, nicknameInput);
-      toast.success("Nickname updated", {
-        description: nicknameInput || "(Cleared)",
-      });
-      setIsDialogOpen(false);
-    }
-  };
 
   const handleToggleFavorite = () => {
     if (selectedWallpaper) {
       toggleFavorite(selectedWallpaper.id);
       toast.success(
         isFavorite ? "Removed from favorites" : "Added to favorites",
-        { description: selectedWallpaper.title },
+        { description: displayName },
       );
     }
   };
@@ -121,9 +90,17 @@ export function WallpaperSidebar() {
 
             {/* 2. 标题与基础信息 */}
             <div className="space-y-2">
-              <h1 className="text-xl font-bold leading-tight break-words">
-                {renderInlineMarkdown(selectedWallpaper.title)}
+              <h1 className={cn(
+                "text-xl font-bold leading-tight break-words",
+                isNickname && "nickname-text"
+              )}>
+                {renderInlineMarkdown(displayName)}
               </h1>
+              {isNickname && (
+                <p className="original-name-text">
+                  {renderInlineMarkdown(originalTitle || "")}
+                </p>
+              )}
               {/* ID 和 Size */}
               <div className="flex flex-wrap gap-2">
                 <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20 hover:bg-pink-500/30">
@@ -141,46 +118,14 @@ export function WallpaperSidebar() {
               <Separator />
               <div className="flex gap-2">
                 {/* Nickname 编辑按钮 */}
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="flex-1 gap-2 h-10">
-                      <Edit3 className="w-4 h-4" />
-                      Nickname
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Set Wallpaper Nickname</DialogTitle>
-                      <DialogDescription>
-                        Give this wallpaper a custom nickname for easier
-                        identification.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="nickname">Nickname</Label>
-                        <Input
-                          id="nickname"
-                          value={nicknameInput}
-                          onChange={(e) => setNicknameInput(e.target.value)}
-                          placeholder="Enter a nickname..."
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") handleSaveNickname();
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsDialogOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button onClick={handleSaveNickname}>Save</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2 h-10"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  <Edit3 className="w-4 h-4" />
+                  Nickname
+                </Button>
 
                 {/* favorite */}
                 <Toggle
@@ -247,6 +192,16 @@ export function WallpaperSidebar() {
       <div className="p-6 bg-background/50">
         <ApplyButton className="w-full h-12 bg-brand hover:bg-brand/90 text-brand-foreground font-bold rounded-xl shadow-lg shadow-brand/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed" />
       </div>
+
+      {/* Edit Nickname Dialog */}
+      {selectedWallpaper && (
+        <EditNicknameDialog
+          wallpaperId={selectedWallpaper.id}
+          wallpaperTitle={selectedWallpaper.title}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+        />
+      )}
     </div>
   );
 }

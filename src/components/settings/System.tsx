@@ -13,6 +13,7 @@ import {
   FolderOpen,
   AlertTriangle,
   Info,
+  Edit3,
 } from "lucide-react";
 import {
   HoverCard,
@@ -26,11 +27,14 @@ import {
   EditableComboboxField,
   RESOLUTION_OPTIONS,
 } from "./Shared";
+import { NicknameManagerDialog } from "@/components/NicknameManagerDialog";
+import { Button } from "@/components/ui/button";
 
 export function SystemSettings() {
   const { settings, updateSetting, highlightSettingField } = useAppStore();
   const [autostart, setAutostart] = useState(false);
   const [hasXvfb, setHasXvfb] = useState<boolean | null>(null);
+  const [nicknameDialogOpen, setNicknameDialogOpen] = useState(false);
 
   useEffect(() => {
     // 获取自启动状态
@@ -246,7 +250,35 @@ export function SystemSettings() {
             />
           </CardContent>
         </Card>
+
+        {/* Wallpaper Nicknames Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Edit3 className="w-4 h-4 text-brand" /> Wallpaper Nicknames
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <p className="text-sm font-medium">Manage Nicknames</p>
+                <p className="text-xs text-muted-foreground">
+                  Set custom names for your wallpapers.
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => setNicknameDialogOpen(true)}>
+                Manage
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Nickname Manager Dialog */}
+      <NicknameManagerDialog
+        open={nicknameDialogOpen}
+        onOpenChange={setNicknameDialogOpen}
+      />
     </div>
   );
 }
