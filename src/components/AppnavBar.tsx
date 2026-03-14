@@ -206,7 +206,7 @@ export function AppNavbar() {
               <FolderOpen className="w-4 h-4 mt-0.5 text-muted-foreground shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground mb-1">Path</p>
-                <p className="text-sm font-mono break-all">
+                <p className="text-sm font-mono break-all text-foreground">
                   {screenshotResult?.outputPath}
                 </p>
               </div>
@@ -216,7 +216,7 @@ export function AppNavbar() {
             <div className="flex justify-center">
               <div className="flex flex-col items-center p-4 rounded-lg bg-muted/50 min-w-32">
                 <Clock className="w-5 h-5 text-muted-foreground mb-1" />
-                <p className="text-2xl font-bold">
+                <p className="text-2xl font-bold text-foreground">
                   {screenshotResult?.duration.toFixed(1)}s
                 </p>
                 <p className="text-xs text-muted-foreground">Duration</p>
