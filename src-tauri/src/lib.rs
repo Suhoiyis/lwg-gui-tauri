@@ -963,7 +963,7 @@ async fn quit_app(app: tauri::AppHandle, state: State<'_, TauriState>) -> Result
 }
 
 #[tauri::command]
-async fn restart_app(app: tauri::AppHandle, state: State<'_, TauriState>) -> Result<(), String> {
+async fn restart_app(_app: tauri::AppHandle, state: State<'_, TauriState>) -> Result<(), String> {
     println!("🔄 [Rust] Restarting application...");
     
     // Stop wallpapers (Linux only)
@@ -989,25 +989,47 @@ async fn restart_app(app: tauri::AppHandle, state: State<'_, TauriState>) -> Res
                 .to_string_lossy()
                 .to_string()
         });
-    
     println!("📍 [Rust] Restart path: {}", exe_path);
     
-    // Spawn new process in new session (detach from current)
+    // Check if running in dev mode
+    let is_dev_mode = exe_path.contains("target/debug");
+    
+    // Spawn new process in a new session (detaches from current process group)
+    #[cfg(target_os = "linux")]
+    {
+        use std::os::unix::process::CommandExt;
+        use std::process::{Command, Stdio};
+        
+        let mut cmd = Command::new(&exe_path);
+        cmd.args(&args)
+            .current_dir(std::env::var("HOME").unwrap_or_else(|_| "/".to_string()))
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .process_group(0);
+        
+        // In dev mode, pass dev server URL so new process connects to Vite
+        if is_dev_mode {
+            cmd.env("TAURI_DEV_SERVER_URL", "http://localhost:1420");
+            println!("🔧 [Rust] Dev mode: setting TAURI_DEV_SERVER_URL");
+        }
+        
+        cmd.spawn()
+            .map_err(|e| format!("Failed to restart: {}", e))?;
+    }
+    
+    #[cfg(not(target_os = "linux"))]
     std::process::Command::new(&exe_path)
         .args(&args)
-        .current_dir(std::env::var("HOME").unwrap_or_else(|_| "/".to_string()))
         .spawn()
         .map_err(|e| format!("Failed to restart: {}", e))?;
     
     println!("✅ [Rust] New process spawned, exiting current...");
     
-    // Exit current process
-    app.exit(0);
-    Ok(())
+    std::process::exit(0);
 }
 
 // ================= System Integration Commands =================
-
 #[tauri::command]
 fn get_display_server() -> String {
     std::env::var("XDG_SESSION_TYPE")
