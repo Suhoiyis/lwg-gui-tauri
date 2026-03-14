@@ -188,7 +188,7 @@ pub fn setup_tray(app: &mut App) -> tauri::Result<()> {
                     let _ = ah.emit("tray-random-wallpaper", ());
                 }
                 "quit" => {
-                    ah.exit(0);
+                    let _ = ah.emit("tray-quit-request", ());
                 }
                 _ => {}
             }

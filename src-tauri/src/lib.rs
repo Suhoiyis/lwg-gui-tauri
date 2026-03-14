@@ -943,6 +943,69 @@ async fn restart_wallpapers(_state: State<'_, TauriState>) -> Result<(), String>
     }
 }
 
+// ================= App Lifecycle Commands =================
+
+#[tauri::command]
+async fn quit_app(app: tauri::AppHandle, state: State<'_, TauriState>) -> Result<(), String> {
+    println!("🛑 [Rust] Quitting application...");
+    
+    // Stop wallpapers (Linux only)
+    #[cfg(target_os = "linux")]
+    {
+        let mut controller = state.controller.lock().await;
+        controller.stop().await;
+        println!("✅ [Rust] Wallpapers stopped");
+    }
+    
+    // Exit app
+    app.exit(0);
+    Ok(())
+}
+
+#[tauri::command]
+async fn restart_app(app: tauri::AppHandle, state: State<'_, TauriState>) -> Result<(), String> {
+    println!("🔄 [Rust] Restarting application...");
+    
+    // Stop wallpapers (Linux only)
+    #[cfg(target_os = "linux")]
+    {
+        let mut controller = state.controller.lock().await;
+        controller.stop().await;
+        println!("✅ [Rust] Wallpapers stopped");
+    }
+    
+    // Filter args (remove --hidden)
+    let args: Vec<String> = std::env::args()
+        .skip(1)
+        .filter(|arg| arg != "--hidden")
+        .collect();
+    
+    // Check if running as AppImage (check APPIMAGE env var)
+    let exe_path = std::env::var("APPIMAGE")
+        .ok()
+        .unwrap_or_else(|| {
+            std::env::current_exe()
+                .expect("Failed to get current exe")
+                .to_string_lossy()
+                .to_string()
+        });
+    
+    println!("📍 [Rust] Restart path: {}", exe_path);
+    
+    // Spawn new process in new session (detach from current)
+    std::process::Command::new(&exe_path)
+        .args(&args)
+        .current_dir(std::env::var("HOME").unwrap_or_else(|_| "/".to_string()))
+        .spawn()
+        .map_err(|e| format!("Failed to restart: {}", e))?;
+    
+    println!("✅ [Rust] New process spawned, exiting current...");
+    
+    // Exit current process
+    app.exit(0);
+    Ok(())
+}
+
 // ================= System Integration Commands =================
 
 #[tauri::command]
@@ -1685,6 +1748,9 @@ pub fn run() {
             save_settings,
             update_config_value,
             restart_wallpapers,
+            // App lifecycle commands
+            quit_app,
+            restart_app,
             // State commands
             get_state,
             save_state,

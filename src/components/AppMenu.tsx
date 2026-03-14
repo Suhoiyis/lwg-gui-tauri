@@ -19,6 +19,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { AboutDialog } from "./AboutDialog";
 import { UpdateDialog } from "./UpdateDialog";
 import { HistoryDialog } from "./HistoryDialog";
@@ -36,10 +46,10 @@ export function AppMenu() {
   const [showAbout, setShowAbout] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [currentVersion, setCurrentVersion] = useState("");
 
-  // Mock handlers
   const handleRefresh = () => {
     loadWallpapers();
     toast.info("Refreshing library...");
@@ -69,7 +79,6 @@ export function AppMenu() {
       toast.dismiss(toastId);
 
       if (result.has_update) {
-        // 情况 A：有新版本 → 打开 Dialog
         setCurrentVersion(result.current_version);
         setUpdateInfo({
           latest_version: result.latest_version!,
@@ -77,20 +86,42 @@ export function AppMenu() {
         });
         setShowUpdate(true);
       } else {
-        // 情况 B：已是最新 → 绿色 toast
         toast.success(`已是最新版本 (v${result.current_version})`);
       }
     } catch (err) {
       toast.dismiss(toastId);
-      // 情况 C：错误 → 红色 toast
       toast.error(`检查更新失败: ${err}`);
     }
   };
 
-  const handleAbout = () =>
-    toast.info(`LWG GUI v${appVersion}\nCreated with Tauri & React`);
-  const handleRestart = () => toast.warning("Restarting app... (Mock)");
-  const handleQuit = () => toast.error("Quitting app... (Mock)");
+
+  const handleRestart = async () => {
+    if (!window.__TAURI_INTERNALS__) {
+      toast.error("Restart is only available in the desktop app");
+      return;
+    }
+    try {
+      await invoke("restart_app");
+    } catch (err) {
+      toast.error(`Restart failed: ${err}`);
+    }
+  };
+
+  const handleQuitClick = () => {
+    setShowQuitConfirm(true);
+  };
+
+  const handleConfirmQuit = async () => {
+    if (!window.__TAURI_INTERNALS__) {
+      toast.error("Quit is only available in the desktop app");
+      return;
+    }
+    try {
+      await invoke("quit_app");
+    } catch (err) {
+      toast.error(`Quit failed: ${err}`);
+    }
+  };
 
   return (
     <>
@@ -136,7 +167,10 @@ export function AppMenu() {
             <RotateCcw className="mr-2 h-4 w-4" /> Restart
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={handleQuit}
+            onSelect={(e) => {
+              e.preventDefault();
+              handleQuitClick();
+            }}
             className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/30"
           >
             <LogOut className="mr-2 h-4 w-4" /> Quit
@@ -144,7 +178,7 @@ export function AppMenu() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Dialogs */}
+      {/* Dialogs - placed outside DropdownMenu */}
       <AboutDialog open={showAbout} onOpenChange={setShowAbout} />
       {updateInfo && (
         <UpdateDialog
@@ -156,6 +190,27 @@ export function AppMenu() {
         />
       )}
       <HistoryDialog open={showHistory} onOpenChange={setShowHistory} />
+
+      {/* Quit Confirmation Dialog */}
+      <AlertDialog open={showQuitConfirm} onOpenChange={setShowQuitConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Quit Application?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will stop all running wallpapers and exit the application.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmQuit}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Quit
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

@@ -87,6 +87,7 @@ export function App() {
     let unlistenRandom: (() => void) | undefined;
     let unlistenStop: (() => void) | undefined;
     let unlistenApplyLast: (() => void) | undefined;
+    let unlistenQuit: (() => void) | undefined;
 
     const setupListeners = async () => {
       const unlisten1 = await listen("tray-random-wallpaper", () => {
@@ -127,6 +128,22 @@ export function App() {
         return;
       }
       unlistenApplyLast = unlisten3;
+
+      const unlisten4 = await listen("tray-quit-request", () => {
+        // Import invoke dynamically to avoid circular dependency
+        import("@tauri-apps/api/core").then(({ invoke }) => {
+          invoke("quit_app");
+        });
+      });
+
+      if (!mounted) {
+        unlisten4();
+        unlistenRandom?.();
+        unlistenStop?.();
+        unlistenApplyLast?.();
+        return;
+      }
+      unlistenQuit = unlisten4;
     };
 
     setupListeners();
@@ -136,8 +153,10 @@ export function App() {
       unlistenRandom?.();
       unlistenStop?.();
       unlistenApplyLast?.();
+      unlistenQuit?.();
     };
   }, []);
+
 
 
   // --- 渲染逻辑 ---
