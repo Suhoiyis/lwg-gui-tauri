@@ -133,7 +133,9 @@ export function AppNavbar() {
     setSelectedId(randomWallpaper.id);
   };
 
-  const handleScreenshot = async (): Promise<void> => {
+
+  const handleScreenshot = async (_e?: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+    setScreenshotHintActive(false); // 点击后立刻取消高亮
     const selectedId = useAppStore.getState().selectedId;
 
     if (!selectedId) {
@@ -418,10 +420,7 @@ export function AppNavbar() {
                     screenshotHintActive &&
                       "ring-2 ring-primary ring-offset-1 bg-primary/20 text-primary animate-pulse",
                   )}
-                  onClick={() => {
-                    setScreenshotHintActive(false); // 用户点击后立刻取消高亮
-                    handleScreenshot();
-                  }}
+                  onClick={handleScreenshot}
                 >
                   <Camera className="w-4 h-4" />
                 </StatefulButton>
