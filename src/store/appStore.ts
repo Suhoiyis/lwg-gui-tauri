@@ -225,15 +225,32 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   },
 
   // Favorites & nicknames actions
-  toggleFavorite: (id: string) => {
-    const current = get().favoriteIds;
-    const next = new Set(current);
+  toggleFavorite: async (id: string) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    
+    // Store previous state for rollback on error
+    const previousFavorites = get().favoriteIds;
+    
+    // Optimistic update - MUST create new Set for React re-render
+    const next = new Set(previousFavorites);
     if (next.has(id)) {
       next.delete(id);
     } else {
       next.add(id);
     }
     set({ favoriteIds: next });
+    
+    // Save to backend
+    if (isTauri) {
+      try {
+        await invoke("toggle_favorite", { id });
+      } catch (error) {
+        console.error("Failed to toggle favorite:", error);
+        toast.error("Failed to save favorite");
+        // Revert on error
+        set({ favoriteIds: previousFavorites });
+      }
+    }
   },
   isFavorite: (id: string) => get().favoriteIds.has(id),
   setNickname: async (id: string, nickname: string) => {
@@ -352,6 +369,15 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
           console.log("[App] Nicknames loaded:", Object.keys(nicknames).length);
         } catch (error) {
           console.error("[App] Failed to load nicknames:", error);
+        }
+        
+        // Load favorites from backend
+        try {
+          const favoriteIds = await invoke<string[]>("get_favorites");
+          set({ favoriteIds: new Set(favoriteIds) });
+          console.log("[App] Favorites loaded:", favoriteIds.length);
+        } catch (error) {
+          console.error("[App] Failed to load favorites:", error);
         }
 
       } else {

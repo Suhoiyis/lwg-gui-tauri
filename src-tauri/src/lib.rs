@@ -25,6 +25,7 @@ use lwg_core::{
     state::{ActiveWallpaper as LwgActiveWallpaper},
     HistoryManager, HistoryEntry,
     NicknameManager,
+    FavoriteManager,
 };
 
 
@@ -275,8 +276,10 @@ struct TauriState {
     #[cfg(target_os = "linux")]
     log_manager: Arc<std::sync::Mutex<LogManager>>,
 
-    #[cfg(target_os = "linux")]
     nickname_manager: Mutex<NicknameManager>,
+
+    #[cfg(target_os = "linux")]
+    favorite_manager: Mutex<FavoriteManager>,
 
     monitor_running: Arc<AtomicBool>,
 
@@ -706,6 +709,44 @@ async fn set_nickname(
     {
         let _ = (id, nickname);
         Ok(())
+    }
+}
+
+// ================= Favorite Commands =================
+
+#[tauri::command]
+async fn get_favorites(
+    state: State<'_, TauriState>
+) -> Result<Vec<String>, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let manager = state.favorite_manager.lock().await;
+        Ok(manager.list())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        Ok(Vec::new())
+    }
+}
+
+#[tauri::command]
+async fn toggle_favorite(
+    id: String,
+    state: State<'_, TauriState>
+) -> Result<bool, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut manager = state.favorite_manager.lock().await;
+        let is_now_favorite = manager.toggle(&id)
+            .map_err(|e| format!("Failed to toggle favorite: {}", e))?;
+        Ok(is_now_favorite)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = id;
+        Ok(false)
     }
 }
 
@@ -1431,6 +1472,9 @@ pub fn run() {
             }
         }
         
+        // 初始化 FavoriteManager
+        let favorite_manager = FavoriteManager::new().expect("Failed to create FavoriteManager");
+        
         let shared_config = Arc::new(tokio::sync::Mutex::new(config_manager.config().clone()));
         let shared_state = Arc::new(tokio::sync::Mutex::new(state_manager.state().clone()));
         let performance_monitor = Arc::new(std::sync::Mutex::new(PerformanceMonitor::new()));
@@ -1470,6 +1514,7 @@ pub fn run() {
             performance_monitor,
             log_manager,
             nickname_manager: Mutex::new(nickname_manager),
+            favorite_manager: Mutex::new(favorite_manager),
             monitor_running: Arc::new(AtomicBool::new(false)),
         }
 
@@ -1573,6 +1618,9 @@ pub fn run() {
             // Nickname commands
             get_nicknames,
             set_nickname,
+            // Favorite commands
+            get_favorites,
+            toggle_favorite,
             // System integration commands
             set_autostart,
             get_autostart_status,
