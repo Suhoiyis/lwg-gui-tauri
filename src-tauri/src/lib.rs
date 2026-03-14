@@ -501,6 +501,78 @@ async fn stop_wallpaper(
     }
 }
 
+
+
+#[tauri::command]
+async fn delete_wallpaper(
+    wallpaper_id: String,
+    path: String,
+    app: tauri::AppHandle,
+    _state: State<'_, TauriState>
+) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        println!("🗑️ [Rust] Deleting wallpaper: {} at path: {}", wallpaper_id, path);
+        log_gui(&_state, &format!("Deleting wallpaper: {}", wallpaper_id));
+        
+        // Security validation: ensure path contains wallpaper_id
+        if !path.contains(&wallpaper_id) {
+            return Err(format!("Security error: path '{}' does not contain wallpaper_id '{}'", path, wallpaper_id));
+        }
+        
+        // Check if wallpaper is currently active, stop it first
+        {
+            let controller = _state.controller.lock().await;
+            let active = controller.get_active_wallpapers().await;
+            let screens_with_wallpaper: Vec<String> = active
+                .iter()
+                .filter(|(_, aw)| aw.wallpaper_id == wallpaper_id && aw.is_playing)
+                .map(|(screen, _)| screen.clone())
+                .collect();
+            drop(controller);
+            
+            if !screens_with_wallpaper.is_empty() {
+                println!("⏹️ [Rust] Wallpaper is active on screens: {:?}, stopping...", screens_with_wallpaper);
+                let mut controller = _state.controller.lock().await;
+                for screen in &screens_with_wallpaper {
+                    if let Err(e) = controller.stop_screen(screen).await {
+                        eprintln!("[WARN] Failed to stop screen {}: {:?}", screen, e);
+                    }
+                }
+            }
+        }
+        
+        // Delete the folder
+        let wallpaper_path = std::path::Path::new(&path);
+        if !wallpaper_path.exists() {
+            return Err(format!("Wallpaper folder not found: {}", path));
+        }
+        
+        std::fs::remove_dir_all(wallpaper_path)
+            .map_err(|e| format!("Failed to delete wallpaper folder: {:?}", e))?;
+        
+        println!("✅ [Rust] Wallpaper deleted successfully: {}", wallpaper_id);
+        log_gui(&_state, &format!("Wallpaper deleted: {}", wallpaper_id));
+        
+        // Emit event to notify frontend
+        if let Err(e) = app.emit("wallpaper-changed", ()) {
+            eprintln!("[WARN] Failed to emit wallpaper-changed event: {:?}", e);
+        }
+        
+        Ok(())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        println!("🪟 [Windows] Mock delete wallpaper: {}", wallpaper_id);
+        if let Err(e) = app.emit("wallpaper-changed", ()) {
+            eprintln!("[WARN] Failed to emit wallpaper-changed event: {:?}", e);
+        }
+        Ok(())
+    }
+}
+// ================= Settings Commands =================
+
 // ================= Settings Commands =================
 
 #[tauri::command]
@@ -1604,6 +1676,10 @@ pub fn run() {
             get_wallpapers,
             apply_wallpaper,
             stop_wallpaper,
+            delete_wallpaper,
+            // Settings commands
+            // Settings commands
+            // Settings commands
             // Settings commands
             get_settings,
             save_settings,

@@ -22,7 +22,7 @@ interface WallpaperGridProps {
   onApply: (id: string, title: string) => void;
   onStop: () => void;
   onOpenFolder: (path: string) => void;
-  onDelete: (id: string, title: string) => void;
+  onDelete: (id: string, title: string, path: string) => void;
 }
 
 export const WallpaperGrid = memo(
@@ -84,7 +84,7 @@ export const WallpaperGrid = memo(
                 <ContextMenuSeparator />
                 <ContextMenuItem
                   className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
-                  onClick={() => onDelete(wp.id, wp.title)}
+                  onClick={() => onDelete(wp.id, wp.title, wp.path)}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete

@@ -129,6 +129,10 @@ interface AppStoreState {
   stopWallpaper: () => Promise<void>;
   applyRandomWallpaper: () => Promise<void>;
 
+
+  // Delete wallpaper
+  removeWallpaper: (id: string, path: string) => Promise<void>;
+
   setSelectedScreen: (screen: string) => void;
   flushPendingUpdates: () => void;
 
@@ -641,6 +645,55 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     const randomIndex = Math.floor(Math.random() * wallpapers.length);
     const randomWp = wallpapers[randomIndex];
     await applyWallpaper(randomWp.id);
+  },
+
+
+
+
+  removeWallpaper: async (id: string, path: string) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    
+    // Store previous state for rollback
+    const previousWallpapers = get().wallpapers;
+    const previousFavorites = get().favoriteIds;
+    const previousNicknames = get().nicknames;
+    const previousSelectedId = get().selectedId;
+    
+    // Optimistic update
+    const newWallpapers = previousWallpapers.filter((w) => w.id !== id);
+    const newFavorites = new Set(previousFavorites);
+    newFavorites.delete(id);
+    const newNicknames = { ...previousNicknames };
+    delete newNicknames[id];
+    const newSelectedId = previousSelectedId === id ? null : previousSelectedId;
+    
+    set({
+      wallpapers: newWallpapers,
+      favoriteIds: newFavorites,
+      nicknames: newNicknames,
+      selectedId: newSelectedId,
+    });
+    
+    // Call backend
+    if (isTauri) {
+      try {
+        const { deleteWallpaper } = await import("../api/wallpaper");
+        await deleteWallpaper(id, path);
+        toast.success("Wallpaper deleted", { description: "Removed from disk" });
+      } catch (error) {
+        console.error("Failed to delete wallpaper:", error);
+        toast.error("Failed to delete wallpaper", { description: String(error) });
+        // Rollback
+        set({
+          wallpapers: previousWallpapers,
+          favoriteIds: previousFavorites,
+          nicknames: previousNicknames,
+          selectedId: previousSelectedId,
+        });
+      }
+    } else {
+      toast.success("Wallpaper deleted (mock)");
+    }
   },
 
   setSelectedScreen: (screen: string) => set({ selectedScreen: screen }),

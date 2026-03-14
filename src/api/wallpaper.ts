@@ -1,28 +1,7 @@
-﻿import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core";
 import { Wallpaper, HistoryEntry } from "@/types";
-import { normalizeType } from "@/lib/utils";
 
-// ================= 🛠️ 类型定义 =================
-export interface Wallpaper {
-  id: string;
-  title: string;
-  preview: string;
-  path: string;
-  type: "video" | "image" | "web";
-  tags: string[];
-  size?: number;
-}
-
-// 类型转换函数：后端 wtype -> 前端 type
-function normalizeType(wtype: string | undefined): "Video" | "Scene" | "Web" {
-  const map: Record<string, "Video" | "Scene" | "Web"> = {
-    video: "Video",
-    scene: "Scene",
-    web: "Web",
-  };
-  return map[wtype?.toLowerCase() || ""] || "Scene";
-}
-
+// ================= Screenshot Types =================
 export interface ScreenshotRecord {
   timestamp: number;
   wpId: string;
@@ -31,37 +10,18 @@ export interface ScreenshotRecord {
   maxCpu: number;
   maxMem: number;
 }
-export interface Wallpaper {
-  id: string;
-  title: string;
-  preview: string;
-  path: string;
-  type: "video" | "image" | "web";
-  tags: string[];
-  size?: number;
-}
 
-// ================= 🧬 基础 Mock 模板 (5张) =================
+// ================= Mock Data =================
 const BASE_MOCK_TEMPLATES: Wallpaper[] = [
-  // {
-  //   id: "base_1",
-  //   title: "Cyberpunk City",
-  //   preview:
-  //     "https://images.unsplash.com/photo-1605218427306-635ba2439af2?w=500&q=80",
-  //   path: "mock/path/1.mp4",
-  //   type: "video",
-  //   tags: ["Cyberpunk", "Night", "City"],
-  //   size: 52428800,
-  // },
   {
     id: "base_2",
     title: "Anime Landscape",
     preview:
       "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
     path: "mock/path/2.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Anime", "Scenery"],
-    size: 5242880,
+    size: "5 MB",
   },
   {
     id: "base_3",
@@ -69,9 +29,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500&q=80",
     path: "mock/path/3.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Cars", "Neon"],
-    size: 8388608,
+    size: "8 MB",
   },
   {
     id: "base_4",
@@ -79,30 +39,19 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=500&q=80",
     path: "mock/path/4.mp4",
-    type: "video",
+    type: "Video",
     tags: ["Abstract", "4K"],
-    size: 125829120,
+    size: "125 MB",
   },
-  // {
-  //   id: "base_5",
-  //   title: "Forest Rain",
-  //   preview:
-  //     "https://images.unsplash.com/photo-1448375240586-dfd8f3793371?w=500&q=80",
-  //   path: "mock/path/5.mp4",
-  //   type: "video",
-  //   tags: ["Nature", "Relaxing"],
-  //   size: 205829120,
-  // },
-  // --- 新增抓取的数据 ---
   {
     id: "base_6",
     title: "Mountain Mist",
     preview:
       "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
     path: "mock/path/6.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Nature", "Mountain", "Mist"],
-    size: 6291456,
+    size: "6 MB",
   },
   {
     id: "base_7",
@@ -110,9 +59,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500&q=80",
     path: "mock/path/7.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Space", "Stars", "Dark"],
-    size: 7340032,
+    size: "7 MB",
   },
   {
     id: "base_8",
@@ -120,9 +69,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?w=500&q=80",
     path: "mock/path/8.mp4",
-    type: "video",
+    type: "Video",
     tags: ["Minimal", "Geometry", "Art"],
-    size: 94371840,
+    size: "94 MB",
   },
   {
     id: "base_9",
@@ -130,9 +79,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&q=80",
     path: "mock/path/9.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Ocean", "Sunset", "Warm"],
-    size: 5767168,
+    size: "5 MB",
   },
   {
     id: "base_10",
@@ -140,9 +89,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=500&q=80",
     path: "mock/path/10.mp4",
-    type: "video",
+    type: "Video",
     tags: ["City", "Rain", "Japan"],
-    size: 157286400,
+    size: "157 MB",
   },
   {
     id: "base_11",
@@ -150,9 +99,9 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=500&q=80",
     path: "mock/path/11.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Desert", "Sand", "Hot"],
-    size: 4718592,
+    size: "4 MB",
   },
   {
     id: "base_12",
@@ -160,14 +109,13 @@ const BASE_MOCK_TEMPLATES: Wallpaper[] = [
     preview:
       "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80",
     path: "mock/path/12.jpg",
-    type: "image",
+    type: "Scene",
     tags: ["Aurora", "Night", "Green"],
-    size: 8912896,
+    size: "8 MB",
   },
 ];
 
-// ================= 🚀 自动生成扩充版 Mock 数据 (60张) =================
-// 这里的逻辑是：把上面5张模板，重复循环12次，生成60张，并修改ID防止重复
+// Generate expanded mock data
 const EXPANDED_MOCK_WALLPAPERS = Array.from({ length: 1500 }).map((_, i) => {
   const template = BASE_MOCK_TEMPLATES[i % BASE_MOCK_TEMPLATES.length];
   return {
@@ -176,6 +124,8 @@ const EXPANDED_MOCK_WALLPAPERS = Array.from({ length: 1500 }).map((_, i) => {
     title: `${template.title} #${i + 1}`,
   };
 });
+
+// ================= API Functions =================
 
 export async function scanWallpapers(): Promise<Wallpaper[]> {
   try {
@@ -186,10 +136,10 @@ export async function scanWallpapers(): Promise<Wallpaper[]> {
       title: item.title,
       preview: item.preview,
       path: item.path || "",
-      type: (item.wtype || "Scene") as "video" | "image" | "web",
-      description: item.description || undefined, // 新增
+      type: item.wtype === "video" ? "Video" : item.wtype === "web" ? "Web" : "Scene",
+      description: item.description || undefined,
       tags: item.tags || [],
-      size: item.size || 0,
+      size: item.size || "0 MB",
     }));
   } catch (error) {
     console.warn("⚠️ 环境检测：无法连接 Rust 后端，已切换至 Mock 数据模式。");
@@ -208,8 +158,6 @@ export async function applyWallpaper(
     console.log(
       `[Mock] 假装应用了壁纸 ID: ${id}${screen ? ` 到屏幕 ${screen}` : ""}`,
     );
-    const wp = EXPANDED_MOCK_WALLPAPERS.find((w) => w.id === id);
-    if (wp) console.log(`   选中: ${wp.title}`);
   }
 }
 
@@ -218,6 +166,17 @@ export async function stopWallpaper(): Promise<void> {
     await invoke("stop_wallpaper");
   } catch (e) {
     console.log(`[Mock] 假装停止了壁纸`);
+  }
+}
+
+export async function deleteWallpaper(
+  id: string,
+  path: string,
+): Promise<void> {
+  try {
+    await invoke("delete_wallpaper", { wallpaperId: id, path });
+  } catch (e) {
+    console.warn(`[Mock] 假装删除了壁纸 ID: ${id}, 路径: ${path}`);
   }
 }
 
@@ -240,6 +199,8 @@ export async function openImage(path: string): Promise<void> {
   await invoke("open_image", { path });
 }
 
+// ================= History =================
+
 const MOCK_HISTORY: HistoryEntry[] = [
   {
     id: "2874425843",
@@ -254,27 +215,6 @@ const MOCK_HISTORY: HistoryEntry[] = [
     preview:
       "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
     timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-  },
-  {
-    id: "2874425844",
-    title: "Neon Tokyo Streets",
-    preview:
-      "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=500&q=80",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-  },
-  {
-    id: "2810924557",
-    title: "Mountain Mist",
-    preview:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-  {
-    id: "2874425845",
-    title: "Northern Lights Aurora",
-    preview:
-      "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=500&q=80",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
   },
 ];
 

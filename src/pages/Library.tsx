@@ -37,38 +37,34 @@ const ITEMS_PER_PAGE = 24;
 
 export function Library() {
   // Store State
-  // ✨ 1. 把 wallpapers 的注释解开！组件必须订阅原始数据
   const wallpapers = useAppStore((state) => state.wallpapers);
   const searchQuery = useAppStore((state) => state.searchQuery);
   const selectedId = useAppStore((state) => state.selectedId);
   const setSelectedId = useAppStore((state) => state.setSelectedId);
-
-  // ✨ 2. 订阅排序状态
   const sortBy = useAppStore((state) => state.sortBy);
-
-  // ✨ 3. 获取屏幕选择和活动壁纸状态
   const selectedScreen = useAppStore((state) => state.selectedScreen);
   const { activeWallpapers } = useActiveWallpapers();
+
   // Local State
   const [wallpaperToDelete, setWallpaperToDelete] = useState<{
     id: string;
     title: string;
+    path: string;
   } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const scrollTopRef = useRef<HTMLDivElement>(null);
 
   // --- Logic Layers ---
 
-  // 使用 store 的 getFilteredWallpapers 方法
   const filteredWallpapers = useMemo(() => {
     return useAppStore.getState().getFilteredWallpapers();
   }, [wallpapers, searchQuery, sortBy]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, sortBy]); // 搜索或改变排序时，自动回到第一页
+  }, [searchQuery, sortBy]);
 
-  // 2. Pagination
+  // Pagination
   const totalItems = filteredWallpapers.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
@@ -88,7 +84,7 @@ export function Library() {
     [totalPages],
   );
 
-  // 3. Selection & Metadata
+  // Selection & Metadata
   const selectedWallpaper = useMemo(() => {
     return filteredWallpapers.find((w) => w.id === selectedId) || null;
   }, [filteredWallpapers, selectedId]);
@@ -99,9 +95,8 @@ export function Library() {
     return index !== -1 ? index + 1 : 0;
   }, [filteredWallpapers, selectedId]);
 
-  // ✨ 4. 计算当前正在播放的壁纸标题（基于 selectedScreen）
+  // Active wallpaper title
   const activeTitle = useMemo(() => {
-    // 如果选择了特定屏幕
     if (selectedScreen !== "all") {
       const wallpaperId = activeWallpapers.get(selectedScreen);
       if (!wallpaperId) return "None";
@@ -109,7 +104,6 @@ export function Library() {
       return wallpaper?.title || "None";
     }
 
-    // 如果选择了 "all"
     const allPlayingIds = Array.from(activeWallpapers.values());
     const uniqueIds = new Set(allPlayingIds);
 
@@ -122,14 +116,13 @@ export function Library() {
     return `${uniqueIds.size} wallpapers playing`;
   }, [activeWallpapers, selectedScreen, wallpapers]);
 
-  // ✨ 5. 计算当前播放壁纸的 ID（用于点击跳转）
+  // Active wallpaper ID
   const activeWallpaperId = useMemo(() => {
     if (selectedScreen !== "all") {
       return activeWallpapers.get(selectedScreen) || null;
     }
     const allPlayingIds = Array.from(activeWallpapers.values());
     const uniqueIds = new Set(allPlayingIds);
-    // 只有唯一壁纸时才返回 ID
     return uniqueIds.size === 1 ? allPlayingIds[0] : null;
   }, [activeWallpapers, selectedScreen]);
 
@@ -168,15 +161,14 @@ export function Library() {
     }
   };
 
-  const handleDeleteRequest = (id: string, title: string) => {
-    setWallpaperToDelete({ id, title });
+  const handleDeleteRequest = (id: string, title: string, path: string) => {
+    setWallpaperToDelete({ id, title, path });
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!wallpaperToDelete) return;
-    toast.error("Wallpaper Deleted", {
-      description: `"${wallpaperToDelete.title}" has been removed.`,
-    });
+    const { id, path } = wallpaperToDelete;
+    await useAppStore.getState().removeWallpaper(id, path);
     setWallpaperToDelete(null);
   };
 
