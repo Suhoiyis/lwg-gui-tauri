@@ -6,6 +6,8 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::collections::HashMap;
 use tokio::sync::Mutex;
+use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_window_state::StateFlags;
 // std::time imported locally where needed
 
 
@@ -276,6 +278,7 @@ struct TauriState {
     #[cfg(target_os = "linux")]
     log_manager: Arc<std::sync::Mutex<LogManager>>,
 
+    #[cfg(target_os = "linux")]
     nickname_manager: Mutex<NicknameManager>,
 
     #[cfg(target_os = "linux")]
@@ -1085,82 +1088,6 @@ fn get_connected_monitors() -> Result<Vec<String>, String> {
 
 
 
-// ================= System Integration Commands =================
-
-#[tauri::command]
-async fn set_autostart(enabled: bool, hidden: bool) -> Result<(), String> {
-    #[cfg(target_os = "linux")]
-    {
-        use std::io::Write;
-
-        let autostart_dir = dirs::config_dir()
-            .ok_or_else(|| "无法获取配置目录".to_string())?
-            .join("autostart");
-
-        std::fs::create_dir_all(&autostart_dir)
-            .map_err(|e| format!("创建 autostart 目录失败: {}", e))?;
-
-        let desktop_path = autostart_dir.join("linux-wallpaperengine-gui.desktop");
-
-        if enabled {
-            let current_exe = std::env::current_exe()
-                .map_err(|e| format!("获取程序路径失败: {}", e))?;
-            let exe_path = current_exe.to_string_lossy();
-
-            let hidden_arg = if hidden { " --hidden" } else { "" };
-
-            let desktop_content = format!(
-                r#"[Desktop Entry]
-Type=Application
-Name=Linux Wallpaper Engine GUI
-Comment=Linux Wallpaper Engine GUI
-Exec="{}"{}
-Icon=linux-wallpaperengine-gui
-Terminal=false
-Categories=Utility;
-"#,
-                exe_path, hidden_arg
-            );
-
-            let mut file = std::fs::File::create(&desktop_path)
-                .map_err(|e| format!("创建 desktop 文件失败: {}", e))?;
-            file.write_all(desktop_content.as_bytes())
-                .map_err(|e| format!("写入 desktop 文件失败: {}", e))?;
-
-            println!("✅ [Rust] Autostart 已启用: {:?}", desktop_path);
-        } else {
-            if desktop_path.exists() {
-                std::fs::remove_file(&desktop_path)
-                    .map_err(|e| format!("删除 desktop 文件失败: {}", e))?;
-            }
-            println!("✅ [Rust] Autostart 已禁用");
-        }
-
-        Ok(())
-    }
-
-    #[cfg(not(target_os = "linux"))]
-    {
-        println!("🪟 [Windows] Autostart 未实现");
-        Ok(())
-    }
-}
-
-#[tauri::command]
-async fn get_autostart_status() -> Result<bool, String> {
-    #[cfg(target_os = "linux")]
-    {
-        let autostart_dir = dirs::config_dir()
-            .ok_or_else(|| "无法获取配置目录".to_string())?;
-        let desktop_path = autostart_dir.join("autostart/linux-wallpaperengine-gui.desktop");
-        Ok(desktop_path.exists())
-    }
-
-    #[cfg(not(target_os = "linux"))]
-    {
-        Ok(false)
-    }
-}
 
 // ================= Performance Monitoring Commands =================
 
@@ -1693,6 +1620,26 @@ pub fn run() {
     tauri::Builder::default()
         .manage(app_state)
         .setup(move |app| {
+            // ── Clean up legacy autostart file (migration) ─────────────────────────
+            if let Some(config_dir) = dirs::config_dir() {
+                let old_autostart_path = config_dir.join("autostart/linux-wallpaperengine-gui.desktop");
+                if old_autostart_path.exists() {
+                    let _ = std::fs::remove_file(&old_autostart_path);
+                    println!("🧹 [Migration] Removed legacy autostart file: {:?}", old_autostart_path);
+                }
+            }
+
+            // ── Handle --hidden parameter (window visibility) ───────────────────────
+            let args: Vec<String> = std::env::args().collect();
+            let start_hidden = args.contains(&"--hidden".to_string());
+
+            if !start_hidden {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
+
             // ── System tray ───────────────────────────────────────────────────
             #[cfg(target_os = "linux")]
             tray::setup_tray(app)?;
@@ -1786,8 +1733,6 @@ pub fn run() {
             get_favorites,
             toggle_favorite,
             // System integration commands
-            set_autostart,
-            get_autostart_status,
             get_display_server,
             check_xvfb_available,
             get_connected_monitors,
@@ -1808,6 +1753,22 @@ pub fn run() {
             check_for_updates,
             get_app_version,
         ])
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }))
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec!["--hidden"]),
+        ))
+        .plugin(
+            tauri_plugin_window_state::Builder::default()
+                .with_state_flags(StateFlags::POSITION | StateFlags::SIZE | StateFlags::MAXIMIZED)
+                .build()
+        )
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())

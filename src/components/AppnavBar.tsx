@@ -44,6 +44,7 @@ import {
   openFolder,
   openImage,
 } from "@/api/wallpaper";
+import { notify } from "@/api/system";
 import { toast } from "sonner";
 import { AppMenu } from "@/components/AppMenu";
 import { ScreenSelector } from "@/components/ScreenSelector";
@@ -131,6 +132,7 @@ export function AppNavbar() {
     const screen = selectedScreen === "all" ? undefined : selectedScreen;
     await useAppStore.getState().applyWallpaper(randomWallpaper.id, screen);
     setSelectedId(randomWallpaper.id);
+    notify("Wallpaper Changed", randomWallpaper.title);
   };
 
 
@@ -148,9 +150,9 @@ export function AppNavbar() {
 
     try {
       const result = await takeScreenshot(selectedId);
-      // 使用 Dialog 显示截图成功信息
       setScreenshotResult(result);
       setScreenshotDialogOpen(true);
+      notify("Screenshot Saved", `Completed in ${result.duration.toFixed(1)}s`);
     } catch (error) {
       toast.error("Screenshot failed", {
         icon: <AlertCircle className="w-5 h-5 text-red-500" />,

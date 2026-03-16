@@ -9,7 +9,10 @@
     "shell:default",
     "opener:default",
     "dialog:default",
-
+    "fs:default",
+    "autostart:default",
+    "window-state:default",
+    "notification:default",
     {
       "identifier": "fs:scope",
       "allow": ["$HOME/**"]

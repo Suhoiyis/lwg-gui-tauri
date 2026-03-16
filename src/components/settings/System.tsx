@@ -31,18 +31,18 @@ import {
 import { NicknameManagerDialog } from "@/components/NicknameManagerDialog";
 import { FavoriteManagerDialog } from "@/components/FavoriteManagerDialog";
 import { Button } from "@/components/ui/button";
+import { setAutostart, getAutostartStatus } from "@/api/system";
 
 export function SystemSettings() {
   const { settings, updateSetting, highlightSettingField } = useAppStore();
-  const [autostart, setAutostart] = useState(false);
+  const [autostart, setAutostartState] = useState(false);
   const [hasXvfb, setHasXvfb] = useState<boolean | null>(null);
   const [nicknameDialogOpen, setNicknameDialogOpen] = useState(false);
   const [favoriteDialogOpen, setFavoriteDialogOpen] = useState(false);
 
   useEffect(() => {
-    // 获取自启动状态
-    invoke<boolean>("get_autostart_status")
-      .then(setAutostart)
+    getAutostartStatus()
+      .then(setAutostartState)
       .catch(() => {});
   }, []);
 
@@ -67,17 +67,14 @@ export function SystemSettings() {
   const handleAutostartChange = useCallback(
     async (enabled: boolean) => {
       try {
-        await invoke("set_autostart", {
-          enabled,
-          hidden: settings?.startHidden ?? false,
-        });
-        setAutostart(enabled);
+        await setAutostart(enabled);
+        setAutostartState(enabled);
         toast.success(enabled ? "Autostart enabled" : "Autostart disabled");
       } catch {
         toast.error("Failed to change autostart");
       }
     },
-    [settings?.startHidden],
+    [],
   );
 
   // ✨ Scroll highlighted field into view
