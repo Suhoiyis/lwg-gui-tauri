@@ -1,8 +1,9 @@
 // src/components/library/LibraryHeader.tsx
-import { memo, useState, useEffect, useRef } from "react";
+import { memo, useState, useEffect, useRef, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { renderInlineMarkdown } from "@/lib/markdown";
+import { getDisplayName } from "@/lib/utils";
 
 import {
   Select,
@@ -74,6 +75,19 @@ export const LibraryHeader = memo(
     // ✨ 获取排序状态
     const sortBy = useAppStore((state) => state.sortBy);
     const setSortBy = useAppStore((state) => state.setSortBy);
+    
+    // ✨ 获取 nicknames 和 wallpapers 用于显示昵称
+    const nicknames = useAppStore((state) => state.nicknames);
+    const wallpapers = useAppStore((state) => state.wallpapers);
+    
+    // 计算带昵称的显示名称
+    const displayTitle = useMemo(() => {
+      if (!activeWallpaperId) return currentTitle;
+      const wp = wallpapers.find((w) => w.id === activeWallpaperId);
+      if (!wp) return currentTitle;
+      const { displayName } = getDisplayName(nicknames, wp.id, wp.title);
+      return displayName;
+    }, [activeWallpaperId, wallpapers, nicknames, currentTitle]);
 
     useEffect(() => {
       if (isEditing && inputRef.current) {
@@ -173,11 +187,11 @@ export const LibraryHeader = memo(
                   className="text-foreground truncate flex-1 min-w-0 cursor-pointer hover:text-brand transition-colors underline underline-offset-2 decoration-brand/30 hover:decoration-brand"
                   onClick={() => onTitleClick(activeWallpaperId)}
                 >
-                  {currentTitle ? renderInlineMarkdown(currentTitle) : "None"}
+                  {displayTitle ? renderInlineMarkdown(displayTitle) : "None"}
                 </span>
               ) : (
                 <span className="text-foreground truncate flex-1 min-w-0">
-                  {currentTitle ? renderInlineMarkdown(currentTitle) : "None"}
+                  {displayTitle ? renderInlineMarkdown(displayTitle) : "None"}
                 </span>
               )}
             </div>
@@ -202,11 +216,11 @@ export const LibraryHeader = memo(
                   className="text-foreground truncate flex-1 min-w-0 cursor-pointer hover:text-brand transition-colors"
                   onClick={() => onTitleClick(activeWallpaperId)}
                 >
-                  {currentTitle ? renderInlineMarkdown(currentTitle) : "None"}
+                  {displayTitle ? renderInlineMarkdown(displayTitle) : "None"}
                 </span>
               ) : (
                 <span className="text-foreground truncate flex-1 min-w-0">
-                  {currentTitle ? renderInlineMarkdown(currentTitle) : "None"}
+                  {displayTitle ? renderInlineMarkdown(displayTitle) : "None"}
                 </span>
               )}
             </div>

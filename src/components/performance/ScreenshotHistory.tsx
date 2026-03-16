@@ -16,6 +16,8 @@ import { convertFileSrc } from "@tauri-apps/api/core";
 import { openFolder, openImage } from "@/api/wallpaper";
 import { toast } from "sonner";
 import { Thumbnail } from "@/components/ui/thumbnail";
+import { getDisplayName } from "@/lib/utils";
+import { renderInlineMarkdown } from "@/lib/markdown";
 import {
   Empty,
   EmptyContent,
@@ -79,10 +81,18 @@ ScreenshotThumbnail.displayName = "ScreenshotThumbnail";
 
 const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
   const wallpapers = useAppStore((state) => state.wallpapers);
+  const nicknames = useAppStore((state) => state.nicknames);
 
   const wallpaper = useMemo(() => {
     return wallpapers.find((w) => w.id === record.wpId);
   }, [wallpapers, record.wpId]);
+  
+  // 计算带昵称的显示名称
+  const displayTitle = useMemo(() => {
+    if (!wallpaper) return "Unknown Wallpaper";
+    const { displayName } = getDisplayName(nicknames, wallpaper.id, wallpaper.title);
+    return displayName;
+  }, [wallpaper, nicknames]);
 
   const handleOpenFolder = async () => {
     try {
@@ -108,7 +118,7 @@ const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
 
         <div>
           <div className="text-base font-bold">
-            {wallpaper?.title || "Unknown Wallpaper"}
+            {renderInlineMarkdown(displayTitle)}
           </div>
         </div>
       </div>

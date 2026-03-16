@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WallpaperCard } from "@/components/WallpaperCard";
 import { Wallpaper } from "@/types";
 import { renderInlineMarkdown } from "@/lib/markdown";
+import { getDisplayName } from "@/lib/utils";
+import { useAppStore } from "@/store/appStore";
 
 interface CompactPreviewProps {
   /** 当前壁纸 */
@@ -32,6 +34,14 @@ export function CompactPreview({
 }: CompactPreviewProps) {
   const [isCopied, setIsCopied] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const nicknames = useAppStore((state) => state.nicknames);
+  
+  // 计算带昵称的显示名称
+  const displayTitle = useMemo(() => {
+    if (!wallpaper) return "Select Wallpaper";
+    const { displayName } = getDisplayName(nicknames, wallpaper.id, wallpaper.title);
+    return displayName;
+  }, [wallpaper, nicknames]);
 
   // 同步当前索引到输入框
   useEffect(() => {
@@ -81,7 +91,7 @@ export function CompactPreview({
       {/* Title & ID */}
       <div className="w-full text-center space-y-1">
         <h3 className="font-bold text-lg leading-tight line-clamp-2 px-4">
-          {wallpaper?.title ? renderInlineMarkdown(wallpaper.title) : "Select Wallpaper"}
+          {displayTitle ? renderInlineMarkdown(displayTitle) : "Select Wallpaper"}
         </h3>
         <div
           className="inline-flex items-center gap-1 text-[10px] bg-muted px-2 py-0.5 rounded-full text-muted-foreground cursor-pointer hover:bg-muted/80 transition-colors"
