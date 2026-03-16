@@ -80,7 +80,7 @@ export function App() {
     fetchAppVersion();
   }, [initializeSettings, fetchMonitors, fetchAppVersion]);
 
-  // 监听 Tauri System Tray 事件
+  // 监听 Tauri System Tray 事件和壁纸轮换事件
   useEffect(() => {
     // 挂载状态锁 - 防止异步操作完成时组件已卸载
     let mounted = true;
@@ -88,6 +88,7 @@ export function App() {
     let unlistenStop: (() => void) | undefined;
     let unlistenApplyLast: (() => void) | undefined;
     let unlistenQuit: (() => void) | undefined;
+    let unlistenWallpaperCycled: (() => void) | undefined;
 
     const setupListeners = async () => {
       const unlisten1 = await listen("tray-random-wallpaper", () => {
@@ -144,6 +145,22 @@ export function App() {
         return;
       }
       unlistenQuit = unlisten4;
+
+      // 监听壁纸轮换完成事件
+      const unlisten5 = await listen("wallpaper-cycled", () => {
+        console.log("[App] Wallpaper cycled, refreshing state...");
+        useAppStore.getState().getState();
+      });
+
+      if (!mounted) {
+        unlisten5();
+        unlistenRandom?.();
+        unlistenStop?.();
+        unlistenApplyLast?.();
+        unlistenQuit?.();
+        return;
+      }
+      unlistenWallpaperCycled = unlisten5;
     };
 
     setupListeners();
@@ -154,6 +171,7 @@ export function App() {
       unlistenStop?.();
       unlistenApplyLast?.();
       unlistenQuit?.();
+      unlistenWallpaperCycled?.();
     };
   }, []);
 

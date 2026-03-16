@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Wallpaper, AppConfig, AppState } from "../types";
 import { scanWallpapers } from "../api/wallpaper";
 import { parseSize, normalizeType } from "../lib/utils";
+import { startCycleTimer, stopCycleTimer, setCycleScreen } from "../api/cycle";
 
 // Runtime settings: require explicit Save button (backend restart needed)
 const RUNTIME_SETTINGS = new Set<keyof AppConfig>([
@@ -466,6 +467,18 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         });
         set({ settings: result });
         console.log(`[Non-Runtime] ${String(key)} saved successfully`);
+        
+        // Handle cycleEnabled changes
+        if (key === "cycleEnabled") {
+          if (value) {
+            await startCycleTimer();
+            toast.success("Wallpaper cycling enabled");
+          } else {
+            await stopCycleTimer();
+            toast.success("Wallpaper cycling disabled");
+          }
+        }
+        
         toast.success("Setting saved", {
           description: `${String(key)} has been updated`,
           duration: 2000,
@@ -696,7 +709,10 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     }
   },
 
-  setSelectedScreen: (screen: string) => set({ selectedScreen: screen }),
+  setSelectedScreen: (screen: string) => {
+    set({ selectedScreen: screen });
+    setCycleScreen(screen).catch(console.error);
+  },
 
 getFilteredWallpapers: () => {
     const { wallpapers, searchQuery, sortBy, nicknames } = get();

@@ -286,6 +286,21 @@ struct TauriState {
 
     monitor_running: Arc<AtomicBool>,
 
+    /// 轮换定时器任务句柄
+    #[cfg(target_os = "linux")]
+    cycle_task: Arc<Mutex<Option<tokio::task::JoinHandle<()>>>>,
+
+    /// 轮换运行标志
+    cycle_running: Arc<AtomicBool>,
+
+    /// 轮换目标屏幕（"all" 或具体屏幕名如 "eDP-1"）
+    #[cfg(target_os = "linux")]
+    cycle_screen: Arc<Mutex<String>>,
+
+    /// 壁纸 ID 缓存（避免每次轮换都扫描磁盘）
+    #[cfg(target_os = "linux")]
+    cached_wallpaper_ids: Arc<std::sync::RwLock<Vec<String>>>,
+
     #[cfg(not(target_os = "linux"))]
     _dummy: bool,
 }
@@ -407,7 +422,7 @@ async fn get_wallpapers(_state: State<'_, TauriState>) -> Result<Vec<Wallpaper>,
         let config_manager = _state.config_manager.lock().await;
         let workshop_path = config_manager.config().workshop_path
             .clone()
-            .unwrap_or_else(|| get_default_workshop_path());
+            .unwrap_or_else(|| get_default_workshop_path);
         drop(config_manager);
 
         println!("📁 [Linux] Workshop 路径: {}", workshop_path);
@@ -430,6 +445,15 @@ async fn get_wallpapers(_state: State<'_, TauriState>) -> Result<Vec<Wallpaper>,
                 size: format_size(w.size),
             }
         }).collect();
+
+        // 更新壁纸 ID 缓存（用于轮换功能）
+        {
+            let ids: Vec<String> = result.iter().map(|w| w.id.clone()).collect();
+            if let Ok(mut cache) = _state.cached_wallpaper_ids.write() {
+                *cache = ids;
+                println!("🔄 [Linux] 已更新壁纸缓存: {} 张", result.len());
+            }
+        }
 
         log_gui(&_state, &format!("Found {} wallpapers", result.len()));
         println!("✅ [Linux] 扫描到 {} 张壁纸", result.len());
@@ -1521,6 +1545,257 @@ async fn clear_logs() -> Result<(), String> {
     Ok(())
 }
 
+// ================= 壁纸轮换命令 =================
+
+/// 选择下一张壁纸（纯函数，无副作用）
+#[cfg(target_os = "linux")]
+fn select_next_wallpaper(
+    order: &str,
+    current_id: Option<&str>,
+    all_ids: &[String],
+) -> String {
+    if all_ids.is_empty() {
+        return String::new();
+    }
+
+    match order {
+        "random" => {
+            use rand::seq::SliceRandom;
+            all_ids.choose(&mut rand::rng()).unwrap().clone()
+        }
+        "title" | "size" | "type" | "id" => {
+            let sorted_ids = {
+                let mut sorted = all_ids.to_vec();
+                sorted.sort();
+                sorted
+            };
+
+            let next_index = if let Some(current) = current_id {
+                let current_index = sorted.iter()
+                    .position(|id| id == current)
+                    .unwrap_or(0);
+                (current_index + 1) % sorted.len()
+            } else {
+                0
+            };
+
+            sorted_ids[next_index].clone()
+        }
+        _ => {
+            use rand::seq::SliceRandom;
+            all_ids.choose(&mut rand::rng()).unwrap().clone()
+        }
+    }
+}
+
+/// 执行一次轮换
+/// 
+/// ⚠️ 死锁防护：此函数严格遵守"锁的粒度极细"原则
+/// 所有 .await 操作执行前，必须确保没有任何 Mutex 锁被持有
+#[cfg(target_os = "linux")]
+async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
+    let state = app.state::<TauriState>();
+
+    // 步骤 1：快速获取配置（纯读取，立刻释放锁）
+    let (cycle_order, cycle_screen) = {
+        let order = {
+            let cm = state.config_manager.lock().await;
+            cm.config().cycle_order.clone()
+        };
+        let screen = state.cycle_screen.lock().await.clone();
+        (order, screen)
+    };
+
+    // 步骤 2：从缓存获取壁纸 ID 列表
+    let all_wallpaper_ids = {
+        let cache = state.cached_wallpaper_ids.read()
+            .map_err(|e| format!("Cache read error: {}", e))?;
+        cache.clone()
+    };
+
+    if all_wallpaper_ids.is_empty() {
+        return Err("No wallpapers in cache. Please refresh wallpaper library.".to_string());
+    }
+
+    // 步骤 3：快速获取当前活跃状态（立刻释放锁）
+    let active_state = {
+        let controller = state.controller.lock().await;
+        controller.get_active_wallpapers().await
+    };
+
+    if active_state.is_empty() {
+        return Err("No active wallpapers to cycle.".to_string());
+    }
+
+    // 步骤 4：纯内存计算（无需任何锁）
+    let mut new_state = active_state.clone();
+
+    if cycle_screen == "all" {
+        let new_wp_id = select_next_wallpaper(
+            &cycle_order,
+            None,
+            &all_wallpaper_ids,
+        );
+
+        for (_, aw) in &mut new_state {
+            aw.wallpaper_id = new_wp_id.clone();
+            aw.is_playing = true;
+        }
+    } else {
+        if let Some(aw) = new_state.get_mut(&cycle_screen) {
+            let new_wp_id = select_next_wallpaper(
+                &cycle_order,
+                Some(&aw.wallpaper_id),
+                &all_wallpaper_ids,
+            );
+            aw.wallpaper_id = new_wp_id;
+            aw.is_playing = true;
+        }
+    }
+
+    // 步骤 5：快速同步内存状态（立刻释放锁）
+    {
+        let mut controller = state.controller.lock().await;
+        controller.sync_state(new_state.clone()).await;
+    }
+
+    // 步骤 6：持久化状态
+    {
+        let mut sm = state.state_manager.lock().await;
+        *sm.state_mut() = new_state.iter()
+            .map(|(k, v)| (k.clone(), LwgActiveWallpaper {
+                wallpaper_id: v.wallpaper_id.clone(),
+                is_playing: v.is_playing,
+            }))
+            .collect();
+        sm.save().ok();
+    }
+
+    // 步骤 7：执行耗时的进程重启（不持有任何锁！）
+    {
+        let controller = state.controller.lock().await;
+        controller.restart_wallpapers().await
+            .map_err(|e| format!("Restart error: {:?}", e))?;
+    }
+
+    // 步骤 8：发送事件通知前端
+    app.emit("wallpaper-cycled", ()).ok();
+
+    // 记录日志
+    if let Ok(lm) = state.log_manager.lock() {
+        lm.info(LogSource::GUI, &format!("Wallpaper cycled ({})", cycle_order));
+    }
+
+    Ok(())
+}
+
+/// 启动轮换定时器
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn start_cycle_timer(
+    app: tauri::AppHandle,
+    state: State<'_, TauriState>,
+) -> Result<(), String> {
+    // 1. 停止现有定时器（如果存在）
+    {
+        let mut task_guard = state.cycle_task.lock().await;
+        if let Some(task) = task_guard.take() {
+            state.cycle_running.store(false, Ordering::SeqCst);
+            task.abort();
+        }
+    }
+
+    // 2. 读取配置（快速获取，立刻释放锁）
+    let interval_mins = {
+        let cm = state.config_manager.lock().await;
+        cm.config().cycle_interval.max(1)
+    };
+
+    // 3. 设置运行标志
+    state.cycle_running.store(true, Ordering::SeqCst);
+
+    // 4. 启动后台任务
+    let running = state.cycle_running.clone();
+    let app_handle = app.clone();
+
+    let task = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(
+            std::time::Duration::from_secs(interval_mins as u64 * 60)
+        );
+
+        while running.load(Ordering::SeqCst) {
+            interval.tick().await;
+            if !running.load(Ordering::SeqCst) {
+                break;
+            }
+
+            if let Err(e) = trigger_cycle_internal(&app_handle).await {
+                eprintln!("[Cycle] Error: {}", e);
+            }
+        }
+    });
+
+    // 5. 保存任务句柄
+    *state.cycle_task.lock().await = Some(task);
+
+    // 记录日志
+    if let Ok(lm) = state.log_manager.lock() {
+        lm.info(LogSource::GUI, &format!("Wallpaper cycling enabled (every {} mins)", interval_mins));
+    }
+
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn start_cycle_timer() -> Result<(), String> {
+    Ok(())
+}
+
+/// 停止轮换定时器
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn stop_cycle_timer(state: State<'_, TauriState>) -> Result<(), String> {
+    state.cycle_running.store(false, Ordering::SeqCst);
+
+    {
+        let mut task_guard = state.cycle_task.lock().await;
+        if let Some(task) = task_guard.take() {
+            task.abort();
+        }
+    }
+
+    if let Ok(lm) = state.log_manager.lock() {
+        lm.info(LogSource::GUI, "Wallpaper cycling disabled");
+    }
+
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn stop_cycle_timer() -> Result<(), String> {
+    Ok(())
+}
+
+/// 设置轮换目标屏幕
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn set_cycle_screen(
+    screen: String,
+    state: State<'_, TauriState>,
+) -> Result<(), String> {
+    let mut cycle_screen = state.cycle_screen.lock().await;
+    *cycle_screen = screen;
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn set_cycle_screen(_screen: String) -> Result<(), String> {
+    Ok(())
+}
+
 // ================= 主入口 =================
 
 pub fn run() {
@@ -1589,6 +1864,23 @@ pub fn run() {
             controller.set_detected_pids(detected_pids);
         }
 
+        // 初始化壁纸 ID 缓存（用于轮换功能）
+        let cached_wallpaper_ids = {
+            let workshop_path = config_manager.config().workshop_path.clone()
+                .unwrap_or_else(|| get_default_workshop_path());
+            let mut wm = WallpaperManager::new(&workshop_path);
+            let ids = if let Ok(wallpapers) = wm.scan() {
+                wallpapers.values().map(|w| w.id.clone()).collect()
+            } else {
+                Vec::new()
+            };
+            println!("🔄 [Init] 壁纸缓存初始化: {} 张", ids.len());
+            Arc::new(std::sync::RwLock::new(ids))
+        };
+
+        // 初始化轮换屏幕选择为 "all"
+        let cycle_screen = Arc::new(Mutex::new("all".to_string()));
+
         TauriState {
             controller: Mutex::new(controller),
             config_manager: Mutex::new(config_manager),
@@ -1600,6 +1892,10 @@ pub fn run() {
             nickname_manager: Mutex::new(nickname_manager),
             favorite_manager: Mutex::new(favorite_manager),
             monitor_running: Arc::new(AtomicBool::new(false)),
+            cycle_task: Arc::new(Mutex::new(None)),
+            cycle_running: Arc::new(AtomicBool::new(false)),
+            cycle_screen,
+            cached_wallpaper_ids,
         }
 
     };
@@ -1610,6 +1906,7 @@ pub fn run() {
         TauriState {
             _dummy: true,
             monitor_running: Arc::new(AtomicBool::new(false)),
+            cycle_running: Arc::new(AtomicBool::new(false)),
         }
     };
 
@@ -1702,6 +1999,67 @@ pub fn run() {
                 });
             }
 
+            // ✨ Auto-start cycle timer if enabled
+            #[cfg(target_os = "linux")]
+            {
+                let app_handle = app.handle().clone();
+
+                tauri::async_runtime::spawn(async move {
+                    let tauri_state = app_handle.state::<TauriState>();
+
+                    let cycle_enabled = {
+                        let cm = tauri_state.config_manager.lock().await;
+                        cm.config().cycle_enabled
+                    };
+
+                    if cycle_enabled {
+                        println!("🔄 [Auto-Cycle] Starting cycle timer on startup...");
+                        
+                        // 停止现有定时器
+                        {
+                            let mut task_guard = tauri_state.cycle_task.lock().await;
+                            if let Some(task) = task_guard.take() {
+                                tauri_state.cycle_running.store(false, Ordering::SeqCst);
+                                task.abort();
+                            }
+                        }
+
+                        // 读取配置
+                        let interval_mins = {
+                            let cm = tauri_state.config_manager.lock().await;
+                            cm.config().cycle_interval.max(1)
+                        };
+
+                        // 设置运行标志
+                        tauri_state.cycle_running.store(true, Ordering::SeqCst);
+
+                        // 启动后台任务
+                        let running = tauri_state.cycle_running.clone();
+                        let app = app_handle.clone();
+
+                        let task = tokio::spawn(async move {
+                            let mut interval = tokio::time::interval(
+                                std::time::Duration::from_secs(interval_mins as u64 * 60)
+                            );
+
+                            while running.load(Ordering::SeqCst) {
+                                interval.tick().await;
+                                if !running.load(Ordering::SeqCst) {
+                                    break;
+                                }
+
+                                if let Err(e) = trigger_cycle_internal(&app).await {
+                                    eprintln!("[Cycle] Error: {}", e);
+                                }
+                            }
+                        });
+
+                        *tauri_state.cycle_task.lock().await = Some(task);
+                        println!("✅ [Auto-Cycle] Cycle timer started (every {} mins)", interval_mins);
+                    }
+                });
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -1752,6 +2110,10 @@ pub fn run() {
             // Update check commands
             check_for_updates,
             get_app_version,
+            // Cycle commands
+            start_cycle_timer,
+            stop_cycle_timer,
+            set_cycle_screen,
         ])
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             if let Some(window) = app.get_webview_window("main") {
