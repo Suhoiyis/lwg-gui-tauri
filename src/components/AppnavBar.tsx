@@ -132,7 +132,10 @@ export function AppNavbar() {
     const screen = selectedScreen === "all" ? undefined : selectedScreen;
     await useAppStore.getState().applyWallpaper(randomWallpaper.id, screen);
     setSelectedId(randomWallpaper.id);
-    notify("Wallpaper Changed", randomWallpaper.title);
+    // 优先显示 nickname
+    const store = useAppStore.getState();
+    const displayName = store.getNickname(randomWallpaper.id) || randomWallpaper.title;
+    notify("Wallpaper Changed", displayName);
   };
 
 

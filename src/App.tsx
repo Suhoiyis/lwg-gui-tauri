@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { listen } from "@tauri-apps/api/event";
+import { toast } from "sonner";
 
 // Shadcn UI 组件
 import { Tabs } from "@/components/ui/tabs";
@@ -147,9 +148,24 @@ export function App() {
       unlistenQuit = unlisten4;
 
       // 监听壁纸轮换完成事件
-      const unlisten5 = await listen("wallpaper-cycled", () => {
-        console.log("[App] Wallpaper cycled, refreshing state...");
+      const unlisten5 = await listen<string>("wallpaper-cycled", (event) => {
+        const wallpaperId = event.payload;
+        console.log("[App] Wallpaper cycled:", wallpaperId);
         useAppStore.getState().getState();
+        
+        // 发送系统通知和应用内 toast
+        const store = useAppStore.getState();
+        const wallpaper = store.wallpapers.find(w => w.id === wallpaperId);
+        if (wallpaper) {
+          // 优先显示 nickname，否则显示原标题
+          const displayName = store.getNickname(wallpaperId) || wallpaper.title;
+          // 应用内 toast
+          toast.success("Wallpaper Changed", { description: displayName });
+          // 系统通知
+          import("@/api/system").then(({ notify }) => {
+            notify("Wallpaper Changed", displayName);
+          });
+        }
       });
 
       if (!mounted) {

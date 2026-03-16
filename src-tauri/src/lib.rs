@@ -1629,6 +1629,7 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
 
     // 步骤 4：纯内存计算（无需任何锁）
     let mut new_state = active_state.clone();
+    let mut cycled_wallpaper_id = String::new();
 
     if cycle_screen == "all" {
         let new_wp_id = select_next_wallpaper(
@@ -1636,6 +1637,7 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
             None,
             &all_wallpaper_ids,
         );
+        cycled_wallpaper_id = new_wp_id.clone();
 
         for (_, aw) in &mut new_state {
             aw.wallpaper_id = new_wp_id.clone();
@@ -1648,6 +1650,7 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
                 Some(&aw.wallpaper_id),
                 &all_wallpaper_ids,
             );
+            cycled_wallpaper_id = new_wp_id.clone();
             aw.wallpaper_id = new_wp_id;
             aw.is_playing = true;
         }
@@ -1678,8 +1681,8 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
             .map_err(|e| format!("Restart error: {:?}", e))?;
     }
 
-    // 步骤 8：发送事件通知前端
-    app.emit("wallpaper-cycled", ()).ok();
+    // 步骤 8：发送事件通知前端（包含壁纸 ID）
+    app.emit("wallpaper-cycled", &cycled_wallpaper_id).ok();
 
     // 记录日志
     if let Ok(lm) = state.log_manager.lock() {
