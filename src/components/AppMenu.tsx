@@ -86,11 +86,11 @@ export function AppMenu() {
         });
         setShowUpdate(true);
       } else {
-        toast.success(`已是最新版本 (v${result.current_version})`);
+        toast.success(`Already up to date (v${result.current_version})`);
       }
     } catch (err) {
       toast.dismiss(toastId);
-      toast.error(`检查更新失败: ${err}`);
+      toast.error(`Update check failed: ${err}`);
     }
   };
 
