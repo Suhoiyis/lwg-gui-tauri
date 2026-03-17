@@ -5,9 +5,9 @@ import { useAppStore } from "@/store/appStore";
 // 子组件
 import { CompactNavbar } from "@/components/compact/CompactNavbar";
 import { CompactPreview } from "@/components/compact/CompactPreview";
-import { WallpaperMetadata } from "@/components/WallpaperMetadata";
+import { WallpaperMetadata } from "@/components/library/WallpaperMetadata";
 import { CompactCarousel } from "@/components/compact/CompactCarousel";
-import { ApplyButton } from "@/components/ApplyButton";
+import { ApplyButton } from "@/components/shared/ApplyButton";
 
 // Tauri API
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";

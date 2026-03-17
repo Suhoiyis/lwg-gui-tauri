@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 // Layout & UI Components
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EmptyState } from "@/components/ui/empty";
+import { EmptyState } from "@/components/common/Empty";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   AlertDialog,

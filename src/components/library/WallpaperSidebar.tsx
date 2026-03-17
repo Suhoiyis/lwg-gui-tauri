@@ -11,10 +11,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { WallpaperCard } from "@/components/WallpaperCard";
-import { WallpaperMetadata } from "@/components/WallpaperMetadata";
-import { ApplyButton } from "@/components/ApplyButton";
-import { EditNicknameDialog } from "@/components/EditNicknameDialog";
+import { WallpaperCard } from "@/components/library/WallpaperCard";
+import { WallpaperMetadata } from "@/components/library/WallpaperMetadata";
+import { ApplyButton } from "@/components/shared/ApplyButton";
+import { EditNicknameDialog } from "@/components/dialogs/EditNicknameDialog";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 import { cn, getDisplayName } from "@/lib/utils";

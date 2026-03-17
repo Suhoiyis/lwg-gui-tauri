@@ -1,7 +1,7 @@
 import { Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AppMenu } from "@/components/AppMenu";
-import { ScreenSelector } from "@/components/ScreenSelector";
+import { AppMenu } from "@/components/layout/AppMenu";
+import { ScreenSelector } from "@/components/layout/ScreenSelector";
 
 interface CompactNavbarProps {
   /** 切换到正常窗口模式的回调 */

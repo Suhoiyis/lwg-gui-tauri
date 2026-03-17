@@ -28,8 +28,8 @@ import {
   EditableComboboxField,
   RESOLUTION_OPTIONS,
 } from "./Shared";
-import { NicknameManagerDialog } from "@/components/NicknameManagerDialog";
-import { FavoriteManagerDialog } from "@/components/FavoriteManagerDialog";
+import { NicknameManagerDialog } from "@/components/dialogs/NicknameManagerDialog";
+import { FavoriteManagerDialog } from "@/components/dialogs/FavoriteManagerDialog";
 import { Button } from "@/components/ui/button";
 import { setAutostart, getAutostartStatus } from "@/api/system";
 

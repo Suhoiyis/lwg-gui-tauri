@@ -10,8 +10,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 // 项目自定义组件
-import { Layout } from "./components/Layout";
-import { AppNavbar } from "./components/AppnavBar";
+import { Layout } from "./components/layout/Layout";
+import { AppNavbar } from "./components/layout/AppNavbar";
 
 // 页面组件
 import { Library } from "./pages/Library";

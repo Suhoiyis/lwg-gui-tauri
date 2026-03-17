@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Thumbnail } from "@/components/ui/thumbnail";
+import { Thumbnail } from "@/components/common/Thumbnail";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";

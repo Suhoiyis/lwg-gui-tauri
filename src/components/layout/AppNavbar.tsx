@@ -15,13 +15,13 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Button as StatefulButton } from "@/components/ui/stateful-button";
+import { Button as StatefulButton } from "@/components/common/StatefulButton";
 
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@/components/ui/input-group";
+} from "@/components/common/InputGroup";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -46,8 +46,8 @@ import {
 } from "@/api/wallpaper";
 import { notify } from "@/api/system";
 import { toast } from "sonner";
-import { AppMenu } from "@/components/AppMenu";
-import { ScreenSelector } from "@/components/ScreenSelector";
+import { AppMenu } from "@/components/layout/AppMenu";
+import { ScreenSelector } from "@/components/layout/ScreenSelector";
 
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 

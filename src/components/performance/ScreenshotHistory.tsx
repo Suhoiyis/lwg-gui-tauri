@@ -15,7 +15,7 @@ import { useAppStore } from "@/store/appStore";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { openFolder, openImage } from "@/api/wallpaper";
 import { toast } from "sonner";
-import { Thumbnail } from "@/components/ui/thumbnail";
+import { Thumbnail } from "@/components/common/Thumbnail";
 import { getDisplayName } from "@/lib/utils";
 import { renderInlineMarkdown } from "@/lib/markdown";
 import {
@@ -25,7 +25,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
+} from "@/components/common/Empty";
 
 interface ScreenshotRowProps {
   record: ScreenshotRecord;

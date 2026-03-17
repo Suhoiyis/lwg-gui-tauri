@@ -15,7 +15,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Thumbnail } from "@/components/ui/thumbnail";
+import { Thumbnail } from "@/components/common/Thumbnail";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { ProcessStats, SystemStats } from "@/types/performance";

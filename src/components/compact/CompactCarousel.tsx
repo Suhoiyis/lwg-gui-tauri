@@ -8,7 +8,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Wallpaper } from "@/types";
-import { Thumbnail } from "@/components/ui/thumbnail";
+import { Thumbnail } from "@/components/common/Thumbnail";
 
 interface CompactCarouselProps {
   /** 壁纸列表 */

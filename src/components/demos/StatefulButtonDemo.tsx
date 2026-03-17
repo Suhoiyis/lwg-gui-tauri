@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/stateful-button";
+import { Button } from "@/components/common/StatefulButton";
 
 export default function StatefulButtonDemo() {
   // dummy API call

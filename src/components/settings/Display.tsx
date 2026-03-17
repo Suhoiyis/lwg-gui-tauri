@@ -1,6 +1,6 @@
 import { Monitor, Volume2, Moon, Sun, Speaker } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Header, SliderRow, SwitchRow, SwitchCard } from "./Shared";

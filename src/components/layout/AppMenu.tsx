@@ -29,9 +29,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { AboutDialog } from "./AboutDialog";
-import { UpdateDialog } from "./UpdateDialog";
-import { HistoryDialog } from "./HistoryDialog";
+import { AboutDialog } from "@/components/dialogs/AboutDialog";
+import { UpdateDialog } from "@/components/dialogs/UpdateDialog";
+import { HistoryDialog } from "@/components/dialogs/HistoryDialog";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 

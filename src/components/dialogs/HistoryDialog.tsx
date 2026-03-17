@@ -15,8 +15,8 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
-import { Thumbnail } from "@/components/ui/thumbnail";
+} from "@/components/common/Empty";
+import { Thumbnail } from "@/components/common/Thumbnail";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
 import { History, Play, Trash2, Clock, Hash, CircleQuestionMark } from "lucide-react";

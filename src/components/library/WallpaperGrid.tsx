@@ -1,7 +1,7 @@
 // src/components/library/WallpaperGrid.tsx
 import { memo, useState } from "react";
 import { Play, Square, FolderOpen, Trash2, Edit3 } from "lucide-react";
-import { WallpaperCard } from "@/components/WallpaperCard";
+import { WallpaperCard } from "@/components/library/WallpaperCard";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -10,7 +10,7 @@ import {
   ContextMenuTrigger,
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
-import { EditNicknameDialog } from "@/components/EditNicknameDialog";
+import { EditNicknameDialog } from "@/components/dialogs/EditNicknameDialog";
 
 // 假设 Wallpaper 类型定义在 @/types，如果没有则需在此定义
 import { Wallpaper } from "@/types";

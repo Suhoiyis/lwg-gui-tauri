@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { WallpaperCard } from "@/components/WallpaperCard";
+import { WallpaperCard } from "@/components/library/WallpaperCard";
 import { Wallpaper } from "@/types";
 import { renderInlineMarkdown } from "@/lib/markdown";
 import { getDisplayName } from "@/lib/utils";
