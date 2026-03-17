@@ -736,6 +736,11 @@ getFilteredWallpapers: () => {
       if (sortBy === "name") {
         return (a.title || "").localeCompare(b.title || "");
       } else if (sortBy === "id") {
+        const aNum = parseInt(a.id, 10);
+        const bNum = parseInt(b.id, 10);
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return aNum - bNum;
+        }
         return (a.id || "").localeCompare(b.id || "");
       } else if (sortBy === "size") {
         return parseSize(b.size) - parseSize(a.size);
