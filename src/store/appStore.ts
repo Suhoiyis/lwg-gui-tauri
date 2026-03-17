@@ -143,6 +143,10 @@ interface AppStoreState {
 
   isCompactMode: boolean;
   toggleCompactMode: (enabled: boolean) => void;
+
+  // 初始化
+  initApp: () => Promise<void>;
+  initializeSelectedWallpaper: () => void;
 }
 
 export const useAppStore = create<AppStoreState>((set, get) => ({
@@ -196,10 +200,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     })) as Wallpaper[];
 
     set({ wallpapers: mappedWallpapers });
-
-    if (mappedWallpapers.length > 0 && !get().selectedId) {
-      set({ selectedId: mappedWallpapers[0].id });
-    }
+    // 不再自动选中，等待 initApp -> initializeSelectedWallpaper() 处理
   },
 
   setSelectedId: (id) => set({ selectedId: id }),
@@ -749,4 +750,60 @@ getFilteredWallpapers: () => {
   },
 
   toggleCompactMode: (enabled) => set({ isCompactMode: enabled }),
+
+  initializeSelectedWallpaper: () => {
+    const { wallpapers, selectedId, selectedScreen, runtimeState } = get();
+
+    // 如果已有选中，跳过
+    if (selectedId) return;
+
+    // 如果没有壁纸，跳过
+    if (wallpapers.length === 0) return;
+
+    // 1. 尝试从 runtimeState 恢复
+    let initialId: string | null = null;
+
+    if (Object.keys(runtimeState).length > 0) {
+      // 优先找当前选中屏幕的壁纸
+      if (selectedScreen !== "all" && runtimeState[selectedScreen]?.wallpaperId) {
+        initialId = runtimeState[selectedScreen].wallpaperId;
+      }
+      // 否则找任一屏幕的壁纸
+      if (!initialId) {
+        for (const screen of Object.keys(runtimeState)) {
+          if (runtimeState[screen]?.wallpaperId) {
+            initialId = runtimeState[screen].wallpaperId;
+            break;
+          }
+        }
+      }
+    }
+
+    // 2. 验证找到的壁纸是否在当前列表中（防御性编程）
+    if (initialId && wallpapers.find(w => w.id === initialId)) {
+      set({ selectedId: initialId });
+      return;
+    }
+
+    // 3. 默认选中排序后的第一个
+    const sorted = get().getFilteredWallpapers();
+    if (sorted.length > 0) {
+      set({ selectedId: sorted[0].id });
+    }
+  },
+
+  initApp: async () => {
+    // 1. 并发加载基础数据（互不依赖，提升启动速度）
+    await Promise.all([
+      get().loadWallpapers(),
+      get().initializeSettings()
+    ]);
+
+    // 2. 数据就绪后，执行初始选中逻辑
+    get().initializeSelectedWallpaper();
+
+    // 3. 其他启动任务
+    get().fetchMonitors();
+    get().fetchAppVersion();
+  },
 }));

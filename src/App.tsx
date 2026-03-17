@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { listen } from "@tauri-apps/api/event";
@@ -35,17 +35,11 @@ const pageTransition = {
 } as const;
 
 export function App() {
-  const [isLoading, setIsLoading] = useState(false);
-
   const activeTab = useAppStore((state) => state.activeTab);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
-  const loadWallpapers = useAppStore((state) => state.loadWallpapers);
 
   const isCompactMode = useAppStore((s) => s.isCompactMode);
   const toggleCompactMode = useAppStore((s) => s.toggleCompactMode);
-  const initializeSettings = useAppStore((s) => s.initializeSettings);
-  const fetchMonitors = useAppStore((s) => s.fetchMonitors);
-  const fetchAppVersion = useAppStore((s) => s.fetchAppVersion);
 
   useEffect(() => {
     const handleResize = () => {
@@ -67,19 +61,10 @@ export function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, [isCompactMode, toggleCompactMode]); // 依赖项
 
-  // 初始化加载壁纸
+  // 初始化应用
   useEffect(() => {
-    setIsLoading(true);
-    loadWallpapers().finally(() => setIsLoading(false));
-    loadWallpapers();
-  }, [loadWallpapers]); // 简化依赖
-
-  // Initialize settings and monitors at app startup
-  useEffect(() => {
-    initializeSettings();
-    fetchMonitors();
-    fetchAppVersion();
-  }, [initializeSettings, fetchMonitors, fetchAppVersion]);
+    useAppStore.getState().initApp();
+  }, []);
 
   // 监听 Tauri System Tray 事件和壁纸轮换事件
   useEffect(() => {
