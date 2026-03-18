@@ -1,6 +1,6 @@
 // src/components/library/WallpaperGrid.tsx
 import { memo, useState } from "react";
-import { Play, Square, FolderOpen, Trash2, Edit3 } from "lucide-react";
+import { Play, Square, FolderOpen, Trash2, Edit3, Star } from "lucide-react";
 import { WallpaperCard } from "@/components/library/WallpaperCard";
 import {
   ContextMenu,
@@ -11,8 +11,9 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { EditNicknameDialog } from "@/components/dialogs/EditNicknameDialog";
+import { useAppStore } from "@/store/appStore";
+import { cn } from "@/lib/utils";
 
-// 假设 Wallpaper 类型定义在 @/types，如果没有则需在此定义
 import { Wallpaper } from "@/types";
 
 interface WallpaperGridProps {
@@ -38,6 +39,9 @@ export const WallpaperGrid = memo(
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editWallpaperId, setEditWallpaperId] = useState<string | null>(null);
     const [editWallpaperTitle, setEditWallpaperTitle] = useState("");
+
+    const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+    const favoriteIds = useAppStore((state) => state.favoriteIds);
 
     const handleEditNickname = (id: string, title: string) => {
       setEditWallpaperId(id);
@@ -76,6 +80,13 @@ export const WallpaperGrid = memo(
                 <ContextMenuItem onClick={() => handleEditNickname(wp.id, wp.title)}>
                   <Edit3 className="mr-2 h-4 w-4" />
                   Edit Nickname
+                </ContextMenuItem>
+                <ContextMenuItem onClick={() => toggleFavorite(wp.id)}>
+                  <Star className={cn(
+                    "mr-2 h-4 w-4",
+                    favoriteIds.has(wp.id) && "fill-yellow-500 text-yellow-500"
+                  )} />
+                  {favoriteIds.has(wp.id) ? "Remove from Favorites" : "Add to Favorites"}
                 </ContextMenuItem>
                 <ContextMenuItem onClick={() => onOpenFolder(wp.path)}>
                   <FolderOpen className="mr-2 h-4 w-4" />
