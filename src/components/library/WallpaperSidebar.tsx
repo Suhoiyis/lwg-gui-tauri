@@ -1,9 +1,7 @@
 import React from "react";
 import { Star, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Accordion,
@@ -11,21 +9,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { WallpaperCard } from "@/components/library/WallpaperCard";
-import { WallpaperMetadata } from "@/components/library/WallpaperMetadata";
 import { ApplyButton } from "@/components/shared/ApplyButton";
 import { EditNicknameDialog } from "@/components/dialogs/EditNicknameDialog";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
-import { cn, getDisplayName } from "@/lib/utils";
+import { cn, getDisplayName, getColorForTag } from "@/lib/utils";
 import { renderInlineMarkdown } from "@/lib/markdown";
 
-/**
- * 移除 BBCode 标签并清理文本
- */
-/**
- * 移除 BBCode 标签并清理文本
- */
 function cleanDescription(text: string): string {
   return (
     text
@@ -47,6 +39,13 @@ export function WallpaperSidebar() {
   const selectedWallpaper = useAppStore((state) =>
     state.getSelectedWallpaper(),
   );
+  const getFilteredWallpapers = useAppStore((state) => state.getFilteredWallpapers);
+  
+  // Calculate position in sorted list
+  const filteredWallpapers = getFilteredWallpapers();
+  const wallpaperIndex = selectedWallpaper
+    ? filteredWallpapers.findIndex((w) => w.id === selectedWallpaper.id) + 1
+    : 0;
   
   // Get display name with nickname support
   const { displayName, originalTitle } = selectedWallpaper
@@ -73,111 +72,131 @@ export function WallpaperSidebar() {
 
   return (
     <div className="h-full flex flex-col bg-card/30">
-      <ScrollArea className="flex-1 p-6">
+      <ScrollArea className="flex-1 p-4">
         {selectedWallpaper ? (
-          <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
-            {/* 1. 图片容器 */}
-            <div className="w-full">
-              <WallpaperCard
-                wp={selectedWallpaper}
-                isSelected={false} // 侧边栏不需要选中框
-                onSelect={() => {}} // 也不需要点击事件
-                showTitle={false} // ❌ 隐藏底部标题
-                showIcons={false} // ❌ 隐藏右上角图标和收藏
-                className="w-full aspect-square shadow-2xl" // 强制正方形并加深阴影
-              />
-            </div>
+          <div className="space-y-3 animate-in fade-in zoom-in-95 duration-300">
+            {/* 1. 预览图 */}
+            <WallpaperCard
+              wp={selectedWallpaper}
+              isSelected={false}
+              onSelect={() => {}}
+              showTitle={false}
+              showIcons={false}
+              className="w-full aspect-square shadow-xl"
+            />
 
-            {/* 2. 标题与基础信息 */}
-            <div className="space-y-2">
-              <h1 className={cn(
-                "text-xl font-bold leading-tight break-words",
-                isNickname && "nickname-text"
-              )}>
-                {renderInlineMarkdown(displayName)}
-              </h1>
+            {/* 2. 标题行：标题 + 图标按钮 inline */}
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-start gap-x-1 gap-y-0">
+                <h1 className={cn(
+                  "text-lg font-bold leading-tight",
+                  isNickname && "nickname-text"
+                )}>
+                  {renderInlineMarkdown(displayName)}
+                </h1>
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => setIsDialogOpen(true)}
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">Edit Nickname</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={handleToggleFavorite}
+                      >
+                        <Star className={cn(
+                          "w-3.5 h-3.5",
+                          isFavorite ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"
+                        )} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      {isFavorite ? "Remove from favorites" : "Add to favorites"}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </div>
+
+              {/* 原标题 */}
               {isNickname && (
-                <p className="original-name-text">
+                <p className="original-name-text text-xs">
                   {renderInlineMarkdown(originalTitle || "")}
                 </p>
               )}
-              {/* ID 和 Size */}
-              <div className="flex flex-wrap gap-2">
-                <Badge className="bg-pink-500/20 text-pink-500 border-pink-500/20 hover:bg-pink-500/30">
+
+              {/* Badge 行 - 中性色区分（避开 Tags 颜色） */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                <Badge className="bg-slate-500/20 text-slate-600 dark:text-slate-400 border-slate-500/20 hover:bg-slate-500/30 text-[10px] px-1.5 h-5">
+                  {selectedWallpaper.type || "unknown"}
+                </Badge>
+                <Badge className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/30 text-[10px] px-1.5 h-5 font-mono">
                   {selectedWallpaper.id}
                 </Badge>
-                <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/30">
+                <Badge className="bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/20 hover:bg-rose-500/30 text-[10px] px-1.5 h-5">
                   {selectedWallpaper.size || "0 MB"}
                 </Badge>
+                {wallpaperIndex > 0 && (
+                  <Badge className="bg-sky-500/20 text-sky-600 dark:text-sky-400 border-sky-500/20 hover:bg-sky-500/30 text-[10px] px-1.5 h-5">
+                    {wallpaperIndex}/{filteredWallpapers.length}
+                  </Badge>
+                )}
               </div>
-            </div>
 
-            {/* Nickname  + favorite */}
-            {/* ✨ 修复间距：将 Separator 和按键打包在一个 div 里，内部使用紧凑间距 */}
-            <div className="space-y-2">
-              <Separator />
-              <div className="flex gap-2">
-                {/* Nickname 编辑按钮 */}
-                <Button
-                  variant="outline"
-                  className="flex-1 gap-2 h-10"
-                  onClick={() => setIsDialogOpen(true)}
-                >
-                  <Edit3 className="w-4 h-4" />
-                  Nickname
-                </Button>
-
-                {/* favorite */}
-                <Toggle
-                  pressed={isFavorite}
-                  onPressedChange={handleToggleFavorite}
-                  variant="outline"
-                  className="flex-1 gap-2 h-10 data-[state=on]:bg-yellow-500/20 data-[state=on]:text-yellow-600 data-[state=on]:border-yellow-500/50"
-                >
-                  <Star
-                    className={`w-4 h-4 transition-colors ${
-                      isFavorite
-                        ? "fill-yellow-500 text-yellow-500"
-                        : "fill-transparent"
-                    }`}
-                  />
-                  {/* always Favorite */}
-                  Favorite
-                </Toggle>
-              </div>
-            </div>
-
-            {/* Tags (left) + Type (right) */}
-            {/* ✨ 修复间距：打包 Separator 和 Metadata */}
-            <div className="space-y-3">
-              <Separator />
-              <WallpaperMetadata wallpaper={selectedWallpaper} />
-            </div>
-
-            {/* 4. 描述 - 使用 Accordion，可折叠展开 */}
-            {selectedWallpaper.description &&
-              cleanDescription(selectedWallpaper.description) && (
-                /* ✨ 修复间距：打包 Separator 和 Accordion */
-                <div className="space-y-2">
-                  <Separator />
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="description" className="border-0">
-                      <AccordionTrigger className="text-xs font-bold text-muted-foreground uppercase tracking-widest py-2 hover:no-underline">
-                        Description
-                      </AccordionTrigger>
-                      <AccordionContent
-                        className="text-sm text-muted-foreground/80 leading-relaxed italic break-words pt-0"
-                        style={{
-                          whiteSpace: "pre-wrap",
-                          overflowWrap: "anywhere",
-                        }}
+              {/* Tags - 带标题 */}
+              {selectedWallpaper.tags && selectedWallpaper.tags.length > 0 && (
+                <div className="space-y-1.5 pt-2">
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                    Tags
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedWallpaper.tags.slice(0, 8).map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="outline"
+                        className={cn(
+                          "text-[10px] px-1.5 h-5 font-normal",
+                          getColorForTag(tag)
+                        )}
                       >
-                        {cleanDescription(selectedWallpaper.description)}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                        {tag}
+                      </Badge>
+                    ))}
+                    {selectedWallpaper.tags.length > 8 && (
+                      <span className="text-[10px] text-muted-foreground">
+                        +{selectedWallpaper.tags.length - 8}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
+            </div>
+
+            {/* 4. Description - 可折叠 */}
+            {selectedWallpaper.description && cleanDescription(selectedWallpaper.description) && (
+              <Accordion type="single" collapsible>
+                <AccordionItem value="description" className="border-0">
+                  <AccordionTrigger className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest py-2 hover:no-underline">
+                    Description
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground/80 leading-relaxed break-words pt-0 whitespace-pre-wrap overflow-wrap-anywhere">
+                    {cleanDescription(selectedWallpaper.description)}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground/50 space-y-4">
@@ -187,10 +206,9 @@ export function WallpaperSidebar() {
         )}
       </ScrollArea>
 
-      {/* 这个底部的区域本来就不受 space-y-6 的影响，所以不需要包，结构保持干净即可 */}
-      <Separator />
-      <div className="p-6 bg-background/50">
-        <ApplyButton className="w-full h-12 bg-brand hover:bg-brand/90 text-brand-foreground font-bold rounded-xl shadow-lg shadow-brand/20 gap-2 disabled:opacity-50 disabled:cursor-not-allowed" />
+      {/* 底部 Apply 按钮 */}
+      <div className="p-4 bg-background/50 border-t">
+        <ApplyButton className="w-full h-11 bg-brand hover:bg-brand/90 text-brand-foreground font-bold rounded-xl" />
       </div>
 
       {/* Edit Nickname Dialog */}
