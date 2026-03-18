@@ -15,6 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useAppStore } from "@/store/appStore";
 import { PlaylistItem } from "./PlaylistItem";
+import { Accordion } from "@/components/ui/accordion";
 
 export function PlaylistList() {
   const playlists = useAppStore((state) => state.playlists);
@@ -67,11 +68,11 @@ export function PlaylistList() {
         items={playlists.map((p) => p.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="space-y-1">
+        <Accordion type="single" collapsible className="space-y-1">
           {playlists.map((playlist) => (
             <PlaylistItem key={playlist.id} playlist={playlist} />
           ))}
-        </div>
+        </Accordion>
       </SortableContext>
     </DndContext>
   );
