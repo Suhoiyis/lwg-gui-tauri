@@ -1,4 +1,4 @@
-import { Zap, MousePointer2, Clock, AlertTriangle } from "lucide-react";
+import { Zap, MousePointer2, Clock, AlertTriangle, ListMusic } from "lucide-react";
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useAppStore } from "@/store/appStore";
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 // 引入公共组件
 import {
   Header,
@@ -23,6 +24,7 @@ import {
   CYCLE_ORDER_OPTIONS,
   TextareaField,
 } from "./Shared";
+import { CyclePlaylistSelector } from "@/components/playlist/CyclePlaylistSelector";
 
 export function PlaybackSettings() {
   const { settings, updateSetting } = useAppStore();
@@ -165,6 +167,18 @@ export function PlaybackSettings() {
                   onValueChange={(v) => updateSetting("cycleOrder", v)}
                   options={CYCLE_ORDER_OPTIONS}
                 />
+              </div>
+            )}
+            {settings.cycleEnabled && (
+              <div className="space-y-2 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <Label className="flex items-center gap-2 text-sm font-medium">
+                  <ListMusic className="w-4 h-4 text-muted-foreground" />
+                  Cycle Source
+                </Label>
+                <CyclePlaylistSelector className="w-full" />
+                <p className="text-xs text-muted-foreground">
+                  Choose which playlist to use for automatic cycling. Select "All Wallpapers" to cycle through your entire library.
+                </p>
               </div>
             )}
           </CardContent>

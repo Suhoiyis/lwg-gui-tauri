@@ -1,6 +1,7 @@
 // src/components/library/LibraryHeader.tsx
 import { memo, useState, useEffect, useRef, useMemo } from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { renderInlineMarkdown } from "@/lib/markdown";
 import { getDisplayName } from "@/lib/utils";
@@ -12,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, CheckSquare } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 
 interface LibraryHeaderProps {
@@ -75,6 +76,10 @@ export const LibraryHeader = memo(
     // ✨ 获取排序状态
     const sortBy = useAppStore((state) => state.sortBy);
     const setSortBy = useAppStore((state) => state.setSortBy);
+    
+    // ✨ 勾选模式状态
+    const isSelectionMode = useAppStore((state) => state.isSelectionMode);
+    const enterSelectionMode = useAppStore((state) => state.enterSelectionMode);
     
     // ✨ 获取 nicknames 和 wallpapers 用于显示昵称
     const nicknames = useAppStore((state) => state.nicknames);
@@ -169,6 +174,20 @@ export const LibraryHeader = memo(
       </Select>
     );
 
+    // 勾选模式按钮
+    const selectButton = (
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-7 text-xs gap-1.5"
+        onClick={enterSelectionMode}
+        disabled={isSelectionMode}
+      >
+        <CheckSquare className="h-3.5 w-3.5" />
+        <span className="hidden sm:inline">Select</span>
+      </Button>
+    );
+
     return (
       <div
         ref={containerRef}
@@ -198,6 +217,8 @@ export const LibraryHeader = memo(
 
             {/* 右侧：排序 + 分页 */}
             <div className="flex items-center gap-4 flex-shrink-0">
+              {selectButton}
+              <div className="h-4 w-px bg-border/50"></div>
               {sortSelect}
               <div className="h-4 w-px bg-border/50"></div>
               {paginationInfo}
@@ -227,6 +248,8 @@ export const LibraryHeader = memo(
 
             {/* 第二行（控制区）：分页 + 排序，整体靠右 */}
             <div className="flex items-center justify-end gap-3 mt-1">
+              {selectButton}
+              <div className="h-4 w-px bg-border/50"></div>
               {paginationInfo}
               <div className="h-4 w-px bg-border/50"></div>
               {sortSelect}
