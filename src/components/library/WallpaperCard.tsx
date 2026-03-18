@@ -1,6 +1,6 @@
 // src/components/library/WallpaperCard.tsx
 import { memo, useMemo } from "react";
-import { Star, Video, Monitor, Globe, Image as ImageIcon } from "lucide-react";
+import { Star, Video, Monitor, Globe, Image as ImageIcon, Check } from "lucide-react";
 import { Wallpaper } from "@/types";
 import { renderInlineMarkdown } from "@/lib/markdown";
 import { convertFileSrc } from "@tauri-apps/api/core";
@@ -42,6 +42,12 @@ export const WallpaperCard = memo(function WallpaperCard({
   const isFavorite = useAppStore((state) => state.isFavorite(wp.id));
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
   
+  // Selection mode state
+  const isSelectionMode = useAppStore((state) => state.isSelectionMode);
+  const selectedForPlaylist = useAppStore((state) => state.selectedForPlaylist);
+  const toggleSelectForPlaylist = useAppStore((state) => state.toggleSelectForPlaylist);
+  const isInSelection = selectedForPlaylist.has(wp.id);
+  
   // Get display name with nickname support
   const { displayName, originalTitle } = getDisplayName(nicknames, wp.id, wp.title);
   const isNickname = originalTitle !== null;
@@ -52,6 +58,14 @@ export const WallpaperCard = memo(function WallpaperCard({
       isFavorite ? "Removed from favorites" : "Added to favorites",
       { description: displayName },
     );
+  };
+
+  const handleClick = () => {
+    if (isSelectionMode) {
+      toggleSelectForPlaylist(wp.id);
+    } else {
+      onSelect();
+    }
   };
 
   const previewUrl = useMemo(() => getPreviewUrl(wp.preview), [wp.preview]);
@@ -73,7 +87,7 @@ export const WallpaperCard = memo(function WallpaperCard({
   return (
     // 1. 最外层容器：负责响应点击、布局位置和传入的 className
     <div
-      onClick={onSelect}
+      onClick={handleClick}
       className={cn(
         "group relative cursor-pointer select-none",
         "aspect-square",
@@ -87,6 +101,7 @@ export const WallpaperCard = memo(function WallpaperCard({
           isSelected
             ? "border-brand ring-2 ring-brand ring-offset-4 ring-offset-background shadow-lg shadow-brand/20"
             : "border-border/50 hover:border-brand/50 hover:shadow-xl hover:shadow-brand/10",
+          isInSelection && "border-primary ring-2 ring-primary/50",
         )}
       >
         {/* 3. 内容层：图片和叠加元素 */}
@@ -146,6 +161,22 @@ export const WallpaperCard = memo(function WallpaperCard({
         {showIcons && (
           <div className="absolute top-2 right-2 z-20 bg-muted/70 backdrop-blur-md p-1.5 rounded-lg border border-border/30 shadow-sm flex items-center justify-center pointer-events-none">
             {TypeIcon}
+          </div>
+        )}
+
+        {/* Selection mode checkbox (center overlay) */}
+        {isSelectionMode && (
+          <div className="absolute inset-0 z-25 flex items-center justify-center bg-muted/30 transition-opacity">
+            <div
+              className={cn(
+                "w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all",
+                isInSelection
+                  ? "bg-primary border-primary"
+                  : "bg-muted/80 border-border/50"
+              )}
+            >
+              {isInSelection && <Check className="w-5 h-5 text-primary-foreground" />}
+            </div>
           </div>
         )}
 

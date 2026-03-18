@@ -82,3 +82,12 @@ export interface HistoryEntry {
   preview: string;
   timestamp: string;
 }
+
+// Playlist for user-defined wallpaper collections
+export interface Playlist {
+  id: string;              // UUID (generated on frontend)
+  name: string;            // User-defined name
+  wallpaperIds: string[];  // Ordered list of wallpaper IDs
+  createdAt: number;       // Unix timestamp
+  updatedAt: number;       // Unix timestamp
+}

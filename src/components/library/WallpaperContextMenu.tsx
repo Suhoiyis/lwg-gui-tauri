@@ -1,9 +1,11 @@
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { ReactNode } from "react";
-import { FolderOpen, Trash2, Info, Play } from "lucide-react";
+import { FolderOpen, Trash2, Info, Play, ListPlus } from "lucide-react";
+import { AddToPlaylistMenu } from "@/components/playlist/AddToPlaylistMenu";
 
 interface Props {
   children: ReactNode;
+  wallpaperId: string;
   onOpenFolder?: () => void;
   onDelete?: () => void;
   onProperties?: () => void;
@@ -11,6 +13,7 @@ interface Props {
 
 export function WallpaperContextMenu({
   children,
+  wallpaperId,
   onOpenFolder,
   onDelete,
   onProperties,
@@ -38,6 +41,23 @@ export function WallpaperContextMenu({
             icon={<Info size={14} />}
             label="Properties"
           />
+
+          <ContextMenu.Separator className="h-px bg-border my-1" />
+          
+          {/* Add to playlist submenu */}
+          <ContextMenu.Sub>
+            <ContextMenu.SubTrigger className="flex items-center gap-2 px-2 py-1.5 rounded text-sm outline-none cursor-pointer select-none data-[state=open]:bg-accent data-[highlighted]:bg-accent">
+              <ListPlus size={14} />
+              <span>Add to playlist</span>
+            </ContextMenu.SubTrigger>
+            <ContextMenu.Portal>
+              <ContextMenu.SubContent className="min-w-[160px] bg-popover rounded-lg border border-border p-1.5 shadow-xl animate-in fade-in duration-200 z-50">
+                <AddToPlaylistMenu wallpaperId={wallpaperId}>
+                  <span className="hidden">trigger</span>
+                </AddToPlaylistMenu>
+              </ContextMenu.SubContent>
+            </ContextMenu.Portal>
+          </ContextMenu.Sub>
 
           <ContextMenu.Separator className="h-px bg-border my-1" />
           <Item

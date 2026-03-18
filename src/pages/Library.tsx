@@ -28,6 +28,8 @@ import { LibraryHeader } from "@/components/library/LibraryHeader";
 import { WallpaperSidebar } from "@/components/library/WallpaperSidebar";
 import { WallpaperGrid } from "@/components/library/WallpaperGrid";
 import { LibraryPagination } from "@/components/library/LibraryPagination";
+import { PlaylistSidebar } from "@/components/playlist/PlaylistSidebar";
+import { SelectionModeBar } from "@/components/playlist/SelectionModeBar";
 
 // State & API
 import { useAppStore } from "@/store/appStore";
@@ -43,6 +45,8 @@ export function Library() {
   const setSelectedId = useAppStore((state) => state.setSelectedId);
   const sortBy = useAppStore((state) => state.sortBy);
   const selectedScreen = useAppStore((state) => state.selectedScreen);
+  const isSelectionMode = useAppStore((state) => state.isSelectionMode);
+  const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const { activeWallpapers } = useActiveWallpapers();
 
   // Local State
@@ -58,7 +62,7 @@ export function Library() {
 
   const filteredWallpapers = useMemo(() => {
     return useAppStore.getState().getFilteredWallpapers();
-  }, [wallpapers, searchQuery, sortBy]);
+  }, [wallpapers, searchQuery, sortBy, activePlaylistId]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -173,82 +177,93 @@ export function Library() {
   };
 
   return (
-    <div className="h-full w-full overflow-hidden">
-      <ResizablePanelGroup
-        orientation="horizontal"
-        className="h-full w-full rounded-lg"
-      >
-        {/* Left Panel: Main Content */}
-        <ResizablePanel defaultSize="75%" minSize="30%">
-          <div className="flex flex-col h-full overflow-hidden">
-            {/* Header */}
-            <div className="px-6 pt-6 pb-4 shrink-0">
-              <LibraryHeader
-                currentTitle={activeTitle}
-                activeWallpaperId={activeWallpaperId}
-                onTitleClick={handleSelect}
-                totalCount={filteredWallpapers.length}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                currentIndex={currentIndex}
-                onPageChange={handlePageChange}
-              />
-            </div>
+    <div className="h-full w-full overflow-hidden relative">
+      <div className="flex h-full">
+        {/* Playlist Sidebar (left side, fixed width) */}
+        <PlaylistSidebar />
 
-            {/* Content Area */}
-            <TooltipProvider>
-              <ScrollArea className="flex-1 w-full h-full">
-                {filteredWallpapers.length === 0 ? (
-                  <div className="flex h-full min-h-[50vh] items-center justify-center">
-                    <EmptyState />
-                  </div>
-                ) : (
-                  <div className="px-6 pb-10">
-                    <div ref={scrollTopRef} />
+        {/* Main Content Area */}
+        <div className="flex-1 h-full overflow-hidden">
+          <ResizablePanelGroup
+            orientation="horizontal"
+            className="h-full w-full rounded-lg"
+          >
+            {/* Left Panel: Main Content */}
+            <ResizablePanel defaultSize="75%" minSize="30%">
+              <div className="flex flex-col h-full overflow-hidden">
+                {/* Header */}
+                <div className="px-6 pt-6 pb-4 shrink-0">
+                  <LibraryHeader
+                    currentTitle={activeTitle}
+                    activeWallpaperId={activeWallpaperId}
+                    onTitleClick={handleSelect}
+                    totalCount={filteredWallpapers.length}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    currentIndex={currentIndex}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
 
-                    {/* Grid Component */}
-                    <WallpaperGrid
-                      wallpapers={paginatedWallpapers}
-                      selectedId={selectedId}
-                      onSelect={handleSelect}
-                      onApply={handleApply}
-                      onStop={handleStop}
-                      onOpenFolder={handleOpenFolder}
-                      onDelete={handleDeleteRequest}
-                    />
+                {/* Selection Mode Bar */}
+                {isSelectionMode && <SelectionModeBar />}
 
-                    {/* Pagination Component */}
-                    <LibraryPagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={handlePageChange}
-                    />
-                  </div>
-                )}
-              </ScrollArea>
-            </TooltipProvider>
-          </div>
-        </ResizablePanel>
+                {/* Content Area */}
+                <TooltipProvider>
+                  <ScrollArea className="flex-1 w-full h-full">
+                    {filteredWallpapers.length === 0 ? (
+                      <div className="flex h-full min-h-[50vh] items-center justify-center">
+                        <EmptyState />
+                      </div>
+                    ) : (
+                      <div className="px-6 pb-10">
+                        <div ref={scrollTopRef} />
 
-        {/* Handle */}
-        <ResizableHandle
-          withHandle={false}
-          className="relative w-2 bg-transparent z-10 -ml-1 cursor-col-resize group outline-none"
-        >
-          <div className="h-full w-[1px] bg-border/40 mx-auto group-hover:bg-border transition-colors duration-300" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-border opacity-0 group-hover:opacity-100 group-hover:bg-primary group-active:bg-primary/80 transition-all duration-300 ease-in-out shadow-sm" />
-        </ResizableHandle>
+                        {/* Grid Component */}
+                        <WallpaperGrid
+                          wallpapers={paginatedWallpapers}
+                          selectedId={selectedId}
+                          onSelect={handleSelect}
+                          onApply={handleApply}
+                          onStop={handleStop}
+                          onOpenFolder={handleOpenFolder}
+                          onDelete={handleDeleteRequest}
+                        />
 
-        {/* Right Panel: Sidebar */}
-        <ResizablePanel
-          defaultSize="20%"
-          minSize={300}
-          maxSize="40%"
-          className="bg-muted/30 min-w-[300px] max-w-[450px]"
-        >
-          <WallpaperSidebar />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+                        {/* Pagination Component */}
+                        <LibraryPagination
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          onPageChange={handlePageChange}
+                        />
+                      </div>
+                    )}
+                  </ScrollArea>
+                </TooltipProvider>
+              </div>
+            </ResizablePanel>
+
+            {/* Handle */}
+            <ResizableHandle
+              withHandle={false}
+              className="relative w-2 bg-transparent z-10 -ml-1 cursor-col-resize group outline-none"
+            >
+              <div className="h-full w-[1px] bg-border/40 mx-auto group-hover:bg-border transition-colors duration-300" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-8 rounded-full bg-border opacity-0 group-hover:opacity-100 group-hover:bg-primary group-active:bg-primary/80 transition-all duration-300 ease-in-out shadow-sm" />
+            </ResizableHandle>
+
+            {/* Right Panel: Sidebar */}
+            <ResizablePanel
+              defaultSize="20%"
+              minSize={300}
+              maxSize="40%"
+              className="bg-muted/30 min-w-[300px] max-w-[450px]"
+            >
+              <WallpaperSidebar />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+      </div>
 
       {/* Delete Dialog */}
       <AlertDialog

@@ -1,6 +1,6 @@
 // src/components/library/WallpaperGrid.tsx
 import { memo, useState } from "react";
-import { Play, Square, FolderOpen, Trash2, Edit3, Star } from "lucide-react";
+import { Play, Square, FolderOpen, Trash2, Edit3, Star, ListPlus } from "lucide-react";
 import { WallpaperCard } from "@/components/library/WallpaperCard";
 import {
   ContextMenu,
@@ -9,8 +9,12 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
   ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
 } from "@/components/ui/context-menu";
 import { EditNicknameDialog } from "@/components/dialogs/EditNicknameDialog";
+import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
 import { useAppStore } from "@/store/appStore";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -37,12 +41,18 @@ export const WallpaperGrid = memo(
     onOpenFolder,
     onDelete,
   }: WallpaperGridProps) => {
+    const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+    const favoriteIds = useAppStore((state) => state.favoriteIds);
+    const playlists = useAppStore((state) => state.playlists);
+    const addToPlaylist = useAppStore((state) => state.addToPlaylist);
+
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editWallpaperId, setEditWallpaperId] = useState<string | null>(null);
     const [editWallpaperTitle, setEditWallpaperTitle] = useState("");
-
-    const toggleFavorite = useAppStore((state) => state.toggleFavorite);
-    const favoriteIds = useAppStore((state) => state.favoriteIds);
+    
+    // Create playlist dialog state
+    const [createPlaylistDialogOpen, setCreatePlaylistDialogOpen] = useState(false);
+    const [createPlaylistWallpaperId, setCreatePlaylistWallpaperId] = useState<string | null>(null);
 
     const handleEditNickname = (id: string, title: string) => {
       setEditWallpaperId(id);
@@ -57,6 +67,15 @@ export const WallpaperGrid = memo(
         wasFavorite ? "Removed from favorites" : "Added to favorites",
         { description: title }
       );
+    };
+
+    const handleAddToPlaylist = async (playlistId: string, wallpaperId: string) => {
+      await addToPlaylist(playlistId, [wallpaperId]);
+    };
+
+    const handleCreatePlaylist = (wallpaperId: string) => {
+      setCreatePlaylistWallpaperId(wallpaperId);
+      setCreatePlaylistDialogOpen(true);
     };
 
     return (
@@ -102,6 +121,36 @@ export const WallpaperGrid = memo(
                   <FolderOpen className="mr-2 h-4 w-4" />
                   Open Folder...
                 </ContextMenuItem>
+                
+                {/* Add to playlist submenu */}
+                <ContextMenuSub>
+                  <ContextMenuSubTrigger>
+                    <ListPlus className="mr-2 h-4 w-4" />
+                    Add to playlist
+                  </ContextMenuSubTrigger>
+                  <ContextMenuSubContent className="w-48">
+                    {playlists.length > 0 ? (
+                      <>
+                        {playlists.map((playlist) => (
+                          <ContextMenuItem
+                            key={playlist.id}
+                            onClick={() => handleAddToPlaylist(playlist.id, wp.id)}
+                          >
+                            {playlist.name}
+                            <span className="ml-auto text-muted-foreground text-xs">
+                              {playlist.wallpaperIds.length}
+                            </span>
+                          </ContextMenuItem>
+                        ))}
+                        <ContextMenuSeparator />
+                      </>
+                    ) : null}
+                    <ContextMenuItem onClick={() => handleCreatePlaylist(wp.id)}>
+                      <span className="text-primary">+ Create new playlist</span>
+                    </ContextMenuItem>
+                  </ContextMenuSubContent>
+                </ContextMenuSub>
+                
                 <ContextMenuSeparator />
                 <ContextMenuItem
                   className="text-red-600 focus:text-red-600 focus:bg-red-100 dark:focus:bg-red-900/20"
@@ -123,6 +172,15 @@ export const WallpaperGrid = memo(
             wallpaperTitle={editWallpaperTitle}
             open={editDialogOpen}
             onOpenChange={setEditDialogOpen}
+          />
+        )}
+
+        {/* Create Playlist Dialog */}
+        {createPlaylistWallpaperId && (
+          <CreatePlaylistDialog
+            open={createPlaylistDialogOpen}
+            onOpenChange={setCreatePlaylistDialogOpen}
+            initialWallpaperIds={[createPlaylistWallpaperId]}
           />
         )}
       </>

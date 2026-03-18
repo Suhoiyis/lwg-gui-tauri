@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "sonner";
 
-import { Wallpaper, AppConfig, AppState } from "../types";
+import { Wallpaper, AppConfig, AppState, Playlist } from "../types";
 import { scanWallpapers } from "../api/wallpaper";
 import { parseSize, normalizeType } from "../lib/utils";
 import { startCycleTimer, stopCycleTimer, setCycleScreen } from "../api/cycle";
@@ -41,6 +41,9 @@ const saveTimeouts: Record<string, ReturnType<typeof setTimeout>> = {};
 
 // Highlight timeout for settings field focus
 let highlightTimeout: ReturnType<typeof setTimeout> | undefined;
+
+// Maximum selection count for playlist creation (performance protection)
+const MAX_SELECTION_COUNT = 100;
 
 const isSliderOrInput = (key: keyof AppConfig): boolean => {
   const sliderInputKeys: Array<keyof AppConfig> = [
@@ -88,6 +91,27 @@ interface AppStoreState {
   highlightSettingField: string | null;
   // Runtime state (loaded from separate state endpoint)
   runtimeState: import('../types').AppState;
+
+  // ===== Playlist 相关状态 =====
+  
+  // Playlist data
+  playlists: Playlist[];
+  
+  // Currently browsing playlist ID (null = ALL)
+  activePlaylistId: string | null;
+  
+  // Playlist used for cycling (null = ALL)
+  cyclePlaylistId: string | null;
+  
+  // Sidebar visibility
+  isPlaylistSidebarOpen: boolean;
+  
+  // Hydration state (FOUC prevention)
+  isHydrated: boolean;
+  
+  // Selection mode for batch operations
+  isSelectionMode: boolean;
+  selectedForPlaylist: Set<string>;
 
 
 
@@ -147,6 +171,32 @@ interface AppStoreState {
   // 初始化
   initApp: () => Promise<void>;
   initializeSelectedWallpaper: () => void;
+  
+  // ===== Playlist 相关方法 =====
+  
+  // Playlist CRUD
+  loadPlaylists: () => Promise<void>;
+  createPlaylist: (name: string, wallpaperIds: string[]) => Promise<void>;
+  renamePlaylist: (id: string, name: string) => Promise<void>;
+  deletePlaylist: (id: string) => Promise<void>;
+  reorderPlaylists: (orderedIds: string[]) => Promise<void>;
+  
+  // Synthetic actions (frontend composition, calls update_playlist)
+  addToPlaylist: (playlistId: string, wallpaperIds: string[]) => Promise<void>;
+  removeFromPlaylist: (playlistId: string, wallpaperId: string) => Promise<void>;
+  
+  // State control
+  setActivePlaylist: (id: string | null) => void;
+  setCyclePlaylist: (id: string | null) => Promise<void>;
+  togglePlaylistSidebar: () => void;
+  
+  // Selection mode
+  enterSelectionMode: () => void;
+  exitSelectionMode: () => void;
+  toggleSelectForPlaylist: (wallpaperId: string) => void;
+  selectAllForPlaylist: () => void;
+  deselectAllForPlaylist: () => void;
+  createPlaylistFromSelection: (name: string) => Promise<void>;
 }
 
 export const useAppStore = create<AppStoreState>((set, get) => ({
@@ -174,6 +224,15 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
 
   // Runtime state from separate API endpoint
   runtimeState: {},
+
+  // ===== Playlist 初始状态 =====
+  playlists: [],
+  activePlaylistId: null,
+  cyclePlaylistId: null,
+  isPlaylistSidebarOpen: true,
+  isHydrated: false,
+  isSelectionMode: false,
+  selectedForPlaylist: new Set<string>(),
 
 
   // App version action
@@ -716,9 +775,33 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   },
 
 getFilteredWallpapers: () => {
-    const { wallpapers, searchQuery, sortBy, nicknames } = get();
+    const { wallpapers, searchQuery, sortBy, nicknames, activePlaylistId, playlists } = get();
 
-    // 1. 过滤
+    // ===== 情况 1：查看特定 Playlist =====
+    if (activePlaylistId) {
+      const activePlaylist = playlists.find(p => p.id === activePlaylistId);
+      if (!activePlaylist) return [];
+      
+      // 【步骤 1：域过滤】使用 map 保留用户自定义顺序
+      const playlistWallpapers = activePlaylist.wallpaperIds
+        .map(id => wallpapers.find(w => w.id === id))
+        .filter((w): w is Wallpaper => w !== undefined);
+      
+      // 【步骤 2：搜索过滤】在域过滤结果上进行搜索
+      if (searchQuery) {
+        const lowerQ = searchQuery.toLowerCase();
+        return playlistWallpapers.filter(w => 
+          (w.title || "").toLowerCase().includes(lowerQ) ||
+          w.id.includes(lowerQ) ||
+          (nicknames[w.id] || '').toLowerCase().includes(lowerQ)
+        );
+      }
+      
+      // 【步骤 3：最终输出】
+      return playlistWallpapers;
+    }
+    
+    // ===== 情况 2：ALL 视图 =====
     let filtered = wallpapers;
     if (searchQuery) {
       const lowerQ = searchQuery.toLowerCase();
@@ -731,7 +814,7 @@ getFilteredWallpapers: () => {
       );
     }
 
-    // 2. 排序 (浅拷贝防止修改原数组)
+    // 排序 (浅拷贝防止修改原数组)
     return [...filtered].sort((a, b) => {
       if (sortBy === "name") {
         return (a.title || "").localeCompare(b.title || "");
@@ -797,11 +880,360 @@ getFilteredWallpapers: () => {
     }
   },
 
+  // ===== Playlist 方法实现 =====
+
+  loadPlaylists: async () => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    
+    try {
+      if (isTauri) {
+        // 从后端加载
+        const playlists = await invoke<Playlist[]>('get_playlists');
+        const cyclePlaylistId = await invoke<string | null>('get_cycle_playlist');
+        const sidebarOpen = await invoke<boolean>('get_playlist_sidebar_open');
+        set({ playlists, cyclePlaylistId, isPlaylistSidebarOpen: sidebarOpen, isHydrated: true });
+      } else {
+        // 浏览器开发环境：从 localStorage 加载
+        const stored = localStorage.getItem('lwg_playlists');
+        const playlists = stored ? JSON.parse(stored) : [];
+        const cyclePlaylistId = localStorage.getItem('lwg_cycle_playlist') || null;
+        const sidebarOpen = localStorage.getItem('lwg_sidebar_open') !== 'false';
+        set({ playlists, cyclePlaylistId, isPlaylistSidebarOpen: sidebarOpen, isHydrated: true });
+      }
+    } catch (error) {
+      console.error('Failed to load playlists:', error);
+      set({ isHydrated: true }); // 即使失败也标记完成
+    }
+  },
+
+  createPlaylist: async (name: string, wallpaperIds: string[]) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const state = get();
+    
+    // 检查同名
+    const trimmedName = name.trim().slice(0, 100);
+    const existingPlaylist = state.playlists.find(
+      p => p.name.toLowerCase() === trimmedName.toLowerCase()
+    );
+    if (existingPlaylist) {
+      toast.error('Playlist name already exists', {
+        description: `A playlist named "${trimmedName}" already exists.`
+      });
+      throw new Error('Duplicate playlist name');
+    }
+    
+    // 前端生成 UUID
+    const id = crypto.randomUUID();
+    const now = Math.floor(Date.now() / 1000);
+    
+    const newPlaylist: Playlist = {
+      id,
+      name: trimmedName,
+      wallpaperIds: Array.from(new Set(wallpaperIds)), // 去重
+      createdAt: now,
+      updatedAt: now,
+    };
+    
+    // 乐观更新
+    const previousPlaylists = state.playlists;
+    set({ playlists: [...previousPlaylists, newPlaylist] });
+    
+    // 持久化
+    if (isTauri) {
+      try {
+        await invoke('create_playlist', { id, name: newPlaylist.name, wallpaperIds: newPlaylist.wallpaperIds });
+        toast.success('Playlist created');
+      } catch (error) {
+        // 回滚
+        set({ playlists: previousPlaylists });
+        console.error('Failed to create playlist:', error);
+        toast.error('Failed to create playlist', { description: String(error) });
+        throw error;
+      }
+    } else {
+      localStorage.setItem('lwg_playlists', JSON.stringify(get().playlists));
+      toast.success('Playlist created');
+    }
+  },
+
+  renamePlaylist: async (id: string, name: string) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    
+    const previousPlaylists = get().playlists;
+    const trimmedName = name.trim().slice(0, 100);
+    
+    // 乐观更新
+    const updatedPlaylists = previousPlaylists.map(p =>
+      p.id === id ? { ...p, name: trimmedName, updatedAt: Math.floor(Date.now() / 1000) } : p
+    );
+    set({ playlists: updatedPlaylists });
+    
+    // 持久化
+    if (isTauri) {
+      try {
+        await invoke('rename_playlist', { id, name: trimmedName });
+        toast.success('Playlist renamed');
+      } catch (error) {
+        set({ playlists: previousPlaylists });
+        console.error('Failed to rename playlist:', error);
+        toast.error('Failed to rename playlist', { description: String(error) });
+        throw error;
+      }
+    } else {
+      localStorage.setItem('lwg_playlists', JSON.stringify(updatedPlaylists));
+      toast.success('Playlist renamed');
+    }
+  },
+
+  deletePlaylist: async (id: string) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const state = get();
+    
+    // 防御 1：如果删除的是当前正在查看的列表，退回到 ALL
+    if (state.activePlaylistId === id) {
+      set({ activePlaylistId: null });
+    }
+    
+    // 防御 2：如果删除的是轮换列表，清除轮换设置
+    if (state.cyclePlaylistId === id) {
+      if (isTauri) {
+        try {
+          await invoke('set_cycle_playlist', { id: null });
+        } catch (e) {
+          console.error('Failed to clear cycle playlist:', e);
+        }
+      }
+      set({ cyclePlaylistId: null });
+    }
+    
+    // 从列表中移除
+    const previousPlaylists = state.playlists;
+    const newPlaylists = previousPlaylists.filter(p => p.id !== id);
+    set({ playlists: newPlaylists });
+    
+    // 持久化
+    if (isTauri) {
+      try {
+        await invoke('delete_playlist', { id });
+        toast.success('Playlist deleted');
+      } catch (error) {
+        set({ playlists: previousPlaylists });
+        console.error('Failed to delete playlist:', error);
+        toast.error('Failed to delete playlist', { description: String(error) });
+        throw error;
+      }
+    } else {
+      localStorage.setItem('lwg_playlists', JSON.stringify(newPlaylists));
+      toast.success('Playlist deleted');
+    }
+  },
+
+  reorderPlaylists: async (orderedIds: string[]) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const state = get();
+    
+    // 根据 orderedIds 重新排序 playlists
+    const playlistMap = new Map(state.playlists.map(p => [p.id, p]));
+    const reorderedPlaylists = orderedIds
+      .map(id => playlistMap.get(id))
+      .filter((p): p is Playlist => p !== undefined);
+    
+    // 乐观更新
+    set({ playlists: reorderedPlaylists });
+    
+    // 持久化
+    if (isTauri) {
+      try {
+        await invoke('reorder_playlists', { orderedIds });
+      } catch (error) {
+        console.error('Failed to persist reorder:', error);
+        toast.error('Failed to save playlist order');
+        // 可选：重新加载恢复状态
+        await get().loadPlaylists();
+      }
+    } else {
+      localStorage.setItem('lwg_playlists', JSON.stringify(reorderedPlaylists));
+    }
+  },
+
+  addToPlaylist: async (playlistId: string, newWallpaperIds: string[]) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const state = get();
+    const playlist = state.playlists.find(p => p.id === playlistId);
+    
+    if (!playlist) {
+      toast.error('Playlist not found');
+      return;
+    }
+    
+    // 合并后去重
+    const mergedIds = [...playlist.wallpaperIds, ...newWallpaperIds];
+    const dedupedIds = Array.from(new Set(mergedIds));
+    
+    // 乐观更新
+    const previousPlaylists = state.playlists;
+    const updatedPlaylists = previousPlaylists.map(p =>
+      p.id === playlistId
+        ? { ...p, wallpaperIds: dedupedIds, updatedAt: Math.floor(Date.now() / 1000) }
+        : p
+    );
+    set({ playlists: updatedPlaylists });
+    
+    // 持久化
+    if (isTauri) {
+      try {
+        await invoke('update_playlist', { id: playlistId, wallpaperIds: dedupedIds });
+        toast.success(`Added ${newWallpaperIds.length} wallpaper(s) to playlist`);
+      } catch (error) {
+        set({ playlists: previousPlaylists });
+        console.error('Failed to add to playlist:', error);
+        toast.error('Failed to add to playlist', { description: String(error) });
+        throw error;
+      }
+    } else {
+      localStorage.setItem('lwg_playlists', JSON.stringify(updatedPlaylists));
+      toast.success(`Added ${newWallpaperIds.length} wallpaper(s) to playlist`);
+    }
+  },
+
+  removeFromPlaylist: async (playlistId: string, wallpaperId: string) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const state = get();
+    const playlist = state.playlists.find(p => p.id === playlistId);
+    
+    if (!playlist) {
+      toast.error('Playlist not found');
+      return;
+    }
+    
+    const newWallpaperIds = playlist.wallpaperIds.filter(id => id !== wallpaperId);
+    
+    // 乐观更新
+    const previousPlaylists = state.playlists;
+    const updatedPlaylists = previousPlaylists.map(p =>
+      p.id === playlistId
+        ? { ...p, wallpaperIds: newWallpaperIds, updatedAt: Math.floor(Date.now() / 1000) }
+        : p
+    );
+    set({ playlists: updatedPlaylists });
+    
+    // 持久化
+    if (isTauri) {
+      try {
+        await invoke('update_playlist', { id: playlistId, wallpaperIds: newWallpaperIds });
+      } catch (error) {
+        set({ playlists: previousPlaylists });
+        console.error('Failed to remove from playlist:', error);
+        toast.error('Failed to remove from playlist', { description: String(error) });
+        throw error;
+      }
+    } else {
+      localStorage.setItem('lwg_playlists', JSON.stringify(updatedPlaylists));
+    }
+  },
+
+  setActivePlaylist: (id: string | null) => {
+    set({ activePlaylistId: id });
+  },
+
+  setCyclePlaylist: async (id: string | null) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    
+    set({ cyclePlaylistId: id });
+    
+    if (isTauri) {
+      try {
+        await invoke('set_cycle_playlist', { id });
+      } catch (error) {
+        console.error('Failed to set cycle playlist:', error);
+        toast.error('Failed to set cycle playlist', { description: String(error) });
+      }
+    } else {
+      if (id) {
+        localStorage.setItem('lwg_cycle_playlist', id);
+      } else {
+        localStorage.removeItem('lwg_cycle_playlist');
+      }
+    }
+  },
+
+  togglePlaylistSidebar: () => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const newOpen = !get().isPlaylistSidebarOpen;
+    set({ isPlaylistSidebarOpen: newOpen });
+    
+    if (isTauri) {
+      invoke('set_playlist_sidebar_open', { open: newOpen }).catch(console.error);
+    } else {
+      localStorage.setItem('lwg_sidebar_open', String(newOpen));
+    }
+  },
+
+  enterSelectionMode: () => {
+    set({ isSelectionMode: true, selectedForPlaylist: new Set() });
+  },
+
+  exitSelectionMode: () => {
+    set({ isSelectionMode: false, selectedForPlaylist: new Set() });
+  },
+
+  toggleSelectForPlaylist: (wallpaperId: string) => {
+    const state = get();
+    const newSet = new Set(state.selectedForPlaylist);
+    
+    if (newSet.has(wallpaperId)) {
+      newSet.delete(wallpaperId);
+    } else {
+      // 检查是否超过上限
+      if (newSet.size >= MAX_SELECTION_COUNT) {
+        toast.warning(`Maximum ${MAX_SELECTION_COUNT} wallpapers can be selected at once`);
+        return;
+      }
+      newSet.add(wallpaperId);
+    }
+    
+    set({ selectedForPlaylist: newSet });
+  },
+
+  selectAllForPlaylist: () => {
+    const state = get();
+    const visibleWallpapers = state.getFilteredWallpapers();
+    
+    // 数量限制保护
+    if (visibleWallpapers.length > MAX_SELECTION_COUNT) {
+      toast.warning(`Too many wallpapers (${visibleWallpapers.length}). Only first ${MAX_SELECTION_COUNT} will be selected.`);
+      const limited = visibleWallpapers.slice(0, MAX_SELECTION_COUNT);
+      set({ selectedForPlaylist: new Set(limited.map(w => w.id)) });
+    } else {
+      set({ selectedForPlaylist: new Set(visibleWallpapers.map(w => w.id)) });
+    }
+  },
+
+  deselectAllForPlaylist: () => {
+    set({ selectedForPlaylist: new Set() });
+  },
+
+  createPlaylistFromSelection: async (name: string) => {
+    const state = get();
+    const selectedIds = Array.from(state.selectedForPlaylist);
+    
+    if (selectedIds.length === 0) {
+      toast.warning('No wallpapers selected');
+      return;
+    }
+    
+    await get().createPlaylist(name, selectedIds);
+    
+    // 创建成功后退出选择模式
+    set({ isSelectionMode: false, selectedForPlaylist: new Set() });
+  },
+
   initApp: async () => {
     // 1. 并发加载基础数据（互不依赖，提升启动速度）
     await Promise.all([
       get().loadWallpapers(),
-      get().initializeSettings()
+      get().initializeSettings(),
+      get().loadPlaylists(),
     ]);
 
     // 2. 数据就绪后，执行初始选中逻辑
