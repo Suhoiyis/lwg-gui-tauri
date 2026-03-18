@@ -206,12 +206,12 @@ const ProcessRow: React.FC<ProcessRowProps> = memo(({ type, data, icon }) => {
                     <WallpaperPreview
                       wallpaper={firstWallpaperInfo.wallpaper || null}
                     />
-                    <div className="flex flex-col justify-center space-y-1">
+                    <div className="flex flex-col justify-center space-y-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20 hover:bg-blue-500/30">
+                        <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20 hover:bg-blue-500/30 shrink-0">
                           Wallpaper
                         </Badge>
-                        <span className="text-sm font-bold">
+                        <span className="text-sm font-bold truncate" title={firstWallpaperInfo.wallpaper?.title || undefined}>
                           {firstWallpaperInfo.wallpaper?.title
                             ? renderInlineMarkdown(
                                 firstWallpaperInfo.wallpaper.title,

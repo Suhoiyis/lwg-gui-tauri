@@ -116,8 +116,8 @@ const ScreenshotRow: React.FC<ScreenshotRowProps> = memo(({ record }) => {
       <div className="flex items-center gap-4">
         <Thumbnail wallpaperId={record.wpId} className="w-12 h-12" />
 
-        <div>
-          <div className="text-base font-bold">
+        <div className="min-w-0">
+          <div className="text-base font-bold max-w-[200px] truncate" title={displayTitle}>
             {renderInlineMarkdown(displayTitle)}
           </div>
         </div>
