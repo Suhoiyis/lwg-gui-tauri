@@ -1,5 +1,5 @@
 import React from "react";
-import { Star, Edit3 } from "lucide-react";
+import { Star, Edit3, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -59,6 +59,7 @@ export function WallpaperSidebar() {
   const toggleFavorite = useAppStore((state) => state.toggleFavorite);
 
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isIdCopied, setIsIdCopied] = React.useState(false);
 
   const handleToggleFavorite = () => {
     if (selectedWallpaper) {
@@ -68,6 +69,14 @@ export function WallpaperSidebar() {
         { description: displayName },
       );
     }
+  };
+
+  const handleCopyId = () => {
+    if (!selectedWallpaper) return;
+    navigator.clipboard.writeText(selectedWallpaper.id);
+    setIsIdCopied(true);
+    toast.success("ID copied to clipboard", { description: selectedWallpaper.id });
+    setTimeout(() => setIsIdCopied(false), 1500);
   };
 
   return (
@@ -142,8 +151,16 @@ export function WallpaperSidebar() {
                 <Badge className="bg-slate-500/20 text-slate-600 dark:text-slate-400 border-slate-500/20 hover:bg-slate-500/30 text-[10px] px-1.5 h-5">
                   {selectedWallpaper.type || "unknown"}
                 </Badge>
-                <Badge className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/30 text-[10px] px-1.5 h-5 font-mono">
+                <Badge 
+                  className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/30 text-[10px] px-1.5 h-5 font-mono cursor-pointer"
+                  onClick={handleCopyId}
+                >
                   {selectedWallpaper.id}
+                  {isIdCopied ? (
+                    <Check className="w-3 h-3 ml-1 text-green-500" />
+                  ) : (
+                    <Copy className="w-3 h-3 ml-1 opacity-50" />
+                  )}
                 </Badge>
                 <Badge className="bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/20 hover:bg-rose-500/30 text-[10px] px-1.5 h-5">
                   {selectedWallpaper.size || "0 MB"}
