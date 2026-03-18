@@ -13,6 +13,7 @@ import {
 import { EditNicknameDialog } from "@/components/dialogs/EditNicknameDialog";
 import { useAppStore } from "@/store/appStore";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 import { Wallpaper } from "@/types";
 
@@ -49,6 +50,15 @@ export const WallpaperGrid = memo(
       setEditDialogOpen(true);
     };
 
+    const handleToggleFavorite = (id: string, title: string) => {
+      const wasFavorite = favoriteIds.has(id);
+      toggleFavorite(id);
+      toast.success(
+        wasFavorite ? "Removed from favorites" : "Added to favorites",
+        { description: title }
+      );
+    };
+
     return (
       <>
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center [&>*]:w-full [&>*]:max-w-[280px]">
@@ -81,7 +91,7 @@ export const WallpaperGrid = memo(
                   <Edit3 className="mr-2 h-4 w-4" />
                   Edit Nickname
                 </ContextMenuItem>
-                <ContextMenuItem onClick={() => toggleFavorite(wp.id)}>
+                <ContextMenuItem onClick={() => handleToggleFavorite(wp.id, wp.title)}>
                   <Star className={cn(
                     "mr-2 h-4 w-4",
                     favoriteIds.has(wp.id) && "fill-yellow-500 text-yellow-500"
