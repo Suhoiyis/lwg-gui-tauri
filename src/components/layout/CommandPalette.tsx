@@ -426,19 +426,22 @@ export function CommandPalette() {
           <>
             <CommandGroup heading="Library">
               {/* Recent Wallpapers */}
-              {recentWallpapers.slice(0, 3).map((entry) => (
-                <CommandItem
-                  key={entry.id}
-                  value={`recent-${entry.id}`}
-                  onSelect={() => handleApplyWallpaper(entry.id)}
-                >
-                  <Thumbnail wallpaperId={entry.id} className="w-5 h-5 rounded" />
-                  <span className="truncate">{entry.title}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {formatTimeAgo(entry.timestamp)}
-                  </span>
-                </CommandItem>
-              ))}
+              {recentWallpapers.slice(0, 3).map((entry) => {
+                const { displayName } = getDisplayName(nicknames, entry.id, entry.title);
+                return (
+                  <CommandItem
+                    key={entry.id}
+                    value={`recent-${entry.id}`}
+                    onSelect={() => handleApplyWallpaper(entry.id)}
+                  >
+                    <Thumbnail wallpaperId={entry.id} className="w-5 h-5 rounded" />
+                    <span className="truncate">{displayName}</span>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {formatTimeAgo(entry.timestamp)}
+                    </span>
+                  </CommandItem>
+                );
+              })}
               
               {/* Favorites */}
               {favoriteIds.size > 0 && (
