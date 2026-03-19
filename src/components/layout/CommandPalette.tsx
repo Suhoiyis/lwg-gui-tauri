@@ -12,13 +12,11 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import {
-  ImageIcon,
   Activity,
   Shuffle,
   Square,
   Camera,
   RefreshCw,
-  Clock,
   Star,
   Volume2,
   Gauge,
@@ -30,6 +28,7 @@ import { getHistory } from "@/api/wallpaper";
 import { HistoryEntry } from "@/types";
 import { getDisplayName } from "@/lib/utils";
 import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
+import { Thumbnail } from "@/components/common/Thumbnail";
 
 export function CommandPalette() {
   // Local state for search query (filtering only)
@@ -211,7 +210,7 @@ export function CommandPalette() {
                   value={`recent-${entry.id}`}
                   onSelect={() => handleApplyWallpaper(entry.id)}
                 >
-                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <Thumbnail wallpaperId={entry.id} className="w-5 h-5 rounded" />
                   <span className="truncate">{entry.title}</span>
                   <span className="ml-auto text-xs text-muted-foreground">
                     {formatTimeAgo(entry.timestamp)}
@@ -263,7 +262,7 @@ export function CommandPalette() {
                   value={`${wp.title} ${wp.id} ${nicknames[wp.id] || ""}`}
                   onSelect={() => handleApplyWallpaper(wp.id)}
                 >
-                  <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                  <Thumbnail wallpaperId={wp.id} className="w-5 h-5 rounded" />
                   <span className="truncate">{displayName}</span>
                   <span className="ml-auto text-xs text-muted-foreground">
                     {wp.type}
