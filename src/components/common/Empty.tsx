@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { Ghost, Settings, ListPlus, Search } from "lucide-react";
+import { Ghost, Settings, ListPlus, Search, Star } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/appStore";
@@ -239,6 +239,52 @@ export function SearchEmptyState({ query }: { query: string }) {
             <li>Use fewer or more general terms</li>
           </ul>
         </div>
+      </EmptyContent>
+    </Empty>
+  );
+}
+
+/**
+ * FavoritesEmptyState - 收藏列表为空时显示
+ */
+export function FavoritesEmptyState() {
+  const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
+
+  const handleBrowseWallpapers = () => {
+    setActivePlaylist(null);
+  };
+
+  return (
+    <Empty>
+      <EmptyMedia>
+        <Star className="size-12 text-muted-foreground/50" />
+      </EmptyMedia>
+      <EmptyHeader>
+        <EmptyTitle>No Favorites Yet</EmptyTitle>
+        <EmptyDescription>
+          You haven't added any wallpapers to your favorites.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        {/* Instructions */}
+        <div className="text-sm text-muted-foreground space-y-1.5 text-left">
+          <p className="font-medium text-foreground">Add favorites by:</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>Browse wallpapers in the library</li>
+            <li>Click the star icon on any wallpaper</li>
+            <li>Find them here in your favorites</li>
+          </ol>
+        </div>
+
+        {/* Browse button */}
+        <Button
+          onClick={handleBrowseWallpapers}
+          size="sm"
+          className="bg-brand text-brand-foreground hover:bg-brand/90"
+        >
+          <Star className="w-4 h-4 mr-2" />
+          Browse Wallpapers
+        </Button>
       </EmptyContent>
     </Empty>
   );

@@ -15,6 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useAppStore } from "@/store/appStore";
 import { PlaylistItem } from "./PlaylistItem";
+import { FavoritesItem } from "./FavoritesItem";
 import { Accordion } from "@/components/ui/accordion";
 
 export function PlaylistList() {
@@ -47,33 +48,28 @@ export function PlaylistList() {
     }
   };
 
-  if (playlists.length === 0) {
-    return (
-      <div className="text-center py-4">
-        <p className="text-xs text-muted-foreground">No playlists yet</p>
-        <p className="text-xs text-muted-foreground mt-1">
-          Click "+ New Playlist" to create one
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-        <SortableContext
-          items={playlists.map((p) => p.id)}
-          strategy={verticalListSortingStrategy}
+    <Accordion type="multiple" className="space-y-1">
+      {/* Favorites - 固定在最上面，不可拖动 */}
+      <FavoritesItem />
+
+      {/* 用户创建的播放列表 - 可拖动排序 */}
+      {playlists.length > 0 && (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
         >
-        <Accordion type="multiple" className="space-y-1">
-          {playlists.map((playlist) => (
-            <PlaylistItem key={playlist.id} playlist={playlist} />
-          ))}
-        </Accordion>
-      </SortableContext>
-    </DndContext>
+          <SortableContext
+            items={playlists.map((p) => p.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {playlists.map((playlist) => (
+              <PlaylistItem key={playlist.id} playlist={playlist} />
+            ))}
+          </SortableContext>
+        </DndContext>
+      )}
+    </Accordion>
   );
 }

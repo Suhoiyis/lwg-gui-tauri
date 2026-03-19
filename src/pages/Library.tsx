@@ -5,7 +5,8 @@ import { toast } from "sonner";
 
 // Layout & UI Components
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EmptyState, PlaylistEmptyState, SearchEmptyState } from "@/components/common/Empty";
+import { EmptyState, PlaylistEmptyState, SearchEmptyState, FavoritesEmptyState } from "@/components/common/Empty";
+import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   AlertDialog,
@@ -217,6 +218,8 @@ export function Library() {
                         <div className="flex h-full min-h-[50vh] items-center justify-center">
                           {searchQuery ? (
                             <SearchEmptyState query={searchQuery} />
+                          ) : activePlaylistId === FAVORITES_PLAYLIST_ID ? (
+                            <FavoritesEmptyState />
                           ) : activePlaylistId ? (
                             <PlaylistEmptyState playlistName={activePlaylist?.name} />
                           ) : (

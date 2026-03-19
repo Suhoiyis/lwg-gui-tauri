@@ -775,9 +775,29 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   },
 
 getFilteredWallpapers: () => {
-    const { wallpapers, searchQuery, sortBy, nicknames, activePlaylistId, playlists } = get();
+    const { wallpapers, searchQuery, sortBy, nicknames, activePlaylistId, playlists, favoriteIds } = get();
 
-    // ===== 情况 1：查看特定 Playlist =====
+    // ===== 情况 1：Favorites 视图 =====
+    if (activePlaylistId === "__favorites__") {
+      // 从 favoriteIds 生成壁纸列表
+      const favoriteWallpapers = Array.from(favoriteIds)
+        .map(id => wallpapers.find(w => w.id === id))
+        .filter((w): w is Wallpaper => w !== undefined);
+      
+      // 搜索过滤
+      if (searchQuery) {
+        const lowerQ = searchQuery.toLowerCase();
+        return favoriteWallpapers.filter(w => 
+          (w.title || "").toLowerCase().includes(lowerQ) ||
+          w.id.includes(lowerQ) ||
+          (nicknames[w.id] || '').toLowerCase().includes(lowerQ)
+        );
+      }
+      
+      return favoriteWallpapers;
+    }
+
+    // ===== 情况 2：查看特定 Playlist =====
     if (activePlaylistId) {
       const activePlaylist = playlists.find(p => p.id === activePlaylistId);
       if (!activePlaylist) return [];
@@ -801,7 +821,7 @@ getFilteredWallpapers: () => {
       return playlistWallpapers;
     }
     
-    // ===== 情况 2：ALL 视图 =====
+    // ===== 情况 3：ALL 视图 =====
     let filtered = wallpapers;
     if (searchQuery) {
       const lowerQ = searchQuery.toLowerCase();
