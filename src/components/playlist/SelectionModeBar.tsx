@@ -1,4 +1,4 @@
-import { X, Check, CheckCheck, Plus, Trash2, ListPlus } from "lucide-react";
+import { X, Check, CheckCheck, Plus, Trash2, ListPlus, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/appStore";
@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
@@ -106,7 +107,7 @@ export function SelectionModeBar() {
           <Button
             variant="outline"
             size="sm"
-            disabled={selectedCount === 0 || playlists.length === 0}
+            disabled={selectedCount === 0}
             className="gap-1"
           >
             <ListPlus className="w-4 h-4" />
@@ -114,6 +115,20 @@ export function SelectionModeBar() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
+          {/* Favorites 选项 */}
+          <DropdownMenuItem
+            onClick={() => {
+              selectedIds.forEach((id) => toggleFavorite(id));
+              toast.success(`Added ${selectedCount} wallpaper(s) to Favorites`);
+              exitSelectionMode();
+            }}
+          >
+            <Star className="mr-2 h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="truncate">Favorites</span>
+          </DropdownMenuItem>
+          
+          {playlists.length > 0 && <DropdownMenuSeparator />}
+          
           {playlists.map((playlist) => (
             <DropdownMenuItem
               key={playlist.id}

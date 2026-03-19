@@ -18,6 +18,7 @@ import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog
 import { useAppStore } from "@/store/appStore";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 
 import { Wallpaper } from "@/types";
 
@@ -162,10 +163,24 @@ export const WallpaperGrid = memo(
                 {/* Remove from current playlist - only show when viewing a playlist */}
                 {activePlaylistId && (
                   <ContextMenuItem
-                    onClick={() => removeFromPlaylist(activePlaylistId, wp.id)}
+                    onClick={() => {
+                      if (activePlaylistId === FAVORITES_PLAYLIST_ID) {
+                        // 从 Favorites 移除 = 取消收藏
+                        const wasFavorite = favoriteIds.has(wp.id);
+                        toggleFavorite(wp.id);
+                        toast.success(
+                          wasFavorite ? "Removed from favorites" : "Added to favorites",
+                          { description: wp.title }
+                        );
+                      } else {
+                        removeFromPlaylist(activePlaylistId, wp.id);
+                      }
+                    }}
                   >
                     <Minus className="mr-2 h-4 w-4" />
-                    Remove from playlist
+                    {activePlaylistId === FAVORITES_PLAYLIST_ID
+                      ? "Remove from Favorites"
+                      : "Remove from playlist"}
                   </ContextMenuItem>
                 )}
                 
