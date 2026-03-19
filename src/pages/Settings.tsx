@@ -27,7 +27,7 @@ type SettingsTab = "playback" | "display" | "system" | "logs";
 export function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("playback");
   const {
-    settings,
+    // settings,
     saveSettings,
     flushPendingUpdates,
     restartWallpapers,

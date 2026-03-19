@@ -6,7 +6,6 @@ import {
   Image as ImageIcon,
   Trash2,
   CircleQuestionMark,
-  Layers,
   Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

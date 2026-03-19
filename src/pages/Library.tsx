@@ -89,9 +89,9 @@ export function Library() {
   );
 
   // Selection & Metadata
-  const selectedWallpaper = useMemo(() => {
-    return filteredWallpapers.find((w) => w.id === selectedId) || null;
-  }, [filteredWallpapers, selectedId]);
+  // const selectedWallpaper = useMemo(() => {
+  //   return filteredWallpapers.find((w) => w.id === selectedId) || null;
+  // }, [filteredWallpapers, selectedId]);
 
   const currentIndex = useMemo(() => {
     if (!selectedId) return 0;

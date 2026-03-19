@@ -42,7 +42,7 @@ interface UpdateInfo {
 
 export function AppMenu() {
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
-  const appVersion = useAppStore((state) => state.appVersion);
+  // const appVersion = useAppStore((state) => state.appVersion);
   const [showAbout, setShowAbout] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [showHistory, setShowHistory] = useState(false);

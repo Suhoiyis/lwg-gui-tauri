@@ -2,9 +2,6 @@
 import React, { useState, memo, useMemo } from "react";
 import {
   Activity,
-  Cpu,
-  Layout,
-  ArrowDownToLine,
   Monitor,
   Layers,
   Image as ImageIcon,
@@ -23,7 +20,6 @@ import { Wallpaper } from "@/types";
 import PerformanceChart from "./Chart";
 import { useActiveWallpapers } from "@/hooks/useActiveWallpapers";
 import { useAppStore } from "@/store/appStore";
-import { convertFileSrc } from "@tauri-apps/api/core";
 import { renderInlineMarkdown } from "@/lib/markdown";
 
 interface ProcessRowProps {
@@ -35,17 +31,6 @@ interface ProcessRowProps {
 // Small preview component for wallpaper
 const WallpaperPreview = memo(
   ({ wallpaper }: { wallpaper: Wallpaper | null }) => {
-    const previewUrl = useMemo(() => {
-      if (!wallpaper?.preview) return null;
-      if (
-        wallpaper.preview.startsWith("http://") ||
-        wallpaper.preview.startsWith("https://")
-      ) {
-        return wallpaper.preview;
-      }
-      return convertFileSrc(wallpaper.preview);
-    }, [wallpaper?.preview]);
-
     if (!wallpaper) {
       return (
         <div className="w-20 h-20 bg-muted/60 rounded-md overflow-hidden border border-border/50 shrink-0 relative">
@@ -269,8 +254,7 @@ export default function ProcessList({
 }: {
   processes: SystemStats["processes"];
 }) {
-  const { activeWallpapers } = useActiveWallpapers();
-  const hasActiveWallpaper = activeWallpapers.size > 0;
+  // const { activeWallpapers } = useActiveWallpapers();
 
   return (
     <div className="space-y-4">

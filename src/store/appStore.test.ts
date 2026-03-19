@@ -5,7 +5,7 @@ import { Wallpaper } from "../types";
 describe("appStore - getSelectedWallpaper", () => {
   beforeEach(() => {
     // Reset the store state before each test
-    const { wallpapers, selectedId } = useAppStore.getState();
+    // const { wallpapers, selectedId } = useAppStore.getState();
     useAppStore.setState({
       wallpapers: [],
       selectedId: null,

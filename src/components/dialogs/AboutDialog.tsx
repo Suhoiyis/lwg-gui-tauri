@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Github, Globe, Code2 } from "lucide-react";
+import { Github } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 
 interface AboutDialogProps {

@@ -10,18 +10,10 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  Cpu,
-  HardDrive,
   FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Button as StatefulButton } from "@/components/common/StatefulButton";
-
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/common/InputGroup";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,

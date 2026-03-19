@@ -27,5 +27,10 @@
     }
   },
   "include": ["src"],
+  "exclude": [
+    "src/components/demos/**/*",
+    "src/components/ui/resizable-navbar.tsx",
+    "src/pages/Wallpapers.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
