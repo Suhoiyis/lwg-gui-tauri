@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { Ghost, Settings } from "lucide-react";
+import { Ghost, Settings, ListPlus, Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/appStore";
@@ -106,6 +106,9 @@ export {
   EmptyMedia,
 };
 
+/**
+ * EmptyState - All Wallpapers 场景，空库时显示
+ */
 export function EmptyState() {
   const workshopPath = useAppStore((state) => state.settings?.workshopPath);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
@@ -147,6 +150,95 @@ export function EmptyState() {
           <Settings className="w-4 h-4 mr-2" />
           Configure Library Path
         </Button>
+      </EmptyContent>
+    </Empty>
+  );
+}
+
+/**
+ * PlaylistEmptyState - 播放列表为空时显示
+ */
+export function PlaylistEmptyState({ playlistName }: { playlistName?: string }) {
+  const enterSelectionMode = useAppStore((state) => state.enterSelectionMode);
+  const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
+
+  const handleAddWallpapers = () => {
+    // 先切换到 All Wallpapers，再进入选择模式
+    setActivePlaylist(null);
+    enterSelectionMode();
+  };
+
+  return (
+    <Empty>
+      <EmptyMedia>
+        <ListPlus className="size-12 text-muted-foreground/50" />
+      </EmptyMedia>
+      <EmptyHeader>
+        <EmptyTitle>This Playlist is Empty</EmptyTitle>
+        <EmptyDescription>
+          {playlistName 
+            ? `"${playlistName}" doesn't have any wallpapers yet.`
+            : "This playlist doesn't have any wallpapers yet."}
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        {/* Instructions */}
+        <div className="text-sm text-muted-foreground space-y-1.5 text-left">
+          <p className="font-medium text-foreground">Add wallpapers by:</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>Click the button below to browse all wallpapers</li>
+            <li>Select wallpapers you want to add</li>
+            <li>Click "Add to Playlist" in the toolbar</li>
+          </ol>
+        </div>
+
+        {/* Browse & Add button */}
+        <Button
+          onClick={handleAddWallpapers}
+          size="sm"
+          className="bg-brand text-brand-foreground hover:bg-brand/90"
+        >
+          <ListPlus className="w-4 h-4 mr-2" />
+          Browse & Add Wallpapers
+        </Button>
+      </EmptyContent>
+    </Empty>
+  );
+}
+
+/**
+ * SearchEmptyState - 搜索无结果时显示
+ */
+export function SearchEmptyState({ query }: { query: string }) {
+  return (
+    <Empty>
+      <EmptyMedia>
+        <Search className="size-12 text-muted-foreground/50" />
+      </EmptyMedia>
+      <EmptyHeader>
+        <EmptyTitle>No Results Found</EmptyTitle>
+        <EmptyDescription>
+          No wallpapers match your search.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        {/* Search query display */}
+        <div className="text-sm text-muted-foreground space-y-2">
+          <span className="font-medium">Search query:</span>
+          <code className="block px-3 py-2 bg-muted rounded text-xs break-all">
+            "{query}"
+          </code>
+        </div>
+
+        {/* Tips */}
+        <div className="text-xs text-muted-foreground text-left space-y-1">
+          <p className="font-medium">Tips:</p>
+          <ul className="list-disc list-inside space-y-0.5">
+            <li>Try different keywords</li>
+            <li>Check your spelling</li>
+            <li>Use fewer or more general terms</li>
+          </ul>
+        </div>
       </EmptyContent>
     </Empty>
   );

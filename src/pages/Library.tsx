@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 // Layout & UI Components
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EmptyState } from "@/components/common/Empty";
+import { EmptyState, PlaylistEmptyState, SearchEmptyState } from "@/components/common/Empty";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   AlertDialog,
@@ -48,6 +48,7 @@ export function Library() {
   const isSelectionMode = useAppStore((state) => state.isSelectionMode);
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const playlists = useAppStore((state) => state.playlists);
+  const activePlaylist = playlists.find((p) => p.id === activePlaylistId);
   const { activeWallpapers } = useActiveWallpapers();
 
   // Local State
@@ -209,14 +210,20 @@ export function Library() {
                 {/* Selection Mode Bar */}
                 {isSelectionMode && <SelectionModeBar />}
 
-                {/* Content Area */}
-                <TooltipProvider>
-                  <ScrollArea className="flex-1 w-full h-full">
-                    {filteredWallpapers.length === 0 ? (
-                      <div className="flex h-full min-h-[50vh] items-center justify-center">
-                        <EmptyState />
-                      </div>
-                    ) : (
+{/* Content Area */}
+                  <TooltipProvider>
+                    <ScrollArea className="flex-1 w-full h-full">
+                      {filteredWallpapers.length === 0 ? (
+                        <div className="flex h-full min-h-[50vh] items-center justify-center">
+                          {searchQuery ? (
+                            <SearchEmptyState query={searchQuery} />
+                          ) : activePlaylistId ? (
+                            <PlaylistEmptyState playlistName={activePlaylist?.name} />
+                          ) : (
+                            <EmptyState />
+                          )}
+                        </div>
+                      ) : (
                       <div className="px-6 pb-10">
                         <div ref={scrollTopRef} />
 
