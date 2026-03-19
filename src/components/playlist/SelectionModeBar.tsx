@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 
 export function SelectionModeBar() {
   const selectedForPlaylist = useAppStore((state) => state.selectedForPlaylist);
@@ -23,6 +24,12 @@ export function SelectionModeBar() {
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const addToPlaylist = useAppStore((state) => state.addToPlaylist);
   const removeFromPlaylist = useAppStore((state) => state.removeFromPlaylist);
+  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+
+  // 获取当前播放列表名称（包括 Favorites）
+  const activePlaylistName = activePlaylistId === FAVORITES_PLAYLIST_ID
+    ? "Favorites"
+    : playlists.find((p) => p.id === activePlaylistId)?.name;
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
@@ -41,24 +48,29 @@ export function SelectionModeBar() {
     }
   };
 
-  // 从当前播放列表移除
+  // 从当前播放列表移除（支持 Favorites）
   const handleRemoveFromPlaylist = async () => {
     if (!activePlaylistId || selectedCount === 0) return;
     
     try {
-      // 逐个移除
-      for (const wallpaperId of selectedIds) {
-        await removeFromPlaylist(activePlaylistId, wallpaperId);
+      if (activePlaylistId === FAVORITES_PLAYLIST_ID) {
+        // 从 Favorites 移除 = 取消收藏
+        for (const wallpaperId of selectedIds) {
+          toggleFavorite(wallpaperId);
+        }
+        toast.success(`Removed ${selectedCount} wallpaper(s) from Favorites`);
+      } else {
+        // 从普通播放列表移除
+        for (const wallpaperId of selectedIds) {
+          await removeFromPlaylist(activePlaylistId, wallpaperId);
+        }
+        toast.success(`Removed ${selectedCount} wallpaper(s) from playlist`);
       }
-      toast.success(`Removed ${selectedCount} wallpaper(s) from playlist`);
       exitSelectionMode();
     } catch (error) {
       // 错误已在 store 中处理
     }
   };
-
-  // 获取当前播放列表名称
-  const activePlaylist = playlists.find(p => p.id === activePlaylistId);
 
   return (
     <div className="flex items-center gap-2 px-4 py-2 bg-accent/50 border-b animate-in fade-in slide-in-from-top-2 duration-300">
@@ -126,7 +138,7 @@ export function SelectionModeBar() {
           className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
         >
           <Trash2 className="w-4 h-4" />
-          Remove from "{activePlaylist?.name}"
+          Remove from "{activePlaylistName}"
         </Button>
       )}
 
