@@ -65,7 +65,11 @@ export function Settings() {
       const fieldToTabMap: Record<string, SettingsTab> = {
         workshopPath: "system",
         assetsPath: "system",
-        // Add more field mappings as needed
+        volume: "display",
+        muteAudio: "display",
+        fps: "playback",
+        scaling: "playback",
+        clamping: "playback",
       };
 
       const targetTab = fieldToTabMap[highlightSettingField];

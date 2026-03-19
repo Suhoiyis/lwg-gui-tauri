@@ -28,6 +28,7 @@ import { useAppStore } from "@/store/appStore";
 import { getHistory } from "@/api/wallpaper";
 import { HistoryEntry } from "@/types";
 import { getDisplayName } from "@/lib/utils";
+import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 
 export function CommandPalette() {
   // Local state for search query (filtering only)
@@ -50,6 +51,7 @@ export function CommandPalette() {
   const applyRandomWallpaper = useAppStore((state) => state.applyRandomWallpaper);
   const loadWallpapers = useAppStore((state) => state.loadWallpapers);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
+  const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
   const setHighlightSettingField = useAppStore((state) => state.setHighlightSettingField);
   const setScreenshotHintActive = useAppStore((state) => state.setScreenshotHintActive);
 
@@ -115,7 +117,7 @@ export function CommandPalette() {
 
   const handleViewFavorites = () => {
     setActiveTab("wallpapers");
-    // TODO: Navigate to favorites tab
+    setActivePlaylist(FAVORITES_PLAYLIST_ID);
     setCommandPaletteOpen(false);
   };
 
@@ -211,66 +213,71 @@ export function CommandPalette() {
           </CommandGroup>
         )}
 
-        {/* Settings Group */}
-        <CommandGroup heading="Settings">
-          <CommandItem
-            value="settings-volume"
-            onSelect={() => handleSettingsNavigate("volume")}
-          >
-            <Volume2 className="h-4 w-4" />
-            <span>Volume: {settings?.volume ?? 50}%</span>
-          </CommandItem>
-          <CommandItem
-            value="settings-fps"
-            onSelect={() => handleSettingsNavigate("fps")}
-          >
-            <Gauge className="h-4 w-4" />
-            <span>FPS: {settings?.fps ?? 30}</span>
-          </CommandItem>
-          <CommandItem
-            value="settings-workshop"
-            onSelect={() => handleSettingsNavigate("workshopPath")}
-          >
-            <FolderOpen className="h-4 w-4" />
-            <span>Workshop Path</span>
-          </CommandItem>
-        </CommandGroup>
+        {/* Settings/Monitor/Quick Actions - Hide when searching */}
+        {!search && (
+          <>
+            {/* Settings Group */}
+            <CommandGroup heading="Settings">
+              <CommandItem
+                value="settings-volume"
+                onSelect={() => handleSettingsNavigate("volume")}
+              >
+                <Volume2 className="h-4 w-4" />
+                <span>Volume: {settings?.volume ?? 50}%</span>
+              </CommandItem>
+              <CommandItem
+                value="settings-fps"
+                onSelect={() => handleSettingsNavigate("fps")}
+              >
+                <Gauge className="h-4 w-4" />
+                <span>FPS: {settings?.fps ?? 30}</span>
+              </CommandItem>
+              <CommandItem
+                value="settings-workshop"
+                onSelect={() => handleSettingsNavigate("workshopPath")}
+              >
+                <FolderOpen className="h-4 w-4" />
+                <span>Workshop Path</span>
+              </CommandItem>
+            </CommandGroup>
 
-        <CommandSeparator />
+            <CommandSeparator />
 
-        {/* Monitor Group */}
-        <CommandGroup heading="Monitor">
-          <CommandItem value="monitor-open" onSelect={handleMonitorNavigate}>
-            <Activity className="h-4 w-4" />
-            <span>Open Performance Monitor</span>
-          </CommandItem>
-        </CommandGroup>
+            {/* Monitor Group */}
+            <CommandGroup heading="Monitor">
+              <CommandItem value="monitor-open" onSelect={handleMonitorNavigate}>
+                <Activity className="h-4 w-4" />
+                <span>Open Performance Monitor</span>
+              </CommandItem>
+            </CommandGroup>
 
-        <CommandSeparator />
+            <CommandSeparator />
 
-        {/* Quick Actions Group */}
-        <CommandGroup heading="Quick Actions">
-          <CommandItem value="action-random" onSelect={handleRandom}>
-            <Shuffle className="h-4 w-4" />
-            <span>Random Wallpaper</span>
-            <CommandShortcut>Ctrl+R</CommandShortcut>
-          </CommandItem>
-          <CommandItem value="action-stop" onSelect={handleStop}>
-            <Square className="h-4 w-4" />
-            <span>Stop All</span>
-            <CommandShortcut>Ctrl+S</CommandShortcut>
-          </CommandItem>
-          <CommandItem value="action-screenshot" onSelect={handleScreenshot}>
-            <Camera className="h-4 w-4" />
-            <span>Screenshot</span>
-            <CommandShortcut>Ctrl+P</CommandShortcut>
-          </CommandItem>
-          <CommandItem value="action-refresh" onSelect={handleRefresh}>
-            <RefreshCw className="h-4 w-4" />
-            <span>Refresh Library</span>
-            <CommandShortcut>Ctrl+L</CommandShortcut>
-          </CommandItem>
-        </CommandGroup>
+            {/* Quick Actions Group */}
+            <CommandGroup heading="Quick Actions">
+              <CommandItem value="action-random" onSelect={handleRandom}>
+                <Shuffle className="h-4 w-4" />
+                <span>Random Wallpaper</span>
+                <CommandShortcut>Ctrl+R</CommandShortcut>
+              </CommandItem>
+              <CommandItem value="action-stop" onSelect={handleStop}>
+                <Square className="h-4 w-4" />
+                <span>Stop All</span>
+                <CommandShortcut>Ctrl+S</CommandShortcut>
+              </CommandItem>
+              <CommandItem value="action-screenshot" onSelect={handleScreenshot}>
+                <Camera className="h-4 w-4" />
+                <span>Screenshot</span>
+                <CommandShortcut>Ctrl+P</CommandShortcut>
+              </CommandItem>
+              <CommandItem value="action-refresh" onSelect={handleRefresh}>
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh Library</span>
+                <CommandShortcut>Ctrl+L</CommandShortcut>
+              </CommandItem>
+            </CommandGroup>
+          </>
+        )}
       </CommandList>
     </CommandDialog>
   );
