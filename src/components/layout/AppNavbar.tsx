@@ -69,6 +69,9 @@ export function AppNavbar() {
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
   const toggleCompactMode = useAppStore((state) => state.toggleCompactMode);
   const selectedScreen = useAppStore((state) => state.selectedScreen);
+  
+  // ✨ Command Palette 状态
+  const setCommandPaletteOpen = useAppStore((state) => state.setCommandPaletteOpen);
 
   const getFilteredWallpapers = useAppStore(
     (state) => state.getFilteredWallpapers,
@@ -296,65 +299,31 @@ export function AppNavbar() {
 
         <Separator orientation="vertical" className="h-6 mx-2" />
 
-        <div
-          className={cn(
-            "no-drag relative flex items-center rounded-md border transition-all duration-300 ease-out overflow-hidden cursor-text",
-            isSearchActive
-              ? "flex-1 max-w-xl border-input bg-background px-3 h-9 shadow-sm" // 展开时的样式：占据空间、有边框背景
-              : "w-8 h-8 border-transparent bg-transparent px-0 hover:bg-muted/60 justify-center cursor-pointer shadow-none", // 收起时的样式：像个透明按钮
-          )}
-          onClick={() => {
-            // 点击容器的任何位置，都触发焦点
-            setIsSearchFocused(true);
-            setTimeout(() => searchInputRef.current?.focus(), 50);
-          }}
-        >
-          <Search
-            className={cn(
-              "shrink-0 transition-colors duration-300",
-              isSearchActive
-                ? "w-4 h-4 text-muted-foreground"
-                : "w-4 h-4 text-foreground",
-            )}
-          />
-
-          {/* 原生 Input，配合外层 div 模拟 Shadcn Input */}
-          <input
-            ref={searchInputRef}
-            className={cn(
-              "bg-transparent text-sm outline-none placeholder:text-muted-foreground transition-all duration-300",
-              // 宽度从 0 到 w-full 的过渡，同时带透明度渐变
-              isSearchActive
-                ? "w-full ml-2 opacity-100"
-                : "w-0 ml-0 opacity-0 pointer-events-none",
-            )}
-            placeholder="Search wallpapers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setIsSearchFocused(false)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                setSearchQuery(""); // 按 ESC 清空内容
-                searchInputRef.current?.blur(); // 失去焦点，触发折叠动画
-              }
-            }}
-          />
-
-          {/* 动态显示的 Results 数量标签 */}
-          <div
-            className={cn(
-              "transition-all duration-300 ease-out overflow-hidden whitespace-nowrap shrink-0",
-              isSearchActive && searchQuery.trim().length > 0
-                ? "max-w-[100px] opacity-100 ml-2"
-                : "max-w-0 opacity-0 ml-0",
-            )}
-          >
-            <span className="text-xs text-muted-foreground font-mono">
-              {filteredWallpapers.length} results
-            </span>
-          </div>
-        </div>
+        {/* Command Palette Trigger */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className={cn(
+                  "no-drag flex items-center gap-2 px-3 py-1.5 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer",
+                  "min-w-[200px] max-w-xs"
+                )}
+                onClick={() => setCommandPaletteOpen(true)}
+              >
+                <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+                <span className="text-sm text-muted-foreground truncate flex-1 text-left">
+                  Search...
+                </span>
+                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                  <span className="text-xs">Ctrl</span>K
+                </kbd>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Open Command Palette (Ctrl+K)</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         {/* 这是一个弹簧占位符，会把右侧的图标推到最右边 */}
         <div className="flex-1" />

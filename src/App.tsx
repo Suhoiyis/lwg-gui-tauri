@@ -12,6 +12,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 // 项目自定义组件
 import { Layout } from "./components/layout/Layout";
 import { AppNavbar } from "./components/layout/AppNavbar";
+import { CommandPalette } from "./components/layout/CommandPalette";
 
 // 页面组件
 import { Library } from "./pages/Library";
@@ -194,6 +195,7 @@ export function App() {
         >
           <CompactMode />
           <Toaster />
+          <CommandPalette />
         </motion.div>
       </TooltipProvider>
     );
@@ -256,6 +258,7 @@ export function App() {
         </Layout>
       </Tabs>
       <Toaster />
+      <CommandPalette />
     </TooltipProvider>
   );
 }
