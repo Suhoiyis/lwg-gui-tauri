@@ -47,6 +47,7 @@ export function Library() {
   const selectedScreen = useAppStore((state) => state.selectedScreen);
   const isSelectionMode = useAppStore((state) => state.isSelectionMode);
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
+  const playlists = useAppStore((state) => state.playlists);
   const { activeWallpapers } = useActiveWallpapers();
 
   // Local State
@@ -62,7 +63,7 @@ export function Library() {
 
   const filteredWallpapers = useMemo(() => {
     return useAppStore.getState().getFilteredWallpapers();
-  }, [wallpapers, searchQuery, sortBy, activePlaylistId]);
+  }, [wallpapers, searchQuery, sortBy, activePlaylistId, playlists]);
 
   useEffect(() => {
     setCurrentPage(1);

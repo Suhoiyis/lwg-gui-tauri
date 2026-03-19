@@ -47,8 +47,16 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
     isDragging,
   } = useSortable({ id: playlist.id });
 
+  // 限制拖动为垂直方向
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Transform.toString(
+      transform
+        ? {
+            ...transform,
+            x: 0, // 限制水平方向
+          }
+        : null
+    ),
     transition,
   };
 
