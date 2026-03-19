@@ -155,6 +155,37 @@ export function CommandPalette() {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
+  // ========== Playlist Display Logic ==========
+  
+  // Select playlists to display (max 3)
+  // Priority: 1) cyclePlaylistId 2) sortBy updatedAt (most recent)
+  const displayedPlaylists = useMemo(() => {
+    if (playlists.length === 0) return [];
+    
+    // 1. Find cycle playlist (if set)
+    const cyclePlaylist = cyclePlaylistId 
+      ? playlists.find(p => p.id === cyclePlaylistId) 
+      : null;
+    
+    // 2. Other playlists sorted by updatedAt (most recent first)
+    const otherPlaylists = playlists
+      .filter(p => p.id !== cyclePlaylistId)
+      .sort((a, b) => b.updatedAt - a.updatedAt);
+    
+    // 3. Combine: cycle playlist first, then recent ones
+    const result: typeof playlists = [];
+    
+    if (cyclePlaylist) {
+      result.push(cyclePlaylist);
+    }
+    
+    // Fill remaining slots (max 3 total)
+    const remaining = 3 - result.length;
+    result.push(...otherPlaylists.slice(0, remaining));
+    
+    return result;
+  }, [playlists, cyclePlaylistId]);
+
   // ========== Render ==========
 
   return (
@@ -199,8 +230,8 @@ export function CommandPalette() {
                 </CommandItem>
               )}
               
-              {/* User Playlists */}
-              {playlists.length > 0 && playlists.map((playlist) => (
+              {/* User Playlists (max 3, sorted by cycle + recent update) */}
+              {displayedPlaylists.length > 0 && displayedPlaylists.map((playlist) => (
                 <CommandItem
                   key={playlist.id}
                   value={`playlist-${playlist.id}`}
