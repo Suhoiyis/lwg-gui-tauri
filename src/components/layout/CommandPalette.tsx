@@ -29,6 +29,29 @@ import { HistoryEntry } from "@/types";
 import { getDisplayName } from "@/lib/utils";
 import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 import { Thumbnail } from "@/components/common/Thumbnail";
+import { toast } from "sonner";
+
+// Valid settings fields for navigation (type safety)
+const VALID_SETTINGS_FIELDS = [
+  "volume",
+  "fps",
+  "scaling",
+  "clamping",
+  "workshopPath",
+  "assetsPath",
+  "screenshotDelay",
+  "screenshotRes",
+  "preferXvfb",
+  "cycleEnabled",
+  "cycleInterval",
+  "cycleOrder",
+] as const;
+
+type SettingsField = (typeof VALID_SETTINGS_FIELDS)[number];
+
+function isValidSettingsField(field: string): field is SettingsField {
+  return VALID_SETTINGS_FIELDS.includes(field as SettingsField);
+}
 
 export function CommandPalette() {
   // Local state for search query (filtering only)
@@ -62,32 +85,69 @@ export function CommandPalette() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault(); // CRITICAL: Prevent browser default search behavior
-        setCommandPaletteOpen(!isCommandPaletteOpen);
+        // Use getState() to avoid stale closure
+        const currentState = useAppStore.getState().isCommandPaletteOpen;
+        setCommandPaletteOpen(!currentState);
       }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [isCommandPaletteOpen, setCommandPaletteOpen]);
+  }, [setCommandPaletteOpen]);
 
-  // Load recent wallpapers when dialog opens
+  // Load recent wallpapers when dialog opens (with race condition protection)
   useEffect(() => {
+    let ignore = false; // Prevent stale updates after unmount/close
+    
     if (isCommandPaletteOpen) {
-      getHistory().then(setRecentWallpapers);
       setSearch(""); // Clear search when opening
+      
+      getHistory()
+        .then((data) => {
+          if (!ignore) {
+            setRecentWallpapers(data);
+          }
+        })
+        .catch((error) => {
+          if (!ignore) {
+            console.error("Failed to load recent wallpapers:", error);
+            toast.error("Failed to load recent wallpapers", {
+              description: String(error),
+            });
+          }
+        });
     }
+    
+    return () => {
+      ignore = true; // Cleanup: ignore pending responses
+    };
   }, [isCommandPaletteOpen]);
 
   // ========== Action Handlers ==========
 
   const handleRandom = async () => {
-    await applyRandomWallpaper();
-    setCommandPaletteOpen(false);
+    try {
+      await applyRandomWallpaper();
+      setCommandPaletteOpen(false);
+    } catch (error) {
+      console.error("Random wallpaper failed:", error);
+      toast.error("Failed to apply random wallpaper", {
+        description: String(error),
+      });
+      // Keep palette open so user can retry
+    }
   };
 
   const handleStop = async () => {
-    await stopWallpaper();
-    setCommandPaletteOpen(false);
+    try {
+      await stopWallpaper();
+      setCommandPaletteOpen(false);
+    } catch (error) {
+      console.error("Stop wallpaper failed:", error);
+      toast.error("Failed to stop wallpaper", {
+        description: String(error),
+      });
+    }
   };
 
   const handleScreenshot = () => {
@@ -97,11 +157,22 @@ export function CommandPalette() {
   };
 
   const handleRefresh = async () => {
-    await loadWallpapers();
-    setCommandPaletteOpen(false);
+    try {
+      await loadWallpapers();
+      setCommandPaletteOpen(false);
+    } catch (error) {
+      console.error("Refresh failed:", error);
+      toast.error("Failed to refresh library", {
+        description: String(error),
+      });
+    }
   };
 
   const handleSettingsNavigate = (field: string) => {
+    if (!isValidSettingsField(field)) {
+      console.warn(`Invalid settings field: ${field}`);
+      return;
+    }
     setActiveTab("settings");
     setHighlightSettingField(field);
     setCommandPaletteOpen(false);
@@ -113,8 +184,15 @@ export function CommandPalette() {
   };
 
   const handleApplyWallpaper = async (id: string) => {
-    await applyWallpaper(id);
-    setCommandPaletteOpen(false);
+    try {
+      await applyWallpaper(id);
+      setCommandPaletteOpen(false);
+    } catch (error) {
+      console.error("Apply wallpaper failed:", error);
+      toast.error("Failed to apply wallpaper", {
+        description: String(error),
+      });
+    }
   };
 
   const handleViewFavorites = () => {

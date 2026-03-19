@@ -294,11 +294,16 @@ export function AppNavbar() {
           <Tooltip>
             <TooltipTrigger asChild>
               <button
+                type="button"
+                aria-label="Open Command Palette"
                 className={cn(
                   "no-drag flex items-center gap-2 px-3 py-1.5 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer",
                   "min-w-[200px] max-w-xs"
                 )}
-                onClick={() => setCommandPaletteOpen(true)}
+                onClick={() => {
+                  const currentState = useAppStore.getState().isCommandPaletteOpen;
+                  setCommandPaletteOpen(!currentState);
+                }}
               >
                 <Search className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span className="text-sm text-muted-foreground truncate flex-1 text-left">

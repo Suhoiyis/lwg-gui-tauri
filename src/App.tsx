@@ -195,8 +195,9 @@ export function App() {
         >
           <CompactMode />
           <Toaster />
-          <CommandPalette />
         </motion.div>
+        {/* CommandPalette rendered once outside conditional to prevent remounting */}
+        <CommandPalette />
       </TooltipProvider>
     );
   }
@@ -258,6 +259,7 @@ export function App() {
         </Layout>
       </Tabs>
       <Toaster />
+      {/* CommandPalette rendered once outside conditional to prevent remounting */}
       <CommandPalette />
     </TooltipProvider>
   );
