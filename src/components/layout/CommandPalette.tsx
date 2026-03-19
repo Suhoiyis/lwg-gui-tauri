@@ -23,6 +23,7 @@ import {
   Volume2,
   Gauge,
   FolderOpen,
+  ListMusic,
 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { getHistory } from "@/api/wallpaper";
@@ -44,6 +45,8 @@ export function CommandPalette() {
   const favoriteIds = useAppStore((state) => state.favoriteIds);
   const nicknames = useAppStore((state) => state.nicknames);
   const settings = useAppStore((state) => state.settings);
+  const playlists = useAppStore((state) => state.playlists);
+  const cyclePlaylistId = useAppStore((state) => state.cyclePlaylistId);
   
   // Store actions
   const applyWallpaper = useAppStore((state) => state.applyWallpaper);
@@ -121,6 +124,12 @@ export function CommandPalette() {
     setCommandPaletteOpen(false);
   };
 
+  const handleViewPlaylist = (playlistId: string) => {
+    setActiveTab("wallpapers");
+    setActivePlaylist(playlistId);
+    setCommandPaletteOpen(false);
+  };
+
   // ========== Computed Data ==========
 
   // Filtered wallpapers for search
@@ -164,6 +173,7 @@ export function CommandPalette() {
         {!search && (
           <>
             <CommandGroup heading="Library">
+              {/* Recent Wallpapers */}
               {recentWallpapers.slice(0, 3).map((entry) => (
                 <CommandItem
                   key={entry.id}
@@ -177,6 +187,8 @@ export function CommandPalette() {
                   </span>
                 </CommandItem>
               ))}
+              
+              {/* Favorites */}
               {favoriteIds.size > 0 && (
                 <CommandItem value="view-favorites" onSelect={handleViewFavorites}>
                   <Star className="h-4 w-4 text-yellow-500" />
@@ -186,6 +198,24 @@ export function CommandPalette() {
                   </span>
                 </CommandItem>
               )}
+              
+              {/* User Playlists */}
+              {playlists.length > 0 && playlists.map((playlist) => (
+                <CommandItem
+                  key={playlist.id}
+                  value={`playlist-${playlist.id}`}
+                  onSelect={() => handleViewPlaylist(playlist.id)}
+                >
+                  <ListMusic className="h-4 w-4 text-muted-foreground" />
+                  <span className="truncate">{playlist.name}</span>
+                  <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
+                    {cyclePlaylistId === playlist.id && (
+                      <span className="text-primary font-medium">cycle</span>
+                    )}
+                    {playlist.wallpaperIds.length} items
+                  </span>
+                </CommandItem>
+              ))}
             </CommandGroup>
             <CommandSeparator />
           </>
