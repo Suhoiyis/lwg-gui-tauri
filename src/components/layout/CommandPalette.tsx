@@ -53,6 +53,20 @@ function isValidSettingsField(field: string): field is SettingsField {
   return VALID_SETTINGS_FIELDS.includes(field as SettingsField);
 }
 
+// Token matching helper for unified search
+function matchesTokens(
+  tokens: string[],
+  fields: Array<string | null | undefined>,
+  keywords: string[] = []
+): boolean {
+  if (tokens.length === 0) return true;
+  const haystacks = [
+    ...fields.filter((f): f is string => Boolean(f)).map((f) => f.toLowerCase()),
+    ...keywords.map((k) => k.toLowerCase()),
+  ];
+  return tokens.every((tok) => haystacks.some((h) => h.includes(tok)));
+}
+
 export function CommandPalette() {
   // Local state for search query (filtering only)
   const [search, setSearch] = useState("");
@@ -209,18 +223,148 @@ export function CommandPalette() {
 
   // ========== Computed Data ==========
 
-  // Filtered wallpapers for search
+  // Search tokenization
+  const trimmedSearch = search.trim();
+  const searchTokens = useMemo(() => {
+    if (!trimmedSearch) return [];
+    return trimmedSearch
+      .toLowerCase()
+      .split(/\s+/)
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }, [trimmedSearch]);
+
+  const hasSearch = searchTokens.length > 0;
+
+  // Filtered wallpapers for search (Library group)
   const filteredWallpapers = useMemo(() => {
-    if (!search.trim()) return [];
-    const lowerSearch = search.toLowerCase();
+    if (!hasSearch) return [];
     return wallpapers
-      .filter((w) => {
-        const title = (w.title || "").toLowerCase();
-        const nick = (nicknames[w.id] || "").toLowerCase();
-        return title.includes(lowerSearch) || w.id.includes(lowerSearch) || nick.includes(lowerSearch);
-      })
-      .slice(0, 8); // Limit to 8 results
-  }, [search, wallpapers, nicknames]);
+      .filter((w) =>
+        matchesTokens(
+          searchTokens,
+          [w.title || "", w.id, nicknames[w.id] || "", w.type],
+          ["wallpaper", "library"]
+        )
+      )
+      .slice(0, 8);
+  }, [hasSearch, searchTokens, wallpapers, nicknames]);
+
+  // Filtered playlists for search (Library group)
+  const filteredPlaylists = useMemo(() => {
+    if (!hasSearch) return [];
+    return playlists
+      .filter((p) =>
+        matchesTokens(
+          searchTokens,
+          [p.name, p.id],
+          ["playlist", cyclePlaylistId === p.id ? "cycle" : ""]
+        )
+      )
+      .sort((a, b) => b.updatedAt - a.updatedAt)
+      .slice(0, 5);
+  }, [hasSearch, searchTokens, playlists, cyclePlaylistId]);
+
+  // Favorites matches search
+  const favoritesMatchesSearch = useMemo(() => {
+    if (!hasSearch) return false;
+    if (favoriteIds.size === 0) return false;
+    return matchesTokens(searchTokens, ["favorites"], ["favorite", "star", "liked"]);
+  }, [hasSearch, favoriteIds.size, searchTokens]);
+
+  // Settings nav items with keywords
+  const settingsNavItems = useMemo(
+    () => [
+      {
+        id: "settings-volume",
+        label: `Volume: ${settings?.volume ?? 50}%`,
+        field: "volume" as const,
+        keywords: ["audio", "sound", "loudness"],
+        icon: <Volume2 className="h-4 w-4 text-blue-500" />,
+      },
+      {
+        id: "settings-fps",
+        label: `FPS: ${settings?.fps ?? 30}`,
+        field: "fps" as const,
+        keywords: ["frame", "framerate", "performance"],
+        icon: <Gauge className="h-4 w-4 text-emerald-500" />,
+      },
+      {
+        id: "settings-workshop",
+        label: "Workshop Path",
+        field: "workshopPath" as const,
+        keywords: ["steam", "workshop", "path", "folder", "directory"],
+        icon: <FolderOpen className="h-4 w-4 text-amber-500" />,
+      },
+    ],
+    [settings?.volume, settings?.fps]
+  );
+
+  // Filtered settings nav items
+  const filteredSettingsNavItems = useMemo(() => {
+    if (!hasSearch) return settingsNavItems;
+    return settingsNavItems.filter((it) =>
+      matchesTokens(searchTokens, [it.id, it.label, it.field], it.keywords)
+    );
+  }, [hasSearch, searchTokens, settingsNavItems]);
+
+  // Monitor matches search
+  const monitorMatchesSearch = useMemo(() => {
+    if (!hasSearch) return true;
+    return matchesTokens(
+      searchTokens,
+      ["Open Performance Monitor", "monitor", "performance"],
+      ["cpu", "memory", "usage", "stats", "activity"]
+    );
+  }, [hasSearch, searchTokens]);
+
+  // Quick action items with keywords
+  const quickActionItems = useMemo(
+    () => [
+      {
+        id: "action-random",
+        label: "Random Wallpaper",
+        keywords: ["random", "shuffle", "lucky", "dice"],
+        icon: <Shuffle className="h-4 w-4 text-pink-500" />,
+        shortcut: "Ctrl+R",
+        onSelect: handleRandom,
+      },
+      {
+        id: "action-stop",
+        label: "Stop All",
+        keywords: ["stop", "kill", "terminate", "end"],
+        icon: <Square className="h-4 w-4 text-red-500" />,
+        shortcut: "Ctrl+S",
+        onSelect: handleStop,
+      },
+      {
+        id: "action-screenshot",
+        label: "Screenshot",
+        keywords: ["screenshot", "capture", "photo", "snap"],
+        icon: <Camera className="h-4 w-4 text-cyan-500" />,
+        shortcut: "Ctrl+P",
+        onSelect: handleScreenshot,
+      },
+      {
+        id: "action-refresh",
+        label: "Refresh Library",
+        keywords: ["refresh", "reload", "rescan", "scan"],
+        icon: <RefreshCw className="h-4 w-4 text-teal-500" />,
+        shortcut: "Ctrl+L",
+        onSelect: handleRefresh,
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  // Filtered quick action items
+  const filteredQuickActionItems = useMemo(() => {
+    if (!hasSearch) return quickActionItems;
+    return quickActionItems.filter((it) =>
+      matchesTokens(searchTokens, [it.id, it.label], it.keywords)
+    );
+  }, [hasSearch, searchTokens, quickActionItems]);
 
   // Format relative time
   const formatTimeAgo = (timestamp: string): string => {
@@ -274,11 +418,11 @@ export function CommandPalette() {
       />
       <CommandList>
         <CommandEmpty>
-          {search ? `No results for "${search}"` : "Start typing to search..."}
+          {trimmedSearch ? `No results for "${trimmedSearch}"` : "Start typing to search..."}
         </CommandEmpty>
 
         {/* Library Group - Show when no search */}
-        {!search && (
+        {!hasSearch && (
           <>
             <CommandGroup heading="Library">
               {/* Recent Wallpapers */}
@@ -329,54 +473,148 @@ export function CommandPalette() {
           </>
         )}
 
-        {/* Wallpaper Search Results - Show when search is active */}
-        {filteredWallpapers.length > 0 && (
-          <CommandGroup heading="Wallpapers">
-            {filteredWallpapers.map((wp) => {
-              const { displayName } = getDisplayName(nicknames, wp.id, wp.title);
-              return (
-                <CommandItem
-                  key={wp.id}
-                  value={`${wp.title} ${wp.id} ${nicknames[wp.id] || ""}`}
-                  onSelect={() => handleApplyWallpaper(wp.id)}
-                >
-                  <Thumbnail wallpaperId={wp.id} className="w-5 h-5 rounded" />
-                  <span className="truncate">{displayName}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {wp.type}
-                  </span>
-                </CommandItem>
-              );
-            })}
-          </CommandGroup>
-        )}
+        {/* Search Mode - Unified Groups */}
+        {hasSearch && (() => {
+          const libraryVisible =
+            filteredWallpapers.length > 0 ||
+            filteredPlaylists.length > 0 ||
+            favoritesMatchesSearch;
+          const settingsVisible = filteredSettingsNavItems.length > 0;
+          const monitorVisible = monitorMatchesSearch;
+          const actionsVisible = filteredQuickActionItems.length > 0;
 
-        {/* Settings/Monitor/Quick Actions - Hide when searching */}
-        {!search && (
+          return (
+            <>
+              {/* Library Group (Wallpapers + Playlists + Favorites) */}
+              {libraryVisible && (
+                <CommandGroup heading="Library">
+                  {filteredWallpapers.map((wp) => {
+                    const { displayName } = getDisplayName(nicknames, wp.id, wp.title);
+                    return (
+                      <CommandItem
+                        key={`lib-wp-${wp.id}`}
+                        value={`${wp.title} ${wp.id} ${nicknames[wp.id] || ""} wallpaper`}
+                        onSelect={() => handleApplyWallpaper(wp.id)}
+                      >
+                        <Thumbnail wallpaperId={wp.id} className="w-5 h-5 rounded" />
+                        <span className="truncate">{displayName}</span>
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {wp.type}
+                        </span>
+                      </CommandItem>
+                    );
+                  })}
+
+                  {filteredWallpapers.length > 0 && (favoritesMatchesSearch || filteredPlaylists.length > 0) && (
+                    <CommandSeparator />
+                  )}
+
+                  {favoritesMatchesSearch && (
+                    <CommandItem value="view-favorites-search" onSelect={handleViewFavorites}>
+                      <Star className="h-4 w-4 text-yellow-500" />
+                      <span>Favorites</span>
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        {favoriteIds.size} items
+                      </span>
+                    </CommandItem>
+                  )}
+
+                  {favoritesMatchesSearch && filteredPlaylists.length > 0 && (
+                    <CommandSeparator />
+                  )}
+
+                  {filteredPlaylists.map((playlist) => (
+                    <CommandItem
+                      key={`lib-pl-${playlist.id}`}
+                      value={`${playlist.name} playlist ${cyclePlaylistId === playlist.id ? "cycle" : ""}`}
+                      onSelect={() => handleViewPlaylist(playlist.id)}
+                    >
+                      <ListMusic className="h-4 w-4 text-violet-500" />
+                      <span className="truncate">{playlist.name}</span>
+                      <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
+                        {cyclePlaylistId === playlist.id && (
+                          <span className="text-primary font-medium">cycle</span>
+                        )}
+                        {playlist.wallpaperIds.length} items
+                      </span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+
+              {libraryVisible && (settingsVisible || monitorVisible || actionsVisible) && (
+                <CommandSeparator />
+              )}
+
+              {/* Settings Group */}
+              {settingsVisible && (
+                <CommandGroup heading="Settings">
+                  {filteredSettingsNavItems.map((it) => (
+                    <CommandItem
+                      key={it.id}
+                      value={`${it.label} ${it.field} ${it.keywords.join(" ")}`}
+                      onSelect={() => handleSettingsNavigate(it.field)}
+                    >
+                      {it.icon}
+                      <span>{it.label}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+
+              {settingsVisible && (monitorVisible || actionsVisible) && (
+                <CommandSeparator />
+              )}
+
+              {/* Monitor Group */}
+              {monitorVisible && (
+                <CommandGroup heading="Monitor">
+                  <CommandItem value="monitor-open-search" onSelect={handleMonitorNavigate}>
+                    <Activity className="h-4 w-4 text-purple-500" />
+                    <span>Open Performance Monitor</span>
+                  </CommandItem>
+                </CommandGroup>
+              )}
+
+              {monitorVisible && actionsVisible && <CommandSeparator />}
+
+              {/* Quick Actions Group */}
+              {actionsVisible && (
+                <CommandGroup heading="Quick Actions">
+                  {filteredQuickActionItems.map((it) => (
+                    <CommandItem
+                      key={it.id}
+                      value={`${it.label} ${it.keywords.join(" ")}`}
+                      onSelect={it.onSelect}
+                    >
+                      {it.icon}
+                      <span>{it.label}</span>
+                      {it.shortcut && (
+                        <CommandShortcut>{it.shortcut}</CommandShortcut>
+                      )}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </>
+          );
+        })()}
+
+        {/* Non-search mode: Settings/Monitor/Quick Actions */}
+        {!hasSearch && (
           <>
             {/* Settings Group */}
             <CommandGroup heading="Settings">
-              <CommandItem
-                value="settings-volume"
-                onSelect={() => handleSettingsNavigate("volume")}
-              >
-                <Volume2 className="h-4 w-4 text-blue-500" />
-                <span>Volume: {settings?.volume ?? 50}%</span>
-              </CommandItem>
-              <CommandItem
-                value="settings-fps"
-                onSelect={() => handleSettingsNavigate("fps")}
-              >
-                <Gauge className="h-4 w-4 text-emerald-500" />
-                <span>FPS: {settings?.fps ?? 30}</span>
-              </CommandItem>
-              <CommandItem
-                value="settings-workshop"
-                onSelect={() => handleSettingsNavigate("workshopPath")}
-              >
-                <FolderOpen className="h-4 w-4 text-amber-500" />
-                <span>Workshop Path</span>
-              </CommandItem>
+              {settingsNavItems.map((it) => (
+                <CommandItem
+                  key={it.id}
+                  value={it.id}
+                  onSelect={() => handleSettingsNavigate(it.field)}
+                >
+                  {it.icon}
+                  <span>{it.label}</span>
+                </CommandItem>
+              ))}
             </CommandGroup>
 
             <CommandSeparator />
@@ -393,26 +631,19 @@ export function CommandPalette() {
 
             {/* Quick Actions Group */}
             <CommandGroup heading="Quick Actions">
-              <CommandItem value="action-random" onSelect={handleRandom}>
-                <Shuffle className="h-4 w-4 text-pink-500" />
-                <span>Random Wallpaper</span>
-                <CommandShortcut>Ctrl+R</CommandShortcut>
-              </CommandItem>
-              <CommandItem value="action-stop" onSelect={handleStop}>
-                <Square className="h-4 w-4 text-red-500" />
-                <span>Stop All</span>
-                <CommandShortcut>Ctrl+S</CommandShortcut>
-              </CommandItem>
-              <CommandItem value="action-screenshot" onSelect={handleScreenshot}>
-                <Camera className="h-4 w-4 text-cyan-500" />
-                <span>Screenshot</span>
-                <CommandShortcut>Ctrl+P</CommandShortcut>
-              </CommandItem>
-              <CommandItem value="action-refresh" onSelect={handleRefresh}>
-                <RefreshCw className="h-4 w-4 text-teal-500" />
-                <span>Refresh Library</span>
-                <CommandShortcut>Ctrl+L</CommandShortcut>
-              </CommandItem>
+              {quickActionItems.map((it) => (
+                <CommandItem
+                  key={it.id}
+                  value={it.id}
+                  onSelect={it.onSelect}
+                >
+                  {it.icon}
+                  <span>{it.label}</span>
+                  {it.shortcut && (
+                    <CommandShortcut>{it.shortcut}</CommandShortcut>
+                  )}
+                </CommandItem>
+              ))}
             </CommandGroup>
           </>
         )}
