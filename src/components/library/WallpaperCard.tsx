@@ -120,8 +120,8 @@ export const WallpaperCard = memo(function WallpaperCard({
           }}
         />
 
-        {/* 收藏按钮 (左上) */}
-        {showIcons && (
+        {/* 收藏按钮 (左上) - 选择模式下隐藏 */}
+        {showIcons && !isSelectionMode && (
           <Tooltip>
             <TooltipTrigger asChild>
               <div
@@ -157,8 +157,8 @@ export const WallpaperCard = memo(function WallpaperCard({
           </Tooltip>
         )}
 
-        {/* 类型图标 (右上) */}
-        {showIcons && (
+        {/* 类型图标 (右上) - 选择模式下隐藏 */}
+        {showIcons && !isSelectionMode && (
           <div className="absolute top-2 right-2 z-20 bg-muted/70 backdrop-blur-md p-1.5 rounded-lg border border-border/30 shadow-sm flex items-center justify-center pointer-events-none">
             {TypeIcon}
           </div>
