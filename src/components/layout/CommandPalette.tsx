@@ -30,6 +30,10 @@ import { getDisplayName } from "@/lib/utils";
 import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 import { Thumbnail } from "@/components/common/Thumbnail";
 import { toast } from "sonner";
+import {
+  computePlaylistMatchedWallpaperCounts,
+  mergeAndRankPlaylistsForSearch,
+} from "@/lib/commandPaletteSearch";
 
 // Valid settings fields for navigation (type safety)
 const VALID_SETTINGS_FIELDS = [
@@ -250,20 +254,74 @@ export function CommandPalette() {
       .slice(0, 8);
   }, [hasSearch, searchTokens, wallpapers, nicknames]);
 
-  // Filtered playlists for search (Library group)
+  // Matched wallpaper IDs (uncapped) for playlist "contains" matching
+  const matchedWallpaperIdsForPlaylists = useMemo(() => {
+    if (!hasSearch) return new Set<string>();
+    const ids = new Set<string>();
+    for (const w of wallpapers) {
+      const hit = matchesTokens(
+        searchTokens,
+        [w.title || "", w.id, nicknames[w.id] || "", w.type],
+        ["wallpaper", "library"]
+      );
+      if (hit) ids.add(w.id);
+    }
+    return ids;
+  }, [hasSearch, searchTokens, wallpapers, nicknames]);
+
+  const playlistMatchedWallpaperCountById = useMemo(() => {
+    if (!hasSearch) return new Map<string, number>();
+    return computePlaylistMatchedWallpaperCounts(
+      playlists,
+      matchedWallpaperIdsForPlaylists
+    );
+  }, [hasSearch, playlists, matchedWallpaperIdsForPlaylists]);
+
+  const playlistsWithMatchedWallpapers = useMemo(() => {
+    if (!hasSearch) return [];
+    if (playlistMatchedWallpaperCountById.size === 0) return [];
+    return playlists
+      .filter((p) => (playlistMatchedWallpaperCountById.get(p.id) ?? 0) > 0)
+      .sort((a, b) => {
+        const ac = playlistMatchedWallpaperCountById.get(a.id) ?? 0;
+        const bc = playlistMatchedWallpaperCountById.get(b.id) ?? 0;
+        if (ac !== bc) return bc - ac;
+        return b.updatedAt - a.updatedAt;
+      });
+  }, [hasSearch, playlists, playlistMatchedWallpaperCountById]);
+
+  const nameMatchedPlaylists = useMemo(() => {
+    if (!hasSearch) return [];
+    return playlists.filter((p) =>
+      matchesTokens(
+        searchTokens,
+        [p.name, p.id],
+        ["playlist", cyclePlaylistId === p.id ? "cycle" : ""]
+      )
+    );
+  }, [hasSearch, searchTokens, playlists, cyclePlaylistId]);
+
+  // Filtered playlists for search (Library group) — merged name-match + contains-match
   const filteredPlaylists = useMemo(() => {
     if (!hasSearch) return [];
-    return playlists
-      .filter((p) =>
-        matchesTokens(
-          searchTokens,
-          [p.name, p.id],
-          ["playlist", cyclePlaylistId === p.id ? "cycle" : ""]
-        )
-      )
-      .sort((a, b) => b.updatedAt - a.updatedAt)
-      .slice(0, 5);
-  }, [hasSearch, searchTokens, playlists, cyclePlaylistId]);
+    // NOTE: playlistsWithMatchedWallpapers is computed for optional count UI and debugging;
+    // merge helper uses the shared matchedCountById map.
+    void playlistsWithMatchedWallpapers;
+    return mergeAndRankPlaylistsForSearch({
+      playlists,
+      nameMatchedPlaylists,
+      matchedCountById: playlistMatchedWallpaperCountById,
+      cyclePlaylistId,
+      limit: 5,
+    });
+  }, [
+    hasSearch,
+    playlists,
+    nameMatchedPlaylists,
+    playlistMatchedWallpaperCountById,
+    cyclePlaylistId,
+    playlistsWithMatchedWallpapers,
+  ]);
 
   // Settings nav items with keywords
   const settingsNavItems = useMemo(
@@ -518,22 +576,31 @@ export function CommandPalette() {
                   )}
 
                   {/* Other playlists */}
-                  {filteredPlaylists.map((playlist) => (
-                    <CommandItem
-                      key={`lib-pl-${playlist.id}`}
-                      value={`${playlist.name} playlist ${cyclePlaylistId === playlist.id ? "cycle" : ""}`}
-                      onSelect={() => handleViewPlaylist(playlist.id)}
-                    >
-                      <ListMusic className="h-4 w-4 text-violet-500" />
-                      <span className="truncate">{playlist.name}</span>
-                      <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
-                        {cyclePlaylistId === playlist.id && (
-                          <span className="text-primary font-medium">cycle</span>
-                        )}
-                        {playlist.wallpaperIds.length} items
-                      </span>
-                    </CommandItem>
-                  ))}
+                  {filteredPlaylists.map((playlist) => {
+                    const matchCount =
+                      playlistMatchedWallpaperCountById.get(playlist.id) ?? 0;
+                    return (
+                      <CommandItem
+                        key={`lib-pl-${playlist.id}`}
+                        value={`${playlist.name} playlist ${cyclePlaylistId === playlist.id ? "cycle" : ""}`}
+                        onSelect={() => handleViewPlaylist(playlist.id)}
+                      >
+                        <ListMusic className="h-4 w-4 text-violet-500" />
+                        <span className="truncate">{playlist.name}</span>
+                        <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
+                          {cyclePlaylistId === playlist.id && (
+                            <span className="text-primary font-medium">cycle</span>
+                          )}
+                          {matchCount > 0 && (
+                            <span>
+                              {matchCount} match{matchCount === 1 ? "" : "es"}
+                            </span>
+                          )}
+                          {playlist.wallpaperIds.length} items
+                        </span>
+                      </CommandItem>
+                    );
+                  })}
                 </CommandGroup>
               )}
 

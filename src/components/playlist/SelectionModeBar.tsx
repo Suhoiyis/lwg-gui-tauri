@@ -2,7 +2,7 @@ import { X, Check, CheckCheck, Plus, Trash2, ListPlus, Star } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/appStore";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { CreatePlaylistDialog } from "./CreatePlaylistDialog";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 export function SelectionModeBar() {
   const selectedForPlaylist = useAppStore((state) => state.selectedForPlaylist);
@@ -23,6 +24,7 @@ export function SelectionModeBar() {
   // 播放列表相关状态
   const playlists = useAppStore((state) => state.playlists);
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
+  const favoriteIds = useAppStore((state) => state.favoriteIds);
   const addToPlaylist = useAppStore((state) => state.addToPlaylist);
   const removeFromPlaylist = useAppStore((state) => state.removeFromPlaylist);
   const addToFavorites = useAppStore((state) => state.addToFavorites);
@@ -38,16 +40,17 @@ export function SelectionModeBar() {
   const selectedCount = selectedForPlaylist.size;
   const selectedIds = Array.from(selectedForPlaylist);
 
-  // 添加到指定播放列表
-  const handleAddToPlaylist = async (playlistId: string) => {
-    if (selectedCount === 0) return;
-    
-    try {
-      await addToPlaylist(playlistId, selectedIds);
-      exitSelectionMode();
-    } catch (error) {
-      // 错误已在 store 中处理
-    }
+  // 计算已收藏的数量
+  const favoritesAlreadyCount = useMemo(() => {
+    return selectedIds.filter(id => favoriteIds.has(id)).length;
+  }, [selectedIds, favoriteIds]);
+  const allInFavorites = favoritesAlreadyCount === selectedCount;
+
+  // 计算每个播放列表中已加入的数量
+  const getPlaylistAlreadyCount = (playlistId: string) => {
+    const playlist = playlists.find(p => p.id === playlistId);
+    if (!playlist) return 0;
+    return selectedIds.filter(id => playlist.wallpaperIds.includes(id)).length;
   };
 
   // 从当前播放列表移除（支持 Favorites）
@@ -117,32 +120,76 @@ export function SelectionModeBar() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           {/* Favorites 选项 */}
-          <DropdownMenuItem
-            onClick={async () => {
-              for (const id of selectedIds) {
-                await addToFavorites(id);
-              }
-              toast.success(`Added ${selectedCount} wallpaper(s) to Favorites`);
-              exitSelectionMode();
-            }}
-          >
-            <Star className="mr-2 h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="truncate">Favorites</span>
-          </DropdownMenuItem>
+          {(() => {
+            return (
+              <DropdownMenuItem
+                disabled={allInFavorites}
+                onClick={async () => {
+                  // 只添加未收藏的
+                  const toAdd = selectedIds.filter(id => !favoriteIds.has(id));
+                  for (const id of toAdd) {
+                    await addToFavorites(id);
+                  }
+                  if (toAdd.length > 0) {
+                    toast.success(`Added ${toAdd.length} wallpaper(s) to Favorites`);
+                  }
+                  exitSelectionMode();
+                }}
+              >
+                <Star className={cn(
+                  "mr-2 h-4 w-4",
+                  allInFavorites && "fill-yellow-400 text-yellow-400"
+                )} />
+                <span className={allInFavorites ? "text-muted-foreground" : ""}>Favorites</span>
+                {favoritesAlreadyCount > 0 && (
+                  <Badge variant="secondary" className="ml-auto text-[10px] px-1">
+                    {favoritesAlreadyCount}/{selectedCount}
+                  </Badge>
+                )}
+                {allInFavorites && (
+                  <Check className="ml-auto h-4 w-4 text-muted-foreground" />
+                )}
+              </DropdownMenuItem>
+            );
+          })()}
           
           {playlists.length > 0 && <DropdownMenuSeparator />}
           
-          {playlists.map((playlist) => (
-            <DropdownMenuItem
-              key={playlist.id}
-              onClick={() => handleAddToPlaylist(playlist.id)}
-            >
-              <span className="truncate">{playlist.name}</span>
-              <Badge variant="secondary" className="ml-auto text-[10px] px-1">
-                {playlist.wallpaperIds.length}
-              </Badge>
-            </DropdownMenuItem>
-          ))}
+          {playlists.map((playlist) => {
+            const alreadyCount = getPlaylistAlreadyCount(playlist.id);
+            const allInThisPlaylist = alreadyCount === selectedCount;
+            
+            return (
+              <DropdownMenuItem
+                key={playlist.id}
+                disabled={allInThisPlaylist}
+                onClick={async () => {
+                  // 只添加未加入的
+                  const toAdd = selectedIds.filter(id => !playlist.wallpaperIds.includes(id));
+                  if (toAdd.length > 0) {
+                    await addToPlaylist(playlist.id, toAdd);
+                  }
+                  exitSelectionMode();
+                }}
+              >
+                <span className={allInThisPlaylist ? "text-muted-foreground" : ""}>
+                  {playlist.name}
+                </span>
+                {alreadyCount > 0 ? (
+                  <Badge variant="secondary" className="ml-auto text-[10px] px-1">
+                    {alreadyCount}/{selectedCount}
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="ml-auto text-[10px] px-1">
+                    {playlist.wallpaperIds.length}
+                  </Badge>
+                )}
+                {allInThisPlaylist && (
+                  <Check className="ml-1 h-4 w-4 text-muted-foreground" />
+                )}
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
 

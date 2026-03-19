@@ -1,6 +1,6 @@
 // src/components/library/WallpaperGrid.tsx
 import { memo, useState } from "react";
-import { Play, Square, FolderOpen, Trash2, Edit3, Star, ListPlus, Minus } from "lucide-react";
+import { Play, Square, FolderOpen, Trash2, Edit3, Star, ListPlus, Minus, Check } from "lucide-react";
 import { WallpaperCard } from "@/components/library/WallpaperCard";
 import {
   ContextMenu,
@@ -138,22 +138,61 @@ export const WallpaperGrid = memo(
                     Add to playlist
                   </ContextMenuSubTrigger>
                   <ContextMenuSubContent className="w-48">
-                    {playlists.length > 0 ? (
-                      <>
-                        {playlists.map((playlist) => (
-                          <ContextMenuItem
-                            key={playlist.id}
-                            onClick={() => handleAddToPlaylist(playlist.id, wp.id)}
-                          >
+                    {/* Favorites 选项 */}
+                    {(() => {
+                      const isFavorite = favoriteIds.has(wp.id);
+                      return (
+                        <ContextMenuItem
+                          disabled={isFavorite}
+                          onClick={() => {
+                            if (!isFavorite) {
+                              toggleFavorite(wp.id);
+                              toast.success("Added to favorites", { description: wp.title });
+                            }
+                          }}
+                        >
+                          {isFavorite ? (
+                            <Star className="mr-2 h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          ) : (
+                            <Star className="mr-2 h-4 w-4" />
+                          )}
+                          <span className={isFavorite ? "text-muted-foreground" : ""}>Favorites</span>
+                          {isFavorite && (
+                            <Check className="ml-auto h-4 w-4 text-muted-foreground" />
+                          )}
+                        </ContextMenuItem>
+                      );
+                    })()}
+                    
+                    {playlists.length > 0 && <ContextMenuSeparator />}
+                    
+                    {/* 普通播放列表 */}
+                    {playlists.map((playlist) => {
+                      const isInPlaylist = playlist.wallpaperIds.includes(wp.id);
+                      return (
+                        <ContextMenuItem
+                          key={playlist.id}
+                          disabled={isInPlaylist}
+                          onClick={() => {
+                            if (!isInPlaylist) {
+                              handleAddToPlaylist(playlist.id, wp.id);
+                            }
+                          }}
+                        >
+                          <span className={isInPlaylist ? "text-muted-foreground" : ""}>
                             {playlist.name}
-                            <span className="ml-auto text-muted-foreground text-xs">
-                              {playlist.wallpaperIds.length}
-                            </span>
-                          </ContextMenuItem>
-                        ))}
-                        <ContextMenuSeparator />
-                      </>
-                    ) : null}
+                          </span>
+                          <span className="ml-auto text-muted-foreground text-xs">
+                            {playlist.wallpaperIds.length}
+                          </span>
+                          {isInPlaylist && (
+                            <Check className="ml-1 h-4 w-4 text-muted-foreground" />
+                          )}
+                        </ContextMenuItem>
+                      );
+                    })}
+                    
+                    <ContextMenuSeparator />
                     <ContextMenuItem onClick={() => handleCreatePlaylist(wp.id)}>
                       <span className="text-primary">+ Create new playlist</span>
                     </ContextMenuItem>

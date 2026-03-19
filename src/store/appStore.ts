@@ -1198,9 +1198,18 @@ getFilteredWallpapers: () => {
       return;
     }
     
+    // 过滤出真正新增的 ID
+    const existingIds = new Set(playlist.wallpaperIds);
+    const actuallyNewIds = newWallpaperIds.filter(id => !existingIds.has(id));
+    
+    // 如果没有新增，直接返回
+    if (actuallyNewIds.length === 0) {
+      toast.info('All selected wallpapers are already in this playlist');
+      return;
+    }
+    
     // 合并后去重
-    const mergedIds = [...playlist.wallpaperIds, ...newWallpaperIds];
-    const dedupedIds = Array.from(new Set(mergedIds));
+    const dedupedIds = [...playlist.wallpaperIds, ...actuallyNewIds];
     
     // 乐观更新
     const previousPlaylists = state.playlists;
@@ -1215,7 +1224,7 @@ getFilteredWallpapers: () => {
     if (isTauri) {
       try {
         await invoke('update_playlist', { id: playlistId, wallpaperIds: dedupedIds });
-        toast.success(`Added ${newWallpaperIds.length} wallpaper(s) to playlist`);
+        toast.success(`Added ${actuallyNewIds.length} wallpaper(s) to playlist`);
       } catch (error) {
         set({ playlists: previousPlaylists });
         console.error('Failed to add to playlist:', error);
@@ -1224,7 +1233,7 @@ getFilteredWallpapers: () => {
       }
     } else {
       localStorage.setItem('lwg_playlists', JSON.stringify(updatedPlaylists));
-      toast.success(`Added ${newWallpaperIds.length} wallpaper(s) to playlist`);
+      toast.success(`Added ${actuallyNewIds.length} wallpaper(s) to playlist`);
     }
   },
 
