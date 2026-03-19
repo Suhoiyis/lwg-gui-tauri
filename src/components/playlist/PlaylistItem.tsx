@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { GripVertical, MoreHorizontal, Pencil, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/appStore";
 import { Playlist } from "@/types";
@@ -30,6 +30,7 @@ interface PlaylistItemProps {
 export function PlaylistItem({ playlist }: PlaylistItemProps) {
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
+  const removeFromPlaylist = useAppStore((state) => state.removeFromPlaylist);
   const isActive = activePlaylistId === playlist.id;
 
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
@@ -74,6 +75,16 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
     const thumbnailSizePx = 32;
     const gapPx = 6; // matches gap-1.5
 
+    // Avoid first-render jank: until we have a real measurement, just render a small, stable set.
+    if (stripWidth <= 0) {
+      const initialShown = thumbnailIds.slice(0, Math.min(3, total));
+      return {
+        shownIds: initialShown,
+        overflow: 0,
+        overflowThumbnailId: null as string | null,
+      };
+    }
+
     // How many slots fit in one row at current width.
     const slotCount = Math.max(
       1,
@@ -107,6 +118,27 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
     };
   }, [stripWidth, thumbnailIds, total]);
 
+  const stopAccordionToggle: React.PointerEventHandler<HTMLElement> = (e) => {
+    e.stopPropagation();
+  };
+
+  const stopAccordionToggleClick: React.MouseEventHandler<HTMLElement> = (e) => {
+    e.stopPropagation();
+  };
+
+  const stopAccordionToggleKeyDown: React.KeyboardEventHandler<HTMLElement> = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  const handleRemove = (wallpaperId: string) => {
+    removeFromPlaylist(playlist.id, wallpaperId).catch((error) => {
+      console.error("Failed to remove from playlist:", error);
+    });
+  };
+
   return (
     <>
       <AccordionItem
@@ -137,21 +169,30 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
             <GripVertical className="w-3.5 h-3.5" />
           </button>
 
-          {/* Clickable/trigger area */}
-          <AccordionTrigger
-            className="flex-1 py-0 hover:no-underline"
+          {/* Selection area (does not toggle accordion) */}
+          <button
+            type="button"
+            className="flex-1 min-w-0 flex items-center gap-2 text-left"
             onClick={() => setActivePlaylist(playlist.id)}
+            aria-current={isActive ? "page" : undefined}
           >
-            <div className="flex-1 flex items-center justify-between text-left min-w-0">
-              <span className="truncate">{playlist.name}</span>
-              <Badge
-                variant="secondary"
-                className="text-[10px] px-1.5 h-4 font-normal ml-2"
-              >
-                {playlist.wallpaperIds.length}
-              </Badge>
-            </div>
-          </AccordionTrigger>
+            <span className="truncate">{playlist.name}</span>
+          </button>
+
+          {/* Right-side cluster: badge + chevron + menu (right-aligned) */}
+          <div className="ml-auto flex items-center gap-1">
+            <Badge
+              variant="secondary"
+              className="text-[10px] px-1.5 h-4 font-normal"
+            >
+              {playlist.wallpaperIds.length}
+            </Badge>
+
+            {/* Chevron-only toggle */}
+            <AccordionTrigger
+              aria-label="Toggle playlist"
+              className="py-0 px-1 hover:no-underline flex-none justify-end w-auto"
+            />
 
           {/* Context menu */}
           <DropdownMenu>
@@ -161,8 +202,9 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => e.stopPropagation()}
-                onPointerDown={(e) => e.stopPropagation()}
+                onPointerDownCapture={stopAccordionToggle}
+                onClickCapture={stopAccordionToggleClick}
+                onKeyDownCapture={stopAccordionToggleKeyDown}
               >
                 <MoreHorizontal className="w-3.5 h-3.5" />
               </Button>
@@ -182,6 +224,7 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
 
         <AccordionContent className="pt-1 pb-2 px-2">
@@ -190,12 +233,24 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
               No wallpapers in this playlist
             </div>
           ) : (
-            <div
-              ref={stripRef}
-              className="flex items-center gap-1.5 overflow-hidden min-w-0"
-            >
+            <div ref={stripRef} className="flex items-center gap-1.5 overflow-hidden min-w-0">
               {shownIds.map((id) => (
-                <Thumbnail key={id} wallpaperId={id} className="w-8 h-8" />
+                <div key={id} className="group relative w-8 h-8 shrink-0">
+                  <Thumbnail wallpaperId={id} className="w-8 h-8" />
+                  <button
+                    type="button"
+                    className="absolute top-0 right-0 h-4 w-4 rounded-sm bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    aria-label="Remove from playlist"
+                    onPointerDownCapture={stopAccordionToggle}
+                    onClickCapture={(e) => {
+                      stopAccordionToggleClick(e);
+                      handleRemove(id);
+                    }}
+                    onKeyDownCapture={stopAccordionToggleKeyDown}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
               ))}
               {overflow > 0 && overflowThumbnailId && (
                 <div className="relative w-8 h-8 shrink-0">
