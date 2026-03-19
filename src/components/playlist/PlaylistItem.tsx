@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/appStore";
 import { Playlist } from "@/types";
@@ -88,37 +88,30 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
           isDragging && "opacity-50 shadow-lg z-50"
         )}
       >
+        {/* 整个 header 区域可拖动 */}
         <div
           className={cn(
-            "group flex items-center gap-1 px-2 py-1.5 rounded-md text-sm transition-colors",
+            "group flex items-center gap-1 px-2 py-1.5 rounded-md text-sm transition-colors cursor-grab active:cursor-grabbing",
             isActive
               ? "bg-accent text-accent-foreground"
               : "hover:bg-accent/50 text-muted-foreground"
           )}
+          {...attributes}
+          {...listeners}
         >
-          {/* Drag handle */}
-          <button
-            type="button"
-            className="cursor-grab active:cursor-grabbing p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-            aria-label="Drag playlist"
-            {...attributes}
-            {...listeners}
+          {/* Playlist name - 点击选择 */}
+          <span
+            className="flex-1 min-w-0 truncate cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setActivePlaylist(playlist.id);
+            }}
           >
-            <GripVertical className="w-3.5 h-3.5" />
-          </button>
-
-          {/* Selection area (does not toggle accordion) */}
-          <button
-            type="button"
-            className="flex-1 min-w-0 flex items-center gap-2 text-left"
-            onClick={() => setActivePlaylist(playlist.id)}
-            aria-current={isActive ? "page" : undefined}
-          >
-            <span className="truncate">{playlist.name}</span>
-          </button>
+            {playlist.name}
+          </span>
 
           {/* Right-side cluster: badge + chevron + menu (right-aligned) */}
-          <div className="ml-auto flex items-center gap-1">
+          <div className="flex items-center gap-1">
             <Badge
               variant="secondary"
               className="text-[10px] px-1.5 h-4 font-normal"
@@ -132,14 +125,14 @@ export function PlaylistItem({ playlist }: PlaylistItemProps) {
               className="py-0 px-1 hover:no-underline flex-none justify-end w-auto"
             />
 
-            {/* Context menu - 使用冒泡阶段 stopPropagation */}
+            {/* Context menu - 阻止拖动 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => e.stopPropagation()}
                 >
