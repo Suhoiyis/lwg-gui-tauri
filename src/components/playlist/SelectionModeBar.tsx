@@ -25,7 +25,8 @@ export function SelectionModeBar() {
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const addToPlaylist = useAppStore((state) => state.addToPlaylist);
   const removeFromPlaylist = useAppStore((state) => state.removeFromPlaylist);
-  const toggleFavorite = useAppStore((state) => state.toggleFavorite);
+  const addToFavorites = useAppStore((state) => state.addToFavorites);
+  const removeFromFavorites = useAppStore((state) => state.removeFromFavorites);
 
   // 获取当前播放列表名称（包括 Favorites）
   const activePlaylistName = activePlaylistId === FAVORITES_PLAYLIST_ID
@@ -55,9 +56,9 @@ export function SelectionModeBar() {
     
     try {
       if (activePlaylistId === FAVORITES_PLAYLIST_ID) {
-        // 从 Favorites 移除 = 取消收藏
+        // 从 Favorites 移除 = 使用幂等的 removeFromFavorites
         for (const wallpaperId of selectedIds) {
-          toggleFavorite(wallpaperId);
+          await removeFromFavorites(wallpaperId);
         }
         toast.success(`Removed ${selectedCount} wallpaper(s) from Favorites`);
       } else {
@@ -117,8 +118,10 @@ export function SelectionModeBar() {
         <DropdownMenuContent align="end" className="w-48">
           {/* Favorites 选项 */}
           <DropdownMenuItem
-            onClick={() => {
-              selectedIds.forEach((id) => toggleFavorite(id));
+            onClick={async () => {
+              for (const id of selectedIds) {
+                await addToFavorites(id);
+              }
               toast.success(`Added ${selectedCount} wallpaper(s) to Favorites`);
               exitSelectionMode();
             }}

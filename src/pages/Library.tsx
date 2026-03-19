@@ -49,6 +49,9 @@ export function Library() {
   const isSelectionMode = useAppStore((state) => state.isSelectionMode);
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const playlists = useAppStore((state) => state.playlists);
+  // 订阅 favoriteIds 和 nicknames 以确保 memo 正确响应
+  const favoriteIds = useAppStore((state) => state.favoriteIds);
+  const nicknames = useAppStore((state) => state.nicknames);
   const activePlaylist = playlists.find((p) => p.id === activePlaylistId);
   const { activeWallpapers } = useActiveWallpapers();
 
@@ -65,11 +68,11 @@ export function Library() {
 
   const filteredWallpapers = useMemo(() => {
     return useAppStore.getState().getFilteredWallpapers();
-  }, [wallpapers, searchQuery, sortBy, activePlaylistId, playlists]);
+  }, [wallpapers, searchQuery, sortBy, activePlaylistId, playlists, favoriteIds, nicknames]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, sortBy]);
+  }, [searchQuery, sortBy, activePlaylistId]);
 
   // Pagination
   const totalItems = filteredWallpapers.length;

@@ -6,6 +6,7 @@ import { Wallpaper, AppConfig, AppState, Playlist } from "../types";
 import { scanWallpapers } from "../api/wallpaper";
 import { parseSize, normalizeType } from "../lib/utils";
 import { startCycleTimer, stopCycleTimer, setCycleScreen } from "../api/cycle";
+import { FAVORITES_PLAYLIST_ID } from "../lib/constants";
 
 // Runtime settings: require explicit Save button (backend restart needed)
 const RUNTIME_SETTINGS = new Set<keyof AppConfig>([
@@ -139,6 +140,8 @@ interface AppStoreState {
   setCommandPaletteOpen: (open: boolean) => void;
 
   toggleFavorite: (id: string) => void;
+  addToFavorites: (id: string) => void;
+  removeFromFavorites: (id: string) => void;
   isFavorite: (id: string) => boolean;
   setNickname: (id: string, nickname: string) => Promise<void>;
   getNickname: (id: string) => string | undefined;
@@ -329,6 +332,57 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
       }
     }
   },
+  
+  // 幂等添加到收藏（已收藏则无操作）
+  addToFavorites: async (id: string) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const currentFavorites = get().favoriteIds;
+    
+    // 已收藏则无操作
+    if (currentFavorites.has(id)) return;
+    
+    // 乐观更新
+    const next = new Set(currentFavorites);
+    next.add(id);
+    set({ favoriteIds: next });
+    
+    // 保存到后端
+    if (isTauri) {
+      try {
+        await invoke("toggle_favorite", { id });
+      } catch (error) {
+        console.error("Failed to add favorite:", error);
+        toast.error("Failed to add to favorites");
+        set({ favoriteIds: currentFavorites });
+      }
+    }
+  },
+  
+  // 幂等从收藏移除（未收藏则无操作）
+  removeFromFavorites: async (id: string) => {
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const currentFavorites = get().favoriteIds;
+    
+    // 未收藏则无操作
+    if (!currentFavorites.has(id)) return;
+    
+    // 乐观更新
+    const next = new Set(currentFavorites);
+    next.delete(id);
+    set({ favoriteIds: next });
+    
+    // 保存到后端
+    if (isTauri) {
+      try {
+        await invoke("toggle_favorite", { id });
+      } catch (error) {
+        console.error("Failed to remove favorite:", error);
+        toast.error("Failed to remove from favorites");
+        set({ favoriteIds: currentFavorites });
+      }
+    }
+  },
+  
   isFavorite: (id: string) => get().favoriteIds.has(id),
   setNickname: async (id: string, nickname: string) => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
@@ -790,7 +844,7 @@ getFilteredWallpapers: () => {
     const { wallpapers, searchQuery, sortBy, nicknames, activePlaylistId, playlists, favoriteIds } = get();
 
     // ===== 情况 1：Favorites 视图 =====
-    if (activePlaylistId === "__favorites__") {
+    if (activePlaylistId === FAVORITES_PLAYLIST_ID) {
       // 从 favoriteIds 生成壁纸列表
       const favoriteWallpapers = Array.from(favoriteIds)
         .map(id => wallpapers.find(w => w.id === id))
@@ -942,8 +996,16 @@ getFilteredWallpapers: () => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
     const state = get();
     
-    // 检查同名
+    // 检查空名称
     const trimmedName = name.trim().slice(0, 100);
+    if (trimmedName.length === 0) {
+      toast.error('Invalid playlist name', {
+        description: 'Playlist name cannot be empty.'
+      });
+      throw new Error('Empty playlist name');
+    }
+    
+    // 检查同名
     const existingPlaylist = state.playlists.find(
       p => p.name.toLowerCase() === trimmedName.toLowerCase()
     );
@@ -991,8 +1053,29 @@ getFilteredWallpapers: () => {
   renamePlaylist: async (id: string, name: string) => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
     
-    const previousPlaylists = get().playlists;
     const trimmedName = name.trim().slice(0, 100);
+    
+    // 检查空名称
+    if (trimmedName.length === 0) {
+      toast.error('Invalid playlist name', {
+        description: 'Playlist name cannot be empty.'
+      });
+      throw new Error('Empty playlist name');
+    }
+    
+    // 检查重名（排除自己）
+    const currentPlaylists = get().playlists;
+    const duplicate = currentPlaylists.find(
+      p => p.id !== id && p.name.toLowerCase() === trimmedName.toLowerCase()
+    );
+    if (duplicate) {
+      toast.error('Playlist name already exists', {
+        description: `A playlist named "${trimmedName}" already exists.`
+      });
+      throw new Error('Duplicate playlist name');
+    }
+    
+    const previousPlaylists = currentPlaylists;
     
     // 乐观更新
     const updatedPlaylists = previousPlaylists.map(p =>
@@ -1021,6 +1104,11 @@ getFilteredWallpapers: () => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
     const state = get();
     
+    // 保存状态以便回滚
+    const previousPlaylists = state.playlists;
+    const previousActivePlaylistId = state.activePlaylistId;
+    const previousCyclePlaylistId = state.cyclePlaylistId;
+    
     // 防御 1：如果删除的是当前正在查看的列表，退回到 ALL
     if (state.activePlaylistId === id) {
       set({ activePlaylistId: null });
@@ -1039,7 +1127,6 @@ getFilteredWallpapers: () => {
     }
     
     // 从列表中移除
-    const previousPlaylists = state.playlists;
     const newPlaylists = previousPlaylists.filter(p => p.id !== id);
     set({ playlists: newPlaylists });
     
@@ -1049,7 +1136,20 @@ getFilteredWallpapers: () => {
         await invoke('delete_playlist', { id });
         toast.success('Playlist deleted');
       } catch (error) {
-        set({ playlists: previousPlaylists });
+        // 完整回滚：恢复 playlists, activePlaylistId, cyclePlaylistId
+        set({ 
+          playlists: previousPlaylists,
+          activePlaylistId: previousActivePlaylistId,
+          cyclePlaylistId: previousCyclePlaylistId
+        });
+        // 如果之前有 cycle playlist，尝试恢复后端状态
+        if (previousCyclePlaylistId === id) {
+          try {
+            await invoke('set_cycle_playlist', { id: previousCyclePlaylistId });
+          } catch (e) {
+            console.error('Failed to restore cycle playlist:', e);
+          }
+        }
         console.error('Failed to delete playlist:', error);
         toast.error('Failed to delete playlist', { description: String(error) });
         throw error;
