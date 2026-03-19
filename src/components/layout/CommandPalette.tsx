@@ -314,7 +314,7 @@ export function CommandPalette() {
                   value={`playlist-${playlist.id}`}
                   onSelect={() => handleViewPlaylist(playlist.id)}
                 >
-                  <ListMusic className="h-4 w-4 text-muted-foreground" />
+                  <ListMusic className="h-4 w-4 text-violet-500" />
                   <span className="truncate">{playlist.name}</span>
                   <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
                     {cyclePlaylistId === playlist.id && (
@@ -360,21 +360,21 @@ export function CommandPalette() {
                 value="settings-volume"
                 onSelect={() => handleSettingsNavigate("volume")}
               >
-                <Volume2 className="h-4 w-4" />
+                <Volume2 className="h-4 w-4 text-blue-500" />
                 <span>Volume: {settings?.volume ?? 50}%</span>
               </CommandItem>
               <CommandItem
                 value="settings-fps"
                 onSelect={() => handleSettingsNavigate("fps")}
               >
-                <Gauge className="h-4 w-4" />
+                <Gauge className="h-4 w-4 text-emerald-500" />
                 <span>FPS: {settings?.fps ?? 30}</span>
               </CommandItem>
               <CommandItem
                 value="settings-workshop"
                 onSelect={() => handleSettingsNavigate("workshopPath")}
               >
-                <FolderOpen className="h-4 w-4" />
+                <FolderOpen className="h-4 w-4 text-amber-500" />
                 <span>Workshop Path</span>
               </CommandItem>
             </CommandGroup>
@@ -384,7 +384,7 @@ export function CommandPalette() {
             {/* Monitor Group */}
             <CommandGroup heading="Monitor">
               <CommandItem value="monitor-open" onSelect={handleMonitorNavigate}>
-                <Activity className="h-4 w-4" />
+                <Activity className="h-4 w-4 text-purple-500" />
                 <span>Open Performance Monitor</span>
               </CommandItem>
             </CommandGroup>
@@ -394,22 +394,22 @@ export function CommandPalette() {
             {/* Quick Actions Group */}
             <CommandGroup heading="Quick Actions">
               <CommandItem value="action-random" onSelect={handleRandom}>
-                <Shuffle className="h-4 w-4" />
+                <Shuffle className="h-4 w-4 text-pink-500" />
                 <span>Random Wallpaper</span>
                 <CommandShortcut>Ctrl+R</CommandShortcut>
               </CommandItem>
               <CommandItem value="action-stop" onSelect={handleStop}>
-                <Square className="h-4 w-4" />
+                <Square className="h-4 w-4 text-red-500" />
                 <span>Stop All</span>
                 <CommandShortcut>Ctrl+S</CommandShortcut>
               </CommandItem>
               <CommandItem value="action-screenshot" onSelect={handleScreenshot}>
-                <Camera className="h-4 w-4" />
+                <Camera className="h-4 w-4 text-cyan-500" />
                 <span>Screenshot</span>
                 <CommandShortcut>Ctrl+P</CommandShortcut>
               </CommandItem>
               <CommandItem value="action-refresh" onSelect={handleRefresh}>
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className="h-4 w-4 text-teal-500" />
                 <span>Refresh Library</span>
                 <CommandShortcut>Ctrl+L</CommandShortcut>
               </CommandItem>
