@@ -1,6 +1,6 @@
 // src/components/library/WallpaperGrid.tsx
 import { memo, useState } from "react";
-import { Play, Square, FolderOpen, Trash2, Edit3, Star, ListPlus } from "lucide-react";
+import { Play, Square, FolderOpen, Trash2, Edit3, Star, ListPlus, Minus } from "lucide-react";
 import { WallpaperCard } from "@/components/library/WallpaperCard";
 import {
   ContextMenu,
@@ -45,6 +45,9 @@ export const WallpaperGrid = memo(
     const favoriteIds = useAppStore((state) => state.favoriteIds);
     const playlists = useAppStore((state) => state.playlists);
     const addToPlaylist = useAppStore((state) => state.addToPlaylist);
+    const activePlaylistId = useAppStore((state) => state.activePlaylistId);
+    const removeFromPlaylist = useAppStore((state) => state.removeFromPlaylist);
+    const isSelectionMode = useAppStore((state) => state.isSelectionMode);
 
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editWallpaperId, setEditWallpaperId] = useState<string | null>(null);
@@ -86,7 +89,12 @@ export const WallpaperGrid = memo(
               <ContextMenuTrigger asChild>
                 <div
                   className="w-full h-full relative cursor-context-menu select-none"
-                  onDoubleClick={() => onApply(wp.id, wp.title)}
+                  onDoubleClick={() => {
+                    // 在选择模式下双击不触发 apply
+                    if (!isSelectionMode) {
+                      onApply(wp.id, wp.title);
+                    }
+                  }}
                 >
                   <WallpaperCard
                     wp={wp}
@@ -150,6 +158,16 @@ export const WallpaperGrid = memo(
                     </ContextMenuItem>
                   </ContextMenuSubContent>
                 </ContextMenuSub>
+                
+                {/* Remove from current playlist - only show when viewing a playlist */}
+                {activePlaylistId && (
+                  <ContextMenuItem
+                    onClick={() => removeFromPlaylist(activePlaylistId, wp.id)}
+                  >
+                    <Minus className="mr-2 h-4 w-4" />
+                    Remove from playlist
+                  </ContextMenuItem>
+                )}
                 
                 <ContextMenuSeparator />
                 <ContextMenuItem
