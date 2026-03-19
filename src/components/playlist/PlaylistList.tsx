@@ -64,11 +64,11 @@ export function PlaylistList() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext
-        items={playlists.map((p) => p.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        <Accordion type="single" collapsible className="space-y-1">
+        <SortableContext
+          items={playlists.map((p) => p.id)}
+          strategy={verticalListSortingStrategy}
+        >
+        <Accordion type="multiple" className="space-y-1">
           {playlists.map((playlist) => (
             <PlaylistItem key={playlist.id} playlist={playlist} />
           ))}
