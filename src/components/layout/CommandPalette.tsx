@@ -265,13 +265,6 @@ export function CommandPalette() {
       .slice(0, 5);
   }, [hasSearch, searchTokens, playlists, cyclePlaylistId]);
 
-  // Favorites matches search
-  const favoritesMatchesSearch = useMemo(() => {
-    if (!hasSearch) return false;
-    if (favoriteIds.size === 0) return false;
-    return matchesTokens(searchTokens, ["favorites"], ["favorite", "star", "liked"]);
-  }, [hasSearch, favoriteIds.size, searchTokens]);
-
   // Settings nav items with keywords
   const settingsNavItems = useMemo(
     () => [
@@ -482,7 +475,7 @@ export function CommandPalette() {
           const libraryVisible =
             filteredWallpapers.length > 0 ||
             filteredPlaylists.length > 0 ||
-            favoritesMatchesSearch;
+            favoriteIds.size > 0; // Favorites is always shown if has favorites
           const settingsVisible = filteredSettingsNavItems.length > 0;
           const monitorVisible = monitorMatchesSearch;
           const actionsVisible = filteredQuickActionItems.length > 0;
@@ -509,12 +502,12 @@ export function CommandPalette() {
                     );
                   })}
 
-                  {filteredWallpapers.length > 0 && (favoritesMatchesSearch || filteredPlaylists.length > 0) && (
+                  {filteredWallpapers.length > 0 && (favoriteIds.size > 0 || filteredPlaylists.length > 0) && (
                     <CommandSeparator />
                   )}
 
-                  {/* Favorites - first in playlists list */}
-                  {favoritesMatchesSearch && (
+                  {/* Favorites - always first in playlists list (if has favorites) */}
+                  {favoriteIds.size > 0 && (
                     <CommandItem value="view-favorites-search" onSelect={handleViewFavorites}>
                       <Star className="h-4 w-4 text-yellow-500" />
                       <span>Favorites</span>
