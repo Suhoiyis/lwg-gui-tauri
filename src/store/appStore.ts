@@ -113,6 +113,9 @@ interface AppStoreState {
   isSelectionMode: boolean;
   selectedForPlaylist: Set<string>;
 
+  // ✨✨ Command Palette 状态 ✨✨
+  isCommandPaletteOpen: boolean;
+
 
 
 
@@ -131,6 +134,9 @@ interface AppStoreState {
 
   // ✨✨ 新增：设置字段高亮方法 ✨✨
   setHighlightSettingField: (field: string | null) => void;
+
+  // ✨✨ Command Palette 方法 ✨✨
+  setCommandPaletteOpen: (open: boolean) => void;
 
   toggleFavorite: (id: string) => void;
   isFavorite: (id: string) => boolean;
@@ -234,6 +240,9 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   isSelectionMode: false,
   selectedForPlaylist: new Set<string>(),
 
+  // ✨✨ Command Palette 默认关闭 ✨✨
+  isCommandPaletteOpen: false,
+
 
   // App version action
   fetchAppVersion: async () => {
@@ -288,6 +297,9 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
       }, 3000);
     }
   },
+
+  // ✨✨ Command Palette 开关 ✨✨
+  setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
 
   // Favorites & nicknames actions
   toggleFavorite: async (id: string) => {
