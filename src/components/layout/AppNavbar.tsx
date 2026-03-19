@@ -43,7 +43,7 @@ import { ScreenSelector } from "@/components/layout/ScreenSelector";
 
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface ScreenshotResult {
@@ -65,8 +65,6 @@ export function AppNavbar() {
   // 2. 维护 Tooltip 自身的 hover 状态
   const [isHovered, setIsHovered] = useState(false);
 
-  const searchQuery = useAppStore((state) => state.searchQuery);
-  const setSearchQuery = useAppStore((state) => state.setSearchQuery);
   const toggleCompactMode = useAppStore((state) => state.toggleCompactMode);
   const selectedScreen = useAppStore((state) => state.selectedScreen);
   
@@ -79,18 +77,10 @@ export function AppNavbar() {
   const setSelectedId = useAppStore((state) => state.setSelectedId);
   const filteredWallpapers = getFilteredWallpapers();
 
-  // 搜索框的焦点状态与引用
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
   // 截图成功 Dialog 状态
   const [screenshotDialogOpen, setScreenshotDialogOpen] = useState(false);
   const [screenshotResult, setScreenshotResult] =
     useState<ScreenshotResult | null>(null);
-
-  // 判断搜索框是否应该处于"展开"状态
-  // 只要获得焦点，或者里面有字，就保持展开
-  const isSearchActive = isSearchFocused || searchQuery.trim().length > 0;
 
   const handleSwitchToCompact = async () => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;

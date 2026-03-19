@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/command";
 import {
   ImageIcon,
-  Settings,
   Activity,
   Shuffle,
   Square,
@@ -27,7 +26,7 @@ import {
 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { getHistory } from "@/api/wallpaper";
-import { HistoryEntry, Wallpaper } from "@/types";
+import { HistoryEntry } from "@/types";
 import { getDisplayName } from "@/lib/utils";
 
 export function CommandPalette() {
@@ -134,11 +133,6 @@ export function CommandPalette() {
       })
       .slice(0, 8); // Limit to 8 results
   }, [search, wallpapers, nicknames]);
-
-  // Favorite wallpapers for display
-  const favoriteWallpapers = useMemo(() => {
-    return wallpapers.filter((w) => favoriteIds.has(w.id)).slice(0, 5);
-  }, [wallpapers, favoriteIds]);
 
   // Format relative time
   const formatTimeAgo = (timestamp: string): string => {
