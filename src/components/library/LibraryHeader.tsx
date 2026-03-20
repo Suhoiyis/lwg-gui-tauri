@@ -13,6 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ArrowUpDown, CheckSquare } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 
@@ -174,18 +180,26 @@ export const LibraryHeader = memo(
       </Select>
     );
 
-    // 勾选模式按钮
+    // 勾选模式按钮（仅图标 + Tooltip）
     const selectButton = (
-      <Button
-        variant="outline"
-        size="sm"
-        className="h-7 text-xs gap-1.5"
-        onClick={enterSelectionMode}
-        disabled={isSelectionMode}
-      >
-        <CheckSquare className="h-3.5 w-3.5" />
-        <span className="hidden sm:inline">Select</span>
-      </Button>
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={enterSelectionMode}
+              disabled={isSelectionMode}
+            >
+              <CheckSquare className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <p>Select mode</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
 
     return (
