@@ -105,7 +105,7 @@ export function PlaylistSidebar() {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-6 rounded-r-md border border-l-0 bg-background hover:bg-accent"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-6 rounded-r-md border border-l-0 border-border/30 bg-background hover:bg-accent"
           onClick={toggleSidebar}
         >
           <ChevronRight className="w-4 h-4" />
