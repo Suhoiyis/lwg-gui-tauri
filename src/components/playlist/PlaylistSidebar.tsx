@@ -10,6 +10,15 @@ import { PlaylistList } from "./PlaylistList";
 import { CreatePlaylistDialog } from "./CreatePlaylistDialog";
 import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 
+// 自定义 hook：追踪上一个值
+function usePrevious<T>(value: T): T | undefined {
+  const ref = useRef<T | undefined>(undefined);
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
+
 // 生成随机但一致的颜色（基于字符串 hash）
 function generateAvatarColor(name: string): string {
   const colors = [
@@ -252,31 +261,51 @@ export function PlaylistSidebar() {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isMouseInside, setIsMouseInside] = useState(false);
   const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
-  const [isClosing, setIsClosing] = useState(false);
+  
+  // 关闭动画状态（仅在关闭到最小化时使用）
+  const [isClosingToMinimized, setIsClosingToMinimized] = useState(false);
+  
+  // 从悬浮到锁定的过渡状态
+  const [isPinning, setIsPinning] = useState(false);
+  const prevIsFloating = usePrevious(isOpen && !isPinned);
+  
+  // 检测从悬浮到锁定的转换
+  useEffect(() => {
+    const wasFloating = prevIsFloating ?? false;
+    const isNowLocked = isOpen && isPinned;
+    
+    if (wasFloating && isNowLocked) {
+      // 从悬浮切换到锁定：开始过渡
+      setIsPinning(true);
+      // 等待主容器变宽完成后结束过渡
+      const timer = setTimeout(() => {
+        setIsPinning(false);
+      }, 300); // 与主容器宽度动画时长一致
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, isPinned, prevIsFloating]);
 
-  // 关闭悬浮面板（带动画）
-  const closeFloatingPanel = useCallback(() => {
-    setIsClosing(true);
-    // 等待动画完成后再真正关闭
+  // 关闭悬浮面板到最小化（带动画）
+  const closeFloatingToMinimized = useCallback(() => {
+    setIsClosingToMinimized(true);
     setTimeout(() => {
       togglePlaylistSidebar();
-      setIsClosing(false);
-    }, 250); // 动画时长 250ms
+      setIsClosingToMinimized(false);
+    }, 250);
   }, [togglePlaylistSidebar]);
 
   // 悬浮模式：鼠标离开后延迟关闭
   useEffect(() => {
     if (isOpen && !isPinned) {
       if (!isMouseInside) {
-        // 开始关闭倒计时
         const timer = setTimeout(() => {
-          closeFloatingPanel();
-        }, 500); // 500ms 延迟
+          closeFloatingToMinimized();
+        }, 500);
         setCloseTimer(timer);
         return () => clearTimeout(timer);
       }
     }
-  }, [isOpen, isPinned, isMouseInside, closeFloatingPanel]);
+  }, [isOpen, isPinned, isMouseInside, closeFloatingToMinimized]);
 
   // 鼠标进入时取消关闭倒计时
   useEffect(() => {
@@ -297,7 +326,7 @@ export function PlaylistSidebar() {
   // 处理最小化栏的点击（打开悬浮）
   const handleExpandClick = useCallback(() => {
     openPlaylistSidebarFloating();
-    setIsMouseInside(true); // 立即标记鼠标在内部
+    setIsMouseInside(true);
   }, [openPlaylistSidebarFloating]);
 
   // FOUC prevention - show skeleton while hydrating
@@ -316,67 +345,72 @@ export function PlaylistSidebar() {
     );
   }
 
-  // 计算当前状态
-  const isExpanded = isOpen;
+// 计算当前状态
   const isFloating = isOpen && !isPinned;
+  const isLocked = isOpen && isPinned;
 
   return (
     <>
-      {/* 主容器 - 始终参与 flex 布局，占用最小化宽度 */}
+      {/* 主容器 - 始终参与 flex 布局 */}
       <div
         className={cn(
           "h-full flex flex-col bg-sidebar border-r border-border/30 shrink-0",
           "transition-all duration-300 ease-in-out",
-          // 锁定模式占用 220px，其他模式占用 48px
-          isPinned && isExpanded ? "w-[220px]" : "w-12"
+          // 锁定模式或正在 pinning 时占用 220px，其他模式占用 48px
+          (isLocked || isPinning) ? "w-[220px]" : "w-12"
         )}
       >
-        {/* 最小化/锁定模式内容 */}
-        {!isFloating && (
-          isExpanded ? (
-            <ExpandedSidebarContent 
-              onTogglePin={togglePlaylistSidebarPin} 
-              isPinned={isPinned} 
-              onClose={togglePlaylistSidebar}
-            />
-          ) : (
-            <MinimizedIcons onExpand={handleExpandClick} />
-          )
+        {/* 最小化模式内容 */}
+        {!isOpen && (
+          <MinimizedIcons onExpand={handleExpandClick} />
+        )}
+        
+        {/* 锁定模式内容（正在 pinning 时也显示，但可能被悬浮面板遮挡） */}
+        {isLocked && (
+          <ExpandedSidebarContent 
+            onTogglePin={togglePlaylistSidebarPin} 
+            isPinned={true}
+            onClose={togglePlaylistSidebar}
+          />
         )}
       </div>
 
-      {/* 悬浮模式：额外渲染一个 absolute 面板覆盖在 grid 上 */}
-      {isFloating && (
+      {/* 悬浮面板：悬浮模式 或 正在从悬浮切换到锁定时显示 */}
+      {(isFloating || isPinning) && (
         <div
           ref={sidebarRef}
           className={cn(
             "absolute left-0 top-0 h-full w-[220px] z-30",
-            "flex flex-col bg-sidebar border-r border-border/30 shadow-2xl",
-            "transition-transform duration-250 ease-in-out",
-            isClosing 
-              ? "-translate-x-full opacity-0" 
-              : "translate-x-0 opacity-100"
+            "flex flex-col bg-sidebar border-r border-border/30",
+            "transition-all duration-250 ease-in-out",
+            // 关闭到最小化：滑出 + 淡出
+            // 从悬浮到锁定：只淡出（主容器变宽时遮挡）
+            isClosingToMinimized 
+              ? "-translate-x-full opacity-0 shadow-2xl" 
+              : isPinning
+                ? "translate-x-0 opacity-0 shadow-none"  // 淡出，不滑出
+                : "translate-x-0 opacity-100 shadow-2xl"
           )}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={isFloating ? handleMouseEnter : undefined}
+          onMouseLeave={isFloating ? handleMouseLeave : undefined}
         >
           <ExpandedSidebarContent 
             onTogglePin={togglePlaylistSidebarPin} 
             isPinned={false}
-            onClose={closeFloatingPanel}
+            onClose={closeFloatingToMinimized}
           />
         </div>
       )}
 
-      {/* 悬浮模式的遮罩层（点击关闭） */}
+      {/* 悬浮模式的遮罩层（点击关闭到最小化） */}
       {isFloating && (
         <div
           className={cn(
             "absolute left-12 top-0 bottom-0 right-0 z-20 bg-black/5",
             "transition-opacity duration-200",
-            isClosing ? "opacity-0" : "opacity-100"
+            isClosingToMinimized ? "opacity-0" : "opacity-100"
           )}
-          onClick={closeFloatingPanel}
+          onClick={closeFloatingToMinimized}
         />
       )}
     </>
