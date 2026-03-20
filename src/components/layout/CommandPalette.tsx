@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -143,7 +143,7 @@ export function CommandPalette() {
 
   // ========== Action Handlers ==========
 
-  const handleRandom = async () => {
+  const handleRandom = useCallback(async () => {
     try {
       await applyRandomWallpaper();
       setCommandPaletteOpen(false);
@@ -152,11 +152,10 @@ export function CommandPalette() {
       toast.error("Failed to apply random wallpaper", {
         description: String(error),
       });
-      // Keep palette open so user can retry
     }
-  };
+  }, [applyRandomWallpaper, setCommandPaletteOpen]);
 
-  const handleStop = async () => {
+  const handleStop = useCallback(async () => {
     try {
       await stopWallpaper();
       setCommandPaletteOpen(false);
@@ -166,15 +165,15 @@ export function CommandPalette() {
         description: String(error),
       });
     }
-  };
+  }, [stopWallpaper, setCommandPaletteOpen]);
 
-  const handleScreenshot = () => {
+  const handleScreenshot = useCallback(() => {
     setActiveTab("wallpapers");
     setScreenshotHintActive(true);
     setCommandPaletteOpen(false);
-  };
+  }, [setActiveTab, setScreenshotHintActive, setCommandPaletteOpen]);
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     try {
       await loadWallpapers();
       setCommandPaletteOpen(false);
@@ -184,7 +183,7 @@ export function CommandPalette() {
         description: String(error),
       });
     }
-  };
+  }, [loadWallpapers, setCommandPaletteOpen]);
 
   const handleSettingsNavigate = (field: string) => {
     if (!isValidSettingsField(field)) {
@@ -240,33 +239,31 @@ export function CommandPalette() {
 
   const hasSearch = searchTokens.length > 0;
 
-  // Filtered wallpapers for search (Library group)
-  const filteredWallpapers = useMemo(() => {
-    if (!hasSearch) return [];
-    return wallpapers
-      .filter((w) =>
-        matchesTokens(
-          searchTokens,
-          [w.title || "", w.id, nicknames[w.id] || "", w.type],
-          ["wallpaper", "library"]
-        )
-      )
-      .slice(0, 8);
-  }, [hasSearch, searchTokens, wallpapers, nicknames]);
+  // Single-pass wallpaper matching (optimization: avoids duplicate scan)
+  const { filteredWallpapers, matchedWallpaperIdsForPlaylists } = useMemo(() => {
+    if (!hasSearch) {
+      return {
+        filteredWallpapers: [] as typeof wallpapers,
+        matchedWallpaperIdsForPlaylists: new Set<string>(),
+      };
+    }
 
-  // Matched wallpaper IDs (uncapped) for playlist "contains" matching
-  const matchedWallpaperIdsForPlaylists = useMemo(() => {
-    if (!hasSearch) return new Set<string>();
+    const filtered: typeof wallpapers = [];
     const ids = new Set<string>();
+
     for (const w of wallpapers) {
       const hit = matchesTokens(
         searchTokens,
         [w.title || "", w.id, nicknames[w.id] || "", w.type],
         ["wallpaper", "library"]
       );
-      if (hit) ids.add(w.id);
+      if (!hit) continue;
+
+      ids.add(w.id);
+      if (filtered.length < 8) filtered.push(w);
     }
-    return ids;
+
+    return { filteredWallpapers: filtered, matchedWallpaperIdsForPlaylists: ids };
   }, [hasSearch, searchTokens, wallpapers, nicknames]);
 
   const playlistMatchedWallpaperCountById = useMemo(() => {
@@ -276,19 +273,6 @@ export function CommandPalette() {
       matchedWallpaperIdsForPlaylists
     );
   }, [hasSearch, playlists, matchedWallpaperIdsForPlaylists]);
-
-  const playlistsWithMatchedWallpapers = useMemo(() => {
-    if (!hasSearch) return [];
-    if (playlistMatchedWallpaperCountById.size === 0) return [];
-    return playlists
-      .filter((p) => (playlistMatchedWallpaperCountById.get(p.id) ?? 0) > 0)
-      .sort((a, b) => {
-        const ac = playlistMatchedWallpaperCountById.get(a.id) ?? 0;
-        const bc = playlistMatchedWallpaperCountById.get(b.id) ?? 0;
-        if (ac !== bc) return bc - ac;
-        return b.updatedAt - a.updatedAt;
-      });
-  }, [hasSearch, playlists, playlistMatchedWallpaperCountById]);
 
   const nameMatchedPlaylists = useMemo(() => {
     if (!hasSearch) return [];
@@ -304,9 +288,6 @@ export function CommandPalette() {
   // Filtered playlists for search (Library group) — merged name-match + contains-match
   const filteredPlaylists = useMemo(() => {
     if (!hasSearch) return [];
-    // NOTE: playlistsWithMatchedWallpapers is computed for optional count UI and debugging;
-    // merge helper uses the shared matchedCountById map.
-    void playlistsWithMatchedWallpapers;
     return mergeAndRankPlaylistsForSearch({
       playlists,
       nameMatchedPlaylists,
@@ -314,14 +295,7 @@ export function CommandPalette() {
       cyclePlaylistId,
       limit: 5,
     });
-  }, [
-    hasSearch,
-    playlists,
-    nameMatchedPlaylists,
-    playlistMatchedWallpaperCountById,
-    cyclePlaylistId,
-    playlistsWithMatchedWallpapers,
-  ]);
+  }, [hasSearch, playlists, nameMatchedPlaylists, playlistMatchedWallpaperCountById, cyclePlaylistId]);
 
   // Settings nav items with keywords
   const settingsNavItems = useMemo(
@@ -405,8 +379,7 @@ export function CommandPalette() {
         onSelect: handleRefresh,
       },
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [handleRandom, handleStop, handleScreenshot, handleRefresh]
   );
 
   // Filtered quick action items
@@ -419,11 +392,18 @@ export function CommandPalette() {
 
   // Format relative time
   const formatTimeAgo = (timestamp: string): string => {
-    const diff = Date.now() - new Date(timestamp).getTime();
-    const minutes = Math.floor(diff / 60000);
+    const t = new Date(timestamp).getTime();
+    if (!Number.isFinite(t)) return "—";
+
+    const diffMs = Date.now() - t;
+    if (!Number.isFinite(diffMs)) return "—";
+
+    const minutes = Math.max(0, Math.floor(diffMs / 60000));
     if (minutes < 60) return `${minutes}m ago`;
+
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;
+
     return `${Math.floor(hours / 24)}d ago`;
   };
 
@@ -530,10 +510,23 @@ export function CommandPalette() {
 
         {/* Search Mode - Unified Groups */}
         {hasSearch && (() => {
+          // Favorites only shown when search matches favorites keywords
+          const favoritesVisible =
+            favoriteIds.size > 0 &&
+            matchesTokens(searchTokens, ["Favorites", "Starred"], [
+              "favorite",
+              "favorites",
+              "favourite",
+              "favourites",
+              "star",
+              "starred",
+              "liked",
+            ]);
+
           const libraryVisible =
             filteredWallpapers.length > 0 ||
             filteredPlaylists.length > 0 ||
-            favoriteIds.size > 0; // Favorites is always shown if has favorites
+            favoritesVisible;
           const settingsVisible = filteredSettingsNavItems.length > 0;
           const monitorVisible = monitorMatchesSearch;
           const actionsVisible = filteredQuickActionItems.length > 0;
@@ -560,12 +553,12 @@ export function CommandPalette() {
                     );
                   })}
 
-                  {filteredWallpapers.length > 0 && (favoriteIds.size > 0 || filteredPlaylists.length > 0) && (
+                  {filteredWallpapers.length > 0 && (favoritesVisible || filteredPlaylists.length > 0) && (
                     <CommandSeparator />
                   )}
 
-                  {/* Favorites - always first in playlists list (if has favorites) */}
-                  {favoriteIds.size > 0 && (
+                  {/* Favorites - only shown when search matches keywords */}
+                  {favoritesVisible && (
                     <CommandItem value="view-favorites-search" onSelect={handleViewFavorites}>
                       <Star className="h-4 w-4 text-yellow-500" />
                       <span>Favorites</span>

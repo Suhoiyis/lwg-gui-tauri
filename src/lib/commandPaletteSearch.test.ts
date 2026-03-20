@@ -115,4 +115,39 @@ describe("commandPaletteSearch", () => {
 
     expect(result).toHaveLength(2);
   });
+
+  it("does not throw if playlist.wallpaperIds is malformed", () => {
+    const playlists = [
+      { ...pl("bad", "Bad", ["w1"], 10), wallpaperIds: null as unknown as string[] },
+      pl("ok", "Ok", ["w2"], 20),
+    ] as Playlist[];
+
+    const matched = new Set<string>(["w2"]);
+
+    expect(() => computePlaylistMatchedWallpaperCounts(playlists, matched)).not.toThrow();
+
+    const counts = computePlaylistMatchedWallpaperCounts(playlists, matched);
+    expect(counts.get("ok")).toBe(1);
+    expect(counts.has("bad")).toBe(false);
+  });
+
+  it("uses playlist id as final tie-breaker for deterministic sort", () => {
+    const playlists: Playlist[] = [
+      pl("b", "B", ["w1"], 100),
+      pl("a", "A", ["w1"], 100),
+    ];
+
+    const result = mergeAndRankPlaylistsForSearch({
+      playlists,
+      nameMatchedPlaylists: [],
+      matchedCountById: new Map<string, number>([
+        ["a", 1],
+        ["b", 1],
+      ]),
+      cyclePlaylistId: null,
+      limit: 10,
+    });
+
+    expect(result.map((p) => p.id)).toEqual(["a", "b"]);
+  });
 });

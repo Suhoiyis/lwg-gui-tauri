@@ -9,9 +9,16 @@ export function computePlaylistMatchedWallpaperCounts(
 
   for (const p of playlists) {
     let count = 0;
-    for (const wid of p.wallpaperIds) {
+
+    // Guard against malformed wallpaperIds
+    const rawIds: unknown = (p as unknown as { wallpaperIds?: unknown }).wallpaperIds;
+    const wallpaperIds = Array.isArray(rawIds) ? rawIds : [];
+
+    for (const wid of wallpaperIds) {
+      if (typeof wid !== "string") continue;
       if (matchedWallpaperIds.has(wid)) count += 1;
     }
+
     if (count > 0) counts.set(p.id, count);
   }
 
@@ -34,7 +41,7 @@ export interface MergeAndRankPlaylistsForSearchParams {
  * - cycle playlist first (if present)
  * - name/id-matched playlists before contains-only playlists
  * - contains-only playlists ordered by matchedCount desc then updatedAt desc
- * - final fallback: updatedAt desc
+ * - final fallback: updatedAt desc, then id asc for determinism
  * - return capped by `limit`
  */
 export function mergeAndRankPlaylistsForSearch({
@@ -72,7 +79,12 @@ export function mergeAndRankPlaylistsForSearch({
       if (ac !== bc) return bc - ac;
     }
 
-    return b.updatedAt - a.updatedAt;
+    // updatedAt descending
+    const updatedAtDiff = b.updatedAt - a.updatedAt;
+    if (updatedAtDiff !== 0) return updatedAtDiff;
+
+    // Final tie-breaker: id ascending for deterministic sort
+    return a.id.localeCompare(b.id);
   });
 
   return merged.slice(0, limit);
