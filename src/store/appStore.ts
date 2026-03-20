@@ -106,6 +106,7 @@ interface AppStoreState {
   
   // Sidebar visibility
   isPlaylistSidebarOpen: boolean;
+  isPlaylistSidebarPinned: boolean; // true = locked (pushes content), false = floating (overlays content)
   
   // Hydration state (FOUC prevention)
   isHydrated: boolean;
@@ -198,6 +199,8 @@ interface AppStoreState {
   setActivePlaylist: (id: string | null) => void;
   setCyclePlaylist: (id: string | null) => Promise<void>;
   togglePlaylistSidebar: () => void;
+  togglePlaylistSidebarPin: () => void;
+  openPlaylistSidebarFloating: () => void;
   
   // Selection mode
   enterSelectionMode: () => void;
@@ -239,6 +242,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   activePlaylistId: null,
   cyclePlaylistId: null,
   isPlaylistSidebarOpen: true,
+  isPlaylistSidebarPinned: true, // 默认锁定模式
   isHydrated: false,
   isSelectionMode: false,
   selectedForPlaylist: new Set<string>(),
@@ -1308,6 +1312,16 @@ getFilteredWallpapers: () => {
     } else {
       localStorage.setItem('lwg_sidebar_open', String(newOpen));
     }
+  },
+
+  togglePlaylistSidebarPin: () => {
+    const newPinned = !get().isPlaylistSidebarPinned;
+    set({ isPlaylistSidebarPinned: newPinned });
+  },
+
+  openPlaylistSidebarFloating: () => {
+    // 打开悬浮模式（不锁定）
+    set({ isPlaylistSidebarOpen: true, isPlaylistSidebarPinned: false });
   },
 
   enterSelectionMode: () => {

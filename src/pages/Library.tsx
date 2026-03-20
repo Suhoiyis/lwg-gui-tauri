@@ -4,10 +4,11 @@ import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 // Layout & UI Components
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { EmptyState, PlaylistEmptyState, SearchEmptyState, FavoritesEmptyState } from "@/components/common/Empty";
-import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
-import { TooltipProvider } from "@/components/ui/tooltip";
+  import { ScrollArea } from "@/components/ui/scroll-area";
+  import { EmptyState, PlaylistEmptyState, SearchEmptyState, FavoritesEmptyState } from "@/components/common/Empty";
+  import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
+  import { TooltipProvider } from "@/components/ui/tooltip";
+  import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,12 +26,16 @@ import {
 } from "@/components/ui/resizable";
 
 // Custom Components
-import { LibraryHeader } from "@/components/library/LibraryHeader";
-import { WallpaperSidebar } from "@/components/library/WallpaperSidebar";
-import { WallpaperGrid } from "@/components/library/WallpaperGrid";
-import { LibraryPagination } from "@/components/library/LibraryPagination";
-import { PlaylistSidebar } from "@/components/playlist/PlaylistSidebar";
-import { SelectionModeBar } from "@/components/playlist/SelectionModeBar";
+  import { LibraryHeader } from "@/components/library/LibraryHeader";
+  import { WallpaperSidebar } from "@/components/library/WallpaperSidebar";
+  import { WallpaperGrid } from "@/components/library/WallpaperGrid";
+  import { LibraryPagination } from "@/components/library/LibraryPagination";
+  import { PlaylistSidebar } from "@/components/playlist/PlaylistSidebar";
+  import { SelectionModeBar } from "@/components/playlist/SelectionModeBar";
+  
+  // Sidebar state for layout calculation
+  const isPlaylistSidebarOpen = useAppStore((state) => state.isPlaylistSidebarOpen);
+  const isPlaylistSidebarPinned = useAppStore((state) => state.isPlaylistSidebarPinned);
 
 // State & API
 import { useAppStore } from "@/store/appStore";
@@ -185,11 +190,16 @@ export function Library() {
   return (
     <div className="h-full w-full overflow-hidden relative">
       <div className="flex h-full">
-        {/* Playlist Sidebar (left side, fixed width) */}
+        {/* Playlist Sidebar - handles minimized/floating/locked states internally */}
         <PlaylistSidebar />
 
-        {/* Main Content Area */}
-        <div className="flex-1 h-full overflow-hidden">
+        {/* Main Content Area - full width when floating, otherwise fills remaining space */}
+        <div className={cn(
+          "h-full overflow-hidden",
+          // When sidebar is floating or minimized, main content takes full width
+          // When sidebar is locked (pinned and open), flex-1 will be set by the sidebar's width
+          (!isPlaylistSidebarOpen || !isPlaylistSidebarPinned) ? "flex-1" : "flex-1"
+        )}>
           <ResizablePanelGroup
             orientation="horizontal"
             className="h-full w-full rounded-lg"
