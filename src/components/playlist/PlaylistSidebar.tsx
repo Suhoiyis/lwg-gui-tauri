@@ -39,42 +39,41 @@ function getInitial(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-// ===== 最小化图标条组件 =====
-function MinimizedBar() {
+// ===== 最小化图标条 =====
+function MinimizedIcons({ onExpand }: { onExpand: () => void }) {
   const playlists = useAppStore((state) => state.playlists);
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
-  const openPlaylistSidebarFloating = useAppStore((state) => state.openPlaylistSidebarFloating);
   const favoriteIds = useAppStore((state) => state.favoriteIds);
   
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   return (
-    <div className="w-12 h-full flex flex-col bg-sidebar border-r border-border/30 items-center py-2">
-      {/* 展开/锁定按钮 */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 shrink-0"
-        onClick={openPlaylistSidebarFloating}
-        title="Open sidebar"
-      >
-        <ChevronRight className="w-4 h-4" />
-      </Button>
+    <>
+      {/* 展开/悬浮按钮 */}
+      <div className="shrink-0 px-1.5 pt-2">
+        <button
+          onClick={onExpand}
+          className="w-9 h-9 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+          title="Open sidebar (floating)"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
 
-      <Separator className="my-2 w-6" />
+      <Separator className="my-2 mx-2 w-8" />
 
       {/* 内容区域 */}
-      <ScrollArea className="flex-1 w-full">
-        <div className="flex flex-col items-center gap-1 px-1">
+      <ScrollArea className="flex-1">
+        <div className="flex flex-col items-center gap-1 px-1.5 py-1">
           {/* All Wallpapers */}
           <button
             onClick={() => setActivePlaylist(null)}
             className={cn(
-              "w-9 h-9 rounded-md flex items-center justify-center transition-colors",
+              "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
               !activePlaylistId
-                ? "bg-accent text-accent-foreground"
-                : "hover:bg-accent/50 text-muted-foreground"
+                ? "bg-accent text-accent-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
             )}
             title="All Wallpapers"
           >
@@ -85,20 +84,20 @@ function MinimizedBar() {
           <button
             onClick={() => setActivePlaylist(FAVORITES_PLAYLIST_ID)}
             className={cn(
-              "w-9 h-9 rounded-md flex items-center justify-center transition-colors",
+              "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
               activePlaylistId === FAVORITES_PLAYLIST_ID
-                ? "bg-brand text-brand-foreground"
-                : "hover:bg-accent/50 text-muted-foreground"
+                ? "bg-brand text-brand-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
             )}
             title={`Favorites (${favoriteIds.size})`}
           >
             <Star className={cn(
-              "w-4 h-4",
-              activePlaylistId === FAVORITES_PLAYLIST_ID && "fill-current"
+              "w-4 h-4 transition-transform duration-200",
+              activePlaylistId === FAVORITES_PLAYLIST_ID && "fill-current scale-110"
             )} />
           </button>
 
-          <Separator className="my-1 w-6" />
+          <Separator className="my-1 w-8" />
 
           {/* Playlists */}
           {playlists.map((playlist) => (
@@ -106,16 +105,17 @@ function MinimizedBar() {
               key={playlist.id}
               onClick={() => setActivePlaylist(playlist.id)}
               className={cn(
-                "w-9 h-9 rounded-md flex items-center justify-center text-sm font-semibold transition-colors",
+                "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
                 activePlaylistId === playlist.id
-                  ? "bg-accent text-accent-foreground"
-                  : "hover:bg-accent/50 text-muted-foreground"
+                  ? "ring-2 ring-accent ring-offset-1 ring-offset-sidebar"
+                  : "hover:scale-105"
               )}
               title={playlist.name}
             >
               <span className={cn(
-                "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold text-white",
-                generateAvatarColor(playlist.name)
+                "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold text-white transition-transform duration-200",
+                generateAvatarColor(playlist.name),
+                activePlaylistId === playlist.id && "scale-110"
               )}>
                 {getInitial(playlist.name)}
               </span>
@@ -125,27 +125,29 @@ function MinimizedBar() {
       </ScrollArea>
 
       {/* 新建播放列表 */}
-      <Separator className="my-2 w-6" />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 shrink-0"
-        onClick={() => setIsCreateDialogOpen(true)}
-        title="New Playlist"
-      >
-        <Plus className="w-4 h-4" />
-      </Button>
+      <Separator className="my-2 mx-2 w-8" />
+      <div className="shrink-0 px-1.5 pb-2">
+        <button
+          onClick={() => setIsCreateDialogOpen(true)}
+          className="w-9 h-9 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+          title="New Playlist"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+      </div>
 
       <CreatePlaylistDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
       />
-    </div>
+    </>
   );
 }
 
 // ===== 展开的侧栏内容 =====
 function ExpandedSidebarContent({ onTogglePin, isPinned }: { onTogglePin: () => void; isPinned: boolean }) {
+  const activePlaylistId = useAppStore((state) => state.activePlaylistId);
+  const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   return (
@@ -156,29 +158,37 @@ function ExpandedSidebarContent({ onTogglePin, isPinned }: { onTogglePin: () => 
           <ListMusic className="w-4 h-4 text-muted-foreground" />
           <span className="font-semibold text-sm">Playlists</span>
         </div>
-        <div className="flex items-center gap-1">
-          {/* Pin 按钮 */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={onTogglePin}
-            title={isPinned ? "Unpin (floating mode)" : "Pin (locked mode)"}
-          >
-            {isPinned ? (
-              <PinOff className="w-3.5 h-3.5" />
-            ) : (
-              <Pin className="w-3.5 h-3.5" />
-            )}
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 transition-transform duration-200 hover:scale-110"
+          onClick={onTogglePin}
+          title={isPinned ? "Unpin (floating mode)" : "Pin (locked mode)"}
+        >
+          {isPinned ? (
+            <PinOff className="w-4 h-4" />
+          ) : (
+            <Pin className="w-4 h-4" />
+          )}
+        </Button>
       </div>
 
       {/* Content */}
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
           {/* ALL item */}
-          <AllWallpapersItem />
+          <button
+            onClick={() => setActivePlaylist(null)}
+            className={cn(
+              "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-all duration-200",
+              !activePlaylistId
+                ? "bg-accent text-accent-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+            )}
+          >
+            <ListMusic className="w-4 h-4" />
+            <span>All Wallpapers</span>
+          </button>
 
           <Separator className="my-2" />
 
@@ -192,7 +202,7 @@ function ExpandedSidebarContent({ onTogglePin, isPinned }: { onTogglePin: () => 
         <Button
           variant="outline"
           size="sm"
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 transition-all duration-200 hover:translate-x-0.5"
           onClick={() => setIsCreateDialogOpen(true)}
         >
           <Plus className="w-4 h-4" />
@@ -208,27 +218,6 @@ function ExpandedSidebarContent({ onTogglePin, isPinned }: { onTogglePin: () => 
   );
 }
 
-// ===== All Wallpapers 按钮 =====
-function AllWallpapersItem() {
-  const activePlaylistId = useAppStore((state) => state.activePlaylistId);
-  const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
-
-  return (
-    <button
-      onClick={() => setActivePlaylist(null)}
-      className={cn(
-        "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-        !activePlaylistId
-          ? "bg-accent text-accent-foreground"
-          : "hover:bg-accent/50 text-muted-foreground"
-      )}
-    >
-      <ListMusic className="w-4 h-4" />
-      <span>All Wallpapers</span>
-    </button>
-  );
-}
-
 // ===== 主组件 =====
 export function PlaylistSidebar() {
   const isHydrated = useAppStore((state) => state.isHydrated);
@@ -236,24 +225,34 @@ export function PlaylistSidebar() {
   const isPinned = useAppStore((state) => state.isPlaylistSidebarPinned);
   const togglePlaylistSidebar = useAppStore((state) => state.togglePlaylistSidebar);
   const togglePlaylistSidebarPin = useAppStore((state) => state.togglePlaylistSidebarPin);
+  const openPlaylistSidebarFloating = useAppStore((state) => state.openPlaylistSidebarFloating);
 
-  // 悬浮模式的鼠标离开检测
+  // 悬浮模式的鼠标检测
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isMouseInside, setIsMouseInside] = useState(false);
+  const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
 
-  // 悬浮模式：鼠标离开后关闭
+  // 悬浮模式：鼠标离开后延迟关闭
   useEffect(() => {
     if (isOpen && !isPinned) {
-      // 悬浮模式
-      const timer = setTimeout(() => {
-        if (!isMouseInside) {
+      if (!isMouseInside) {
+        // 开始关闭倒计时
+        const timer = setTimeout(() => {
           togglePlaylistSidebar();
-        }
-      }, 300); // 300ms 延迟
-
-      return () => clearTimeout(timer);
+        }, 500); // 500ms 延迟
+        setCloseTimer(timer);
+        return () => clearTimeout(timer);
+      }
     }
   }, [isOpen, isPinned, isMouseInside, togglePlaylistSidebar]);
+
+  // 鼠标进入时取消关闭倒计时
+  useEffect(() => {
+    if (isMouseInside && closeTimer) {
+      clearTimeout(closeTimer);
+      setCloseTimer(null);
+    }
+  }, [isMouseInside, closeTimer]);
 
   const handleMouseEnter = useCallback(() => {
     setIsMouseInside(true);
@@ -262,6 +261,12 @@ export function PlaylistSidebar() {
   const handleMouseLeave = useCallback(() => {
     setIsMouseInside(false);
   }, []);
+
+  // 处理最小化栏的点击（打开悬浮）
+  const handleExpandClick = useCallback(() => {
+    openPlaylistSidebarFloating();
+    setIsMouseInside(true); // 立即标记鼠标在内部
+  }, [openPlaylistSidebarFloating]);
 
   // FOUC prevention - show skeleton while hydrating
   if (!isHydrated) {
@@ -279,29 +284,55 @@ export function PlaylistSidebar() {
     );
   }
 
-  // 最小化状态
-  if (!isOpen) {
-    return <MinimizedBar />;
-  }
+  // 计算当前状态
+  const isExpanded = isOpen;
+  const isFloating = isOpen && !isPinned;
+  const isMinimized = !isOpen;
 
-  // 锁定模式：正常布局，挤压内容
-  if (isPinned) {
-    return (
-      <div className="w-[220px] h-full flex flex-col bg-sidebar border-r border-border/30 transition-all duration-200">
-        <ExpandedSidebarContent onTogglePin={togglePlaylistSidebarPin} isPinned={true} />
-      </div>
-    );
-  }
-
-  // 悬浮模式：绝对定位，覆盖内容
   return (
-    <div
-      ref={sidebarRef}
-      className="absolute left-0 top-0 bottom-0 w-[220px] z-20 flex flex-col bg-sidebar border-r border-border/30 shadow-xl transition-all duration-200"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <ExpandedSidebarContent onTogglePin={togglePlaylistSidebarPin} isPinned={false} />
-    </div>
+    <>
+      {/* 主容器 - 始终渲染，通过宽度控制显示状态 */}
+      <div
+        className={cn(
+          "h-full flex flex-col bg-sidebar border-r border-border/30 shrink-0",
+          "transition-all duration-300 ease-in-out overflow-hidden",
+          // 宽度变化
+          isExpanded ? "w-[220px]" : "w-12",
+          // 悬浮模式的阴影和 z-index
+          isFloating && "fixed left-0 top-0 z-30 shadow-2xl",
+          // 动画效果
+          isExpanded && "animate-in slide-in-from-left duration-300"
+        )}
+        ref={sidebarRef}
+        onMouseEnter={isFloating ? handleMouseEnter : undefined}
+        onMouseLeave={isFloating ? handleMouseLeave : undefined}
+      >
+        {isExpanded ? (
+          <ExpandedSidebarContent onTogglePin={togglePlaylistSidebarPin} isPinned={isPinned} />
+        ) : (
+          <MinimizedIcons onExpand={handleExpandClick} />
+        )}
+      </div>
+
+      {/* 最小化状态下的展开按钮覆盖层 */}
+      {isMinimized && (
+        <div
+          className="absolute left-12 top-0 bottom-0 w-1 z-10 cursor-pointer group"
+          onClick={handleExpandClick}
+          onMouseEnter={handleExpandClick}
+        >
+          {/* 悬浮触发区域 */}
+          <div className="h-full w-1 bg-transparent group-hover:bg-brand/30 transition-colors duration-200" />
+        </div>
+      )}
+
+      {/* 悬浮模式的遮罩层（点击关闭） */}
+      {isFloating && (
+        <div
+          className="fixed inset-0 z-10 bg-black/5 animate-in fade-in duration-200"
+          onClick={togglePlaylistSidebar}
+        />
+      )}
+    </>
   );
 }
