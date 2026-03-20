@@ -252,6 +252,17 @@ export function PlaylistSidebar() {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isMouseInside, setIsMouseInside] = useState(false);
   const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  // 关闭悬浮面板（带动画）
+  const closeFloatingPanel = useCallback(() => {
+    setIsClosing(true);
+    // 等待动画完成后再真正关闭
+    setTimeout(() => {
+      togglePlaylistSidebar();
+      setIsClosing(false);
+    }, 250); // 动画时长 250ms
+  }, [togglePlaylistSidebar]);
 
   // 悬浮模式：鼠标离开后延迟关闭
   useEffect(() => {
@@ -259,13 +270,13 @@ export function PlaylistSidebar() {
       if (!isMouseInside) {
         // 开始关闭倒计时
         const timer = setTimeout(() => {
-          togglePlaylistSidebar();
+          closeFloatingPanel();
         }, 500); // 500ms 延迟
         setCloseTimer(timer);
         return () => clearTimeout(timer);
       }
     }
-  }, [isOpen, isPinned, isMouseInside, togglePlaylistSidebar]);
+  }, [isOpen, isPinned, isMouseInside, closeFloatingPanel]);
 
   // 鼠标进入时取消关闭倒计时
   useEffect(() => {
@@ -341,7 +352,10 @@ export function PlaylistSidebar() {
           className={cn(
             "absolute left-0 top-0 h-full w-[220px] z-30",
             "flex flex-col bg-sidebar border-r border-border/30 shadow-2xl",
-            "animate-in slide-in-from-left duration-300"
+            "transition-transform duration-250 ease-in-out",
+            isClosing 
+              ? "-translate-x-full opacity-0" 
+              : "translate-x-0 opacity-100"
           )}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -349,7 +363,7 @@ export function PlaylistSidebar() {
           <ExpandedSidebarContent 
             onTogglePin={togglePlaylistSidebarPin} 
             isPinned={false}
-            onClose={togglePlaylistSidebar}
+            onClose={closeFloatingPanel}
           />
         </div>
       )}
@@ -357,8 +371,12 @@ export function PlaylistSidebar() {
       {/* 悬浮模式的遮罩层（点击关闭） */}
       {isFloating && (
         <div
-          className="absolute left-12 top-0 bottom-0 right-0 z-20 bg-black/5 animate-in fade-in duration-200"
-          onClick={togglePlaylistSidebar}
+          className={cn(
+            "absolute left-12 top-0 bottom-0 right-0 z-20 bg-black/5",
+            "transition-opacity duration-200",
+            isClosing ? "opacity-0" : "opacity-100"
+          )}
+          onClick={closeFloatingPanel}
         />
       )}
     </>
