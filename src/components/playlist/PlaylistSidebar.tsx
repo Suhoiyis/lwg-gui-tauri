@@ -267,11 +267,8 @@ export function PlaylistSidebar() {
   
   // 从悬浮到锁定的过渡状态
   const [isPinning, setIsPinning] = useState(false);
-  // 从锁定到悬浮的过渡状态
-  const [isUnpinning, setIsUnpinning] = useState(false);
   
   const prevIsFloating = usePrevious(isOpen && !isPinned);
-  const prevIsLocked = usePrevious(isOpen && isPinned);
   
   // 检测从悬浮到锁定的转换
   useEffect(() => {
@@ -288,22 +285,6 @@ export function PlaylistSidebar() {
       return () => clearTimeout(timer);
     }
   }, [isOpen, isPinned, prevIsFloating]);
-  
-  // 检测从锁定到悬浮的转换
-  useEffect(() => {
-    const wasLocked = prevIsLocked ?? false;
-    const isNowFloating = isOpen && !isPinned;
-    
-    if (wasLocked && isNowFloating) {
-      // 从锁定切换到悬浮：开始过渡
-      setIsUnpinning(true);
-      // 等待主容器变窄完成后结束过渡
-      const timer = setTimeout(() => {
-        setIsUnpinning(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, isPinned, prevIsLocked]);
 
   // 关闭悬浮面板到最小化（带动画）
   const closeFloatingToMinimized = useCallback(() => {
@@ -376,13 +357,12 @@ export function PlaylistSidebar() {
         className={cn(
           "h-full flex flex-col bg-sidebar border-r border-border/30 shrink-0",
           "transition-all duration-300 ease-in-out",
-          // 只有锁定模式或正在 pinning 时占用 220px
-          // unpinning 时立即变窄，让 Grid 释放空间
+          // 锁定模式或 pinning 时占用 220px，其他情况 48px
           (isLocked || isPinning) ? "w-[220px]" : "w-12"
         )}
       >
-        {/* 最小化模式内容 */}
-        {!isOpen && !isUnpinning && (
+        {/* 最小化模式内容（不在悬浮模式时渲染，因为会被悬浮面板覆盖） */}
+        {!isOpen && !isFloating && (
           <MinimizedIcons onExpand={handleExpandClick} />
         )}
         
@@ -396,8 +376,8 @@ export function PlaylistSidebar() {
         )}
       </div>
 
-      {/* 悬浮面板：悬浮模式、正在 pinning、或正在 unpinning 时显示 */}
-      {(isFloating || isPinning || isUnpinning) && (
+      {/* 悬浮面板：悬浮模式或 pinning 时显示 */}
+      {(isFloating || isPinning) && (
         <div
           ref={sidebarRef}
           className={cn(
@@ -407,10 +387,10 @@ export function PlaylistSidebar() {
             // 关闭到最小化：滑出 + 淡出
             isClosingToMinimized 
               ? "-translate-x-full opacity-0 shadow-2xl" 
-              // 从悬浮到锁定：只淡出（主容器变宽时遮挡）
+              // 从悬浮到锁定：只淡出
               : isPinning
                 ? "translate-x-0 opacity-0 shadow-none"
-                // 其他情况：显示
+                // 正常显示
                 : "translate-x-0 opacity-100 shadow-2xl"
           )}
           onMouseEnter={isFloating ? handleMouseEnter : undefined}
@@ -425,7 +405,7 @@ export function PlaylistSidebar() {
       )}
 
       {/* 悬浮模式的遮罩层（点击关闭到最小化） */}
-      {(isFloating || isUnpinning) && (
+      {isFloating && (
         <div
           className={cn(
             "absolute left-12 top-0 bottom-0 right-0 z-20 bg-black/5",
