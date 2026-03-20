@@ -48,8 +48,14 @@ function getInitial(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-// ===== 最小化图标条 =====
-function MinimizedIcons({ onExpand }: { onExpand: () => void }) {
+// ===== 图标列（仅最小化模式使用）=====
+function IconColumn({ 
+  isExpanded, 
+  onToggle 
+}: { 
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
   const playlists = useAppStore((state) => state.playlists);
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
@@ -59,22 +65,24 @@ function MinimizedIcons({ onExpand }: { onExpand: () => void }) {
 
   return (
     <>
-      {/* 展开/悬浮按钮 */}
-      <div className="shrink-0 px-1.5 pt-2">
+      {/* 切换按钮 - Header 高度 52px */}
+      <div className="shrink-0 h-[52px] flex items-center justify-center border-b border-border/30">
         <button
-          onClick={onExpand}
-          className="w-9 h-9 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
-          title="Open sidebar (floating)"
+          onClick={onToggle}
+          className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+          title={isExpanded ? "Collapse sidebar" : "Open sidebar (floating)"}
         >
-          <ChevronRight className="w-4 h-4" />
+          {isExpanded ? (
+            <ChevronLeft className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
         </button>
       </div>
 
-      <Separator className="my-2 mx-2 w-8" />
-
       {/* 内容区域 */}
       <ScrollArea className="flex-1">
-        <div className="flex flex-col items-center gap-1 px-1.5 py-1">
+        <div className="flex flex-col items-center gap-1 p-2">
           {/* All Wallpapers */}
           <button
             onClick={() => setActivePlaylist(null)}
@@ -88,6 +96,8 @@ function MinimizedIcons({ onExpand }: { onExpand: () => void }) {
           >
             <ListMusic className="w-4 h-4" />
           </button>
+
+          <Separator className="my-2 w-8" />
 
           {/* Favorites */}
           <button
@@ -105,8 +115,6 @@ function MinimizedIcons({ onExpand }: { onExpand: () => void }) {
               activePlaylistId === FAVORITES_PLAYLIST_ID && "fill-current scale-110"
             )} />
           </button>
-
-          <Separator className="my-1 w-8" />
 
           {/* Playlists */}
           {playlists.map((playlist) => (
@@ -133,12 +141,11 @@ function MinimizedIcons({ onExpand }: { onExpand: () => void }) {
         </div>
       </ScrollArea>
 
-      {/* 新建播放列表 */}
-      <Separator className="my-2 mx-2 w-8" />
-      <div className="shrink-0 px-1.5 pb-2">
+      {/* Footer 高度 48px */}
+      <div className="shrink-0 h-[48px] flex items-center justify-center border-t border-border/30">
         <button
           onClick={() => setIsCreateDialogOpen(true)}
-          className="w-9 h-9 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+          className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
           title="New Playlist"
         >
           <Plus className="w-4 h-4" />
@@ -153,7 +160,146 @@ function MinimizedIcons({ onExpand }: { onExpand: () => void }) {
   );
 }
 
-// ===== 展开的侧栏内容 =====
+// ===== 锁定模式：单一 ScrollArea，使用 PlaylistList variant="locked" =====
+function LockedSidebarLayout({
+  onTogglePin,
+  isPinned,
+  onClose,
+}: {
+  onTogglePin: () => void;
+  isPinned: boolean;
+  onClose: () => void;
+}) {
+  const activePlaylistId = useAppStore((state) => state.activePlaylistId);
+  const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* ── Header（单行横跨两列）── */}
+      <div className="shrink-0 h-[52px] flex items-center border-b border-border/30">
+        {/* 左侧图标列（48px）*/}
+        <div className="w-12 shrink-0 flex items-center justify-center border-r border-border/30 h-full">
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+            title="Collapse sidebar"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        </div>
+        {/* 右侧文字列 */}
+        <div className="flex-1 flex items-center justify-between px-3">
+          <div className="flex items-center gap-2">
+            <ListMusic className="w-4 h-4 text-muted-foreground" />
+            <span className="font-semibold text-sm">Playlists</span>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 transition-transform duration-200 hover:scale-110"
+              onClick={onTogglePin}
+              title={isPinned ? "Unpin (floating mode)" : "Pin (locked mode)"}
+            >
+              {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 transition-transform duration-200 hover:scale-110"
+              onClick={onClose}
+              title="Close sidebar"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 单一 ScrollArea：每行同时渲染图标（左）和文字（右）── */}
+      <ScrollArea className="flex-1">
+        <div className="py-2">
+          {/* All Wallpapers 行 */}
+          <div className="flex items-center">
+            <div className="w-12 shrink-0 flex items-center justify-center">
+              <button
+                onClick={() => setActivePlaylist(null)}
+                className={cn(
+                  "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
+                  !activePlaylistId
+                    ? "bg-accent text-accent-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                )}
+                title="All Wallpapers"
+              >
+                <ListMusic className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 pr-2">
+              <button
+                onClick={() => setActivePlaylist(null)}
+                className={cn(
+                  "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-all duration-200",
+                  !activePlaylistId
+                    ? "bg-accent text-accent-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                )}
+              >
+                <ListMusic className="w-4 h-4 shrink-0" />
+                <span>All Wallpapers</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Separator 行 */}
+          <div className="flex items-center my-2">
+            <div className="w-12 shrink-0 flex items-center justify-center">
+              <div className="w-6 h-px bg-border/50" />
+            </div>
+            <div className="flex-1 pr-2 pl-3">
+              <Separator />
+            </div>
+          </div>
+
+          {/* PlaylistList variant="locked" - 包含 Favorites + Playlists，带拖拽排序 */}
+          <PlaylistList variant="locked" />
+        </div>
+      </ScrollArea>
+
+      {/* ── Footer（单行横跨两列）── */}
+      <div className="shrink-0 h-[48px] flex items-center border-t border-border/30">
+        <div className="w-12 shrink-0 flex items-center justify-center border-r border-border/30 h-full">
+          <button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+            title="New Playlist"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex-1 px-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full justify-start gap-2 transition-all duration-200 hover:translate-x-0.5"
+            onClick={() => setIsCreateDialogOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Playlist</span>
+          </Button>
+        </div>
+      </div>
+
+      <CreatePlaylistDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
+    </div>
+  );
+}
+
+// ===== 悬浮面板内容（不需要与图标列对齐，独立显示）=====
 function ExpandedSidebarContent({ 
   onTogglePin, 
   isPinned,
@@ -170,13 +316,12 @@ function ExpandedSidebarContent({
   return (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-border/30 shrink-0">
+      <div className="h-[52px] flex items-center justify-between px-3 border-b border-border/30 shrink-0">
         <div className="flex items-center gap-2">
           <ListMusic className="w-4 h-4 text-muted-foreground" />
           <span className="font-semibold text-sm">Playlists</span>
         </div>
         <div className="flex items-center gap-0.5">
-          {/* Pin 按钮 */}
           <Button
             variant="ghost"
             size="icon"
@@ -190,7 +335,6 @@ function ExpandedSidebarContent({
               <Pin className="w-4 h-4" />
             )}
           </Button>
-          {/* 关闭按钮 */}
           <Button
             variant="ghost"
             size="icon"
@@ -206,7 +350,6 @@ function ExpandedSidebarContent({
       {/* Content */}
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
-          {/* ALL item */}
           <button
             onClick={() => setActivePlaylist(null)}
             className={cn(
@@ -222,13 +365,12 @@ function ExpandedSidebarContent({
 
           <Separator className="my-2" />
 
-          {/* Playlist list with drag-drop */}
           <PlaylistList />
         </div>
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-2 border-t border-border/30 shrink-0">
+      <div className="h-[48px] flex items-center px-2 border-t border-border/30 shrink-0">
         <Button
           variant="outline"
           size="sm"
@@ -257,53 +399,39 @@ export function PlaylistSidebar() {
   const togglePlaylistSidebarPin = useAppStore((state) => state.togglePlaylistSidebarPin);
   const openPlaylistSidebarFloating = useAppStore((state) => state.openPlaylistSidebarFloating);
 
-  // 悬浮模式的鼠标检测
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isMouseInside, setIsMouseInside] = useState(false);
   const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
   
-  // 关闭动画状态（仅在关闭到最小化时使用）
   const [isClosingToMinimized, setIsClosingToMinimized] = useState(false);
-  
-  // 从悬浮到锁定的过渡状态
   const [isPinning, setIsPinning] = useState(false);
-  // 悬浮面板入场动画状态
   const [isOpening, setIsOpening] = useState(false);
   
   const prevIsFloating = usePrevious(isOpen && !isPinned);
   const prevWasMinimized = usePrevious(!isOpen);
   
-  // 检测从最小化到悬浮的转换（入场动画）
   useEffect(() => {
     const wasMinimized = prevWasMinimized ?? false;
     const isNowFloating = isOpen && !isPinned;
     
     if (wasMinimized && isNowFloating) {
       setIsOpening(true);
-      const timer = setTimeout(() => {
-        setIsOpening(false);
-      }, 300);
+      const timer = setTimeout(() => setIsOpening(false), 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen, isPinned, prevWasMinimized]);
   
-  // 检测从悬浮到锁定的转换
   useEffect(() => {
     const wasFloating = prevIsFloating ?? false;
     const isNowLocked = isOpen && isPinned;
     
     if (wasFloating && isNowLocked) {
-      // 从悬浮切换到锁定：开始过渡
       setIsPinning(true);
-      // 等待主容器变宽完成后结束过渡
-      const timer = setTimeout(() => {
-        setIsPinning(false);
-      }, 300); // 与主容器宽度动画时长一致
+      const timer = setTimeout(() => setIsPinning(false), 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen, isPinned, prevIsFloating]);
 
-  // 关闭悬浮面板到最小化（带动画）
   const closeFloatingToMinimized = useCallback(() => {
     setIsClosingToMinimized(true);
     setTimeout(() => {
@@ -312,20 +440,16 @@ export function PlaylistSidebar() {
     }, 250);
   }, [togglePlaylistSidebar]);
 
-  // 悬浮模式：鼠标离开后延迟关闭
   useEffect(() => {
     if (isOpen && !isPinned) {
       if (!isMouseInside) {
-        const timer = setTimeout(() => {
-          closeFloatingToMinimized();
-        }, 500);
+        const timer = setTimeout(() => closeFloatingToMinimized(), 500);
         setCloseTimer(timer);
         return () => clearTimeout(timer);
       }
     }
   }, [isOpen, isPinned, isMouseInside, closeFloatingToMinimized]);
 
-  // 鼠标进入时取消关闭倒计时
   useEffect(() => {
     if (isMouseInside && closeTimer) {
       clearTimeout(closeTimer);
@@ -333,83 +457,72 @@ export function PlaylistSidebar() {
     }
   }, [isMouseInside, closeTimer]);
 
-  const handleMouseEnter = useCallback(() => {
-    setIsMouseInside(true);
-  }, []);
+  const handleMouseEnter = useCallback(() => setIsMouseInside(true), []);
+  const handleMouseLeave = useCallback(() => setIsMouseInside(false), []);
 
-  const handleMouseLeave = useCallback(() => {
-    setIsMouseInside(false);
-  }, []);
-
-  // 处理最小化栏的点击（打开悬浮）
   const handleExpandClick = useCallback(() => {
     openPlaylistSidebarFloating();
     setIsMouseInside(true);
   }, [openPlaylistSidebarFloating]);
 
-  // FOUC prevention - show skeleton while hydrating
   if (!isHydrated) {
     return (
-      <div className="w-[220px] h-full bg-sidebar border-r border-border/30 flex flex-col">
-        <div className="p-4 border-b border-border/30">
-          <Skeleton className="h-6 w-24" />
-        </div>
-        <div className="flex-1 p-2 space-y-2">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-10 w-full rounded-md" />
-          ))}
+      <div className="w-12 h-full bg-sidebar border-r border-border/30 flex">
+        <div className="w-12 shrink-0 flex flex-col items-center py-4 gap-2">
+          <Skeleton className="w-9 h-9 rounded-md" />
+          <Skeleton className="w-9 h-9 rounded-md" />
+          <Skeleton className="w-9 h-9 rounded-md" />
         </div>
       </div>
     );
   }
 
-// 计算当前状态
   const isFloating = isOpen && !isPinned;
   const isLocked = isOpen && isPinned;
 
   return (
     <>
-      {/* 主容器 - 始终参与 flex 布局 */}
+      {/* 主容器 */}
       <div
         className={cn(
-          "h-full flex flex-col bg-sidebar border-r border-border/30 shrink-0",
+          "h-full bg-sidebar border-r border-border/30 shrink-0",
           "transition-all duration-300 ease-in-out",
-          // 锁定模式或 pinning 时占用 220px，其他情况 48px
-          (isLocked || isPinning) ? "w-[220px]" : "w-12"
+          // 锁定模式：LockedSidebarLayout 占满 268px（内部自己划分 48+220）
+          // 其他：仅图标列 48px
+          (isLocked || isPinning) ? "w-[268px]" : "w-12"
         )}
       >
-        {/* 最小化模式内容（不在悬浮模式时渲染，因为会被悬浮面板覆盖） */}
-        {!isOpen && !isFloating && (
-          <MinimizedIcons onExpand={handleExpandClick} />
-        )}
-        
-        {/* 锁定模式内容 */}
-        {isLocked && (
-          <ExpandedSidebarContent 
-            onTogglePin={togglePlaylistSidebarPin} 
+        {(isLocked || isPinning) ? (
+          // ★ 锁定模式：统一布局，单一 ScrollArea，彻底消除两列错位
+          <LockedSidebarLayout
+            onTogglePin={togglePlaylistSidebarPin}
             isPinned={true}
             onClose={togglePlaylistSidebar}
           />
+        ) : (
+          // 最小化模式：仅图标列
+          <div className="w-12 flex flex-col h-full">
+            <IconColumn 
+              isExpanded={isOpen}
+              onToggle={isOpen ? togglePlaylistSidebar : handleExpandClick}
+            />
+          </div>
         )}
       </div>
 
-      {/* 悬浮面板：悬浮模式或 pinning 时显示 */}
+      {/* 悬浮面板：位于图标列右侧 */}
       {(isFloating || isPinning) && (
         <div
           ref={sidebarRef}
           className={cn(
-            "absolute left-0 top-0 h-full w-[220px] z-30",
+            "absolute left-12 top-0 h-full w-[220px] z-30",
             "flex flex-col bg-sidebar border-r border-border/30",
             "transition-all duration-300 ease-out",
-            // 入场动画（从最小化打开）
             isOpening && "animate-in slide-in-from-left fade-in",
-            // 关闭到最小化：滑出 + 淡出
             isClosingToMinimized 
               ? "-translate-x-full opacity-0 shadow-2xl" 
-              // 从悬浮到锁定：只淡出
               : isPinning
                 ? "translate-x-0 opacity-0 shadow-none"
-                // 正常显示
                 : "translate-x-0 opacity-100 shadow-2xl"
           )}
           onMouseEnter={isFloating ? handleMouseEnter : undefined}
@@ -423,7 +536,7 @@ export function PlaylistSidebar() {
         </div>
       )}
 
-      {/* 悬浮模式的遮罩层（点击关闭到最小化） */}
+      {/* 悬浮模式遮罩 */}
       {isFloating && (
         <div
           className={cn(

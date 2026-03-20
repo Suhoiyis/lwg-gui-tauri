@@ -18,7 +18,11 @@ import { PlaylistItem } from "./PlaylistItem";
 import { FavoritesItem } from "./FavoritesItem";
 import { Accordion } from "@/components/ui/accordion";
 
-export function PlaylistList() {
+interface PlaylistListProps {
+  variant?: "floating" | "locked";
+}
+
+export function PlaylistList({ variant = "floating" }: PlaylistListProps) {
   const playlists = useAppStore((state) => state.playlists);
   const reorderPlaylists = useAppStore((state) => state.reorderPlaylists);
 
@@ -51,7 +55,7 @@ export function PlaylistList() {
   return (
     <Accordion type="multiple" className="space-y-1">
       {/* Favorites - 固定在最上面，不可拖动 */}
-      <FavoritesItem />
+      <FavoritesItem variant={variant} />
 
       {/* 用户创建的播放列表 - 可拖动排序 */}
       {playlists.length > 0 && (
@@ -65,7 +69,7 @@ export function PlaylistList() {
             strategy={verticalListSortingStrategy}
           >
             {playlists.map((playlist) => (
-              <PlaylistItem key={playlist.id} playlist={playlist} />
+              <PlaylistItem key={playlist.id} playlist={playlist} variant={variant} />
             ))}
           </SortableContext>
         </DndContext>
