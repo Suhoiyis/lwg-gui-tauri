@@ -131,68 +131,42 @@ export const WallpaperGrid = memo(
                   Open Folder...
                 </ContextMenuItem>
                 
-                {/* Add to playlist submenu */}
+                {/* Add to playlist submenu - 仅显示真正的播放列表，Favorites 有独立的菜单项 */}
                 <ContextMenuSub>
                   <ContextMenuSubTrigger>
                     <ListPlus className="mr-2 h-4 w-4" />
                     Add to playlist
                   </ContextMenuSubTrigger>
                   <ContextMenuSubContent className="w-48">
-                    {/* Favorites 选项 */}
-                    {(() => {
-                      const isFavorite = favoriteIds.has(wp.id);
-                      return (
-                        <ContextMenuItem
-                          disabled={isFavorite}
-                          onClick={() => {
-                            if (!isFavorite) {
-                              toggleFavorite(wp.id);
-                              toast.success("Added to favorites", { description: wp.title });
-                            }
-                          }}
-                        >
-                          {isFavorite ? (
-                            <Star className="mr-2 h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          ) : (
-                            <Star className="mr-2 h-4 w-4" />
-                          )}
-                          <span className={isFavorite ? "text-muted-foreground" : ""}>Favorites</span>
-                          {isFavorite && (
-                            <Check className="ml-auto h-4 w-4 text-muted-foreground" />
-                          )}
-                        </ContextMenuItem>
-                      );
-                    })()}
-                    
-                    {playlists.length > 0 && <ContextMenuSeparator />}
-                    
-                    {/* 普通播放列表 */}
-                    {playlists.map((playlist) => {
-                      const isInPlaylist = playlist.wallpaperIds.includes(wp.id);
-                      return (
-                        <ContextMenuItem
-                          key={playlist.id}
-                          disabled={isInPlaylist}
-                          onClick={() => {
-                            if (!isInPlaylist) {
-                              handleAddToPlaylist(playlist.id, wp.id);
-                            }
-                          }}
-                        >
-                          <span className={isInPlaylist ? "text-muted-foreground" : ""}>
-                            {playlist.name}
-                          </span>
-                          <span className="ml-auto text-muted-foreground text-xs">
-                            {playlist.wallpaperIds.length}
-                          </span>
-                          {isInPlaylist && (
-                            <Check className="ml-1 h-4 w-4 text-muted-foreground" />
-                          )}
-                        </ContextMenuItem>
-                      );
-                    })}
-                    
-                    <ContextMenuSeparator />
+                    {playlists.length > 0 ? (
+                      <>
+                        {playlists.map((playlist) => {
+                          const isInPlaylist = playlist.wallpaperIds.includes(wp.id);
+                          return (
+                            <ContextMenuItem
+                              key={playlist.id}
+                              disabled={isInPlaylist}
+                              onClick={() => {
+                                if (!isInPlaylist) {
+                                  handleAddToPlaylist(playlist.id, wp.id);
+                                }
+                              }}
+                            >
+                              <span className={isInPlaylist ? "text-muted-foreground" : ""}>
+                                {playlist.name}
+                              </span>
+                              <span className="ml-auto text-muted-foreground text-xs">
+                                {playlist.wallpaperIds.length}
+                              </span>
+                              {isInPlaylist && (
+                                <Check className="ml-1 h-4 w-4 text-muted-foreground" />
+                              )}
+                            </ContextMenuItem>
+                          );
+                        })}
+                        <ContextMenuSeparator />
+                      </>
+                    ) : null}
                     <ContextMenuItem onClick={() => handleCreatePlaylist(wp.id)}>
                       <span className="text-primary">+ Create new playlist</span>
                     </ContextMenuItem>

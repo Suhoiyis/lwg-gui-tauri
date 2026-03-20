@@ -141,7 +141,8 @@ export function SelectionModeBar() {
                   allInFavorites && "fill-yellow-400 text-yellow-400"
                 )} />
                 <span className={allInFavorites ? "text-muted-foreground" : ""}>Favorites</span>
-                {favoritesAlreadyCount > 0 && (
+                {/* 只在部分已收藏时显示 Badge，全部已收藏时只显示 Check */}
+                {!allInFavorites && favoritesAlreadyCount > 0 && (
                   <Badge variant="secondary" className="ml-auto text-[10px] px-1">
                     {favoritesAlreadyCount}/{selectedCount}
                   </Badge>
@@ -175,17 +176,19 @@ export function SelectionModeBar() {
                 <span className={allInThisPlaylist ? "text-muted-foreground" : ""}>
                   {playlist.name}
                 </span>
-                {alreadyCount > 0 ? (
+                {/* 只在部分已加入时显示 X/Y badge，全部已加入时只显示 Check */}
+                {!allInThisPlaylist && alreadyCount > 0 && (
                   <Badge variant="secondary" className="ml-auto text-[10px] px-1">
                     {alreadyCount}/{selectedCount}
                   </Badge>
-                ) : (
+                )}
+                {!allInThisPlaylist && alreadyCount === 0 && (
                   <Badge variant="secondary" className="ml-auto text-[10px] px-1">
                     {playlist.wallpaperIds.length}
                   </Badge>
                 )}
                 {allInThisPlaylist && (
-                  <Check className="ml-1 h-4 w-4 text-muted-foreground" />
+                  <Check className="ml-auto h-4 w-4 text-muted-foreground" />
                 )}
               </DropdownMenuItem>
             );
