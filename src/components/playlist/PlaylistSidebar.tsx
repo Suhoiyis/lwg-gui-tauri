@@ -267,8 +267,25 @@ export function PlaylistSidebar() {
   
   // 从悬浮到锁定的过渡状态
   const [isPinning, setIsPinning] = useState(false);
+  // 悬浮面板入场动画状态
+  const [isOpening, setIsOpening] = useState(false);
   
   const prevIsFloating = usePrevious(isOpen && !isPinned);
+  const prevWasMinimized = usePrevious(!isOpen);
+  
+  // 检测从最小化到悬浮的转换（入场动画）
+  useEffect(() => {
+    const wasMinimized = prevWasMinimized ?? false;
+    const isNowFloating = isOpen && !isPinned;
+    
+    if (wasMinimized && isNowFloating) {
+      setIsOpening(true);
+      const timer = setTimeout(() => {
+        setIsOpening(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, isPinned, prevWasMinimized]);
   
   // 检测从悬浮到锁定的转换
   useEffect(() => {
@@ -383,7 +400,9 @@ export function PlaylistSidebar() {
           className={cn(
             "absolute left-0 top-0 h-full w-[220px] z-30",
             "flex flex-col bg-sidebar border-r border-border/30",
-            "transition-all duration-250 ease-in-out",
+            "transition-all duration-300 ease-out",
+            // 入场动画（从最小化打开）
+            isOpening && "animate-in slide-in-from-left fade-in",
             // 关闭到最小化：滑出 + 淡出
             isClosingToMinimized 
               ? "-translate-x-full opacity-0 shadow-2xl" 
@@ -409,7 +428,8 @@ export function PlaylistSidebar() {
         <div
           className={cn(
             "absolute left-12 top-0 bottom-0 right-0 z-20 bg-black/5",
-            "transition-opacity duration-200",
+            "transition-opacity duration-300",
+            isOpening && "animate-in fade-in duration-300",
             isClosingToMinimized ? "opacity-0" : "opacity-100"
           )}
           onClick={closeFloatingToMinimized}
