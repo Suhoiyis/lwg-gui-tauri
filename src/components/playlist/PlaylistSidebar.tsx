@@ -315,12 +315,14 @@ export function PlaylistSidebar() {
       {/* 主容器 - 始终渲染，通过宽度控制显示状态 */}
       <div
         className={cn(
-          "h-full flex flex-col bg-sidebar border-r border-border/30 shrink-0",
+          "h-full flex flex-col bg-sidebar border-r border-border/30",
           "transition-all duration-300 ease-in-out overflow-hidden",
           // 宽度变化
           isExpanded ? "w-[220px]" : "w-12",
-          // 悬浮模式的阴影和 z-index
-          isFloating && "fixed left-0 top-0 z-30 shadow-2xl",
+          // 悬浮模式：absolute 定位 + 阴影 + z-index
+          isFloating && "absolute left-0 top-0 z-30 shadow-2xl",
+          // 非悬浮模式：正常布局
+          !isFloating && "shrink-0",
           // 动画效果
           isExpanded && "animate-in slide-in-from-left duration-300"
         )}
@@ -354,7 +356,7 @@ export function PlaylistSidebar() {
       {/* 悬浮模式的遮罩层（点击关闭） */}
       {isFloating && (
         <div
-          className="fixed inset-0 z-10 bg-black/5 animate-in fade-in duration-200"
+          className="absolute inset-0 z-10 bg-black/5 animate-in fade-in duration-200"
           onClick={togglePlaylistSidebar}
         />
       )}
