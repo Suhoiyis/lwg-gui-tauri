@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronRight, Plus, ListMusic, Star, Pin, PinOff } from "lucide-react";
+import { ChevronRight, ChevronLeft, Plus, ListMusic, Star, Pin, PinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -145,7 +145,15 @@ function MinimizedIcons({ onExpand }: { onExpand: () => void }) {
 }
 
 // ===== 展开的侧栏内容 =====
-function ExpandedSidebarContent({ onTogglePin, isPinned }: { onTogglePin: () => void; isPinned: boolean }) {
+function ExpandedSidebarContent({ 
+  onTogglePin, 
+  isPinned,
+  onClose 
+}: { 
+  onTogglePin: () => void; 
+  isPinned: boolean;
+  onClose: () => void;
+}) {
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -158,19 +166,32 @@ function ExpandedSidebarContent({ onTogglePin, isPinned }: { onTogglePin: () => 
           <ListMusic className="w-4 h-4 text-muted-foreground" />
           <span className="font-semibold text-sm">Playlists</span>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7 transition-transform duration-200 hover:scale-110"
-          onClick={onTogglePin}
-          title={isPinned ? "Unpin (floating mode)" : "Pin (locked mode)"}
-        >
-          {isPinned ? (
-            <PinOff className="w-4 h-4" />
-          ) : (
-            <Pin className="w-4 h-4" />
-          )}
-        </Button>
+        <div className="flex items-center gap-0.5">
+          {/* Pin 按钮 */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 transition-transform duration-200 hover:scale-110"
+            onClick={onTogglePin}
+            title={isPinned ? "Unpin (floating mode)" : "Pin (locked mode)"}
+          >
+            {isPinned ? (
+              <PinOff className="w-4 h-4" />
+            ) : (
+              <Pin className="w-4 h-4" />
+            )}
+          </Button>
+          {/* 关闭按钮 */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 transition-transform duration-200 hover:scale-110"
+            onClick={onClose}
+            title="Close sidebar"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Content */}
@@ -308,7 +329,11 @@ export function PlaylistSidebar() {
         onMouseLeave={isFloating ? handleMouseLeave : undefined}
       >
         {isExpanded ? (
-          <ExpandedSidebarContent onTogglePin={togglePlaylistSidebarPin} isPinned={isPinned} />
+          <ExpandedSidebarContent 
+          onTogglePin={togglePlaylistSidebarPin} 
+          isPinned={isPinned} 
+          onClose={togglePlaylistSidebar}
+        />
         ) : (
           <MinimizedIcons onExpand={handleExpandClick} />
         )}
