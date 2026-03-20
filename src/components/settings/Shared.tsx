@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { open } from "@tauri-apps/plugin-dialog";
-import { useState, useEffect } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
@@ -32,6 +32,28 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { FolderOpen } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { isTauriEnv } from "@/lib/utils";
+import {
+  buildLinuxPathCrumbs,
+  collapseHomeToTilde,
+  expandTildePath,
+  normalizeLinuxPath,
+} from "@/lib/linuxPath";
 
 // ============================================================================
 // Types
@@ -336,9 +358,65 @@ export function PathInputField({
   placeholder?: string;
   className?: string;
 }) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editDraft, setEditDraft] = useState(value);
+  const [homeDir, setHomeDir] = useState<string | null>(null);
+
+  const displayValue = useMemo(() => {
+    return collapseHomeToTilde(value, homeDir);
+  }, [value, homeDir]);
+
+  const crumbs = useMemo(() => {
+    return buildLinuxPathCrumbs({ value, homeDir });
+  }, [value, homeDir]);
+
+  const breadcrumbParts = useMemo(() => {
+    const MAX_ITEMS = 6;
+
+    if (crumbs.length <= MAX_ITEMS) {
+      return crumbs.map((c) => ({ type: "crumb" as const, crumb: c }));
+    }
+
+    const keepStart = 2;
+    const keepEnd = 2;
+    const start = crumbs.slice(0, keepStart);
+    const end = crumbs.slice(-keepEnd);
+    const hidden = crumbs.slice(keepStart, -keepEnd);
+
+    return [
+      ...start.map((c) => ({ type: "crumb" as const, crumb: c })),
+      { type: "ellipsis" as const, hidden },
+      ...end.map((c) => ({ type: "crumb" as const, crumb: c })),
+    ];
+  }, [crumbs]);
+
+  useEffect(() => {
+    if (!isTauriEnv()) return;
+    // Prefer Tauri API when available
+    import("@tauri-apps/api/path")
+      .then((mod) => mod.homeDir())
+      .then((dir) => setHomeDir(dir))
+      .catch(() => setHomeDir(null));
+  }, []);
+
+  useEffect(() => {
+    if (isEditing) setEditDraft(displayValue);
+  }, [isEditing, displayValue]);
+
+  useEffect(() => {
+    if (!isEditing) return;
+    const el = inputRef.current;
+    if (!el) return;
+    // Ensure selection after the element is focused
+    queueMicrotask(() => {
+      el.focus();
+      el.select();
+    });
+  }, [isEditing]);
+
   const handleBrowse = async () => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
-    if (!isTauri) {
+    if (!isTauriEnv()) {
       console.warn("[Browser Mode] File dialog not available");
       return;
     }
@@ -352,22 +430,185 @@ export function PathInputField({
 
       if (selected && typeof selected === "string") {
         onChange(selected);
+        setIsEditing(false);
       }
     } catch (error) {
       console.error("Failed to open directory dialog:", error);
     }
   };
 
+  const commitDraft = () => {
+    const normalized = normalizeLinuxPath(editDraft);
+    if (!normalized) {
+      onChange(null);
+      setIsEditing(false);
+      return;
+    }
+
+    const expanded = expandTildePath(normalized, homeDir);
+    onChange(expanded || null);
+    setIsEditing(false);
+  };
+
+  const cancelEdit = () => {
+    setEditDraft(displayValue);
+    setIsEditing(false);
+  };
+
+  const enterEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      commitDraft();
+      e.preventDefault();
+    } else if (e.key === "Escape") {
+      cancelEdit();
+      e.preventDefault();
+    }
+  };
+
+  const handleCrumbNavigate = (path: string) => {
+    onChange(path ? normalizeLinuxPath(path) : null);
+    setIsEditing(false);
+  };
+
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
       <div className="flex space-x-2">
-        <Input
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value || null)}
-          className={className}
-        />
+        <div className="min-w-0 flex-1">
+          {isEditing ? (
+            <Input
+              ref={(node) => {
+                inputRef.current = node;
+              }}
+              placeholder={placeholder}
+              value={editDraft}
+              onChange={(e) => setEditDraft(e.target.value)}
+              onKeyDown={handleInputKeyDown}
+              onBlur={(e) => {
+                // If focus is moving to a crumb/menu item inside the breadcrumb row,
+                // keep edit mode (don't cancel) and let the click/navigate happen.
+                const next = e.relatedTarget as HTMLElement | null;
+                if (next?.dataset?.pathPickerInteractive === "true") return;
+                cancelEdit();
+              }}
+              className={className}
+            />
+          ) : (
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Path"
+              className={cn(
+                "flex h-9 w-full items-center rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground shadow-sm",
+                "transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                "overflow-hidden",
+                className,
+              )}
+              onPointerDown={(e) => {
+                // Single click on the breadcrumb row enters edit mode.
+                // Child crumb/menu handlers stop propagation for navigation.
+                if (e.button !== 0) return;
+                enterEdit();
+              }}
+              onDoubleClick={enterEdit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "F2") {
+                  enterEdit();
+                  e.preventDefault();
+                }
+              }}
+              onFocus={(e) => {
+                // Only enter edit when focus comes from keyboard (Tab), not from a pointer click.
+                if (e.currentTarget.matches(":focus-visible")) {
+                  enterEdit();
+                }
+              }}
+            >
+              {value ? (
+                <Breadcrumb className="min-w-0 flex-1">
+                  <BreadcrumbList className="min-w-0 flex-nowrap gap-1.5">
+                    {breadcrumbParts.map((part, idx) => {
+                      const isLast = idx === breadcrumbParts.length - 1;
+
+                      return (
+                        <Fragment key={part.type === "crumb" ? part.crumb.fullPath : "ellipsis"}>
+                          {idx > 0 && <BreadcrumbSeparator />}
+
+                          {part.type === "ellipsis" ? (
+                            <BreadcrumbItem>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className="inline-flex items-center rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                    onPointerDown={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                    aria-label="More path segments"
+                                    data-path-picker-interactive="true"
+                                  >
+                                    <BreadcrumbEllipsis />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="max-w-[420px]">
+                                  {part.hidden.map((c) => (
+                                    <DropdownMenuItem
+                                      key={c.fullPath}
+                                      onSelect={() => handleCrumbNavigate(c.fullPath)}
+                                      className="font-mono text-xs"
+                                      title={c.fullPath}
+                                      data-path-picker-interactive="true"
+                                    >
+                                      {c.label}
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </BreadcrumbItem>
+                          ) : (
+                            <BreadcrumbItem className="min-w-0">
+                              {isLast ? (
+                                <BreadcrumbPage className="truncate" title={part.crumb.fullPath}>
+                                  {part.crumb.label}
+                                </BreadcrumbPage>
+                              ) : (
+                                <BreadcrumbLink asChild className="min-w-0 truncate cursor-pointer">
+                                  <button
+                                    type="button"
+                                    onPointerDown={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      handleCrumbNavigate(part.crumb.fullPath);
+                                    }}
+                                    aria-label={`Navigate to ${part.crumb.label}`}
+                                    title={part.crumb.fullPath}
+                                    className="min-w-0 truncate"
+                                    data-path-picker-interactive="true"
+                                  >
+                                    {part.crumb.label}
+                                  </button>
+                                </BreadcrumbLink>
+                              )}
+                            </BreadcrumbItem>
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                  </BreadcrumbList>
+                </Breadcrumb>
+              ) : (
+                <span className="text-muted-foreground truncate">
+                  {placeholder || "Select a folder"}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
         <Button variant="secondary" onClick={handleBrowse}>
           <FolderOpen className="w-4 h-4" />
         </Button>
