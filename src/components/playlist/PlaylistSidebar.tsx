@@ -21,8 +21,8 @@ export function PlaylistSidebar() {
   // FOUC prevention - show skeleton while hydrating
   if (!isHydrated) {
     return (
-      <div className="w-[220px] h-full bg-sidebar border-r flex flex-col">
-        <div className="p-4 border-b">
+      <div className="w-[220px] h-full bg-sidebar border-r border-border/30 flex flex-col">
+        <div className="p-4 border-b border-border/30">
           <Skeleton className="h-6 w-24" />
         </div>
         <div className="flex-1 p-2 space-y-2">
@@ -38,12 +38,12 @@ export function PlaylistSidebar() {
     <>
       <div
         className={cn(
-          "h-full flex flex-col bg-sidebar border-r transition-all duration-200",
+          "h-full flex flex-col bg-sidebar border-r border-border/30 transition-all duration-200",
           isOpen ? "w-[220px]" : "w-0 overflow-hidden"
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-3 border-b shrink-0">
+        <div className="flex items-center justify-between p-3 border-b border-border/30 shrink-0">
           <div className="flex items-center gap-2">
             <ListMusic className="w-4 h-4 text-muted-foreground" />
             <span className="font-semibold text-sm">Playlists</span>
@@ -87,7 +87,7 @@ export function PlaylistSidebar() {
         </ScrollArea>
 
         {/* Footer */}
-        <div className="p-2 border-t shrink-0">
+        <div className="p-2 border-t border-border/30 shrink-0">
           <Button
             variant="outline"
             size="sm"
