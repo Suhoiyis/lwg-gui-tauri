@@ -101,7 +101,7 @@ export const WallpaperCard = memo(function WallpaperCard({
           isSelected
             ? "border-brand ring-2 ring-brand ring-offset-4 ring-offset-background shadow-lg shadow-brand/20"
             : "border-border/50 hover:border-brand/50 hover:shadow-xl hover:shadow-brand/10",
-          isInSelection && "border-primary ring-2 ring-primary/50",
+          isInSelection && "border-brand ring-2 ring-brand/50",
         )}
       >
         {/* 3. 内容层：图片和叠加元素 */}
@@ -171,11 +171,11 @@ export const WallpaperCard = memo(function WallpaperCard({
               className={cn(
                 "w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all",
                 isInSelection
-                  ? "bg-primary border-primary"
+                  ? "bg-brand border-brand"
                   : "bg-muted/80 border-border/50"
               )}
             >
-              {isInSelection && <Check className="w-5 h-5 text-primary-foreground" />}
+              {isInSelection && <Check className="w-5 h-5 text-brand-foreground" />}
             </div>
           </div>
         )}

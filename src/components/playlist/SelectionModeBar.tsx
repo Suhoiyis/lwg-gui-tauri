@@ -211,11 +211,10 @@ export function SelectionModeBar() {
       )}
 
       <Button
-        variant="default"
         size="sm"
         onClick={() => setIsCreateDialogOpen(true)}
         disabled={selectedCount === 0}
-        className="gap-1"
+        className="gap-1 bg-brand text-brand-foreground hover:bg-brand/90"
       >
         <Plus className="w-4 h-4" />
         Create Playlist
