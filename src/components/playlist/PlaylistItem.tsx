@@ -47,7 +47,7 @@ function generateAvatarColor(name: string): string {
     "bg-amber-500",
     "bg-orange-500",
   ];
-  
+
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -60,7 +60,10 @@ function getInitial(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemProps) {
+export function PlaylistItem({
+  playlist,
+  variant = "floating",
+}: PlaylistItemProps) {
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
   const isActive = activePlaylistId === playlist.id;
@@ -85,7 +88,7 @@ export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemPro
             ...transform,
             x: 0, // 限制水平方向
           }
-        : null
+        : null,
     ),
     transition,
   };
@@ -123,19 +126,16 @@ export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemPro
           ref={setNodeRef}
           style={style}
           value={playlist.id}
-          className={cn(
-            "border-0",
-            isDragging && "opacity-50 shadow-lg z-50"
-          )}
+          className={cn("border-0", isDragging && "opacity-50 shadow-lg z-50")}
         >
           {/* 外层行容器：图标槽 + 内容，整行可拖动 */}
           <div
-            className="flex items-start cursor-grab active:cursor-grabbing"
+            className="flex items-center cursor-grab active:cursor-grabbing"
             {...attributes}
             {...listeners}
           >
             {/* 左侧图标槽 - 固定 48px 宽 */}
-            <div className="w-12 shrink-0 flex items-center justify-center pt-1.5">
+            <div className="w-12 shrink-0 flex items-center justify-center">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -145,20 +145,22 @@ export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemPro
                   "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
                   isActive
                     ? "ring-2 ring-accent ring-offset-1 ring-offset-sidebar"
-                    : "hover:scale-105"
+                    : "hover:scale-105",
                 )}
                 title={playlist.name}
               >
-                <span className={cn(
-                  "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold text-white transition-transform duration-200",
-                  generateAvatarColor(playlist.name),
-                  isActive && "scale-110"
-                )}>
+                <span
+                  className={cn(
+                    "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold text-white transition-transform duration-200",
+                    generateAvatarColor(playlist.name),
+                    isActive && "scale-110",
+                  )}
+                >
                   {getInitial(playlist.name)}
                 </span>
               </button>
             </div>
-            
+
             {/* 右侧内容槽 */}
             <div className="flex-1 pr-2 min-w-0">
               {/* Header */}
@@ -167,7 +169,7 @@ export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemPro
                   "group flex items-center gap-1 py-1.5 rounded-md text-sm transition-colors",
                   isActive
                     ? "bg-accent text-accent-foreground"
-                    : "hover:bg-accent/50 text-muted-foreground"
+                    : "hover:bg-accent/50 text-muted-foreground",
                 )}
               >
                 {/* Playlist name - 点击选择 */}
@@ -210,7 +212,9 @@ export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemPro
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem onClick={() => setIsRenameDialogOpen(true)}>
+                      <DropdownMenuItem
+                        onClick={() => setIsRenameDialogOpen(true)}
+                      >
                         <Pencil className="w-4 h-4 mr-2" />
                         Rename
                       </DropdownMenuItem>
@@ -236,7 +240,11 @@ export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemPro
                 ) : (
                   <div className="flex items-center gap-1.5 overflow-hidden min-w-0">
                     {shownIds.map((id) => (
-                      <Thumbnail key={id} wallpaperId={id} className="w-8 h-8 shrink-0" />
+                      <Thumbnail
+                        key={id}
+                        wallpaperId={id}
+                        className="w-8 h-8 shrink-0"
+                      />
                     ))}
                     {overflow > 0 && overflowThumbnailId && (
                       <div className="relative w-8 h-8 shrink-0">
@@ -280,18 +288,15 @@ export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemPro
         ref={setNodeRef}
         style={style}
         value={playlist.id}
-        className={cn(
-          "border-0",
-          isDragging && "opacity-50 shadow-lg z-50"
-        )}
+        className={cn("border-0", isDragging && "opacity-50 shadow-lg z-50")}
       >
         {/* 整个 header 区域可拖动 */}
         <div
           className={cn(
-            "group flex items-center gap-1 px-2 py-1.5 rounded-md text-sm transition-colors cursor-grab active:cursor-grabbing",
+            "group flex items-center gap-1 px-2 h-9 rounded-md text-sm transition-colors cursor-grab active:cursor-grabbing",
             isActive
               ? "bg-accent text-accent-foreground"
-              : "hover:bg-accent/50 text-muted-foreground"
+              : "hover:bg-accent/50 text-muted-foreground",
           )}
           {...attributes}
           {...listeners}
@@ -362,7 +367,11 @@ export function PlaylistItem({ playlist, variant = "floating" }: PlaylistItemPro
           ) : (
             <div className="flex items-center gap-1.5 overflow-hidden min-w-0">
               {shownIds.map((id) => (
-                <Thumbnail key={id} wallpaperId={id} className="w-8 h-8 shrink-0" />
+                <Thumbnail
+                  key={id}
+                  wallpaperId={id}
+                  className="w-8 h-8 shrink-0"
+                />
               ))}
               {overflow > 0 && overflowThumbnailId && (
                 <div className="relative w-8 h-8 shrink-0">

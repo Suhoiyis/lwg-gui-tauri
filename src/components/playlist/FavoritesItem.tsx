@@ -66,31 +66,30 @@ export function FavoritesItem({ variant = "floating" }: FavoritesItemProps) {
   // locked 模式：带左侧图标槽的对齐布局
   if (variant === "locked") {
     return (
-      <AccordionItem
-        value={FAVORITES_PLAYLIST_ID}
-        className="border-0"
-      >
+      <AccordionItem value={FAVORITES_PLAYLIST_ID} className="border-0">
         {/* 外层行容器：图标槽 + 内容 */}
-        <div className="flex items-start">
+        <div className="flex items-center">
           {/* 左侧图标槽 - 固定 48px 宽 */}
-          <div className="w-12 shrink-0 flex items-center justify-center pt-1.5">
+          <div className="w-12 shrink-0 flex items-center justify-center">
             <button
               onClick={() => setActivePlaylist(FAVORITES_PLAYLIST_ID)}
               className={cn(
                 "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
                 isActive
                   ? "bg-brand text-brand-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
               )}
               title={`Favorites (${total})`}
             >
-              <Star className={cn(
-                "w-4 h-4 transition-transform duration-200",
-                isActive && "fill-current scale-110"
-              )} />
+              <Star
+                className={cn(
+                  "w-4 h-4 transition-transform duration-200",
+                  isActive && "fill-current scale-110",
+                )}
+              />
             </button>
           </div>
-          
+
           {/* 右侧内容槽 */}
           <div className="flex-1 pr-2 min-w-0">
             {/* Header */}
@@ -99,17 +98,21 @@ export function FavoritesItem({ variant = "floating" }: FavoritesItemProps) {
                 "group flex items-center gap-1 py-1.5 rounded-md text-sm transition-colors",
                 isActive
                   ? "bg-brand/10 text-brand font-medium"
-                  : "hover:bg-accent/50 text-muted-foreground"
+                  : "hover:bg-accent/50 text-muted-foreground",
               )}
             >
               <div
                 className="flex-1 min-w-0 flex items-center gap-2 cursor-pointer"
                 onClick={() => setActivePlaylist(FAVORITES_PLAYLIST_ID)}
               >
-                <Star className={cn(
-                  "w-3.5 h-3.5 shrink-0",
-                  isActive ? "fill-brand text-brand" : "fill-yellow-400 text-yellow-400"
-                )} />
+                <Star
+                  className={cn(
+                    "w-3.5 h-3.5 shrink-0",
+                    isActive
+                      ? "fill-brand text-brand"
+                      : "fill-yellow-400 text-yellow-400",
+                  )}
+                />
                 <span className="truncate">Favorites</span>
               </div>
 
@@ -132,12 +135,17 @@ export function FavoritesItem({ variant = "floating" }: FavoritesItemProps) {
             <AccordionContent className="pt-1 pb-2 px-0">
               {total === 0 ? (
                 <div className="text-xs text-muted-foreground px-1">
-                  No favorites yet. Click the star icon on any wallpaper to add it.
+                  No favorites yet. Click the star icon on any wallpaper to add
+                  it.
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5 overflow-hidden min-w-0">
                   {shownIds.map((id) => (
-                    <Thumbnail key={id} wallpaperId={id} className="w-8 h-8 shrink-0" />
+                    <Thumbnail
+                      key={id}
+                      wallpaperId={id}
+                      className="w-8 h-8 shrink-0"
+                    />
                   ))}
                   {overflow > 0 && overflowThumbnailId && (
                     <div className="relative w-8 h-8 shrink-0">
@@ -161,17 +169,14 @@ export function FavoritesItem({ variant = "floating" }: FavoritesItemProps) {
 
   // floating 模式：原始布局
   return (
-    <AccordionItem
-      value={FAVORITES_PLAYLIST_ID}
-      className="border-0"
-    >
+    <AccordionItem value={FAVORITES_PLAYLIST_ID} className="border-0">
       {/* Header - 不可拖动，没有 cursor-grab */}
       <div
         className={cn(
-          "group flex items-center gap-1 px-2 py-1.5 rounded-md text-sm transition-colors",
+          "group flex items-center gap-1 px-2 h-9 rounded-md text-sm transition-colors",
           isActive
             ? "bg-accent text-accent-foreground"
-            : "hover:bg-accent/50 text-muted-foreground"
+            : "hover:bg-accent/50 text-muted-foreground",
         )}
       >
         {/* Star icon + name */}
@@ -208,7 +213,11 @@ export function FavoritesItem({ variant = "floating" }: FavoritesItemProps) {
         ) : (
           <div className="flex items-center gap-1.5 overflow-hidden min-w-0">
             {shownIds.map((id) => (
-              <Thumbnail key={id} wallpaperId={id} className="w-8 h-8 shrink-0" />
+              <Thumbnail
+                key={id}
+                wallpaperId={id}
+                className="w-8 h-8 shrink-0"
+              />
             ))}
             {overflow > 0 && overflowThumbnailId && (
               <div className="relative w-8 h-8 shrink-0">
