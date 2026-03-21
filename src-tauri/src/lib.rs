@@ -18,6 +18,7 @@ use lwg_core::{
     ConfigManager as LwgConfigManager,
     controller::WallpaperController,
     config::AppConfig as LwgAppConfig,
+    config::Playlist as LwgPlaylist,
     wallpaper::WallpaperManager,
     PerformanceMonitor,
     ScreenshotRecord,
@@ -211,6 +212,9 @@ impl From<LwgAppConfig> for AppConfig {
             wallpaper_nicknames: config.wallpaper_nicknames,
             start_hidden: false,
             auto_restore: config.auto_restore,
+            playlists: config.playlists.into_iter().map(|p| p.into()).collect(),
+            cycle_playlist_id: config.cycle_playlist_id,
+            playlist_sidebar_open: config.playlist_sidebar_open,
         }
     }
 }
@@ -244,6 +248,9 @@ impl From<AppConfig> for LwgAppConfig {
             compact_mode: config.compact_mode,
             wallpaper_nicknames: config.wallpaper_nicknames,
             auto_restore: config.auto_restore,
+            playlists: config.playlists.into_iter().map(|p| p.into()).collect(),
+            cycle_playlist_id: config.cycle_playlist_id,
+            playlist_sidebar_open: config.playlist_sidebar_open,
         }
     }
 }
@@ -264,6 +271,32 @@ impl From<ActiveWallpaper> for LwgActiveWallpaper {
         Self {
             wallpaper_id: aw.wallpaper_id,
             is_playing: aw.is_playing,
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+impl From<LwgPlaylist> for Playlist {
+    fn from(p: LwgPlaylist) -> Self {
+        Self {
+            id: p.id,
+            name: p.name,
+            wallpaper_ids: p.wallpaper_ids,
+            created_at: p.created_at,
+            updated_at: p.updated_at,
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+impl From<Playlist> for LwgPlaylist {
+    fn from(p: Playlist) -> Self {
+        Self {
+            id: p.id,
+            name: p.name,
+            wallpaper_ids: p.wallpaper_ids,
+            created_at: p.created_at,
+            updated_at: p.updated_at,
         }
     }
 }
@@ -594,6 +627,29 @@ async fn delete_wallpaper(
         
         std::fs::remove_dir_all(wallpaper_path)
             .map_err(|e| format!("Failed to delete wallpaper folder: {:?}", e))?;
+        
+        // Clean up dead IDs from playlists
+        {
+            let mut cm = _state.config_manager.lock().await;
+            let mut should_save = false;
+            
+            for playlist in cm.config_mut().playlists.iter_mut() {
+                let original_len = playlist.wallpaper_ids.len();
+                playlist.wallpaper_ids.retain(|id| id != &wallpaper_id);
+                if playlist.wallpaper_ids.len() != original_len {
+                    should_save = true;
+                    playlist.updated_at = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs();
+                }
+            }
+            
+            if should_save {
+                cm.save().map_err(|e| format!("Failed to save playlists: {:?}", e))?;
+                println!("🧹 [Rust] Cleaned wallpaper ID from playlists");
+            }
+        }
         
         println!("✅ [Rust] Wallpaper deleted successfully: {}", wallpaper_id);
         log_gui(&_state, &format!("Wallpaper deleted: {}", wallpaper_id));
@@ -1570,18 +1626,34 @@ fn select_next_wallpaper(
     order: &str,
     current_id: Option<&str>,
     all_ids: &[String],
+    cycle_playlist_id: Option<&str>,
+    playlists: &[LwgPlaylist],
 ) -> String {
-    if all_ids.is_empty() {
+    let candidate_ids: Vec<String> = if let Some(playlist_id) = cycle_playlist_id {
+        let playlist_wallpapers = playlists
+            .iter()
+            .find(|p| p.id == playlist_id)
+            .map(|p| p.wallpaper_ids.clone());
+
+        match playlist_wallpapers {
+            Some(ids) if !ids.is_empty() => ids,
+            _ => all_ids.to_vec(),
+        }
+    } else {
+        all_ids.to_vec()
+    };
+
+    if candidate_ids.is_empty() {
         return String::new();
     }
 
     match order {
         "random" => {
             use rand::seq::IndexedRandom;
-            all_ids.choose(&mut rand::rng()).unwrap().clone()
+            candidate_ids.choose(&mut rand::rng()).unwrap().clone()
         }
         "title" | "size" | "type" | "id" => {
-            let mut sorted = all_ids.to_vec();
+            let mut sorted = candidate_ids.to_vec();
             sorted.sort();
 
             let next_index = if let Some(current) = current_id {
@@ -1597,7 +1669,7 @@ fn select_next_wallpaper(
         }
         _ => {
             use rand::seq::IndexedRandom;
-            all_ids.choose(&mut rand::rng()).unwrap().clone()
+            candidate_ids.choose(&mut rand::rng()).unwrap().clone()
         }
     }
 }
@@ -1611,13 +1683,17 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
     let state = app.state::<TauriState>();
 
     // 步骤 1：快速获取配置（纯读取，立刻释放锁）
-    let (cycle_order, cycle_screen) = {
-        let order = {
+    let (cycle_order, cycle_screen, cycle_playlist_id, playlists) = {
+        let (order, playlist_id, plists) = {
             let cm = state.config_manager.lock().await;
-            cm.config().cycle_order.clone()
+            (
+                cm.config().cycle_order.clone(),
+                cm.config().cycle_playlist_id.clone(),
+                cm.config().playlists.clone(),
+            )
         };
         let screen = state.cycle_screen.lock().await.clone();
-        (order, screen)
+        (order, screen, playlist_id, plists)
     };
 
     // 步骤 2：从缓存获取壁纸 ID 列表
@@ -1650,6 +1726,8 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
             &cycle_order,
             None,
             &all_wallpaper_ids,
+            cycle_playlist_id.as_deref(),
+            &playlists,
         );
         cycled_wallpaper_id = new_wp_id.clone();
 
@@ -1663,6 +1741,8 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
                 &cycle_order,
                 Some(&aw.wallpaper_id),
                 &all_wallpaper_ids,
+                cycle_playlist_id.as_deref(),
+                &playlists,
             );
             cycled_wallpaper_id = new_wp_id.clone();
             aw.wallpaper_id = new_wp_id;
@@ -1703,6 +1783,305 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
         lm.info(LogSource::GUI, &format!("Wallpaper cycled ({})", cycle_order));
     }
 
+    Ok(())
+}
+
+// ================= Playlist 命令 =================
+
+/// 获取所有播放列表
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn get_playlists(
+    state: State<'_, TauriState>,
+) -> Result<Vec<Playlist>, String> {
+    let cm = state.config_manager.lock().await;
+    Ok(cm.config().playlists.iter().map(|p| p.clone().into()).collect())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn get_playlists() -> Result<Vec<Playlist>, String> {
+    Ok(vec![])
+}
+
+/// 创建播放列表
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn create_playlist(
+    id: String,
+    name: String,
+    wallpaper_ids: Vec<String>,
+    state: State<'_, TauriState>,
+) -> Result<Playlist, String> {
+    let name = name.trim();
+    if name.is_empty() {
+        return Err("Playlist name cannot be empty".to_string());
+    }
+    if id.is_empty() || id.len() != 36 {
+        return Err("Invalid playlist ID format".to_string());
+    }
+
+    {
+        let cm = state.config_manager.lock().await;
+        if cm.config().playlists.iter().any(|p| p.id == id) {
+            return Err(format!("Playlist with ID {} already exists", id));
+        }
+    }
+
+    let mut seen = std::collections::HashSet::new();
+    let deduped_ids: Vec<String> = wallpaper_ids
+        .into_iter()
+        .filter(|id| seen.insert(id.clone()))
+        .collect();
+
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+
+    let playlist = LwgPlaylist {
+        id,
+        name: name.to_string(),
+        wallpaper_ids: deduped_ids,
+        created_at: now,
+        updated_at: now,
+    };
+
+    let result = playlist.clone();
+    {
+        let mut cm = state.config_manager.lock().await;
+        cm.config_mut().playlists.push(playlist);
+        cm.save().map_err(|e| format!("Failed to save: {:?}", e))?;
+    }
+
+    Ok(result.into())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn create_playlist(
+    id: String,
+    name: String,
+    wallpaper_ids: Vec<String>,
+) -> Result<Playlist, String> {
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    Ok(Playlist {
+        id,
+        name,
+        wallpaper_ids,
+        created_at: now,
+        updated_at: now,
+    })
+}
+
+/// 更新播放列表
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn update_playlist(
+    id: String,
+    name: Option<String>,
+    wallpaper_ids: Option<Vec<String>>,
+    state: State<'_, TauriState>,
+) -> Result<(), String> {
+    let mut cm = state.config_manager.lock().await;
+
+    let playlist = cm.config_mut()
+        .playlists
+        .iter_mut()
+        .find(|p| p.id == id)
+        .ok_or_else(|| format!("Playlist not found: {}", id))?;
+
+    if let Some(n) = name {
+        let n = n.trim();
+        if n.is_empty() {
+            return Err("Playlist name cannot be empty".to_string());
+        }
+        playlist.name = n.to_string();
+    }
+
+    if let Some(ids) = wallpaper_ids {
+        let mut seen = std::collections::HashSet::new();
+        let deduped_ids: Vec<String> = ids
+            .into_iter()
+            .filter(|id| seen.insert(id.clone()))
+            .collect();
+        playlist.wallpaper_ids = deduped_ids;
+    }
+
+    playlist.updated_at = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+
+    cm.save().map_err(|e| format!("Failed to save: {:?}", e))?;
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn update_playlist(
+    _id: String,
+    _name: Option<String>,
+    _wallpaper_ids: Option<Vec<String>>,
+) -> Result<(), String> {
+    Ok(())
+}
+
+/// 删除播放列表
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn delete_playlist(
+    id: String,
+    state: State<'_, TauriState>,
+) -> Result<(), String> {
+    let mut cm = state.config_manager.lock().await;
+
+    let index = cm.config()
+        .playlists
+        .iter()
+        .position(|p| p.id == id)
+        .ok_or_else(|| format!("Playlist not found: {}", id))?;
+
+    cm.config_mut().playlists.remove(index);
+
+    if cm.config().cycle_playlist_id.as_ref() == Some(&id) {
+        cm.config_mut().cycle_playlist_id = None;
+    }
+
+    cm.save().map_err(|e| format!("Failed to save: {:?}", e))?;
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn delete_playlist(_id: String) -> Result<(), String> {
+    Ok(())
+}
+
+/// 重排序播放列表
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn reorder_playlists(
+    ordered_ids: Vec<String>,
+    state: State<'_, TauriState>,
+) -> Result<(), String> {
+    let mut cm = state.config_manager.lock().await;
+
+    let id_to_playlist: std::collections::HashMap<String, LwgPlaylist> = cm.config()
+        .playlists
+        .iter()
+        .map(|p| (p.id.clone(), p.clone()))
+        .collect();
+
+    let mut new_playlists: Vec<LwgPlaylist> = Vec::new();
+    let mut processed_ids: std::collections::HashSet<String> = std::collections::HashSet::new();
+
+    for id in &ordered_ids {
+        if let Some(playlist) = id_to_playlist.get(id) {
+            new_playlists.push(playlist.clone());
+            processed_ids.insert(id.clone());
+        }
+    }
+
+    for playlist in &cm.config().playlists {
+        if !processed_ids.contains(&playlist.id) {
+            new_playlists.push(playlist.clone());
+        }
+    }
+
+    cm.config_mut().playlists = new_playlists;
+    cm.save().map_err(|e| format!("Failed to save: {:?}", e))?;
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn reorder_playlists(_ordered_ids: Vec<String>) -> Result<(), String> {
+    Ok(())
+}
+
+/// 设置轮换播放列表
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn set_cycle_playlist(
+    id: Option<String>,
+    state: State<'_, TauriState>,
+) -> Result<(), String> {
+    let mut cm = state.config_manager.lock().await;
+
+    if let Some(ref playlist_id) = id {
+        let exists = cm.config()
+            .playlists
+            .iter()
+            .any(|p| &p.id == playlist_id);
+
+        if !exists {
+            return Err(format!("Playlist not found: {}", playlist_id));
+        }
+    }
+
+    cm.config_mut().cycle_playlist_id = id;
+    cm.save().map_err(|e| format!("Failed to save: {:?}", e))?;
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn set_cycle_playlist(_id: Option<String>) -> Result<(), String> {
+    Ok(())
+}
+
+/// 获取当前轮换播放列表 ID
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn get_cycle_playlist(
+    state: State<'_, TauriState>,
+) -> Result<Option<String>, String> {
+    let cm = state.config_manager.lock().await;
+    Ok(cm.config().cycle_playlist_id.clone())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn get_cycle_playlist() -> Result<Option<String>, String> {
+    Ok(None)
+}
+
+/// 获取侧边栏显示状态
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn get_playlist_sidebar_open(
+    state: State<'_, TauriState>,
+) -> Result<bool, String> {
+    let cm = state.config_manager.lock().await;
+    Ok(cm.config().playlist_sidebar_open)
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn get_playlist_sidebar_open() -> Result<bool, String> {
+    Ok(true)
+}
+
+/// 设置侧边栏状态
+#[cfg(target_os = "linux")]
+#[tauri::command]
+async fn set_playlist_sidebar_open(
+    open: bool,
+    state: State<'_, TauriState>,
+) -> Result<(), String> {
+    let mut cm = state.config_manager.lock().await;
+    cm.config_mut().playlist_sidebar_open = open;
+    cm.save().map_err(|e| format!("Failed to save: {:?}", e))?;
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+async fn set_playlist_sidebar_open(_open: bool) -> Result<(), String> {
     Ok(())
 }
 
@@ -2127,6 +2506,16 @@ pub fn run() {
             // Update check commands
             check_for_updates,
             get_app_version,
+            // Playlist commands
+            get_playlists,
+            create_playlist,
+            update_playlist,
+            delete_playlist,
+            reorder_playlists,
+            set_cycle_playlist,
+            get_cycle_playlist,
+            get_playlist_sidebar_open,
+            set_playlist_sidebar_open,
             // Cycle commands
             start_cycle_timer,
             stop_cycle_timer,

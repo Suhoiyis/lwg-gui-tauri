@@ -1090,7 +1090,7 @@ getFilteredWallpapers: () => {
     // 持久化
     if (isTauri) {
       try {
-        await invoke('rename_playlist', { id, name: trimmedName });
+        await invoke('update_playlist', { id, name: trimmedName });
         toast.success('Playlist renamed');
       } catch (error) {
         set({ playlists: previousPlaylists });
