@@ -346,6 +346,7 @@ export function PlaylistSidebar() {
 
   const [isMouseInside, setIsMouseInside] = useState(false);
   const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
+  const hoverExpandTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Transition states
   const [isClosingToMinimized, setIsClosingToMinimized] = useState(false);
@@ -409,6 +410,26 @@ export function PlaylistSidebar() {
   const handleMouseEnter = useCallback(() => setIsMouseInside(true), []);
   const handleMouseLeave = useCallback(() => setIsMouseInside(false), []);
 
+  const handleHoverExpand = useCallback(() => {
+    if (!isOpen) {
+      openPlaylistSidebarFloating();
+      setIsMouseInside(true);
+    }
+  }, [isOpen, openPlaylistSidebarFloating]);
+
+  const handleIconColumnMouseEnter = useCallback(() => {
+    if (!isOpen) {
+      hoverExpandTimerRef.current = setTimeout(handleHoverExpand, 300);
+    }
+  }, [isOpen, handleHoverExpand]);
+
+  const handleIconColumnMouseLeave = useCallback(() => {
+    if (hoverExpandTimerRef.current) {
+      clearTimeout(hoverExpandTimerRef.current);
+      hoverExpandTimerRef.current = null;
+    }
+  }, []);
+
   const handleExpandClick = useCallback(() => {
     openPlaylistSidebarFloating();
     setIsMouseInside(true);
@@ -439,7 +460,11 @@ export function PlaylistSidebar() {
   return (
     <>
       {/* 图标列 - 始终 48px，三种模式下都可见 */}
-      <div className="w-12 h-full bg-sidebar border-r border-border/30 shrink-0 flex flex-col">
+      <div
+        className="w-12 h-full bg-sidebar border-r border-border/30 shrink-0 flex flex-col"
+        onMouseEnter={handleIconColumnMouseEnter}
+        onMouseLeave={handleIconColumnMouseLeave}
+      >
         <IconColumn
           isExpanded={isOpen}
           onToggle={isOpen ? togglePlaylistSidebar : handleExpandClick}
