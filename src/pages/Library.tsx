@@ -5,7 +5,12 @@ import { toast } from "sonner";
 
 // Layout & UI Components
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EmptyState, PlaylistEmptyState, SearchEmptyState, FavoritesEmptyState } from "@/components/common/Empty";
+import {
+  EmptyState,
+  PlaylistEmptyState,
+  SearchEmptyState,
+  FavoritesEmptyState,
+} from "@/components/common/Empty";
 import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -69,7 +74,15 @@ export function Library() {
 
   const filteredWallpapers = useMemo(() => {
     return useAppStore.getState().getFilteredWallpapers();
-  }, [wallpapers, searchQuery, sortBy, activePlaylistId, playlists, favoriteIds, nicknames]);
+  }, [
+    wallpapers,
+    searchQuery,
+    sortBy,
+    activePlaylistId,
+    playlists,
+    favoriteIds,
+    nicknames,
+  ]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -215,22 +228,24 @@ export function Library() {
                 {/* Selection Mode Bar */}
                 {isSelectionMode && <SelectionModeBar />}
 
-{/* Content Area */}
-                  <TooltipProvider>
-                    <ScrollArea className="flex-1 w-full h-full">
-                      {filteredWallpapers.length === 0 ? (
-                        <div className="flex h-full min-h-[50vh] items-center justify-center">
-                          {searchQuery ? (
-                            <SearchEmptyState query={searchQuery} />
-                          ) : activePlaylistId === FAVORITES_PLAYLIST_ID ? (
-                            <FavoritesEmptyState />
-                          ) : activePlaylistId ? (
-                            <PlaylistEmptyState playlistName={activePlaylist?.name} />
-                          ) : (
-                            <EmptyState />
-                          )}
-                        </div>
-                      ) : (
+                {/* Content Area */}
+                <TooltipProvider>
+                  <ScrollArea className="flex-1 w-full h-full">
+                    {filteredWallpapers.length === 0 ? (
+                      <div className="flex h-full min-h-[50vh] items-center justify-center">
+                        {searchQuery ? (
+                          <SearchEmptyState query={searchQuery} />
+                        ) : activePlaylistId === FAVORITES_PLAYLIST_ID ? (
+                          <FavoritesEmptyState />
+                        ) : activePlaylistId ? (
+                          <PlaylistEmptyState
+                            playlistName={activePlaylist?.name}
+                          />
+                        ) : (
+                          <EmptyState />
+                        )}
+                      </div>
+                    ) : (
                       <div className="px-6 pb-10">
                         <div ref={scrollTopRef} />
 
@@ -271,7 +286,7 @@ export function Library() {
             <ResizablePanel
               defaultSize="20%"
               minSize={300}
-              maxSize="40%"
+              maxSize={350}
               className="bg-muted/30 min-w-[300px] max-w-[450px]"
             >
               <WallpaperSidebar />
