@@ -58,7 +58,7 @@ function IconColumn() {
             className={cn(
               "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
               !activePlaylistId
-                ? "bg-accent text-accent-foreground shadow-sm"
+                ? "bg-accent text-accent-foreground shadow-sm scale-110"
                 : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
             )}
             title="All Wallpapers"
@@ -73,16 +73,17 @@ function IconColumn() {
             className={cn(
               "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
               activePlaylistId === FAVORITES_PLAYLIST_ID
-                ? "bg-brand text-brand-foreground shadow-sm"
+                ? "bg-accent shadow-sm scale-110"
                 : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
             )}
             title={`Favorites (${favoriteIds.size})`}
           >
             <Star
               className={cn(
-                "w-4 h-4 transition-transform duration-200",
-                activePlaylistId === FAVORITES_PLAYLIST_ID &&
-                  "fill-current scale-110",
+                "w-4 h-4 transition-all duration-200",
+                activePlaylistId === FAVORITES_PLAYLIST_ID
+                  ? "fill-yellow-400 text-yellow-400"
+                  : "",
               )}
             />
           </button>
@@ -94,8 +95,8 @@ function IconColumn() {
               className={cn(
                 "w-9 h-9 rounded-md flex items-center justify-center transition-all duration-200",
                 activePlaylistId === playlist.id
-                  ? "ring-2 ring-accent ring-offset-1 ring-offset-sidebar"
-                  : "hover:scale-105",
+                  ? "bg-accent shadow-sm scale-110"
+                  : "hover:bg-accent/50",
               )}
               title={playlist.name}
             >
@@ -103,7 +104,7 @@ function IconColumn() {
                 className={cn(
                   "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold text-white transition-transform duration-200",
                   generateAvatarColor(playlist.name),
-                  activePlaylistId === playlist.id && "scale-110",
+                  activePlaylistId === playlist.id && "scale-105",
                 )}
               >
                 {getInitial(playlist.name)}
