@@ -82,6 +82,17 @@ pub struct UpdateCheckResult {
     pub download_url: Option<String>,
 }
 
+/// 播放列表
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Playlist {
+    pub id: String,
+    pub name: String,
+    pub wallpaper_ids: Vec<String>,
+    pub created_at: u64,
+    pub updated_at: u64,
+}
+
 /// 跨平台配置结构体 (user preferences only)
 /// Linux: 与 lwg_core::AppConfig 完全一致
 /// Windows: Mock 版本，用于 UI 开发
@@ -118,6 +129,9 @@ pub struct AppConfig {
     pub start_hidden: bool,
     #[serde(rename = "autoRestore")]
     pub auto_restore: bool,
+    pub playlists: Vec<Playlist>,
+    pub cycle_playlist_id: Option<String>,
+    pub playlist_sidebar_open: bool,
 }
 
 impl Default for AppConfig {
@@ -149,6 +163,9 @@ impl Default for AppConfig {
             wallpaper_nicknames: std::collections::HashMap::new(),
             start_hidden: false,
             auto_restore: false,
+            playlists: Vec::new(),
+            cycle_playlist_id: None,
+            playlist_sidebar_open: true,
         }
     }
 }
@@ -422,7 +439,7 @@ async fn get_wallpapers(_state: State<'_, TauriState>) -> Result<Vec<Wallpaper>,
         let config_manager = _state.config_manager.lock().await;
         let workshop_path = config_manager.config().workshop_path
             .clone()
-            .unwrap_or_else(|| get_default_workshop_path);
+            .unwrap_or_else(|| get_default_workshop_path());
         drop(config_manager);
 
         println!("📁 [Linux] Workshop 路径: {}", workshop_path);
@@ -1560,15 +1577,12 @@ fn select_next_wallpaper(
 
     match order {
         "random" => {
-            use rand::seq::SliceRandom;
+            use rand::seq::IndexedRandom;
             all_ids.choose(&mut rand::rng()).unwrap().clone()
         }
         "title" | "size" | "type" | "id" => {
-            let sorted_ids = {
-                let mut sorted = all_ids.to_vec();
-                sorted.sort();
-                sorted
-            };
+            let mut sorted = all_ids.to_vec();
+            sorted.sort();
 
             let next_index = if let Some(current) = current_id {
                 let current_index = sorted.iter()
@@ -1579,10 +1593,10 @@ fn select_next_wallpaper(
                 0
             };
 
-            sorted_ids[next_index].clone()
+            sorted[next_index].clone()
         }
         _ => {
-            use rand::seq::SliceRandom;
+            use rand::seq::IndexedRandom;
             all_ids.choose(&mut rand::rng()).unwrap().clone()
         }
     }
@@ -1676,7 +1690,7 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
 
     // 步骤 7：执行耗时的进程重启（不持有任何锁！）
     {
-        let controller = state.controller.lock().await;
+        let mut controller = state.controller.lock().await;
         controller.restart_wallpapers().await
             .map_err(|e| format!("Restart error: {:?}", e))?;
     }
