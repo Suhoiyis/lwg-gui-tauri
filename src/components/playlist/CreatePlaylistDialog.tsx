@@ -64,6 +64,8 @@ export function CreatePlaylistDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const MAX_NAME_LENGTH = 15;
+
   // Generate default name when dialog opens
   const defaultName = useMemo(() => getNextPlaylistName(playlists), [playlists]);
 
@@ -123,7 +125,7 @@ export function CreatePlaylistDialog({
                 setError(null);
               }}
               placeholder="My Playlist"
-              maxLength={100}
+              maxLength={MAX_NAME_LENGTH}
               className={error ? "border-red-500 focus-visible:ring-red-500" : ""}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && name.trim() && !isDuplicateName) {
@@ -131,12 +133,18 @@ export function CreatePlaylistDialog({
                 }
               }}
             />
-            {error && (
-              <p className="text-xs text-red-500">{error}</p>
-            )}
-            {isDuplicateName && !error && (
-              <p className="text-xs text-amber-500">A playlist with this name already exists</p>
-            )}
+            <div className="flex justify-between items-center">
+              {error ? (
+                <p className="text-xs text-red-500">{error}</p>
+              ) : isDuplicateName ? (
+                <p className="text-xs text-amber-500">A playlist with this name already exists</p>
+              ) : (
+                <span />
+              )}
+              <p className="text-xs text-muted-foreground shrink-0">
+                {name.length}/{MAX_NAME_LENGTH}
+              </p>
+            </div>
             <p className="text-xs text-muted-foreground">
               {initialWallpaperIds.length > 0 && (
                 <span>

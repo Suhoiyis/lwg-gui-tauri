@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -26,20 +26,27 @@ export function RenamePlaylistDialog({
   currentName,
 }: RenamePlaylistDialogProps) {
   const renamePlaylist = useAppStore((state) => state.renamePlaylist);
+  const playlists = useAppStore((state) => state.playlists);
 
   const [name, setName] = useState(currentName);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Update name when dialog opens with current name
+  const MAX_NAME_LENGTH = 15;
+
   useEffect(() => {
     if (open) {
       setName(currentName);
     }
   }, [open, currentName]);
 
+  const isDuplicateName = useMemo(() => {
+    const trimmedName = name.trim().toLowerCase();
+    if (trimmedName === currentName.toLowerCase()) return false;
+    return playlists.some(p => p.name.toLowerCase() === trimmedName);
+  }, [name, playlists, currentName]);
+
   const handleRename = async () => {
-    if (!name.trim() || name === currentName) {
-      onOpenChange(false);
+    if (!name.trim() || name === currentName || isDuplicateName) {
       return;
     }
 
@@ -48,7 +55,6 @@ export function RenamePlaylistDialog({
       await renamePlaylist(playlistId, name.trim());
       onOpenChange(false);
     } catch (error) {
-      // Error handling is done in the store
     } finally {
       setIsLoading(false);
     }
@@ -71,20 +77,30 @@ export function RenamePlaylistDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Playlist name"
-              maxLength={100}
+              maxLength={MAX_NAME_LENGTH}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && name.trim() && !isDuplicateName) {
                   handleRename();
                 }
               }}
             />
+            <div className="flex justify-between items-center">
+              {isDuplicateName ? (
+                <p className="text-xs text-amber-500">A playlist with this name already exists</p>
+              ) : (
+                <span />
+              )}
+              <p className="text-xs text-muted-foreground shrink-0">
+                {name.length}/{MAX_NAME_LENGTH}
+              </p>
+            </div>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleRename} disabled={!name.trim() || isLoading}>
+          <Button onClick={handleRename} disabled={!name.trim() || isLoading || isDuplicateName || name === currentName}>
             {isLoading ? "Saving..." : "Rename"}
           </Button>
         </DialogFooter>
