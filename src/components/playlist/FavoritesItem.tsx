@@ -105,14 +105,6 @@ export function FavoritesItem({ variant = "floating" }: FavoritesItemProps) {
                 className="flex-1 min-w-0 flex items-center gap-2 cursor-pointer"
                 onClick={() => setActivePlaylist(FAVORITES_PLAYLIST_ID)}
               >
-                <Star
-                  className={cn(
-                    "w-3.5 h-3.5 shrink-0",
-                    isActive
-                      ? "fill-brand text-brand"
-                      : "fill-yellow-400 text-yellow-400",
-                  )}
-                />
                 <span className="truncate">Favorites</span>
               </div>
 

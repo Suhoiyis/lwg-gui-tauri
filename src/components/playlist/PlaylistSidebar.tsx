@@ -1,13 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import {
-  ChevronRight,
-  ChevronLeft,
-  Plus,
-  ListMusic,
-  Star,
-  Pin,
-  PinOff,
-} from "lucide-react";
+import { Plus, ListMusic, List, Star, Pin, PinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,13 +38,7 @@ function getInitial(name: string): string {
 }
 
 // ===== 图标列（仅最小化模式使用）=====
-function IconColumn({
-  isExpanded,
-  onToggle,
-}: {
-  isExpanded: boolean;
-  onToggle: () => void;
-}) {
+function IconColumn() {
   const playlists = useAppStore((state) => state.playlists);
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
@@ -62,19 +48,8 @@ function IconColumn({
 
   return (
     <>
-      <div className="shrink-0 h-[52px] flex items-center justify-center border-b border-border/30">
-        <button
-          onClick={onToggle}
-          className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
-          title={isExpanded ? "Collapse sidebar" : "Open sidebar (floating)"}
-        >
-          {isExpanded ? (
-            <ChevronLeft className="w-4 h-4" />
-          ) : (
-            <ChevronRight className="w-4 h-4" />
-          )}
-        </button>
-      </div>
+      {/* 占位 Header - 与悬浮/锁定模式 Header 高度对齐 */}
+      <div className="shrink-0 h-[52px] border-b border-border/30" />
 
       <ScrollArea className="flex-1">
         <div className="flex flex-col items-center gap-1 p-2">
@@ -162,11 +137,9 @@ function IconColumn({
 function ExpandedSidebarContent({
   onTogglePin,
   isPinned,
-  onClose,
 }: {
   onTogglePin: () => void;
   isPinned: boolean;
-  onClose: () => void;
 }) {
   const activePlaylistId = useAppStore((state) => state.activePlaylistId);
   const setActivePlaylist = useAppStore((state) => state.setActivePlaylist);
@@ -176,7 +149,7 @@ function ExpandedSidebarContent({
     <>
       <div className="h-[52px] flex items-center justify-between px-3 border-b border-border/30 shrink-0">
         <div className="flex items-center gap-2">
-          <ListMusic className="w-4 h-4 text-muted-foreground" />
+          <List className="w-4 h-4 text-muted-foreground" />
           <span className="font-semibold text-sm">Playlists</span>
         </div>
         <div className="flex items-center gap-0.5">
@@ -193,15 +166,6 @@ function ExpandedSidebarContent({
               <Pin className="w-4 h-4" />
             )}
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 transition-transform duration-200 hover:scale-110"
-            onClick={onClose}
-            title="Close sidebar"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 
@@ -216,7 +180,6 @@ function ExpandedSidebarContent({
                 : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
             )}
           >
-            <ListMusic className="w-4 h-4" />
             <span>All Wallpapers</span>
           </button>
 
@@ -250,11 +213,9 @@ function ExpandedSidebarContent({
 function LockedPanel({
   isClosingFromLocked,
   onTogglePin,
-  onClose,
 }: {
   isClosingFromLocked: boolean;
   onTogglePin: () => void;
-  onClose: () => void;
 }) {
   return (
     <div
@@ -266,11 +227,7 @@ function LockedPanel({
     >
       {/* 内部固定宽度，避免内容被挤压变形 */}
       <div className="w-[220px] h-full flex flex-col">
-        <ExpandedSidebarContent
-          onTogglePin={onTogglePin}
-          isPinned={true}
-          onClose={onClose}
-        />
+        <ExpandedSidebarContent onTogglePin={onTogglePin} isPinned={true} />
       </div>
     </div>
   );
@@ -284,7 +241,6 @@ function FloatingPanel({
   onMouseEnter,
   onMouseLeave,
   onTogglePin,
-  onClose,
 }: {
   isClosingToMinimized: boolean;
   isPinning: boolean;
@@ -292,7 +248,6 @@ function FloatingPanel({
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   onTogglePin: () => void;
-  onClose: () => void;
 }) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -320,11 +275,7 @@ function FloatingPanel({
       onMouseEnter={isFloating ? onMouseEnter : undefined}
       onMouseLeave={isFloating ? onMouseLeave : undefined}
     >
-      <ExpandedSidebarContent
-        onTogglePin={onTogglePin}
-        isPinned={false}
-        onClose={onClose}
-      />
+      <ExpandedSidebarContent onTogglePin={onTogglePin} isPinned={false} />
     </div>
   );
 }
@@ -430,11 +381,6 @@ export function PlaylistSidebar() {
     }
   }, []);
 
-  const handleExpandClick = useCallback(() => {
-    openPlaylistSidebarFloating();
-    setIsMouseInside(true);
-  }, [openPlaylistSidebarFloating]);
-
   const handleTogglePin = useCallback(() => {
     if (isPinned) {
       setIsMouseInside(true);
@@ -465,10 +411,7 @@ export function PlaylistSidebar() {
         onMouseEnter={handleIconColumnMouseEnter}
         onMouseLeave={handleIconColumnMouseLeave}
       >
-        <IconColumn
-          isExpanded={isOpen}
-          onToggle={isOpen ? togglePlaylistSidebar : handleExpandClick}
-        />
+        <IconColumn />
       </div>
 
       {/* 锁定面板 - in-flow 定位，会推开壁纸内容区域 */}
@@ -476,7 +419,6 @@ export function PlaylistSidebar() {
         <LockedPanel
           isClosingFromLocked={isClosingFromLocked}
           onTogglePin={handleTogglePin}
-          onClose={togglePlaylistSidebar}
         />
       )}
 
@@ -489,7 +431,6 @@ export function PlaylistSidebar() {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onTogglePin={handleTogglePin}
-          onClose={closeFloatingToMinimized}
         />
       )}
 
