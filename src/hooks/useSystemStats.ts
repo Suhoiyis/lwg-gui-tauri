@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { isTauriEnv } from "@/lib/utils";
 import {
   SystemStats,
   ProcessStats,
@@ -146,7 +147,7 @@ export function useSystemStats() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     let unlistenPerformance: (() => void) | null = null;
     let mockInterval: NodeJS.Timeout | null = null;
 
@@ -298,7 +299,7 @@ export function useSystemStats() {
   }, []);
 
   const clearHistory = async () => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     if (isTauri) {
       try {
         await invoke("clear_screenshot_history");

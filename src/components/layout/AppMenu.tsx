@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { isTauriEnv } from "@/lib/utils";
 import {
   Menu,
   RefreshCw,
@@ -61,7 +62,7 @@ export function AppMenu() {
 
   const handleCheckUpdate = async () => {
     // Guard: Only run in Tauri environment
-    if (!window.__TAURI_INTERNALS__) {
+    if (!isTauriEnv()) {
       toast.error("Update check is only available in the desktop app");
       return;
     }
@@ -96,7 +97,7 @@ export function AppMenu() {
 
 
   const handleRestart = async () => {
-    if (!window.__TAURI_INTERNALS__) {
+    if (!isTauriEnv()) {
       toast.error("Restart is only available in the desktop app");
       return;
     }
@@ -112,7 +113,7 @@ export function AppMenu() {
   };
 
   const handleConfirmQuit = async () => {
-    if (!window.__TAURI_INTERNALS__) {
+    if (!isTauriEnv()) {
       toast.error("Quit is only available in the desktop app");
       return;
     }

@@ -1,5 +1,6 @@
 import { Zap, MousePointer2, Clock, AlertTriangle, ListMusic } from "lucide-react";
 import { useState, useEffect } from "react";
+import { isTauriEnv } from "@/lib/utils";
 import { invoke } from "@tauri-apps/api/core";
 import { useAppStore } from "@/store/appStore";
 import {
@@ -31,7 +32,7 @@ export function PlaybackSettings() {
   const [isWayland, setIsWayland] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     if (isTauri) {
       invoke<string>("get_display_server")
         .then((result) => {

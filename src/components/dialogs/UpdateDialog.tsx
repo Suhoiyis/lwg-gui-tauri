@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Download, ExternalLink } from "lucide-react";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { isTauriEnv } from "@/lib/utils";
 
 interface UpdateDialogProps {
   open: boolean;
@@ -27,7 +28,7 @@ export function UpdateDialog({
 }: UpdateDialogProps) {
   const handleOpenUrl = async () => {
     try {
-      if (window.__TAURI_INTERNALS__) {
+      if (isTauriEnv()) {
         await openUrl(downloadUrl);
       } else {
         window.open(downloadUrl, "_blank");

@@ -1,5 +1,6 @@
 // src/components/settings/Shared.tsx
 import { Check, ChevronsUpDown } from "lucide-react";
+import { isTauriEnv } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -336,7 +337,7 @@ export function PathInputField({
   className?: string;
 }) {
   const handleBrowse = async () => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     if (!isTauri) {
       console.warn("[Browser Mode] File dialog not available");
       return;

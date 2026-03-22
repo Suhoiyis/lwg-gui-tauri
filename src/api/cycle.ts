@@ -1,19 +1,17 @@
 import { invoke } from "@tauri-apps/api/core";
+import { isTauriEnv } from "@/lib/utils";
 
 export async function startCycleTimer(): Promise<void> {
-  const isTauri = !!(window as any).__TAURI_INTERNALS__;
-  if (!isTauri) return;
+  if (!isTauriEnv()) return;
   await invoke("start_cycle_timer");
 }
 
 export async function stopCycleTimer(): Promise<void> {
-  const isTauri = !!(window as any).__TAURI_INTERNALS__;
-  if (!isTauri) return;
+  if (!isTauriEnv()) return;
   await invoke("stop_cycle_timer");
 }
 
 export async function setCycleScreen(screen: string): Promise<void> {
-  const isTauri = !!(window as any).__TAURI_INTERNALS__;
-  if (!isTauri) return;
+  if (!isTauriEnv()) return;
   await invoke("set_cycle_screen", { screen });
 }

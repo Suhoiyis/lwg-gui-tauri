@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import { Wallpaper, AppConfig, AppState, Playlist } from "../types";
 import { scanWallpapers } from "../api/wallpaper";
-import { parseSize, normalizeType } from "../lib/utils";
+import { parseSize, normalizeType, isTauriEnv } from "../lib/utils";
 import { startCycleTimer, stopCycleTimer, setCycleScreen } from "../api/cycle";
 import { FAVORITES_PLAYLIST_ID } from "../lib/constants";
 
@@ -254,7 +254,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   // App version action
   fetchAppVersion: async () => {
     try {
-      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      const isTauri = isTauriEnv();
       if (isTauri) {
         const version = await invoke<string>("get_app_version");
         set({ appVersion: version });
@@ -310,7 +310,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
 
   // Favorites & nicknames actions
   toggleFavorite: async (id: string) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     
     // Store previous state for rollback on error
     const previousFavorites = get().favoriteIds;
@@ -339,7 +339,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   
   // 幂等添加到收藏（已收藏则无操作）
   addToFavorites: async (id: string) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const currentFavorites = get().favoriteIds;
     
     // 已收藏则无操作
@@ -364,7 +364,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   
   // 幂等从收藏移除（未收藏则无操作）
   removeFromFavorites: async (id: string) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const currentFavorites = get().favoriteIds;
     
     // 未收藏则无操作
@@ -389,7 +389,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   
   isFavorite: (id: string) => get().favoriteIds.has(id),
   setNickname: async (id: string, nickname: string) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const previousNicknames = get().nicknames;
     const trimmed = nickname.trim().slice(0, 100);
     const newNicknames = { ...previousNicknames };
@@ -417,7 +417,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   fetchMonitors: async () => {
     set({ monitorsLoading: true });
     try {
-      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      const isTauri = isTauriEnv();
       if (!isTauri) {
         // Browser mode - return empty array
         set({ monitors: [], monitorsLoading: false });
@@ -438,7 +438,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     set({ settingsLoading: true });
     try {
       // ✨ 1. 检查是否在 Tauri 环境中
-      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      const isTauri = isTauriEnv();
 
       let settings;
       if (isTauri) {
@@ -488,7 +488,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   initializeSettings: async () => {
     set({ settingsLoading: true });
     try {
-      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      const isTauri = isTauriEnv();
       if (isTauri) {
         const settings = await invoke<AppConfig>("get_settings");
         set({ settings, settingsLoading: false });
@@ -565,7 +565,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     const newSettings = { ...currentSettings, [key]: value };
     set({ settings: newSettings });
 
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     if (!isTauri) {
       console.log(`[Mock Mode] Updated ${String(key)}:`, value);
       return;
@@ -629,7 +629,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
       throw new Error("No settings to save");
     }
     try {
-      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      const isTauri = isTauriEnv();
       if (isTauri) {
         await invoke("save_settings", { config: settings });
       } else {
@@ -645,7 +645,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
 
   getState: async () => {
     try {
-      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      const isTauri = isTauriEnv();
       if (!isTauri) {
         return {};
       }
@@ -662,7 +662,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
 
   saveRuntimeState: async (state: AppState) => {
     try {
-      const isTauri = !!(window as any).__TAURI_INTERNALS__;
+      const isTauri = isTauriEnv();
       if (!isTauri) {
         set({ runtimeState: state });
         return;
@@ -798,7 +798,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
 
 
   removeWallpaper: async (id: string, path: string) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     
     // Store previous state for rollback
     const previousWallpapers = get().wallpapers;
@@ -943,7 +943,7 @@ getFilteredWallpapers: () => {
     const previous = get().isCompactMode;
     set({ isCompactMode: enabled });
 
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     if (isTauri) {
       const currentSettings = get().settings;
       if (currentSettings) {
@@ -1014,7 +1014,7 @@ getFilteredWallpapers: () => {
   // ===== Playlist 方法实现 =====
 
   loadPlaylists: async () => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     
     try {
       if (isTauri) {
@@ -1038,7 +1038,7 @@ getFilteredWallpapers: () => {
   },
 
   createPlaylist: async (name: string, wallpaperIds: string[]) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const state = get();
     
     // 检查空名称
@@ -1096,7 +1096,7 @@ getFilteredWallpapers: () => {
   },
 
   renamePlaylist: async (id: string, name: string) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     
     const trimmedName = name.trim().slice(0, 100);
     
@@ -1146,7 +1146,7 @@ getFilteredWallpapers: () => {
   },
 
   deletePlaylist: async (id: string) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const state = get();
     
     // 保存状态以便回滚
@@ -1206,7 +1206,7 @@ getFilteredWallpapers: () => {
   },
 
   reorderPlaylists: async (orderedIds: string[]) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const state = get();
     
     // 根据 orderedIds 重新排序 playlists
@@ -1234,7 +1234,7 @@ getFilteredWallpapers: () => {
   },
 
   addToPlaylist: async (playlistId: string, newWallpaperIds: string[]) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const state = get();
     const playlist = state.playlists.find(p => p.id === playlistId);
     
@@ -1283,7 +1283,7 @@ getFilteredWallpapers: () => {
   },
 
   removeFromPlaylist: async (playlistId: string, wallpaperId: string) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const state = get();
     const playlist = state.playlists.find(p => p.id === playlistId);
     
@@ -1323,7 +1323,7 @@ getFilteredWallpapers: () => {
   },
 
   setCyclePlaylist: async (id: string | null) => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const previousCyclePlaylistId = get().cyclePlaylistId;
 
     set({ cyclePlaylistId: id });
@@ -1346,7 +1346,7 @@ getFilteredWallpapers: () => {
   },
 
   togglePlaylistSidebar: () => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     const previousOpen = get().isPlaylistSidebarOpen;
     const newOpen = !get().isPlaylistSidebarOpen;
     set({ isPlaylistSidebarOpen: newOpen });

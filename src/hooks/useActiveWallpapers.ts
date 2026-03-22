@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { isTauriEnv } from "@/lib/utils";
 
 export interface ActiveWallpaper {
   screen: string;
@@ -13,7 +14,10 @@ export function useActiveWallpapers() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    if (!isTauriEnv()) {
+      setIsLoading(false);
+      return;
+    }
 
     const fetchActiveWallpapers = async () => {
       try {
@@ -33,10 +37,6 @@ export function useActiveWallpapers() {
     };
 
     fetchActiveWallpapers();
-
-    if (!isTauri) {
-      return;
-    }
 
     const setupListeners = async () => {
       const unlistenPerf = await listen("performance-update", () => {

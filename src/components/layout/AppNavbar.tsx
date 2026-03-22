@@ -13,6 +13,7 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { isTauriEnv } from "@/lib/utils";
 import { Button as StatefulButton } from "@/components/common/StatefulButton";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -83,7 +84,7 @@ export function AppNavbar() {
     useState<ScreenshotResult | null>(null);
 
   const handleSwitchToCompact = async () => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
 
     if (!isTauri) {
       console.warn("[Browser Mode] Skipping window resize, toggling UI only.");

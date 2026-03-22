@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAppStore } from "@/store/appStore";
+import { isTauriEnv } from "@/lib/utils";
 
 // 子组件
 import { CompactNavbar } from "@/components/compact/CompactNavbar";
@@ -40,7 +41,7 @@ export function CompactMode() {
 
   // 切换到正常窗口模式
   const handleSwitchToNormal = async () => {
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     if (!isTauri) {
       console.warn("Detected non-Tauri environment. Skipping window resize.");
       toggleCompactMode(false);

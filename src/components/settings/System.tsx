@@ -1,5 +1,6 @@
 // src/components/settings/System.tsx
 import { useState, useEffect, useCallback } from "react";
+import { isTauriEnv } from "@/lib/utils";
 import { invoke } from "@tauri-apps/api/core";
 import { useAppStore } from "@/store/appStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,7 +49,7 @@ export function SystemSettings() {
 
   useEffect(() => {
     // 检测 Xvfb 是否安装
-    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const isTauri = isTauriEnv();
     if (isTauri) {
       invoke<boolean>("check_xvfb_available")
         .then((available) => {
