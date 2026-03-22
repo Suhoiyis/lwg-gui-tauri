@@ -1,6 +1,7 @@
 import React from "react";
-import { ListMusic } from "lucide-react";
+import { ListMusic, Star } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
+import { FAVORITES_PLAYLIST_ID } from "@/lib/constants";
 import {
   Select,
   SelectContent,
@@ -19,22 +20,27 @@ export function CyclePlaylistSelector({
   const playlists = useAppStore((state) => state.playlists);
   const cyclePlaylistId = useAppStore((state) => state.cyclePlaylistId);
   const setCyclePlaylist = useAppStore((state) => state.setCyclePlaylist);
+  const favoriteIds = useAppStore((state) => state.favoriteIds);
 
-  // Robustness check: if cyclePlaylistId doesn't exist in playlists, fallback to ALL
+  const isSpecialPlaylist = (id: string | null): boolean => {
+    return id === FAVORITES_PLAYLIST_ID;
+  };
+
   React.useEffect(() => {
     if (cyclePlaylistId) {
+      const isSpecial = isSpecialPlaylist(cyclePlaylistId);
       const exists = playlists.some((p) => p.id === cyclePlaylistId);
-      if (!exists) {
+      if (!isSpecial && !exists) {
         setCyclePlaylist(null);
       }
     }
   }, [cyclePlaylistId, playlists, setCyclePlaylist]);
 
-  // Determine effective value
   const effectiveValue = React.useMemo(() => {
     if (!cyclePlaylistId) return "ALL";
+    const isSpecial = isSpecialPlaylist(cyclePlaylistId);
     const exists = playlists.some((p) => p.id === cyclePlaylistId);
-    return exists ? cyclePlaylistId : "ALL";
+    return isSpecial || exists ? cyclePlaylistId : "ALL";
   }, [cyclePlaylistId, playlists]);
 
   const handleValueChange = (value: string) => {
@@ -51,6 +57,15 @@ export function CyclePlaylistSelector({
           <div className="flex items-center gap-2">
             <ListMusic className="w-4 h-4" />
             <span>All Wallpapers</span>
+          </div>
+        </SelectItem>
+        <SelectItem value={FAVORITES_PLAYLIST_ID}>
+          <div className="flex items-center gap-2">
+            <Star className="w-4 h-4" />
+            <span>Favorites</span>
+            <span className="text-muted-foreground text-xs">
+              ({favoriteIds.size})
+            </span>
           </div>
         </SelectItem>
         {playlists.map((playlist) => (

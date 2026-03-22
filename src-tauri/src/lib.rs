@@ -1652,6 +1652,9 @@ async fn clear_logs() -> Result<(), String> {
 
 // ================= 壁纸轮换命令 =================
 
+/// Favorites 虚拟播放列表的特殊 ID
+const FAVORITES_PLAYLIST_ID: &str = "__favorites__";
+
 /// 选择下一张壁纸（纯函数，无副作用）
 #[cfg(target_os = "linux")]
 fn select_next_wallpaper(
@@ -1660,16 +1663,47 @@ fn select_next_wallpaper(
     all_ids: &[String],
     cycle_playlist_id: Option<&str>,
     playlists: &[LwgPlaylist],
+    favorite_ids: &[String],
 ) -> String {
-    let candidate_ids: Vec<String> = if let Some(playlist_id) = cycle_playlist_id {
-        let playlist_wallpapers = playlists
-            .iter()
-            .find(|p| p.id == playlist_id)
-            .map(|p| p.wallpaper_ids.clone());
+    use std::collections::HashSet;
 
-        match playlist_wallpapers {
-            Some(ids) if !ids.is_empty() => ids,
-            _ => all_ids.to_vec(),
+    let valid_ids: HashSet<&String> = all_ids.iter().collect();
+
+    let candidate_ids: Vec<String> = if let Some(playlist_id) = cycle_playlist_id {
+        if playlist_id == FAVORITES_PLAYLIST_ID {
+            let valid_favorites: Vec<String> = favorite_ids
+                .iter()
+                .filter(|id| valid_ids.contains(id))
+                .cloned()
+                .collect();
+
+            if valid_favorites.is_empty() {
+                all_ids.to_vec()
+            } else {
+                valid_favorites
+            }
+        } else {
+            let playlist_wallpapers = playlists
+                .iter()
+                .find(|p| p.id == playlist_id)
+                .map(|p| p.wallpaper_ids.clone());
+
+            match playlist_wallpapers {
+                Some(ids) => {
+                    let valid_playlist_ids: Vec<String> = ids
+                        .iter()
+                        .filter(|id| valid_ids.contains(id))
+                        .cloned()
+                        .collect();
+
+                    if valid_playlist_ids.is_empty() {
+                        all_ids.to_vec()
+                    } else {
+                        valid_playlist_ids
+                    }
+                }
+                None => all_ids.to_vec(),
+            }
         }
     } else {
         all_ids.to_vec()
@@ -1739,6 +1773,12 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
         return Err("No wallpapers in cache. Please refresh wallpaper library.".to_string());
     }
 
+    // 步骤 2.5：获取收藏壁纸 ID 列表
+    let favorite_ids = {
+        let fm = state.favorite_manager.lock().await;
+        fm.list()
+    };
+
     // 步骤 3：快速获取当前活跃状态（立刻释放锁）
     let active_state = {
         let controller = state.controller.lock().await;
@@ -1760,6 +1800,7 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
             &all_wallpaper_ids,
             cycle_playlist_id.as_deref(),
             &playlists,
+            &favorite_ids,
         );
         cycled_wallpaper_id = new_wp_id.clone();
 
@@ -1775,6 +1816,7 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
                 &all_wallpaper_ids,
                 cycle_playlist_id.as_deref(),
                 &playlists,
+                &favorite_ids,
             );
             cycled_wallpaper_id = new_wp_id.clone();
             aw.wallpaper_id = new_wp_id;
@@ -2036,6 +2078,9 @@ async fn reorder_playlists(_ordered_ids: Vec<String>) -> Result<(), String> {
 }
 
 /// 设置轮换播放列表
+/// 
+/// 支持的特殊 ID：
+/// - `__favorites__`: 使用收藏壁纸作为轮换源
 #[cfg(target_os = "linux")]
 #[tauri::command]
 async fn set_cycle_playlist(
@@ -2045,13 +2090,15 @@ async fn set_cycle_playlist(
     let mut cm = state.config_manager.lock().await;
 
     if let Some(ref playlist_id) = id {
-        let exists = cm.config()
-            .playlists
-            .iter()
-            .any(|p| &p.id == playlist_id);
+        if playlist_id != FAVORITES_PLAYLIST_ID {
+            let exists = cm.config()
+                .playlists
+                .iter()
+                .any(|p| &p.id == playlist_id);
 
-        if !exists {
-            return Err(format!("Playlist not found: {}", playlist_id));
+            if !exists {
+                return Err(format!("Playlist not found: {}", playlist_id));
+            }
         }
     }
 
