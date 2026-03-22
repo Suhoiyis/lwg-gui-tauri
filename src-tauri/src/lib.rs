@@ -210,7 +210,7 @@ impl From<LwgAppConfig> for AppConfig {
             wayland_ignore_appids: config.wayland_ignore_appids,
             compact_mode: config.compact_mode,
             wallpaper_nicknames: config.wallpaper_nicknames,
-            start_hidden: false,
+            start_hidden: config.start_hidden,
             auto_restore: config.auto_restore,
             playlists: config.playlists.into_iter().map(|p| p.into()).collect(),
             cycle_playlist_id: config.cycle_playlist_id,
@@ -247,6 +247,7 @@ impl From<AppConfig> for LwgAppConfig {
             wayland_ignore_appids: config.wayland_ignore_appids,
             compact_mode: config.compact_mode,
             wallpaper_nicknames: config.wallpaper_nicknames,
+            start_hidden: config.start_hidden,
             auto_restore: config.auto_restore,
             playlists: config.playlists.into_iter().map(|p| p.into()).collect(),
             cycle_playlist_id: config.cycle_playlist_id,
@@ -592,12 +593,50 @@ async fn delete_wallpaper(
         println!("🗑️ [Rust] Deleting wallpaper: {} at path: {}", wallpaper_id, path);
         log_gui(&_state, &format!("Deleting wallpaper: {}", wallpaper_id));
         
-        // Security validation: ensure path contains wallpaper_id
-        if !path.contains(&wallpaper_id) {
-            return Err(format!("Security error: path '{}' does not contain wallpaper_id '{}'", path, wallpaper_id));
+        let wallpaper_path = std::path::Path::new(&path);
+        if !wallpaper_path.exists() {
+            return Err(format!("Wallpaper folder not found: {}", path));
         }
         
-        // Check if wallpaper is currently active, stop it first
+        let workshop_path = {
+            let cm = _state.config_manager.lock().await;
+            cm.config().workshop_path.clone()
+        };
+        
+        let allowed_base = match workshop_path {
+            Some(ref base) => std::path::Path::new(base),
+            None => {
+                return Err("No workshop path configured. Cannot safely delete wallpaper.".to_string());
+            }
+        };
+        
+        let canonical_wallpaper = match std::fs::canonicalize(wallpaper_path) {
+            Ok(p) => p,
+            Err(e) => return Err(format!("Failed to resolve wallpaper path: {:?}", e)),
+        };
+        
+        let canonical_base = match std::fs::canonicalize(allowed_base) {
+            Ok(p) => p,
+            Err(e) => return Err(format!("Failed to resolve workshop path: {:?}", e)),
+        };
+        
+        if !canonical_wallpaper.starts_with(&canonical_base) {
+            return Err(format!(
+                "Security error: path '{}' is outside allowed workshop directory",
+                canonical_wallpaper.display()
+            ));
+        }
+        
+        let path_contains_id = canonical_wallpaper
+            .components()
+            .any(|c| c.as_os_str().to_string_lossy().contains(&wallpaper_id));
+        if !path_contains_id {
+            return Err(format!(
+                "Security error: path '{}' does not contain wallpaper_id as a path component",
+                canonical_wallpaper.display()
+            ));
+        }
+        
         {
             let controller = _state.controller.lock().await;
             let active = controller.get_active_wallpapers().await;
@@ -619,13 +658,7 @@ async fn delete_wallpaper(
             }
         }
         
-        // Delete the folder
-        let wallpaper_path = std::path::Path::new(&path);
-        if !wallpaper_path.exists() {
-            return Err(format!("Wallpaper folder not found: {}", path));
-        }
-        
-        std::fs::remove_dir_all(wallpaper_path)
+        std::fs::remove_dir_all(&canonical_wallpaper)
             .map_err(|e| format!("Failed to delete wallpaper folder: {:?}", e))?;
         
         // Clean up dead IDs from playlists
@@ -1295,24 +1328,17 @@ async fn take_screenshot(
         println!("📸 Screenshot requested for wallpaper: {}", wallpaper_id);
 
 
-        // 创建 ScreenshotManager 并获取配置
         let config = state.config_manager.lock().await.config().clone();
 
-
-        // 获取或生成输出路径（需要分辨率）
         let path = output_path.unwrap_or_else(|| {
             get_default_screenshot_path(&wallpaper_id, &config.screenshot_res, "png")
         });
         println!("📁 Output path: {}", path);
-
-        // 创建 ScreenshotManager (delay 硬编码为 20s)
-        const SCREENSHOT_DELAY: u32 = 10;
-        println!("⚙️ Config: delay={}, res={}, prefer_xvfb={}",
-            SCREENSHOT_DELAY, config.screenshot_res, config.prefer_xvfb);
+        println!("⚙️ Config: res={}, prefer_xvfb={}", config.screenshot_res, config.prefer_xvfb);
+        
         let shared_config = Arc::new(tokio::sync::Mutex::new(config));
         let screenshot_manager = ScreenshotManager::new(shared_config);
 
-        // 启动截图并监控
         println!("🚀 Starting screenshot process...");
         let (mut child, tracker) = screenshot_manager
             .take_screenshot_with_monitor(
@@ -1328,16 +1354,15 @@ async fn take_screenshot(
 
         println!("✅ Process started with PID: {}", child.id());
 
-        // 等待截图完成（timeout = delay + 15 秒）
-        let timeout_secs = (SCREENSHOT_DELAY as u64) + 15;
+        const SCREENSHOT_TIMEOUT_SECS: u64 = 30;
 
-        println!("⏳ Waiting for screenshot (timeout: {}s)...", timeout_secs);
+        println!("⏳ Waiting for screenshot (timeout: {}s)...", SCREENSHOT_TIMEOUT_SECS);
 
         // 获取并校验进程退出状态码
         let status = ScreenshotManager::wait_for_screenshot(
             &mut child,
             &path,
-            timeout_secs,
+            SCREENSHOT_TIMEOUT_SECS,
             Some(state.performance_monitor.clone()),
             Some(&tracker),
         )
