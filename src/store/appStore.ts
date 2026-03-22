@@ -390,10 +390,9 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   isFavorite: (id: string) => get().favoriteIds.has(id),
   setNickname: async (id: string, nickname: string) => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
-    
-    // Optimistic update
-    const newNicknames = { ...get().nicknames };
+    const previousNicknames = get().nicknames;
     const trimmed = nickname.trim().slice(0, 100);
+    const newNicknames = { ...previousNicknames };
     if (trimmed === "") {
       delete newNicknames[id];
     } else {
@@ -404,10 +403,11 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     // Save to backend
     if (isTauri) {
       try {
-        await invoke("set_nickname", { id, nickname });
+        await invoke("set_nickname", { id, nickname: trimmed });
       } catch (error) {
         console.error("Failed to save nickname:", error);
         toast.error("Failed to save nickname");
+        set({ nicknames: previousNicknames });
       }
     }
   },
@@ -735,14 +735,18 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         toast.warning("State saved locally but sync failed");
       }
 
-      // Add to history
-      const wallpaper = get().wallpapers.find(w => w.id === id);
+      const wallpaper = get().wallpapers.find((w) => w.id === id);
       if (wallpaper) {
-        await invoke("add_history", {
-          id: wallpaper.id,
-          title: wallpaper.title,
-          preview: wallpaper.preview
-        });
+        try {
+          await invoke("add_history", {
+            id: wallpaper.id,
+            title: wallpaper.title,
+            preview: wallpaper.preview,
+          });
+        } catch (historyError) {
+          console.error("Failed to add history:", historyError);
+          toast.warning("Wallpaper applied, but failed to save history");
+        }
       }
     } catch (error) {
       // 回滚到之前的状态
@@ -801,6 +805,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     const previousFavorites = get().favoriteIds;
     const previousNicknames = get().nicknames;
     const previousSelectedId = get().selectedId;
+    const previousRuntimeState = get().runtimeState;
     
     // Optimistic update
     const newWallpapers = previousWallpapers.filter((w) => w.id !== id);
@@ -809,12 +814,18 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     const newNicknames = { ...previousNicknames };
     delete newNicknames[id];
     const newSelectedId = previousSelectedId === id ? null : previousSelectedId;
+    const newRuntimeState = Object.fromEntries(
+      Object.entries(previousRuntimeState).filter(
+        ([, aw]) => aw.wallpaperId !== id,
+      ),
+    ) as AppState;
     
     set({
       wallpapers: newWallpapers,
       favoriteIds: newFavorites,
       nicknames: newNicknames,
       selectedId: newSelectedId,
+      runtimeState: newRuntimeState,
     });
     
     // Call backend
@@ -832,6 +843,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
           favoriteIds: previousFavorites,
           nicknames: previousNicknames,
           selectedId: previousSelectedId,
+          runtimeState: previousRuntimeState,
         });
       }
     } else {
@@ -927,7 +939,36 @@ getFilteredWallpapers: () => {
     return wallpapers.find((w) => w.id === selectedId) || null;
   },
 
-  toggleCompactMode: (enabled) => set({ isCompactMode: enabled }),
+  toggleCompactMode: (enabled) => {
+    const previous = get().isCompactMode;
+    set({ isCompactMode: enabled });
+
+    const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    if (isTauri) {
+      const currentSettings = get().settings;
+      if (currentSettings) {
+        const nextSettings = { ...currentSettings, compactMode: enabled };
+        set({ settings: nextSettings });
+
+        invoke<AppConfig>("update_config_value", {
+          key: "compactMode",
+          value: enabled,
+        })
+          .then((result) => {
+            set({ settings: result });
+          })
+          .catch((error) => {
+            set({ isCompactMode: previous, settings: currentSettings });
+            console.error("Failed to save compact mode:", error);
+            toast.error("Failed to save compact mode", {
+              description: String(error),
+            });
+          });
+      }
+    } else {
+      localStorage.setItem("lwg_compact_mode", String(enabled));
+    }
+  },
 
   initializeSelectedWallpaper: () => {
     const { wallpapers, selectedId, selectedScreen, runtimeState } = get();
@@ -1283,13 +1324,15 @@ getFilteredWallpapers: () => {
 
   setCyclePlaylist: async (id: string | null) => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
-    
+    const previousCyclePlaylistId = get().cyclePlaylistId;
+
     set({ cyclePlaylistId: id });
     
     if (isTauri) {
       try {
         await invoke('set_cycle_playlist', { id });
       } catch (error) {
+        set({ cyclePlaylistId: previousCyclePlaylistId });
         console.error('Failed to set cycle playlist:', error);
         toast.error('Failed to set cycle playlist', { description: String(error) });
       }
@@ -1304,11 +1347,16 @@ getFilteredWallpapers: () => {
 
   togglePlaylistSidebar: () => {
     const isTauri = !!(window as any).__TAURI_INTERNALS__;
+    const previousOpen = get().isPlaylistSidebarOpen;
     const newOpen = !get().isPlaylistSidebarOpen;
     set({ isPlaylistSidebarOpen: newOpen });
     
     if (isTauri) {
-      invoke('set_playlist_sidebar_open', { open: newOpen }).catch(console.error);
+      invoke('set_playlist_sidebar_open', { open: newOpen }).catch((error) => {
+        set({ isPlaylistSidebarOpen: previousOpen });
+        console.error('Failed to set playlist sidebar open:', error);
+        toast.error('Failed to toggle sidebar', { description: String(error) });
+      });
     } else {
       localStorage.setItem('lwg_sidebar_open', String(newOpen));
     }

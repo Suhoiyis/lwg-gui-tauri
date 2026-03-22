@@ -956,7 +956,7 @@ async fn toggle_favorite(
 }
 
 // Allowed non-runtime keys for single value updates
-const ALLOWED_KEYS: &[&str] = &["lastScreen", "workshopPath", "assetsPath", "screenshotRes", "preferXvfb", "screenshotDelay", "cycleEnabled", "cycleInterval", "cycleOrder"];
+const ALLOWED_KEYS: &[&str] = &["workshopPath", "assetsPath", "screenshotRes", "preferXvfb", "screenshotDelay", "cycleEnabled", "cycleInterval", "cycleOrder", "compactMode"];
 
 #[tauri::command]
 async fn update_config_value(
@@ -1033,6 +1033,13 @@ async fn update_config_value(
                     lwg_config.cycle_order = s.to_string();
                 } else {
                     return Err("cycleOrder must be a string".to_string());
+                }
+            },
+            "compactMode" => {
+                if let Some(b) = value.as_bool() {
+                    lwg_config.compact_mode = b;
+                } else {
+                    return Err("compactMode must be a boolean".to_string());
                 }
             },
             _ => {
