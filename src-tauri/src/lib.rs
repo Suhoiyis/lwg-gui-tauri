@@ -1718,7 +1718,7 @@ fn select_next_wallpaper(
             use rand::seq::IndexedRandom;
             candidate_ids.choose(&mut rand::rng()).unwrap().clone()
         }
-        "title" | "size" | "type" | "id" => {
+        "id" | _ => {
             let mut sorted = candidate_ids.to_vec();
             sorted.sort();
 
@@ -1732,10 +1732,6 @@ fn select_next_wallpaper(
             };
 
             sorted[next_index].clone()
-        }
-        _ => {
-            use rand::seq::IndexedRandom;
-            candidate_ids.choose(&mut rand::rng()).unwrap().clone()
         }
     }
 }
@@ -1839,7 +1835,9 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
                 is_playing: v.is_playing,
             }))
             .collect();
-        sm.save().ok();
+        if let Err(e) = sm.save() {
+            eprintln!("[ERROR] Failed to save state after cycle: {:?}", e);
+        }
     }
 
     // 步骤 7：执行耗时的进程重启（不持有任何锁！）
@@ -1850,7 +1848,9 @@ async fn trigger_cycle_internal(app: &tauri::AppHandle) -> Result<(), String> {
     }
 
     // 步骤 8：发送事件通知前端（包含壁纸 ID）
-    app.emit("wallpaper-cycled", &cycled_wallpaper_id).ok();
+    if let Err(e) = app.emit("wallpaper-cycled", &cycled_wallpaper_id) {
+        eprintln!("[ERROR] Failed to emit wallpaper-cycled event: {:?}", e);
+    }
 
     // 记录日志
     if let Ok(lm) = state.log_manager.lock() {

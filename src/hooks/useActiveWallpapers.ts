@@ -39,13 +39,10 @@ export function useActiveWallpapers() {
     fetchActiveWallpapers();
 
     const setupListeners = async () => {
-      const unlistenPerf = await listen("performance-update", () => {
-        fetchActiveWallpapers();
-      });
       const unlistenWp = await listen("wallpaper-changed", () => {
         fetchActiveWallpapers();
       });
-      return [unlistenPerf, unlistenWp];
+      return [unlistenWp];
     };
 
     let unlisteners: (() => void)[] = [];

@@ -75,8 +75,7 @@ export const CLAMPING_OPTIONS = [
 
 export const CYCLE_ORDER_OPTIONS = [
   { value: "random", label: "Random" },
-  { value: "title", label: "Title" },
-  { value: "size", label: "Size" },
+  { value: "id", label: "By ID (sequential)" },
 ] as const;
 
 export const RESOLUTION_OPTIONS = [
